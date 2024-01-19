@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="js/RemoveEquipe.js"></script>
+    <title>Gestion rencontre</title>
+  </head>
+  <body>
+    
+      {{ include('header.twig') }}
+
+      <div class="row justify-content-center">
+        <div class="col-3">
+          <form action="ajoutEquipe_traitement.php" method="POST">
+            <div class="form-group">
+              <label for="nomEquipe">Nom de l'équipe</label>
+              <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Nom ex: HBCAT2" />
+            </div>
+            <div class="form-group">
+              <label for="Categorie">Choisir la catégorie</label>
+              <select class="form-control" name="Categorie" id="Categorie">
+              <option value="" disabled selected>Choisir une catégorie...</option>
+              <option value="loisir">Loisir</option>
+                <option value="senior">Senior</option>
+                <option value="U17M">U17M</option>
+                <option value="U17F">U17F</option>
+                <option value="U15M">U15M</option>
+                <option value="U15F">U15F</option>
+                <option value="U13M">U13M</option>
+                <option value="U13F">U13F</option>
+                <option value="U11M">U11M</option>
+                <option value="U11F">U11F</option>
+                <option value="MiniDebutant">MiniDebutant</option>
+                <option value="MiniDebrouillard">MiniDebrouillard</option>
+                <option value="MiniConfirme">MiniConfirme</option>
+              </select>
+            </div>
+      
+            <div class="form-group">
+            
+              <label for="nomEquipe">Choisir le tournoi</label>
+            
+              <select class="form-control form-control-sm" name="IdTournoi" id="Idtournoi">
+            
+                 {% for tournament in ListeDesTournois %}
+                
+            {% if tournament.isArchived == 0 %}
+              <option value="{{ tournament.id }}">{{ tournament.nom }}</option>
+             {% endif %}                 
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="nomEquipe">Choisir le club de l'équipe</label>
+              <select name="idClubs" id="club">
+                {% for club in AfficherClub %}
+                  <option value="{{ club.id }}">{{ club.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <input type="submit" />
+          </form>
+        </div>
+        <div class="col-lg-7"><h5>Choisir un tournoi</h5>
+        {% for tournament in ListeDesTournois %}
+          {% if tournament.isArchived == 0 %}
+          <a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button" aria-disabled="true">{{tournament.nom}}</a>
+          {% endif %}
+          
+        {% endfor %}
+        <br>
+        <span class="badge bg-success">{{AfficherLesEquipes|length}}</span> équipes
+        <table class="table">
+  <thead>
+    <tr>
+      
+      <th scope="col">Nom</th>
+      <th scope="col">Categorie</th>
+      <th scope="col">Changer dans</th>
+      <th scope="col">Action</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+  {% for equipe in AfficherLesEquipes %}
+
+    <tr>
+      
+      <td>
+      <form action="modifierEquipe.php" method="POST">
+      <input type="hidden" value="{{equipe.id}}" name="idEquipe">
+      <input type="hidden" value="{{equipe.tournoi_id}}" name="tournoi_id">
+      <input type="text" value="{{equipe.nom}}" class="form-control" size="1" name="nomEquipe"> 
+      </td>
+      
+     <td>{{ equipe.categorie}}</td>
+      <td> 
+      <select id="categorie" name="categorie" class="form-select">
+      <optgroup label="{{equipe.categorie}}">
+
+      {% for categorie in AfficherLesPoules %}
+      <option value="{{categorie['categorie']}}">{{categorie['categorie']}}</option>
+       {% endfor %}
+      </optgroup>
+      </select>
+      
+        </td>
+      <td>
+      <input class="btn btn-primary" type="submit" value="Modifier">
+      </form>
+      <a href="deleteEquipe.php?idEquipe={{equipe.id}}&idTournoi={{equipe.tournoi_id}}" onclick="return confirm('Voulez-vous vraiment supprimer cette équipe ?')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+      </svg>
+    </a>
+       
+
+</td>
+      
+    </tr>
+   {% endfor %}
+  </tbody>
+</table>
+        
+
+        
+        </div>
+      </div>
+    </div>
+<script>
+$(document).ready(function() {
+    $('#nomEquipe').on('keyup', function() {
+        var inputValue = $(this).val().toLowerCase();
+
+        // Supprimez les espaces et les chiffres du inputValue
+        inputValue = inputValue.replace(/\s*\d+$/, '');
+
+        // Cacher tous les options
+        $('#club option').hide();
+
+        // Afficher uniquement ceux qui correspondent
+        var visibleOptions = $('#club option').filter(function() {
+            return $(this).text().toLowerCase().indexOf(inputValue) !== -1;
+        }).show();
+
+        // Définir la première option visible comme l'option sélectionnée
+        if(visibleOptions.length) {
+            visibleOptions.first().prop('selected', true);
+        }
+    });
+});
+
+
+
+
+
+
+
+   // Lors du chargement de la page
+    $(document).ready(function() {
+        // Récupérer la catégorie précédemment sélectionnée (si elle existe)
+        const savedCategory = localStorage.getItem('savedCategory');
+        if (savedCategory) {
+            $('#Categorie').val(savedCategory);
+        }
+
+      
+
+        // Lors de la soumission du formulaire, sauvegarder la catégorie sélectionnée
+        $('form').on('submit', function() {
+            const selectedCategory = $('#Categorie').val();
+            localStorage.setItem('savedCategory', selectedCategory);
+        });
+    });
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
