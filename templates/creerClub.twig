@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <!-- Inclure la bibliothèque htmx via CDN -->
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+
+    <title>Gestion rencontre</title>
+  </head>
+  <body>
+    
+      {{ include('header.twig') }}
+    <div class="container-fluid">
+      <div class="row">
+      
+        <div class="col-lg-3 offset-2">
+        <h2>Créer un club</h2>
+             <form action="creerClub_traitement.php" method="POST" enctype="multipart/form-data">
+                      <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label" name="nomduclub">Nom du club</label>
+                        <input type="text" class="form-control"  aria-describedby="nomduclub" name="nomduclub">
+                        <div id="nomduclub" class="form-text">Nom du club</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Contact</label>
+                        <input type="mail" class="form-control"  name="contactClub">
+                         <div id="nomduclub" class="form-text"> (optionnel)</div>
+                      </div>
+                      <div class="mb-3">
+                       <input type="file" name="logo" class="form-control" />
+                        <label class="form-check-label" for="exampleCheck1">Choisir un logo</label>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

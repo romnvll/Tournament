@@ -1,0 +1,74 @@
+/* Ajoutez vos couleurs personnalisées */
+.bg-custom-green {
+    background-color: #33FF5E; /* Couleur bleue personnalisée */
+}
+
+.bg-custom-green-dark {
+    background-color: #1d8834; /* Couleur bleue personnalisée */
+}
+
+.bg-custom-pink {
+    background-color: #c230b6; /* Couleur verte personnalisée */
+}
+
+.U17M {
+    background-color: #FFC0C0; 
+}
+.U17F {
+    background-color: #FFDDDD; 
+}
+
+
+.U15M {
+    background-color: #C0C0FF; 
+}
+.U15F {
+    background-color: #B0B0FF; 
+}
+.U13M {
+    background-color: #C0FFC0; 
+}
+.U13F {
+    background-color: #B0FFB0; 
+}
+
+.loisir {
+    background-color: #FFD700; 
+}
+.senior {
+    background-color: #DAA520; 
+}
+.U11M {
+    background-color: #FFA500; 
+}
+.U11F {
+    background-color: #FF8C00; 
+}
+.MiniDebutant {
+    background-color: #DDA0DD; 
+}
+.MiniDebrouillard {
+    background-color: #DA70D6; 
+}
+.MiniConfirme {
+    background-color: #BA55D3; 
+}
+
+
+
+
+input[type='number']{
+    width: 80px;
+} 
+
+.blue-text {
+    color: blue;
+}
+
+.green-text {
+    color: green;
+}
+
+.red-text {
+    color: red;
+}

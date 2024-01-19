@@ -1,0 +1,258 @@
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.8" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <script src="js/RemoveEquipe.js"></script>
+  <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+  <title>Gestion rencontre</title>
+</head>
+
+<body>
+ {% set countVisibleTournois = 0 %}
+{% for tournoi in ListeDesTournois %}
+    {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
+        {% set countVisibleTournois = countVisibleTournois + 1 %}
+    {% endif %}
+{% endfor %}
+
+  <div class="container-lg" >
+    <div class="row">
+      <div class="col-lg-3">
+        <h6>
+         {% if  countVisibleTournois  > 1 %}
+          Tournois
+          {% else %}
+          Tournoi
+          {% endif %}
+        </h6>
+        {% set heureIsVisible = 0 %}
+        {% set visibility = 0 %}
+         {% set IsRankingView = 0 %}
+
+        {% for tournoi in ListeDesTournois %}
+            {% if tournoi.id == idTournoi %}
+               {% if tournoi.isVisible == 1 %}
+                 {% set visibility = 1 %}
+               {% endif %}
+
+               {% if tournoi.IsRankingView == 1 %}
+               
+                 {% set IsRankingView = 1 %}
+               {% endif %}
+
+            {% endif %}
+
+     
+
+ {% if tournoi.heureIsVisible  == 1 %}
+         {% set heureIsVisible = 1 %}
+ {% endif %}
+
+{% if tournoi.isVisible == 1 and tournoi.isArchived == 0  %}
+    {% if tournoi.id == idTournoi %}
+      
+        <a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
+        {% else %}
+        <a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+        {% endif %}
+     {% endif %}
+          
+        {% endfor %}
+      </div>
+   
+      <div class="col-lg-3">
+      {% if visibility == 1 %}
+       {% if idTournoi %}
+        <h3>Suivre une poule?</h3>
+      {% endif %}
+       
+
+        <table class="table  table-borderless">
+
+        {% for poule in afficherLesPoules %}
+
+        <tr>
+        <td>
+        {% if poule.id == IdPoules %}
+        <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="btn btn-success btn-lg"
+          role="button">{{ poule.nom }}</a>
+        {% else %}
+        <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="btn btn-secondary"
+          role="button">{{ poule.nom }}</a>
+        {% endif %}
+          </td>
+          <td>
+          
+          </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+     
+     </table>
+      
+      </div>
+
+     
+
+      <div class="col-lg-3">
+        
+          
+          {% if idTournoi %}
+          {% if visibility == 1 %}
+            <h3>Suivre mon club? </h3>
+            {% for club in listeDesCLubs %}
+            {% if club.id == IdClub %}
+            <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}"
+              class="btn btn-success btn-lg">{{ club.nom }}</a>
+            {% else %}
+            <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}"
+              class="btn btn-secondary">{{ club.nom }}</a>
+            {% endif %}
+            {% endfor %}
+          {% endif %}
+          {% endif %}
+        </div>
+        
+          <div class="col-lg-3">
+          {% if idTournoi %}
+          {% if IdClub %}
+          {% if visibility == 1 %}
+            <h3>Choisir mon équipe</h3>
+          
+          {% endif %}
+          {% endif %}
+            {% for equipes in listeDesEquipesByClubs %}
+           
+            {% if equipes.id == IdEquipe %}
+            <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}"
+              class="btn btn-success btn-lg">{{ equipes.nom }}</a>
+            {% else %}
+            <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}"
+              class="btn btn-secondary">{{ equipes.nom }}</a>
+            {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row mt-3" >
+      <div class="col-lg-4" id="score">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              {% if heureIsVisible == 1 %}<th scope="col">Heure</th> {% endif %}
+              <th scope="col">Terrain</th>
+              <th scope="col " class="text-center">Equipe1</th>
+              <th scope="col" class="w-25 text-center">Score</th>
+              <th scope="col">Equipe2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if IdClub %}
+            {% set rencontres = listeDesRencontreByClubs %}
+            {% endif %}
+            {% if IdEquipe %}
+            {% set rencontres = listeDesEquipesByEquipeId %}
+            {% endif %}
+
+            {% if IdPoules %}
+            {% set rencontres = RencontreByPoule %}
+            {% endif %}
+         
+            {% for equipe in rencontres %}
+           {% if equipe.score1 != 0 or equipe.score2 !=0 %}
+            <tr class="table-success">
+              {% else %}
+            <tr>
+              {% endif %}
+              {% if heureIsVisible == 1 %} <td>{{ equipe.heure_rencontre }}</td> {% endif %}
+              <td>{{ equipe.num_terrain }}</td>
+              <td>
+             
+                <p class="h6 text-end">{{equipe.equipe1_nom}}</p>
+                <div class="text-end"><img src="{{equipe.equipe1_logo}}" class="rounded" alt="{{equipe.equipe1_nom}}"></div>
+                
+              </td>
+               <td class="align-middle text-center">
+            
+                {% if  equipe.score1 > equipe.score2  %}
+               <span class="badge bg-success">{{ equipe.score1 }}</span>-<span class="badge bg-danger">{{ equipe.score2 }} </span>
+                {% elseif equipe.score1 < equipe.score2 %}
+                <span class="badge bg-danger">{{ equipe.score1 }}</span>-<span class="badge bg-success">{{ equipe.score2 }}</span>
+              {% elseif equipe.score1 is same as(equipe.score2) and (equipe.score1 is not null or equipe.score2 is not null) %}
+                 <span class="badge bg-secondary">{{ equipe.score1 }}</span>-<span class="badge bg-secondary">{{ equipe.score2 }}</span>
+                  
+               {% elseif equipe.score1 or equipe.score2 == null %}
+              <span class="badge bg-warning text-dark"> Rencontre à venir</span>
+              {{equipe.score1}}
+                {% endif %}
+
+
+               
+                
+              </td>
+              <td>
+               <p class="h6 text-left">{{equipe.equipe2_nom}}</p>
+               <img src="{{equipe.equipe2_logo}}" class="rounded" alt="{{equipe.equipe2_nom}}">
+              </td>
+             
+              </tr>
+              {% endfor %}
+              </tbody>
+              </table>
+              </div>
+        <div class="col-lg-3">
+       
+         {% if IsRankingView == 1 and IdClub == null %}
+           
+         <table class="table" id="classementTableau">
+  <thead>
+    <tr>
+      <th scope="col">Classement</th>
+      <th scope="col">Equipe</th>
+      <th scope="col">Points</th>
+      <th scope="col">Buts+</th>
+      <th scope="col">Buts-</th>
+      <th scope="col">Buts diff</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+  {% set classement = 0 %}
+  {% for resultat in resultatRencontres %}
+  {% set classement = classement + 1 %}
+    <tr>
+      <th scope="row">{{classement}}</th>
+      <td>{{resultat.nom}}</td>
+      <td>{{resultat.TotalDesPoints}}</td>
+      <td>{{resultat.nombreButsMarque}}</td>
+      <td>{{resultat.nombreButsEncaisse}}</td>
+      <td>{{resultat.DifferenceButs}}</td>
+    </tr>
+  {% endfor %}  
+  </tbody>
+</table>
+
+          {% endif %}
+
+      </div>
+</div>
+            </body>
+            </html>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+<script>
+    setInterval(function() {
+        $('#score').load(location.href + ' #score > *');
+    }, 2000); // 2000 millisecondes = 2 secondes
+
+
+    setInterval(function() {
+        $('#classementTableau').load(location.href + ' #classementTableau > *');
+    }, 2000); // 2000 millisecondes = 2 secondes
+</script>
+
