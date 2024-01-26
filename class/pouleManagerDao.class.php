@@ -110,6 +110,24 @@ class PouleManager {
     return $poules;
 }
 
+public function supprimerPoulesParTournoi(int $idTournoi): void {
+    // Supprimer les relations dans EquipePoule liées aux poules du tournoi
+    $queryDeleteEquipePoule = "DELETE FROM EquipePoule 
+                                WHERE poule_id IN (SELECT id FROM Poules WHERE tournoi_id = :idTournoi)";
+    
+    $stmtDeleteEquipePoule = $this->connexion->prepare($queryDeleteEquipePoule);
+    $stmtDeleteEquipePoule->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmtDeleteEquipePoule->execute();
+
+    // Supprimer les poules du tournoi
+    $queryDeletePoules = "DELETE FROM Poules WHERE tournoi_id = :idTournoi";
+    
+    $stmtDeletePoules = $this->connexion->prepare($queryDeletePoules);
+    $stmtDeletePoules->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmtDeletePoules->execute();
+}
+
+
 
 public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     
