@@ -134,7 +134,7 @@
                     {% if infotournoi.isArchived == 1 %}
 					<div class="row">
 						
-						<a class="btn btn-danger btn-lg" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete">Suppression du tournoi</a>
+<a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\'action est irréversible');">Suppression du tournoi</a>
 						
 					</div>
                     {% endif %}
