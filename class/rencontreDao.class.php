@@ -257,7 +257,7 @@ class RencontreDAO {
                 $params[':score2'] = $equipeScore2;
             }
             else {
-                echo "ici";
+                
                 $query .= " score2 = NULL,";
             }
         
