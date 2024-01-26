@@ -170,6 +170,14 @@ class EquipeDAO {
         return $equipes;
     }
     
+    public function supprimerEquipesParTournoi(int $idTournoi): void {
+        $query = "DELETE FROM Equipes WHERE tournoi_id = :idTournoi";
+        
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    
 
     public function getAllCategorieByIdTournoi(int $idTournoi) :array {
         

@@ -1,170 +1,172 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-   
- 
-
-    <title>Gestion rencontre</title>
-  </head>
-  <body>
-      {{ include('header.twig') }}
-      <div class="row">
-      <div class="col">
-        <h3>Selection du tournoi</h3>
-        {% for tournoi in ListeDesTournois %}
-  <a href="modifierTournoi.php?idTournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
-{% endfor %}
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 
 
+		<title>Gestion rencontre</title>
+	</head>
+	<body>
+		{{ include('header.twig') }}
+		<div class="row">
+			<div class="col">
+				<h3>Selection du tournoi</h3>
+				{% for tournoi in ListeDesTournois %}
+					<a href="modifierTournoi.php?idTournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
+				{% endfor %}
 
 
+			</div>
+			{% if tournoiEnCours != 0 %}
+				<div class="col">
+					<div class="container mt-5">
+						<h2>Modifier Tournoi</h2>
+
+						<form action="modifierTournoi_traitement.php" method="post">
+
+							<input
+							type="hidden" name="idTournoi" value="{{infotournoi.id}}">
+							<!-- Remplacez ID_DU_TOURNOI par l'ID réel du tournoi -->
+
+							<div class="form-group">
+								<label for="nom">Nom:</label>
+								<input type="text" class="form-control" id="nom" name="nom" value="{{infotournoi.nom}}" readonly>
+							</div>
+
+							<div class="form-group">
+								<label for="nb_terrains">Nombre de terrains:</label>
+								<input type="number" class="form-control" id="nb_terrains" name="nb_terrains" value="{{infotournoi.nb_terrains}}" required>
+							</div>
+
+							<div class="form-group">
+								<label for="heure_debut">Heure de début:</label>
+								<input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{infotournoi.heure_debut}}">
+							</div>
+
+							<div class="form-group">
+								<label for="pasHoraire">Pas Horaire:</label>
+								<input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{infotournoi.pasHoraire}}">
+							</div>
 
 
-      </div>
-{% if tournoiEnCours != 0 %}
-        <div class="col">
-        <div class="container mt-5">
-    <h2>Modifier Tournoi</h2>
-  
-    <form action="modifierTournoi_traitement.php" method="post">
-        
-        <input type="hidden" name="idTournoi" value="{{infotournoi.id}}"> <!-- Remplacez ID_DU_TOURNOI par l'ID réel du tournoi -->
-
-        <div class="form-group">
-            <label for="nom">Nom:</label>
-            <input type="text" class="form-control" id="nom" name="nom" value="{{infotournoi.nom}}" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="nb_terrains">Nombre de terrains:</label>
-            <input type="number" class="form-control" id="nb_terrains" name="nb_terrains" value="{{infotournoi.nb_terrains}}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="heure_debut">Heure de début:</label>
-            <input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{infotournoi.heure_debut}}" >
-        </div>
-
-        <div class="form-group">
-            <label for="pasHoraire">Pas Horaire:</label>
-            <input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{infotournoi.pasHoraire}}">
-        </div>
-
-   
-
-        <div class="form-group">
-            <label for="heure_fin">Heure de fin:</label>
-            <input type="time" class="form-control" id="heure_fin" name="heure_fin" value="{{infotournoi.heure_fin}}" min="06:00" max="23:59" >
-        </div>
+							<div class="form-group">
+								<label for="heure_fin">Heure de fin:</label>
+								<input type="time" class="form-control" id="heure_fin" name="heure_fin" value="{{infotournoi.heure_fin}}" min="06:00" max="23:59">
+							</div>
 
 
-              {% if infotournoi.isArchived == 1 %}
-                    {% set isArchived = 'checked' %}
-                    {% else %}
-                      {% set isArchived = '' %}
-                {%  endif %}
+							{% if infotournoi.isArchived == 1 %}
+								{% set isArchived = 'checked' %}
+							{% else %}
+								{% set isArchived = '' %}
+							{%  endif %}
 
 
-                 {% if infotournoi.isVisible == 1 %}
-                    {% set isVisible = 'checked' %}
-                    {% else %}
-                      {% set isVisible = '' %}
-                {%  endif %}
+							{% if infotournoi.isVisible == 1 %}
+								{% set isVisible = 'checked' %}
+							{% else %}
+								{% set isVisible = '' %}
+							{%  endif %}
 
-                {% if infotournoi.heureIsVisible == 1 %}
-                    {% set heureIsVisible = 'checked' %}
-                    {% else %}
-                      {% set heureIsVisible = '' %}
-                {%  endif %}
-             
-                
-                {% if infotournoi.IsRankingView == 1 %}
-                    {% set IsRankingView = 'checked' %}
-                    {% else %}
-                      {% set IsRankingView = '' %}
-                {%  endif %}
+							{% if infotournoi.heureIsVisible == 1 %}
+								{% set heureIsVisible = 'checked' %}
+							{% else %}
+								{% set heureIsVisible = '' %}
+							{%  endif %}
 
 
-         <div class="form-group">
-                                 
-           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }}>
-            <label class="form-check-label" for="mySwitch">Tournoi visible du Publique ? (n'affecte pas les tables)</label>
-        </div>   
-
-         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="isArchived" name="heureIsVisible" value="{{infotournoi.heureIsVisible}}" {{ heureIsVisible }}>
-            <label class="form-check-label" for="mySwitch">Horaires visible du Publique ?</label>
-        </div>    
-
-            <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="{{infotournoi.IsRankingView}}" {{ IsRankingView }}>
-            <label class="form-check-label" for="mySwitch">Classement visible du publique ?</label>
-        </div>        
-
-     <div class="form-check form-switch">
-         <input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="{{infotournoi.isArchived}}" {{ isArchived }}>
-         <label class="form-check-label" for="mySwitch">On archive le tournoi?</label>
-    </div>
-
-        </div>
+							{% if infotournoi.IsRankingView == 1 %}
+								{% set IsRankingView = 'checked' %}
+							{% else %}
+								{% set IsRankingView = '' %}
+							{%  endif %}
 
 
-        <button type="submit" class="btn btn-primary">Modifier</button>
+							<div class="form-group">
 
-    </form>
-</div>
-        </div>
-   <div class="col">
-    <div class="row">
-    Pour les coachs:
-              <a  href="GenerateQrCode.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">QRCODE Publique</a>
-    </div>
-    <div class="row">
-    Pour les tables:
-    
-    
-    {% for i in 1.. infotournoi.nb_terrains %}
-                      <a  href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{i}}" class="btn btn-primary">QRCODE table {{i}}</a><br>
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }}>
+									<label class="form-check-label" for="mySwitch">Tournoi visible du Publique ? (n'affecte pas les tables)</label>
+								</div>
 
-{% endfor %}
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="isArchived" name="heureIsVisible" value="{{infotournoi.heureIsVisible}}" {{ heureIsVisible }}>
+									<label class="form-check-label" for="mySwitch">Horaires visible du Publique ?</label>
+								</div>
 
-    </div>
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="{{infotournoi.IsRankingView}}" {{ IsRankingView }}>
+									<label class="form-check-label" for="mySwitch">Classement visible du publique ?</label>
+								</div>
 
-      </div>
-     
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="{{infotournoi.isArchived}}" {{ isArchived }}>
+									<label class="form-check-label" for="mySwitch">On archive le tournoi?</label>
+								</div>
 
-   
-
-      {% endif %}
+							</div>
 
 
-      <script>
-      // Récupération des éléments HTML
+							<button type="submit" class="btn btn-primary">Modifier</button>
+
+						</form>
+					</div>
+				</div>
+				<div class="col">
+					<div class="row">
+						Pour les coachs:
+						<a href="GenerateQrCode.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">QRCODE Publique</a>
+					</div>
+					<div class="row">
+						Pour les tables:
+
+
+						{% for i in 1.. infotournoi.nb_terrains %}
+							<a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{i}}" class="btn btn-primary">QRCODE table
+								{{i}}</a><br>
+
+						{% endfor %}
+
+					</div>
+
+                    {% if infotournoi.isArchived == 1 %}
+					<div class="row">
+						
+						<a class="btn btn-danger btn-lg" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete">Suppression du tournoi</a>
+						
+					</div>
+                    {% endif %}
+                </div>
+				{% endif %}
+
+
+				<script>
+					// Récupération des éléments HTML
 const heureFinInput = document.getElementById('heure_fin');
 const pasHoraireInput = document.getElementById('pasHoraire');
 
 // Fonction pour arrondir à l'heure la plus proche multiple du pas horaire
 function roundToMultiple(time, multiple) {
-    const timeValue = new Date(`2000-01-01T${time}`);
-    const minutes = timeValue.getMinutes();
-    const roundedMinutes = Math.round(minutes / multiple) * multiple;
-    timeValue.setMinutes(roundedMinutes);
-    return timeValue.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const timeValue = new Date(`2000-01-01T${time}`);
+const minutes = timeValue.getMinutes();
+const roundedMinutes = Math.round(minutes / multiple) * multiple;
+timeValue.setMinutes(roundedMinutes);
+return timeValue.toLocaleTimeString([], {
+hour: '2-digit',
+minute: '2-digit'
+});
 }
 
 // Fonction pour mettre à jour l'heure de fin en fonction du pas horaire
 function updateHeureFin() {
-    const pasHoraireValue = parseInt(pasHoraireInput.value, 10);
-    const heureFinValue = heureFinInput.value;
-    heureFinInput.value = roundToMultiple(heureFinValue, pasHoraireValue);
+const pasHoraireValue = parseInt(pasHoraireInput.value, 10);
+const heureFinValue = heureFinInput.value;
+heureFinInput.value = roundToMultiple(heureFinValue, pasHoraireValue);
 }
 
 // Écoute des changements dans le champ Pas Horaire
 pasHoraireInput.addEventListener('input', updateHeureFin);
 heureFinInput.addEventListener('input', updateHeureFin);
-
-</script>
+				</script>

@@ -182,6 +182,13 @@ class RencontreDAO {
         }
     }
     
+    public function supprimerRencontresParTournoi(int $idtournoi): void {
+        $query = "DELETE FROM Rencontres WHERE tournoi_id = :idtournoi";
+        
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':idtournoi', $idtournoi, PDO::PARAM_INT);
+        $stmt->execute();
+    }
     
 
         public function getRencontreByPoule($pouleid) {
