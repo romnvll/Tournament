@@ -23,6 +23,7 @@ $rencontreDao = new RencontreDAO();
 $rencontreDao->supprimerRencontresParTournoi($tournoi);
 
 $pouleDao = new PouleManager();
+
 $pouleDao->supprimerPoulesParTournoi($tournoi);
 
 $equipeDao = new EquipeDAO();
@@ -30,6 +31,8 @@ $equipeDao->supprimerEquipesParTournoi($tournoi);
 
 
 $tournoiDao->supprimerTournoi($tournoi);
+
+header("Location: " . $_SERVER['HTTP_REFERER']);
 }
 
 
