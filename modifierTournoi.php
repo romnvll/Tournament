@@ -32,6 +32,9 @@ $idtournoi = 0;
 }
 else {
     $idtournoi = $_GET['idTournoi'];
+    session_start();
+    $_SESSION['tournoiDefaut'] = $_GET['idTournoi'];
+
 }
 
 $template = $twig->load('modifierTournoi.twig');
@@ -40,7 +43,7 @@ $template = $twig->load('modifierTournoi.twig');
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionTournois',
-    'infotournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
+  'infotournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
   'tournoiEnCours' => $idtournoi,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 'AfficherClub' => $listeClub->afficherClubs(),
