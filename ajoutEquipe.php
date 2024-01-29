@@ -30,6 +30,7 @@ $listeDesEquipes= new EquipeDAO();
 $template = $twig->load('ajoutEquipe.twig');
 
 
+
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEncours' => 'ajoutEquipe',

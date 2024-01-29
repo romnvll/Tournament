@@ -46,12 +46,29 @@ if (isset ($_SESSION['message'])) {
 }
 
 
+//on recupere l'id du tournoi
+if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
+    // Utilisez parse_url pour obtenir les composants de l'URL
+    $refererUrl = parse_url($_SERVER['HTTP_REFERER']);
+  
+    // Utilisez parse_str pour extraire les paramètres de la chaîne de requête
+    parse_str($refererUrl['query'], $params);
+  
+    // Vérifiez si idTournoi est défini dans les paramètres
+    if (isset($params['idTournoi'])) {
+        $idtournoi = $params['idTournoi'];
+        
+        // Maintenant, $idtournoi contient la valeur passée dans la requête précédente
+    }
+  }
+//
+
 
 $template = $twig->load('modifierPoules.twig');
 echo $template->render([
     'email' => $_COOKIE['email'],
     'pageEnCours' => 'GestionDesPoules',
-    
+    'tournoiEnCours' => $idtournoi,
     'poules' => $poulesEtNombreEquipe,
    
     'ListeDesTournois' => $tournois->afficherLesTournois(),
