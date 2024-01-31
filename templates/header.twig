@@ -1,131 +1,126 @@
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
-<!-- JavaScript de Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-   
+
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
-  <div class="container container-fluid">
-   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-   <span class="navbar-toggler-icon"></span>
-</button>
+	<div class="container container-fluid">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
- 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 ">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href=".">Vu Coach</a>
-        </li>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 ">
+				<li class="nav-item">
+					<a class="nav-link" aria-current="page" href=".">Vu Coach</a>
+				</li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionClub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des clubs</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item" href="creerClub.php">1 - Creer un club</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="modifierClub.php">2 - Modifier un club</a>
-            </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </li>
-          </ul>
-        </li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestionclub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des clubs</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li>
+							<a class="dropdown-item" href="creerClub.php">1 - Creer un club</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="modifierClub.php">2 - Modifier un club</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider"/>
+						</li>
+						<li>
+							<a class="dropdown-item" href="#">Something else here</a>
+						</li>
+					</ul>
+				</li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if pageEnCours == "GestionTournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des tournois</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="modifierTournoi.php?idTournoi=0">2 - Modifier un tournoi</a>
-            </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-          </ul>
-        </li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle {% if pageEnCours == " gestiontournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des tournois</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li>
+							<a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="modifierTournoi.php?idTournoi=0">2 - Modifier un tournoi</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider"/>
+						</li>
+					</ul>
+				</li>
 
-        <li class="nav-item">
-         <a class="nav-link {% if pageEncours == "ajoutEquipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1">Gestion équipes</a>
-      </li>
+				<li class="nav-item">
+					<a class="nav-link {% if pageEncours == " ajoutequipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1">Gestion équipes</a>
+				</li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesPoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des poules</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item" href="gestionPoules.php?id_tournoi=0">1 - Générer automatiquement</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="modifierPoules.php">2 - Retoucher les poules</a>
-            </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-          </ul>
-        </li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondespoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des poules</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li>
+							<a class="dropdown-item" href="gestionPoules.php?id_tournoi=0">1 - Générer automatiquement</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="modifierPoules.php">2 - Retoucher les poules</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider"/>
+						</li>
+					</ul>
+				</li>
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesRencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des rencontres</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">1 - Création des rencontres</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="RepartitionDesTours.php">2 - Placer les rencontres</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">3 - Insérer les scores par poules</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi=0">4 - Insérer les scores par terrain</a>
-            </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-             <li>
-              <a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase=0">Gestion des phases finales</a>
-            </li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondesrencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des rencontres</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">1 - Création des rencontres</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="RepartitionDesTours.php">2a - Placer les rencontres</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="RepartitionDesRencontresSurTerrainAuto.php?id_tournoi=0">2b - Placer les rencontres auto</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">3 - Insérer les scores par poules</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi=0">4 - Insérer les scores par terrain</a>
+						</li>
+						<li>
+							<hr class="dropdown-divider"/>
+						</li>
+						<li>
+							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi=0">Suppressions des rencontres</a>
+						</li>
+					</ul>
+				</li>
 
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li>
-              <a class="dropdown-item" href="suppressionRencontres.php?id_tournoi=0">Suppressions des rencontres</a>
-            </li>
-          </ul>
-        </li>
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item dropdown">
+						<a href="#" class="nav-link dropdown-toggle {% if pageEnCours == " stats" %} active {% endif %}" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+							<span class="fa fa-chart-line"></span>Statistiques</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="statsByClubs.php?id_tournoi=0">
+									<span class="fa fa-people-arrows"></span>Par club</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
 
-        
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-              <a href="#" class="nav-link dropdown-toggle {% if pageEnCours == "Stats" %} active {% endif %}" data-bs-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-chart-line"></span>Statistiques</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="statsByClubs.php?id_tournoi=0"><span class="fa fa-people-arrows"></span>Par club</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        
-      </ul>
-      <div class="d-flex">
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false"><span class="fa fa-user"></span>{{email}}</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="Auth/logout.php?logout"><span class="fa fa-sign-out-alt"></span>Logout</a>
-                </li>
-                
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+				<div class="d-flex mr-auto">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item dropdown">
+							<a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+								<span class="fa fa-user"></span>
+								{{email}}</a>
+							<ul class="dropdown-menu">
+								<li>
+									<a class="dropdown-item" href="Auth/logout.php?logout">
+										<span class="fa fa-sign-out-alt"></span>Logout</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</ul>
+		</div>
+	</div>
 </nav>
