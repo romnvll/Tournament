@@ -220,7 +220,7 @@ if (!isset($_GET['id_tournoi'])) {
 
                 $table .= '</select>';
                 if (!empty($selectedValue)) {
-                    $table .= ' <a href="deleteRencontre.php?idRencontre=' . explode("-ID", $selectedValue)[1] . '"><img src="img/trash.svg" alt="Supprimer la programmation"></a>'; // Ajoute l'icône de poubelle à côté du select
+                    $table .= ' <a class="link-danger" href="deleteRencontre.php?idRencontre=' . explode("-ID", $selectedValue)[1] . '"><i class="fa-regular fa-calendar-minus" title="Déprogrammer la rencontre"></i></a>'; // Ajoute l'icône de poubelle à côté du select
                 }
 
                 $table .= '</td>';
