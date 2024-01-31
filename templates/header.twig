@@ -1,7 +1,6 @@
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/0315b9fc45.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
 	<div class="container container-fluid">
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -10,11 +9,11 @@
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav me-auto mb-2 ">
 				<li class="nav-item">
-					<a class="nav-link" aria-current="page" href=".">Vu Coach</a>
+					<a class="nav-link d-flex align-items-center" aria-current="page" href="."><i class="fa-solid fa-binoculars"></i></a>
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestionclub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des clubs</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestionclub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-city"></i>Gestion des clubs</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="creerClub.php">1 - Creer un club</a>
@@ -32,7 +31,7 @@
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle {% if pageEnCours == " gestiontournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des tournois</a>
+					<a class="nav-link dropdown-toggle {% if pageEnCours == " gestiontournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-trophy"></i>Gestion des tournois</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
@@ -47,11 +46,11 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link {% if pageEncours == " ajoutequipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1">Gestion équipes</a>
+					<a class="nav-link d-flex align-items-center {% if pageEncours == " ajoutequipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1" title="Gestion des équipes"><span class="fa-solid fa-people-group"></span>Equipes</a>
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondespoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des poules</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondespoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-table-list"></i>Gestion des poules</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="gestionPoules.php?id_tournoi=0">1 - Générer automatiquement</a>
@@ -66,7 +65,7 @@
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondesrencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestion des rencontres</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondesrencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">1 - Création des rencontres</a>
