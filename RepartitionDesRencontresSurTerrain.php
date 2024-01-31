@@ -62,7 +62,7 @@ foreach ($rencontres as $rencontre) {
 
 // Fonction de tri pour trier les tours en fonction de l'ordre des catégories et du numéro du tour
 function triTours($a, $b) {
-    $ordreCategories = ['U17', 'U15', 'U13', 'U13'];
+    $ordreCategories = ['loisir','U17', 'U15', 'U13', 'U13'];
 
     // Extraire la catégorie et le numéro du tour de la clé
     preg_match('/tour(\d+)-.*-(U\d+).*/', $a, $matchesA);
