@@ -90,7 +90,7 @@ public function getCategoriesPourTournoi(int $idTournoi) {
     // Requête pour récupérer les catégories distinctes pour un tournoi spécifié
     $query = "SELECT DISTINCT p.categorie 
               FROM Poules p
-              WHERE p.tournoi_id = :idTournoi";
+              WHERE p.tournoi_id = :idTournoi and is_classement=0";
 
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);

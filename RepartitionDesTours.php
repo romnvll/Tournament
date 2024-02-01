@@ -199,7 +199,7 @@ if (!isset($_GET['id_tournoi'])) {
 
                 foreach ($rencontresOrganisees as $key => $rencontres) {
                     foreach ($rencontres as $rencontre) {
-
+                        
                         // $value = explode('-', $key)[0] . "-" . $rencontre['equipe1_categorie'] . "-ID" . $rencontre['rencontre_id'];
                         $value = "tour" . $rencontre['tour'] . "-" . $rencontre['equipe1_categorie'] . "-ID" . $rencontre['rencontre_id'];
 
