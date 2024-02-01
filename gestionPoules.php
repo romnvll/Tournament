@@ -27,7 +27,11 @@ $afficheCategorie = new EquipeDAO();
 $poules = new PouleManager();
 
 
-//to DO
+if (isset ($_GET['NbrEquipeParPoule'])) {
+ $nbrEquipeEnCours = $_GET['NbrEquipeParPoule'];
+}
+
+
 // si la poule existe l'indiquer sur cette page
 $nomTournoi=$tournois->getTournoiById($_GET['id_tournoi'])['nom'];
 
@@ -53,6 +57,7 @@ echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionDesPoules',
   'tournoiEnCours' => $idtournoi,
+  'nbrEquipeEnCours' => $nbrEquipeEnCours,
     'poules' => $poules->getAllPoulesByTournoi($_GET['id_tournoi']),
     'poulesverif' => $poules->getAllPoulesByTournoi($_GET['id_tournoi']),
     'nomDuTournoi' => $nomTournoi,
