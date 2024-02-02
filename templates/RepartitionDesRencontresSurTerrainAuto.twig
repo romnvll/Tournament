@@ -36,7 +36,12 @@
 			</div>
 
 			<div class="row">
-				
+			
+			{% if idTournoi == 0 %}
+				<div class="col-lg-3">
+				<h2>Il faut selectionner un tournoi</h2>
+				</div>
+			{% else %}
 				<div class="col-lg-3">
 					<h2>Assigner une categorie à un terrain?</h2>
                 <form action="repartionDesRencontreSurTerrainAuto_traitement.php" method="get">
@@ -56,3 +61,4 @@
                 </form>
 				</div>
 			</div>
+			{% endif %}
