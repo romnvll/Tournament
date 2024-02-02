@@ -35,28 +35,27 @@ $heure_debut_sec = $h * 3600 + $m * 60;
 $heures_debut_terrains = array_fill(1, $nbrTerrain, $heure_debut_sec);
 
 // Parcourir le tableau $rencontres et attribuer un terrain et une heure à chaque rencontre
-// Créer une copie du tableau $rencontres
-$rencontres_initial = $rencontres;
-
 foreach ($rencontres as &$rencontre) {
+   
+    
     for ($i = 1; $i <= $nbrTerrain; $i++) {
-        $terrainKey = 'terrain' . $i;
-        if ($_GET[$terrainKey] == $rencontre['equipe1_categorie'] || $_GET[$terrainKey] == $rencontre['equipe2_categorie']) {
-            // Vérifier si 'terrain' et 'heure' sont vides ou null avant de modifier la rencontre
-            if (empty($rencontre['terrain']) && empty($rencontre['heure'])) {
-                $rencontre['terrain'] = $i;
+        // Vérifier si 'terrain' et 'heure' sont vides ou null avant de modifier la rencontre
+        if (empty($rencontre['terrain']) && empty($rencontre['heure'])) {
+            $rencontre['terrain'] = $i;
 
-                // Convertir l'heure de début du terrain en format hh:mm
-                $heure = gmdate('H:i', $heures_debut_terrains[$i]);
-                
-                // Attribuer l'heure à la rencontre
-                $rencontre['heure'] = $heure;
-                
-                // Ajouter le pas horaire à l'heure de début du terrain (en secondes)
-                $heures_debut_terrains[$i] += $pasHoraire * 60;
-
-                $rencontreDao->modifierRencontre($rencontre['id'],null,null,$rencontre['terrain'],$rencontre['heure'],null,$_GET['id_tournoi']);
-            }
+            // Convertir l'heure de début du terrain en format hh:mm
+            $heure = gmdate('H:i', $heures_debut_terrains[$i]);
+            
+            // Attribuer l'heure à la rencontre
+            $rencontre['heure'] = $heure;
+            
+            // Ajouter le pas horaire à l'heure de début du terrain (en secondes)
+            $heures_debut_terrains[$i] += $pasHoraire * 60;
+           // echo $heure . "<br> " . $rencontre['terrain'];
+            $rencontreDao->modifierRencontre($rencontre['id'],null,null,$rencontre['terrain'],$rencontre['heure'],null,$_GET['id_tournoi']);
+            echo $rencontre['heure'] . "-". $rencontre['id'] . "-" . $rencontre['terrain'] . "<br>" ;
+            // Une fois qu'un terrain et une heure ont été attribués à la rencontre, sortir de la boucle
+            //break;
         }
     }
 }
