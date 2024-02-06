@@ -110,7 +110,7 @@
                                                      <input type="hidden" value="{{rencontre.rencontre_id}}" name="IdRencontre" id="IdRencontre">
                                                     <td scope="row">
                                                     <input class="form-control " type="time" name="heure" data-rencontre-id="{{ rencontre.rencontre_id }}" value="{{ rencontre.heure_rencontre }}" id="heure-{{rencontre.rencontre_id}}" size="8" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']" />
-                                                   
+                                                   <p class="status"></p>
                                                     
                                                                                             
 
@@ -169,7 +169,31 @@
 
   </body>
 
+<script>
+$(document).ready(function() {
+    var checkScores = function() {
+        $('input[name="equipeScore1"], input[name="equipeScore2"]').each(function() {
+            var equipeScore1 = $(this).closest('tr').find('input[name="equipeScore1"]').val();
+            var equipeScore2 = $(this).closest('tr').find('input[name="equipeScore2"]').val();
 
+            if (equipeScore1 !== "" && equipeScore2 !== "") {
+                $(this).closest('tr').find('.status').html('Rencontre terminée').css('color', 'red');
+                //$(this).closest('tr').css('background-color', 'gray');
+            } else {
+                $(this).closest('tr').find('.status').html('');
+            }
+        });
+    };
+
+    // Exécutez la fonction au chargement de la page
+    checkScores();
+
+    // Exécutez la fonction lorsque les champs sont modifiés
+    $('input[name="equipeScore1"], input[name="equipeScore2"]').on('change', checkScores);
+});
+
+
+</script>
 
 
 

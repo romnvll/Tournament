@@ -42,8 +42,13 @@
                    {% if pouleEnCours == poule.id %}
                       {% set btnClass = "btn btn-danger" %}
                    {% endif %}
-            <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
-                     
+                  
+            {% if not isRencontreCreated %}
+            <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a> 
+            {% else %}  
+            <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a> 
+
+            {% endif %}       
 
           {% endfor %}
         </div>
