@@ -41,6 +41,7 @@ if (isset ($_GET['idPoule'])) {
 $template = $twig->load('GestionRencontres.twig');
 echo $template->render([
   'email' => $_COOKIE['email'],
+  'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
   'pageEnCours' => 'GestionDesRencontres',
   //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
   'afficherLesTournois' => $tournoi->afficherLesTournois(),

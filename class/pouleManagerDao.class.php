@@ -45,6 +45,19 @@ class PouleManager {
     }
 
 
+    public function checkRencontresInPoule($idPoule) {
+        $query = "SELECT COUNT(*) as count FROM Rencontres r
+                  JOIN EquipePoule ep ON r.equipe1_id = ep.equipe_id OR r.equipe2_id = ep.equipe_id
+                  WHERE ep.poule_id = :id and r.isClassement = 0";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':id', $idPoule);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['count'] / 2 > 0;
+    }
+    
+
+
     public function supprimerLienEquipePoule($equipeId, $pouleId) {
         $query = "DELETE FROM EquipePoule WHERE equipe_id = :equipeId AND poule_id = :pouleId";
 
