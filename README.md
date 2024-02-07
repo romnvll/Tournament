@@ -20,4 +20,6 @@ Ce projet a été réalisé dans le but d'aider le club de handball local à gé
    
 Dans la base de données, il faut se creer un compte dans la table Clubs avec un email et un mot de passe codé avec sha256.
 
+Version php 8.1 minimum
+
 Pour commencer la configuration des tournois, entrez dans la partie admin http://ip/Tournament/Auth/
