@@ -210,17 +210,21 @@ if (!isset($_GET['id_tournoi'])) {
                             // $displayText = $value;
                             $displayText = "tour" . $rencontre['tour'] . "-" . $rencontre['equipe1_categorie'] . '-' . $rencontre['equipe1_nom'] . '-' . $rencontre['equipe2_nom'];
                         } elseif (isset($rencontre['isClassement']) && $rencontre['isClassement'] == 1) {
-                            $displayText = "PF-tour" . $rencontre['tour'] . "-" . $rencontre['equipe1_categorie'] . '-' . $rencontre['equipe1_nom'] . '-' . $rencontre['equipe2_nom'];
+                            $displayText = "PF-tour" . $rencontre['tour'] . "-" . $rencontre['equipe1_categorie'] . '-' . $rencontre['equipe1_nom'] . '-' . $rencontre['equipe2_nom'] . '-' . $rencontre['equipe1_poule_nom'];
                         }
 
 
                         $table .= '<option ' . $selected . ' value="' . $value . '">' . $displayText . '</option>';
+                       
                     }
+                    
                 }
 
                 $table .= '</select>';
+                
                 if (!empty($selectedValue)) {
                     $table .= ' <a class="link-danger" href="deleteRencontre.php?idRencontre=' . explode("-ID", $selectedValue)[1] . '"><i class="fa-regular fa-calendar-minus" title="Déprogrammer la rencontre"></i></a>'; // Ajoute l'icône de poubelle à côté du select
+                   
                 }
 
                 $table .= '</td>';
