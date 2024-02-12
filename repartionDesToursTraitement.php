@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 if ($idRencontre != "") {
                     //echo "Terrain: $terrain, Heure: $heure, ID de la rencontre: $idRencontre<br>";
-                    $rencontreDao->modifierRencontre($idRencontre,null,null,$terrain,$heure,null,$_SESSION['id_tournoi']);
+                    $rencontreDao->modifierRencontre($idRencontre,9999,9999,$terrain,$heure,"dontTouch",$_SESSION['id_tournoi']);
 
                 }
             }
@@ -32,5 +32,5 @@ $referer = $_SERVER['HTTP_REFERER'];
 }
 
 header("Location: $referer");
-echo $referer;
+//echo $referer;
 ?>

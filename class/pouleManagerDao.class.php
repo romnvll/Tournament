@@ -104,6 +104,7 @@ class PouleManager {
 
 
     public function getPoulesByEquipeId($equipeId) {
+    
     // Requête pour obtenir les poules associées à une équipe spécifique
     $query = "SELECT Poules.* FROM Poules 
               JOIN EquipePoule ON Poules.id = EquipePoule.poule_id 

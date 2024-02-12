@@ -12,8 +12,7 @@ $twig = new \Twig\Environment($loader, [
   'debug' => true,
 
 ]);
-$url1=$_SERVER['REQUEST_URI'];
-//header("Refresh: 3; URL=$url1");
+
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 $template = $twig->load('index.twig');
 $rencontre = new RencontreDAO();
@@ -23,7 +22,14 @@ $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
 $listeDesTournois = $tournoiDao->afficherLesTournois();
 
-$listePoules = $poulemanager->getAllPoulesByTournoi($_GET['id_tournoi']);
+if (isset ($_GET['id_equipe'])) {
+$listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
+}
+
+else {
+
+  $listePoulesParEquipe = null;
+}
 
 
 if (isset ($_GET['id_club'])) {
@@ -58,6 +64,10 @@ if (isset ($_GET['id_tournoi'])) {
 
 }
 
+else {
+  $listeClubsParticipants=null;
+}
+
 if (isset ($_GET['idPoule'])) {
 $idPoule = $_GET['idPoule'];
 }
@@ -70,11 +80,15 @@ if (isset ($_GET['idPoule'])) {
 
  }
 
+ else {
+  $GetResultatDesPoules = null;
+ }
+
 
 
 echo $template->render([
     'ListeDesTournois' => $listeDesTournois,
-    'afficherLesPoules' => $listePoules ,
+    'afficherLesPoules' => $listePoulesParEquipe ,
     'idTournoi'=> $_SESSION['idTournoi'],
     'RencontreByPoule' => $rencontre->getRencontreByPoule($idPoule),
     'IdPoules' => $idPoule,

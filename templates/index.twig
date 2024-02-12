@@ -19,19 +19,20 @@
 
 		{% if countVisibleTournois == 0 %}
 
-	<div class="container-fluid">
-    <div class="jumbotron text-white shadow">
-     
-      <img src="https://hbcat.fr/wp-content/uploads/2022/08/Logo-hbcat-512x512-1-e1664005082207.png" class="rounded mx-auto d-block img-fluid">
-    </div>
-     <h2 class="mb-4 ml-2">
-        Aucun tournoi pour le moment
-      </h2>
-      <p class="mb-4">
-        Séduit par notre logiciel de gestion des tournois? <br>Contactez le club de HandBall d'Auffay, il est gratuit!
-      </p>
+			<div class="container-fluid">
+				<div class="jumbotron text-white shadow">
 
-  </div>
+					<img src="https://hbcat.fr/wp-content/uploads/2022/08/Logo-hbcat-512x512-1-e1664005082207.png" class="rounded mx-auto d-block img-fluid">
+				</div>
+				<h2 class="mb-4 ml-2">
+					Aucun tournoi pour le moment
+				</h2>
+				<p class="mb-4">
+					Séduit par notre logiciel de gestion des tournois?
+					<br>Contactez le club de HandBall d'Auffay, il est gratuit!
+				</p>
+
+			</div>
 		{% else %}
 
 
@@ -79,41 +80,13 @@
 						{% endfor %}
 					</div>
 
-					<div class="col-lg-3">
-						{% if visibility == 1 %}
-							{% if idTournoi %}
-								<h3>Suivre une poule?</h3>
-							{% endif %}
-
-
-							<table class="table  table-borderless">
-
-								{% for poule in afficherLesPoules %}
-
-									<tr>
-										<td>
-											{% if poule.id == IdPoules %}
-												<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="btn btn-success btn-lg" role="button">{{ poule.nom }}</a>
-											{% else %}
-												<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="btn btn-secondary" role="button">{{ poule.nom }}</a>
-											{% endif %}
-										</td>
-										<td></td>
-									</tr>
-								{% endfor %}
-							{% endif %}
-
-						</table>
-
-					</div>
-
 
 					<div class="col-lg-3">
 
 
 						{% if idTournoi %}
 							{% if visibility == 1 %}
-								<h3>Suivre mon club?
+								<h3>Choisir un club ...
 								</h3>
 								{% for club in listeDesCLubs %}
 									{% if club.id == IdClub %}
@@ -142,8 +115,39 @@
 									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="btn btn-secondary">{{ equipes.nom }}</a>
 								{% endif %}
 							{% endfor %}
+						{% endif %}
 						</div>
-					{% endif %}
+					
+
+					
+										<div class="col-lg-3">
+											{% if visibility == 1 %}
+												{% if idTournoi %}
+													<h3>Suivre la poule?</h3>
+												{% endif %}
+					
+					
+												<table class="table  table-borderless">
+					
+													{% for poule in afficherLesPoules %}
+					
+														<tr>
+															<td>
+																{% if poule.id == IdPoules %}
+																	<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-success btn-lg" role="button">{{ poule.nom }}</a>
+																{% else %}
+																	<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary" role="button">{{ poule.nom }}</a>
+																{% endif %}
+															</td>
+															<td></td>
+														</tr>
+													{% endfor %}
+												{% endif %}
+					
+											</table>
+					
+										</div>
+									
 				</div>
 			</div>
 
