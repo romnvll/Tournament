@@ -13,6 +13,19 @@
     
       {{ include('header.twig') }}
 
+    
+ <div class="alert alert-warning alert-dismissible fade show d-flex" role="alert">
+  <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+  <div>
+    <strong>Attention!</strong> Il faut s’assurer que le club soit créé avant de créer une équipe 
+  </div>
+</div>
+
+
+
+   
+
+
       <div class="row justify-content-center">
         <div class="col-3">
           <form action="ajoutEquipe_traitement.php" method="POST">
