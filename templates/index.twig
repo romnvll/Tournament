@@ -51,6 +51,7 @@
 						{% set IsRankingView = 0 %}
 
 						{% for tournoi in ListeDesTournois %}
+						
 							{% if tournoi.id == idTournoi %}
 								{% if tournoi.isVisible == 1 %}
 									{% set visibility = 1 %}
@@ -63,11 +64,11 @@
 
 							{% endif %}
 
-
-							{% if tournoi.heureIsVisible  == 1 %}
+							
+							{% if tournoi.heureIsVisible  == 1 and tournoi.id == idTournoi %}
 								{% set heureIsVisible = 1 %}
 							{% endif %}
-
+							
 							{% if tournoi.isVisible == 1 and tournoi.isArchived == 0  %}
 								{% if tournoi.id == idTournoi %}
 
@@ -122,7 +123,7 @@
 					
 										<div class="col-lg-3">
 											{% if visibility == 1 %}
-												{% if idTournoi %}
+												{% if IdEquipe %}
 													<h3>Suivre la poule?</h3>
 												{% endif %}
 					
@@ -156,6 +157,7 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
+								
 								{% if heureIsVisible == 1 %}
 									<th scope="col">Heure</th>
 								{% endif %}
