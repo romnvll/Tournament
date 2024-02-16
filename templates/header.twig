@@ -5,15 +5,15 @@
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-
+	
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav me-auto mb-2 ">
 				<li class="nav-item">
 					<a class="nav-link d-flex align-items-center" aria-current="page" href="." title="Vue Coach"><i class="fa-solid fa-binoculars me-1"></i></a>
 				</li>
-
+					
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestionclub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-city me-1"></i>Gestion des clubs</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionClub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-city me-1"></i>Gestion des clubs</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="creerClub.php">1 - Creer un club</a>
@@ -31,7 +31,7 @@
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle {% if pageEnCours == " gestiontournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-trophy me-1"></i>Gestion des tournois</a>
+					<a class="nav-link dropdown-toggle {% if pageEnCours == "GestionTournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-trophy me-1"></i>Gestion des tournois</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
@@ -46,11 +46,11 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link d-flex align-items-center {% if pageEncours == " ajoutequipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1" title="Gestion des équipes"><span class="fa-solid fa-people-group me-1"></span>Equipes</a>
+					<a class="nav-link d-flex align-items-center {% if pageEncours == "ajoutEquipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1" title="Gestion des équipes"><span class="fa-solid fa-people-group me-1"></span>Equipes</a>
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondespoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-table-list me-1"></i>Gestion des poules</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesPoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-table-list me-1"></i>Gestion des poules</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="gestionPoules.php?id_tournoi=0">1 - Générer automatiquement</a>
@@ -65,7 +65,7 @@
 				</li>
 
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle  {% if pageEnCours == " gestiondesrencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
+					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesRencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
 							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">1 - Création des rencontres</a>
@@ -96,7 +96,7 @@
 
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item dropdown">
-						<a href="#" class="nav-link dropdown-toggle {% if pageEnCours == " stats" %} active {% endif %}" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+						<a href="#" class="nav-link dropdown-toggle {% if pageEnCours == "Stats" %} active {% endif %}" data-bs-toggle="dropdown" role="button" aria-expanded="false">
 							<span class="fa fa-chart-line"></span>Statistiques</a>
 						<ul class="dropdown-menu">
 							<li>
