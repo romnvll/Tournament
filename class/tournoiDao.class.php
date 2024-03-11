@@ -41,7 +41,17 @@ public function ajouterTournoi(string $nom, int $nb_terrains, string $heure_debu
 
     public function afficherLesTournois() : array {
        
-        $stmt = $this->connexion->prepare("select * FROM Tournois ");
+        $stmt = $this->connexion->prepare("
+        SELECT
+            t.*,
+            COUNT(e.id) AS nombre_equipes
+        FROM
+            Tournois t
+        LEFT JOIN
+            Equipes e ON t.id = e.tournoi_id
+        GROUP BY
+            t.id
+    ");
         $stmt->execute();
        $tounois=$stmt->fetchAll();
        return $tounois;

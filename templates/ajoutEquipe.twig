@@ -58,7 +58,9 @@
               <label for="nomEquipe">Choisir le tournoi</label>
             
               <select class="form-control form-control-sm" name="IdTournoi" id="Idtournoi">
-            
+
+                
+
                  {% for tournament in ListeDesTournois %}
                 
             {% if tournament.isArchived == 0 %}
@@ -81,17 +83,32 @@
         <div class="col-lg-7"><h5>Choisir un tournoi</h5>
         {% for tournament in ListeDesTournois %}
           {% if tournament.isArchived == 0 %}
-          <a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button" aria-disabled="true">{{tournament.nom}}</a>
+
+<a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %} position-relative ms-2">
+    {{tournament.nom}}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+        {{tournament.nombre_equipes}}
+        <span class="visually-hidden">équipes</span>
+    </span>
+</a>
+
+
+
+
+
+
+
           {% endif %}
           
         {% endfor %}
-        <br>
-        <span class="badge bg-success">{{AfficherLesEquipes|length}}</span> équipes
-        <table class="table">
+        
+       
+      
+        <table class="table mt-2">
   <thead>
     <tr>
-      
-      <th scope="col">Nom</th>
+      <th scope="col" class="text-center">Club</th>
+      <th scope="col" class="text-center">Nom de l'équipe</th>
       <th scope="col">Categorie</th>
       <th scope="col">Changer dans</th>
       <th scope="col">Action</th>
@@ -99,10 +116,13 @@
     </tr>
   </thead>
   <tbody>
+ 
   {% for equipe in AfficherLesEquipes %}
 
     <tr>
-      
+      <td>
+      {{equipe.nom_club}} <img class="img-thumbnail float-end shadow" src="{{equipe.logo}}">
+      </td>
       <td>
       <form action="modifierEquipe.php" method="POST">
       <input type="hidden" value="{{equipe.id}}" name="idEquipe">

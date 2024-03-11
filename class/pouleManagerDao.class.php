@@ -147,13 +147,23 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     
 
     if ($AndIsClassement === true) {
-        $query = "SELECT * FROM Poules WHERE tournoi_id = :idTournoi";
+        $query = "SELECT p.*, COUNT(ep.equipe_id) AS nombre_equipes
+        FROM Poules p
+        LEFT JOIN EquipePoule ep ON p.id = ep.poule_id
+        WHERE p.tournoi_id = :idTournoi
+        GROUP BY p.id
+        ORDER BY p.nom";
     } else {
         
-        $query = "SELECT * FROM Poules WHERE tournoi_id = :idTournoi AND is_classement = '0'";
+        $query = "SELECT p.*, COUNT(ep.equipe_id) AS nombre_equipes
+        FROM Poules p
+        LEFT JOIN EquipePoule ep ON p.id = ep.poule_id
+        WHERE p.tournoi_id = :idTournoi AND p.is_classement = '0'
+        GROUP BY p.id
+        ORDER BY p.nom";
     }
 
-    $query .= " ORDER BY nom";
+    //$query .= " ORDER BY nom";
 
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':idTournoi', $idTournoi);

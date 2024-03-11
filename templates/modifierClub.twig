@@ -1,60 +1,65 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-    <!-- Inclure la bibliothèque htmx via CDN -->
-    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<!-- Inclure la bibliothèque htmx via CDN -->
+		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
 
-    <title>Modifier Club</title>
-  </head>
-  <body>
-    
-      {{ include('header.twig') }}
-      <div class="row">
-        <div class="col ml-5">
-          <form action="modifierClub_traitement.php" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="idclub" value={{idClub}}>
-            nom :<input type="text" name="nomduclub" {% if isModify == true  %} value={{afficheclub.nom}} {% endif %}/> <br>
-            contact :<input type="text" name="contactClub" {% if isModify == true  %} value={{afficheclub.contact}}{% endif %} /> <br>
-            logo contact :<input type="file" name="logo" /> <br /> <!-- Champ de type "file" pour l'upload -->
-            <input type="submit" />
-          </form>
-        </div>
-        <div class="col">
+		<title>Modifier Club</title>
+	</head>
+	<body>
 
-        <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Nom</th>
-      <th scope="col">logo</th>
-   
-    </tr>
-  </thead>
+		{{ include('header.twig') }}
+		<div class="row">
+			<div class="col ml-5">
+				<form action="modifierClub_traitement.php" method="POST" enctype="multipart/form-data">
+					<input type="hidden" name="idclub" value={{idClub}}>
+					nom :<input type="text" name="nomduclub" {% if isModify == true %} value={{afficheclub.nom}} {% endif %}/>
+					<br>
+					contact :<input type="text" name="contactClub" {% if isModify == true %} value={{afficheclub.contact}} {% endif %}/>
+					<br>
+					logo contact :<input type="file" name="logo"/>
+					<br/>
+					<!-- Champ de type "file" pour l'upload -->
+					<input type="submit"/>
+				</form>
+			</div>
+			<div class="col">
+
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">Nom</th>
+							<th scope="col">logo</th>
+
+						</tr>
+					</thead>
 
 
+					{% for club in ListeDesClubs %}
+						<tr>
+							{% if idClub == club.id %}
+								<td>
+									<a class="btn btn-success" href="modifierClub.php?idclub={{ club.id }}">{{ club.nom }}</a>
+								</td>
 
-          {% for club in ListeDesClubs %}
-          <tr>
-      {% if idClub == club.id %}
-            <td><a class="btn btn-success" href="modifierClub.php?idclub={{ club.id }}">{{ club.nom }}</a></td>
+							{% else %}
+								<td>
+									<a class="btn btn-primary btn-sm " href="modifierClub.php?idclub={{ club.id }}">{{ club.nom }}</a>
+								</td>
+							{% endif %}
+							<td><img src={{club.logo}}></td>
 
-      {% else %}
-            <td><a class="btn btn-primary btn-sm " href="modifierClub.php?idclub={{ club.id }}">{{ club.nom }}</a></td>
-      {% endif %}
-      <td><img src={{club.logo}}></td>
-      
-    </tr>
-            
-            
-          {% endfor %}
-      <tbody>
-    
-   
-</table>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+						</tr>
+
+
+					{% endfor %}
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+</html></div></body></html>

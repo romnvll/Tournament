@@ -19,11 +19,14 @@
           {% for tournoi in afficherLesTournois %}
            {% if tournoi.isArchived == 0 %}
 
-           {% set btnClass = "btn btn-primary" %}
-                   {% if tournoiEnCours == tournoi.id %}
-                      {% set btnClass = "btn btn-danger" %}
-                   {% endif %}
-            <a href="gestionRencontres.php?idTournoi={{ tournoi.id }}" class="{{btnClass}}" role="button">{{ tournoi.nom }}</a>
+          <a href="gestionRencontres.php?idTournoi={{tournoi.id}}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %} position-relative ms-2">
+    {{tournoi.nom}}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+        {{tournoi.nombre_equipes}}
+        <span class="visually-hidden">équipes</span>
+    </span>
+</a>
+
           {% endif %}
           {% endfor %}
           
@@ -35,7 +38,7 @@
         <div class="col-7">
           <h3 class="text-center">Selection des poules</h3>
            
-           <span class="badge bg-secondary">{{ NombreEquipeParPoules }}</span>
+          
          
           {% for poule in afficherLesPoules %}
                    {% set btnClass = "btn btn-primary" %}
@@ -44,9 +47,23 @@
                    {% endif %}
                   
             {% if not isRencontreCreated %}
-            <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a> 
+          <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }} position-relative ms-5">
+    {{ poule.nom }}
+    <span class="position-absolute top-10 start-100 translate-middle  badge-sm rounded-pill bg-success">
+        {{ poule.nombre_equipes }}
+        <span class="visually-hidden">équipes</span>
+    </span>
+</a>
+
+
             {% else %}  
-            <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a> 
+<a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }} position-relative ms-1">
+    {{ poule.nom }}
+    <span class="position-absolute top-10 start-100 translate-middle  badge-sm rounded-pill bg-success">
+        {{ poule.nombre_equipes }}
+        <span class="visually-hidden">équipes</span>
+    </span>
+</a>
 
             {% endif %}       
 
@@ -93,8 +110,8 @@
                 <td>
                   <input class="form-control" type="number" name="terrain" value="{{ equipe.num_terrain}}" min="1" max="{{NombreTerrain}}" hx-post="gestionRencontres_traitement.php" hx-trigger="change"  hx-include="[id='{{equipe.rencontre_id}}']" />
                 </td>
-                <td><p class="text-center">{{ equipe.equipe1_nom }}</p><input type="number" id="idScore" class="form-control" value="{{ equipe.score1 }}" name="equipeScore1" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change"  hx-include="[id='{{equipe.rencontre_id}}']"  /><input type="hidden" value="{{equipe.equipe1_id}}" name="idEquipe1"> </td>
-                <td><p class="text-center">{{ equipe.equipe2_nom }}</p><input type="number"  id="idScore" class="form-control" value="{{ equipe.score2 }}" name="equipeScore2" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change"  hx-include="[id='{{equipe.rencontre_id}}']"/><input type="hidden" value="{{equipe.equipe2_id}}" name="idEquipe2" ></td>
+                <td><p class="text-center">{{ equipe.equipe1_nom }} {{ equipe.equipe1_id }}</p><input type="number" id="idScore" class="form-control" value="{{ equipe.score1 }}" name="equipeScore1" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change"  hx-include="[id='{{equipe.rencontre_id}}']"  /><input type="hidden" value="{{equipe.equipe1_id}}" name="idEquipe1"> </td>
+                <td><p class="text-center">{{ equipe.equipe2_nom }} {{ equipe.equipe2_id }}</p><input type="number"  id="idScore" class="form-control" value="{{ equipe.score2 }}" name="equipeScore2" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change"  hx-include="[id='{{equipe.rencontre_id}}']"/><input type="hidden" value="{{equipe.equipe2_id}}" name="idEquipe2" ></td>
                 
                   
                 </td>
