@@ -1,12 +1,12 @@
 <?php
 $url1=$_SERVER['REQUEST_URI'];
-//header("Refresh: 2; URL=$url1");
+
 require ('security.php');
 require 'class/equipeDao.class.php';
-//require 'class/equipe.class.php';
+
 require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
-//require 'class/tournoi.class.php';
+
 require 'class/pouleManagerDao.class.php';
 require 'vendor/autoload.php';
 session_start();

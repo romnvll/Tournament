@@ -29,46 +29,55 @@ class RencontreDAO
         if (count($equipesPresentes) >= 2) {
             // Appliquer l'algorithme du round-robin pour créer les rencontres
             $rencontres = $this->generateRoundRobin($equipesPresentes);
+            echo "<pre>";
             //var_dump($rencontres);
+            echo "</pre>";
             // Insérer les rencontres dans la table Rencontres
             foreach ($rencontres as $rencontre) {
-
+                
+                
                 $equipe1Id = $rencontre['equipe1']['id'];
                 $equipe2Id = $rencontre['equipe2']['id'];
                 $tour = $rencontre['tour'];
 
                 // Vérifier si la rencontre existe déjà dans la table Rencontres
-                if (!$this->isRencontreExist($equipe1Id, $equipe2Id)) {
+
+                if ($this->isRencontreExist($equipe1Id, $equipe2Id, $tour)) {
+                    $this->updateTour($rencontre['id'], $tour);
+                   
+                } else {
                     // Si la rencontre n'existe pas, l'insérer dans la table Rencontres
                     $this->insertRencontre($equipe1Id, $equipe2Id, $tournoi_id, $isClassement, $tour);
+                     //echo "tour " . $tour . ": " . $equipe1Id . " vs " . $equipe2Id . "<br>";
+
                 }
+                   
             }
         }
     }
 
 
-    private function isRencontreExist($equipe1Id, $equipe2Id)
-    {
-        // Vérifier si la rencontre existe
-        $query = "SELECT isClassement FROM Rencontres WHERE (equipe1_id = :equipe1Id AND equipe2_id = :equipe2Id) OR (equipe1_id = :equipe2Id AND equipe2_id = :equipe1Id)";
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
-        $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
-        $stmt->execute();
+    private function isRencontreExist($equipe1Id, $equipe2Id, $tour)
+{
+    // Vérifier si la rencontre existe
+    $query = "SELECT COUNT(*) FROM Rencontres WHERE ((equipe1_id = :equipe1Id OR equipe2_id = :equipe1Id) AND (equipe1_id = :equipe2Id OR equipe2_id = :equipe2Id)) AND tour = :tour";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
+    $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
+    $stmt->bindValue(':tour', $tour, PDO::PARAM_INT);
+    $stmt->execute();
 
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $count = $stmt->fetchColumn();
 
-        // Si la rencontre existe
-        if ($result) {
-            // Si isClassement est égal à 1, retourner vrai (la rencontre ne doit pas être créée à nouveau)
-            if ($result['isClassement'] == 1) {
-                return true;
-            }
-        }
-
-        // Si la rencontre n'existe pas ou si isClassement est égal à 0, retourner faux (la rencontre peut être créée)
-        return false;
+    // Si la rencontre existe plus d'une fois, retourner vrai (la rencontre ne doit pas être créée à nouveau)
+    if ($count > 1) {
+        return true;
     }
+
+    // Sinon, retourner faux (la rencontre peut être créée)
+    return false;
+}
+
 
 
     private function generateRoundRobin($equipes)
@@ -117,7 +126,7 @@ class RencontreDAO
         $query = "SELECT e.id, e.nom 
                   FROM Equipes e 
                   INNER JOIN EquipePoule ep ON e.id = ep.equipe_id 
-                  WHERE ep.poule_id = :pouleId AND e.IsPresent = 1";
+                  WHERE ep.poule_id = :pouleId";
 
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
@@ -197,6 +206,25 @@ class RencontreDAO
     }
 
 
+    public function rencontresExistByCategorieAndTournoi(string $categorie, int $idtournoi): bool
+{
+    $query = "SELECT COUNT(*) FROM Rencontres r
+              JOIN Equipes e1 ON r.equipe1_id = e1.id
+              JOIN Equipes e2 ON r.equipe2_id = e2.id
+              WHERE e1.categorie = :categorie AND e2.categorie = :categorie AND r.tournoi_id = :idtournoi";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+    $stmt->bindValue(':idtournoi', $idtournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $count = $stmt->fetchColumn();
+
+    return $count > 0;
+}
+
+
+
     public function getRencontreByPoule($pouleid)
     {
         $query = "SELECT r.id AS rencontre_id,
@@ -220,7 +248,7 @@ class RencontreDAO
                       LEFT JOIN Clubs c1 ON equipe1.club_id = c1.id
                       LEFT JOIN Clubs c2 ON equipe2.club_id = c2.id
                       WHERE ep1.poule_id = :pouleid AND ep2.poule_id = :pouleid
-                      ORDER BY r.heure,r.id";
+                      ORDER BY tour,r.heure,r.id";
 
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':pouleid', $pouleid, PDO::PARAM_INT);
@@ -245,6 +273,15 @@ class RencontreDAO
         $stmt->execute();
     }
 
+
+public function updateTour(int $idrencontre, int $tour)
+{
+    $query = "UPDATE Rencontres SET tour = :tour WHERE id = :idrencontre";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
+    $stmt->bindValue(':tour', $tour, PDO::PARAM_INT);
+    $stmt->execute();
+}
 
 
 
@@ -329,6 +366,7 @@ class RencontreDAO
             $stmt->execute();
         }
         
+
 
 
 

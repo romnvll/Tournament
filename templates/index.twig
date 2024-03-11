@@ -82,13 +82,14 @@
 					</div>
 
 
-					<div class="col-lg-3">
+					<div class="col-lg-3 text-center">
 
 
 						{% if idTournoi %}
 							{% if visibility == 1 %}
-								<h3>Choisir un club ...
-								</h3>
+							<div class="alert alert-success mt-2 ">  
+								<h4>Choisir un club ...</h4>
+							</div>
 								{% for club in listeDesCLubs %}
 									{% if club.id == IdClub %}
 										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-success btn-lg">{{ club.nom }}</a>
@@ -100,12 +101,13 @@
 						{% endif %}
 					</div>
 
-					<div class="col-lg-3">
+					<div class="col-lg-3 ">
 						{% if idTournoi %}
 							{% if IdClub %}
 								{% if visibility == 1 %}
-									<h3>Choisir mon équipe</h3>
-
+								<div class="alert alert-success mt-2">
+									<h4>Choisir mon équipe</h4>
+								</div>
 								{% endif %}
 							{% endif %}
 							{% for equipes in listeDesEquipesByClubs %}
@@ -124,7 +126,9 @@
 										<div class="col-lg-3">
 											{% if visibility == 1 %}
 												{% if IdEquipe %}
-													<h3>Suivre la poule?</h3>
+												<div class="alert alert-success mt-2">
+													<h4>Suivre la poule?</h4>
+												</div>
 												{% endif %}
 					
 					

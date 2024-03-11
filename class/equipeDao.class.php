@@ -209,16 +209,23 @@ class EquipeDAO {
         return 0;
     }
     
-
-    public function getAllEquipeByIdTournoi(int $idTournoi) : array {
-        $query = "SELECT * FROM Equipes WHERE tournoi_id = :tournoi_id order by categorie ";
+    public function getAllEquipeByIdTournoi(int $idTournoi): array {
+        $query = "
+            SELECT e.*, 
+            c.nom AS nom_club,
+            c.logo AS logo
+            FROM Equipes e
+            INNER JOIN Clubs c ON e.club_id = c.id
+            WHERE e.tournoi_id = :tournoi_id
+            ORDER BY e.categorie
+        ";
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':tournoi_id', $idTournoi, PDO::PARAM_INT);
         $stmt->execute();
     
-       return  $stmt->fetchAll();
-
+        return $stmt->fetchAll();
     }
+    
 
     public function getAllEquipeByIdTournoiAndClub (int $idTournoi, int $clubId) {
         $query = "SELECT e.*, c.logo FROM Equipes e
