@@ -21,6 +21,7 @@ $poulemanager = new PouleManager();
 $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
 $listeDesTournois = $tournoiDao->afficherLesTournois();
+$RencontreByPoule=null;
 
 if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
@@ -76,9 +77,23 @@ else {
 }
 
 if (isset ($_GET['idPoule'])) {
-  $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
+  //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
+ 
+  if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 
- }
+  }
+   else {
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,0);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],0);
+
+   }
+
+
+
+
+   }
 
  else {
   $GetResultatDesPoules = null;
@@ -90,7 +105,7 @@ echo $template->render([
     'ListeDesTournois' => $listeDesTournois,
     'afficherLesPoules' => $listePoulesParEquipe ,
     'idTournoi'=> $_SESSION['idTournoi'],
-    'RencontreByPoule' => $rencontre->getRencontreByPoule($idPoule),
+    'RencontreByPoule' => $RencontreByPoule,
     'IdPoules' => $idPoule,
     'IdClub' => $idclub,
     'listeDesCLubs' => $listeClubsParticipants,

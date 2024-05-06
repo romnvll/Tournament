@@ -43,7 +43,6 @@ echo $template->render([
   'email' => $_COOKIE['email'],
   'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
   'pageEnCours' => 'GestionDesRencontres',
-  //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
   'afficherLesTournois' => $tournoi->afficherLesTournois(),
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_SESSION['idTournoi']),
   'idTournoi'=> $_SESSION['idTournoi'],
