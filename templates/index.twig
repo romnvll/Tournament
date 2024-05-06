@@ -4,7 +4,10 @@
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=0.8"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<link href="style/index.css" rel="stylesheet" crossorigin="anonymous"/>
+
 		<script src="js/RemoveEquipe.js"></script>
+
 		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
 		<title>Gestion rencontre</title>
 	</head>
@@ -51,7 +54,7 @@
 						{% set IsRankingView = 0 %}
 
 						{% for tournoi in ListeDesTournois %}
-						
+
 							{% if tournoi.id == idTournoi %}
 								{% if tournoi.isVisible == 1 %}
 									{% set visibility = 1 %}
@@ -64,11 +67,11 @@
 
 							{% endif %}
 
-							
+
 							{% if tournoi.heureIsVisible  == 1 and tournoi.id == idTournoi %}
 								{% set heureIsVisible = 1 %}
 							{% endif %}
-							
+
 							{% if tournoi.isVisible == 1 and tournoi.isArchived == 0  %}
 								{% if tournoi.id == idTournoi %}
 
@@ -87,9 +90,9 @@
 
 						{% if idTournoi %}
 							{% if visibility == 1 %}
-							<div class="alert alert-success mt-2 ">  
-								<h4>Choisir un club ...</h4>
-							</div>
+								<div class="alert alert-success mt-2 ">
+									<h4>Choisir un club ...</h4>
+								</div>
 								{% for club in listeDesCLubs %}
 									{% if club.id == IdClub %}
 										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-success btn-lg">{{ club.nom }}</a>
@@ -105,9 +108,9 @@
 						{% if idTournoi %}
 							{% if IdClub %}
 								{% if visibility == 1 %}
-								<div class="alert alert-success mt-2">
-									<h4>Choisir mon équipe</h4>
-								</div>
+									<div class="alert alert-success mt-2">
+										<h4>Choisir mon équipe</h4>
+									</div>
 								{% endif %}
 							{% endif %}
 							{% for equipes in listeDesEquipesByClubs %}
@@ -119,40 +122,45 @@
 								{% endif %}
 							{% endfor %}
 						{% endif %}
-						</div>
-					
+					</div>
 
-					
-										<div class="col-lg-3">
-											{% if visibility == 1 %}
-												{% if IdEquipe %}
-												<div class="alert alert-success mt-2">
-													<h4>Suivre la poule?</h4>
-												</div>
+
+					<div class="col-lg-3">
+						{% if visibility == 1 %}
+							{% if IdEquipe %}
+								<div class="alert alert-success mt-2 ">
+									<h4>Suivre la poule</h4>
+								</div>
+							{% endif %}
+
+
+							<table class="table  table-borderless">
+
+								{% for poule in afficherLesPoules %}
+
+									<tr>
+										<td>
+											{% if poule.id == IdPoules %}
+												<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-success btn-lg" role="button">{{ poule.nom }}</a>
+
+
+											{% else %}
+												{% if IdPoules %}
+													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary " role="button">{{ poule.nom }}</a>
+												{% else %}
+													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary blink" role="button">{{ poule.nom }}</a>
 												{% endif %}
-					
-					
-												<table class="table  table-borderless">
-					
-													{% for poule in afficherLesPoules %}
-					
-														<tr>
-															<td>
-																{% if poule.id == IdPoules %}
-																	<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-success btn-lg" role="button">{{ poule.nom }}</a>
-																{% else %}
-																	<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary" role="button">{{ poule.nom }}</a>
-																{% endif %}
-															</td>
-															<td></td>
-														</tr>
-													{% endfor %}
-												{% endif %}
-					
-											</table>
-					
-										</div>
-									
+											{% endif %}
+										</td>
+										<td></td>
+									</tr>
+								{% endfor %}
+							{% endif %}
+
+						</table>
+
+					</div>
+
 				</div>
 			</div>
 
@@ -161,7 +169,7 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
-								
+
 								{% if heureIsVisible == 1 %}
 									<th scope="col">Heure</th>
 								{% endif %}
@@ -172,12 +180,15 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% if IdClub %}
-								{% set rencontres = listeDesRencontreByClubs %}
-							{% endif %}
-							{% if IdEquipe %}
-								{% set rencontres = listeDesEquipesByEquipeId %}
-							{% endif %}
+							{# pour aller jusqu'à la poule
+																					{% if IdClub %}
+																						 {% set rencontres = listeDesRencontreByClubs %} 
+																					{% endif %}
+																				
+																					{% if IdEquipe %}
+																						{% set rencontres = listeDesEquipesByEquipeId %}
+																					{% endif %}
+																					#}
 
 							{% if IdPoules %}
 								{% set rencontres = RencontreByPoule %}
@@ -190,9 +201,32 @@
 										<tr>
 										{% endif %}
 										{% if heureIsVisible == 1 %}
-											<td>{{ equipe.heure_rencontre }}</td>
+											{% if not equipe.heure_rencontre is empty %}
+												{% set heure_formatee = equipe.heure_rencontre|replace({ ':': 'h' })|slice(0, 2) ~ 'h' ~ equipe.heure_rencontre|replace({ ':': 'h' })|slice(3, 2) %}
+												<td class="align-middle text-center">
+													<p class="fw-bold">
+														{{ heure_formatee }}</p>
+												</td>
+											{% else %}
+												<td class="align-middle text-center">
+													<span class="badge bg-warning text-dark">
+														A planifier</span>
+												</td>
+											{% endif %}
+
 										{% endif %}
-										<td>{{ equipe.num_terrain }}</td>
+
+										{% if equipe.num_terrain != 0  %}
+											<td class="align-middle text-center position-relative">
+												<img src="img/football.png" class="img-fluid ">
+												<h4 class="position-absolute top-50 start-50 translate-middle">
+													<span class="badge rounded-pill bg-danger">{{ equipe.num_terrain }}</span>
+												</h4>
+											</td>
+
+										{% else  %}
+											<td class="align-middle text-center"></td>
+										{% endif %}
 										<td>
 
 											<p class="h6 text-end">{{equipe.equipe1_nom}}</p>
@@ -230,7 +264,7 @@
 				</div>
 				<div class="col-lg-3">
 
-					{% if IsRankingView == 1 and IdPoules != null %}
+					{% if IsRankingView == 1 and IdPoules != null  %}
 
 						<table class="table" id="classementTableau">
 							<thead>

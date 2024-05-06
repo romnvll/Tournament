@@ -29,9 +29,9 @@
 
 						{% if tournoi.isArchived == 0 %}
 							{% if tournoi.id == idTournoi %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
 							{% else %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom }}</a>
 							{% endif %}
 						{% endif %}
 
@@ -63,13 +63,13 @@
 								<table class="table table-striped text-nowrap">
 									<thead>
 										<tr>
-											<th scope="col">Heure</th>
+											<th scope="col">Heure prévue</th>
 											<!-- <th scope="col">Terrain</th>  -->
 											<th scope="col">Arbitre</th>
 											<th scope="col">Catégorie</th>
-											<th scope="col">Equipe1</th>
-											<th scope="col">Score</th>
-											<th scope="col">Equipe2</th>
+											<th scope="col" class="text-end">Equipe1</th>
+											<th scope="col" class="text-center">Score</th>
+											<th scope="col" class="text-start">Equipe2</th>
 
 										</tr>
 									</thead>
@@ -96,7 +96,7 @@
 																<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
 
 															</td>
-															<td class="align-middle">
+															<td class="text-center">
 
 																{% if  rencontre.score1 > rencontre.score2  %}
 																	<span class="badge bg-success">{{ rencontre.score1 }}</span>-<span class="badge bg-danger">{{ rencontre.score2 }}

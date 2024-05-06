@@ -11,15 +11,19 @@
 	<body>
 		{{ include('header.twig') }}
 		<div class="row">
-			<div class="col">
-				<h3>Selection du tournoi</h3>
-				{% for tournoi in ListeDesTournois %}
-					<a href="modifierTournoi.php?idTournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
-				{% endfor %}
-
+			<div class="row">
+				<div class="col">
+					<h3>Selection du tournoi</h3>
+					{% for tournoi in ListeDesTournois %}
+						<a href="modifierTournoi.php?idTournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
+					{% endfor %}
+				</div>
+				
 
 			</div>
 			{% if tournoiEnCours != 0 %}
+
+
 				<div class="col">
 					<div class="container mt-5">
 						<h2>Modifier Tournoi</h2>
@@ -108,7 +112,6 @@
 
 							</div>
 
-							
 
 							<button type="submit" class="btn btn-primary">Modifier</button>
 
