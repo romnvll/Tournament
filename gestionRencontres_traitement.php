@@ -10,6 +10,8 @@ require 'class/equipeDao.class.php';
 
 $rencontreDao = new RencontreDAO();
 
+
+
 if ((($_POST['equipeScore2'] === "") && ($_POST['equipeScore1'] === ""))) {
     $rencontreDao->modifierRencontre($_POST['IdRencontre'], null, null, (int)$_POST['terrain'], $_POST['heure'], $_POST['arbitre']);
     echo "3";
