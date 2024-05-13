@@ -26,9 +26,15 @@ $poulemanager = new PouleManager();
 $rencontre = new RencontreDAO();
 $equipeDao = new EquipeDAO();
 
-$rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi']);
 
 
+if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
+  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],0,true);
+}
+
+else {
+  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi']);
+}
 
 
 
