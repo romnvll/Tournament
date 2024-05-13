@@ -20,7 +20,7 @@ class RencontreDAO
 
 
 
-    public function createRencontreByPoule($pouleId, $tournoi_id, $isClassement = 0)
+    public function createRencontreByPoule($pouleId, $tournoi_id, $isClassement = 0, $isMatchRetour = false)
     {
         // Récupérer uniquement les équipes de cette poule dont le champ 'IsPresent' est vrai
         $equipesPresentes = $this->getEquipesPresentesByPoule($pouleId);

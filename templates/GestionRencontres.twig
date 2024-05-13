@@ -48,23 +48,21 @@
                    {% endif %}
                   
             {% if not isRencontreCreated %}
-          <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }} position-relative ms-5">
+          <a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" data-poule-id="{{ poule.id }}" class="poule-link {{ btnClass }} position-relative ms-5" id="poule-link">
     {{ poule.nom }}
     <span class="position-absolute top-0 start-100 translate-middle badge badge-small rounded-pill bg-success">
         {{ poule.nombre_equipes }}
-        
     </span>
 </a>
-
 
             {% else %}  
-<a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }} position-relative ms-1">
+<a href="gestionRencontres.php?idTournoi={{ idTournoi }}&idPoule={{ poule.id }}" data-poule-id="{{ poule.id }}" class="poule-link {{ btnClass }} position-relative ms-5" id="poule-link">
     {{ poule.nom }}
-    <span class="position-absolute top-10 start-100 translate-middle badge  badge-sm rounded-pill bg-success">
+    <span class="position-absolute top-0 start-100 translate-middle badge badge-small rounded-pill bg-success">
         {{ poule.nombre_equipes }}
-        <span class="visually-hidden">équipes</span>
     </span>
 </a>
+
 
             {% endif %}       
 
@@ -164,9 +162,49 @@
       
       </div>
       </div>
-      
+ 
    
   </body>
+<script>
+// Sélectionner tous les liens ayant la classe 'poule-link'
+const liensRencontres = document.querySelectorAll('.poule-link');
+
+// Fonction pour restaurer le lien à son état d'origine
+function restaurerLien() {
+    liensRencontres.forEach(lien => {
+        const idTournoi = '{{ idTournoi }}';
+        const idPoule = lien.dataset.pouleId;
+        const url = `gestionRencontres.php?idTournoi=${idTournoi}&idPoule=${idPoule}`;
+        lien.setAttribute('href', url);
+    });
+}
+
+// Ajouter un écouteur d'événements pour détecter le relâchement de la touche "r"
+document.addEventListener('keyup', function(event) {
+    // Vérifier si la touche relâchée est "r"
+    if (event.key === 'r') {
+        // Restaurer le lien à son état d'origine
+        restaurerLien();
+    }
+});
+
+// Ajouter un écouteur d'événements pour détecter la pression sur la touche "r"
+document.addEventListener('keydown', function(event) {
+    // Vérifier si la touche pressée est "r"
+    if (event.key === 'r') {
+        // Modifier l'URL du lien en ajoutant le paramètre rencontreRetour=true
+        liensRencontres.forEach(lien => {
+            const idTournoi = '{{ idTournoi }}';
+            const idPoule = lien.dataset.pouleId;
+            const url = `gestionRencontres.php?idTournoi=${idTournoi}&idPoule=${idPoule}&rencontreRetour=true`;
+            lien.setAttribute('href', url);
+        });
+    }
+});
+
+</script>
+
+  
 </html>
 
 
