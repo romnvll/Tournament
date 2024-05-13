@@ -1,207 +1,226 @@
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-    <link href="style/couleurEquipes.css" rel="stylesheet">
-   <script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
-   <title>Gestion rencontre</title>
-  </head>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<link href="style/couleurEquipes.css" rel="stylesheet">
+		<script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+		<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
+		<title>Gestion rencontre</title>
+	</head>
 
-  <body>
-    
-    {{ include('header.twig') }}
-      <div class="row ml-n4">
-        <div class="col-lg-3">
-          <h6>
-            {% if (ListeDesTournois|length) > 1 %}
-              Tournois
-            {% else %}
-              Tournoi
-            {% endif %}
-          </h6>
-          {% for tournoi in ListeDesTournois %}
-          {% if tournoi.isArchived == 0 %}
-            {% if tournoi.id == idTournoi %}
-              <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
-            {% else %}
-              <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
-            {% endif %}
-          {% endif %}
-          {% endfor %}
-        </div>
- 
-    <div class="row">
-    
-       {% for i in 0..nombreTerrain %}
-                {% set RencontresExistent = false %}
-                {% for rencontre in ToutesLesRencontres %}
-                    {% if rencontre.num_terrain == i %}
-                        {% set RencontresExistent = true %}
-                    {% endif %}
-                {% endfor %}
+	<body>
 
-                {% if terrainSelect is null or terrainSelect == i %}
-                    {% if RencontresExistent %}
-                     
-                        <div class="col-lg-4">
-                     
-                   
+		{{ include('header.twig') }}
+		<div class="row ml-n4">
+			<div class="col-lg-3">
+				<h6>
+					{% if (ListeDesTournois|length) > 1 %}
+						Tournois
+					{% else %}
+						Tournoi
+					{% endif %}
+				</h6>
+				{% for tournoi in ListeDesTournois %}
+					{% if tournoi.isArchived == 0 %}
+						{% if tournoi.id == idTournoi %}
+							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
+						{% else %}
+							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</div>
 
+			<div class="row mt-1" id="progressbar">
 
-                            <h3 class="text-center">Terrain N° {{ i }}</h3>
-                            <div class="table-responsive ">
-                            <table class="table table-sm align-left table-responsive" id="tableau">
-                                <thead>
-                                    <tr>
-                                        <th scope="col"><p class="small">Heure</p></th>
-                                        <th scope="col"><p class="small">Arbitre</p></th>
-                                        <th scope="col"><p class="small">Terrain</p></th>
-                                        <th scope="col"><p class="small">Catégorie</p></th>
-                                        <th scope="col"><p class="small">Equipe1</p></th>
-                                        <th scope="col"><p class="small">Equipe2</p></th>
-                                       
-                                    </tr>
-                                </thead>
-                                <tbody>                          
-                                    {% for rencontre in ToutesLesRencontres %}                                       
-                                                                     
-                                        {% if rencontre.num_terrain == i %}
+				<div class="col">
+					<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="{{pourcentTermine}}" aria-valuemin="0" aria-valuemax="100">
+						<div class="progress-bar bg-success progress-bar progress-bar-striped" style="width: {{pourcentTermine}}%">{{pourcentTermine}}% du tournoi terminé</div>
+					</div>
+				</div>
 
-                                             {% set categoryClass = '' %}
+			</div>
 
-                                                {% if rencontre.equipe1_categorie == 'U17M' %}
-                                                    {% set categoryClass = 'U17M' %}
-                                                     {% elseif rencontre.equipe1_categorie == 'U17F' %}
-                                                    {% set categoryClass = 'U17F' %}
+			<div class="row">
 
-                                                    {% elseif rencontre.equipe1_categorie == 'U15M' %}
-                                                    {% set categoryClass = 'U15M' %}
-                                                    
-                                                
-                                                 {% elseif rencontre.equipe1_categorie == 'U11F' %}
-                                                    {% set categoryClass = 'U11F' %}
+				{% for i in 0..nombreTerrain %}
+					{% set RencontresExistent = false %}
+					{% for rencontre in ToutesLesRencontres %}
+						{% if rencontre.num_terrain == i %}
+							{% set RencontresExistent = true %}
+						{% endif %}
+					{% endfor %}
 
-                                                      {% elseif rencontre.equipe1_categorie == 'U11M' %}
-                                                    {% set categoryClass = 'U11M' %}
-                                                
-                                                {% elseif rencontre.equipe1_categorie == 'U15F' %}
-                                                    {% set categoryClass = 'U15F' %}
-                                                {% elseif rencontre.equipe1_categorie == 'U13M' %}
-                                                    {% set categoryClass = 'U13M' %}
-                                                  {% elseif rencontre.equipe1_categorie == 'U13F' %}
-                                                    {% set categoryClass = 'U13F' %}
-                                                     {% elseif rencontre.equipe1_categorie == 'senior' %}
-                                                    {% set categoryClass = 'senior' %}
-                                                     {% elseif rencontre.equipe1_categorie == 'loisir' %}
-                                                    {% set categoryClass = 'loisir' %}
-                                                    {% elseif rencontre.equipe1_categorie == 'MiniDebutant' %}
-                                                    {% set categoryClass = 'MiniDebutant' %}
-                                                     {% elseif rencontre.equipe1_categorie == 'MiniDebrouillard' %}
-                                                    {% set categoryClass = 'MiniDebrouillard' %}
-                                                     {% elseif rencontre.equipe1_categorie == 'MiniConfirme' %}
-                                                    {% set categoryClass = 'MiniConfirme' %}
-                                                
-                                                
-                                                {% endif %}                                            
-                                              
-                                             
-                                            <form action="gestionRencontres_traitement.php" method="POST" id="{{rencontre.rencontre_id}}">
-                                                <input type="hidden" value="{{idTournoi}}" name="idTournoi" >
-                                                <input type="hidden" value="{{idPoule}}" name="idPoule">
-                                                {% if rencontre.rencontre_id is not null %}
-                                                <tr class="{{categoryClass}}" style="height:120px"  >
-                                                
-                                                     <input type="hidden" value="{{rencontre.rencontre_id}}" name="IdRencontre" id="IdRencontre">
-                                                    <td scope="row">
-                                                    <input class="form-control " type="time" name="heure" data-rencontre-id="{{ rencontre.rencontre_id }}" value="{{ rencontre.heure_rencontre }}" id="heure-{{rencontre.rencontre_id}}" size="8" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']" />
-                                                   <p class="status"></p>
-                                                    
-                                                                                            
+					{% if terrainSelect is null or terrainSelect == i %}
+						{% if RencontresExistent %}
 
-                                                      
-                                                    </td>
-                                                   
-                                                    <td><input class="form-control form-control-sm" type="text" name="arbitre" value="{{ rencontre.arbitre }}" size="3" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"></td>
-                                                    <td><input style="width: 40px;" class="form-control form-control-sm" type="number" name="terrain" value="{{ rencontre.num_terrain }}" min="1" max="{{NombreTerrain}}" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']" />Terrain</td>
-                                                    <td><p class="small">{{ rencontre.equipe1_categorie }}</p></td>
-                                                    <td >
-                                                      
-                                                        <input type="number" style="width: 65px;"  placeholder="Score" id="Equipe1" class="form-control form-control-sm" value="{{ rencontre.score1 }}" name="equipeScore1" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']" />
-                                                      
-                                                        <input type="hidden" value="{{ rencontre.equipe1_id }}" name="idEquipe1">
-                                                        <p class="text-break small fw-bold text-center ">{{ rencontre.equipe1_nom }}</p>
-                                                    
-                                                    </td>
-                                                    <td >                                          
-                                                        <input type="number" style="width: 65px;" placeholder="Score"  id="Equipe2" class="form-control form-control-sm" value="{{ rencontre.score2 }}" name="equipeScore2" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']" />
-                                                        <input type="hidden" value="{{ rencontre.equipe2_id }}" name="idEquipe2">
-                                                        <p class="text-break small fw-bold text-center " >{{ rencontre.equipe2_nom }}</p>
-                                                  
-                                                    </td>
-                                                    
+							<div class="col-lg-4">
 
 
-                                                </tr>
-                                                {% else %}
-                                                <tr class="align-middle " style="height: 120px;">
-                                                  <td class="table-dark"></td>
-                                                  <td  class="table-dark">{{rencontre.heure_rencontre}}</td>
-                                                  <td class="table-dark" >Terrain {{ rencontre.num_terrain }}
-                                                  </td>
-                                                  <td class="table-dark"> Libre </td>
-                                                  <td class="table-dark"></td>
-                                                  <td class="table-dark"></td>
-                                                  <td class="table-dark"></td>
-                                                  
-                                                 </tr>
-                                                {% endif %}
-                                                
-                                            </form>
-                                             
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-    
+								<h3 class="text-center">Terrain N°
+									{{ i }}</h3>
+								<div class="table-responsive ">
+									<table class="table table-sm align-left table-responsive" id="tableau">
+										<thead>
+											<tr>
+												<th scope="col">
+													<p class="small">Heure</p>
+												</th>
+												<th scope="col">
+													<p class="small">Arbitre</p>
+												</th>
+												<th scope="col">
+													<p class="small">Terrain</p>
+												</th>
+												<th scope="col">
+													<p class="small">Catégorie</p>
+												</th>
+												<th scope="col">
+													<p class="small">Equipe1</p>
+												</th>
+												<th scope="col">
+													<p class="small">Equipe2</p>
+												</th>
 
-  </div>
+											</tr>
+										</thead>
+										<tbody>
+											{% for rencontre in ToutesLesRencontres %}
 
-  </body>
+												{% if rencontre.num_terrain == i %}
 
-<script>
-$(document).ready(function() {
-    var checkScores = function() {
-        $('input[name="equipeScore1"], input[name="equipeScore2"]').each(function() {
-            var equipeScore1 = $(this).closest('tr').find('input[name="equipeScore1"]').val();
-            var equipeScore2 = $(this).closest('tr').find('input[name="equipeScore2"]').val();
+													{% set categoryClass = '' %}
 
-            if (equipeScore1 !== "" && equipeScore2 !== "") {
-                $(this).closest('tr').find('.status').html('Rencontre terminée').css('color', 'red');
-                //$(this).closest('tr').css('background-color', 'gray');
-            } else {
-                $(this).closest('tr').find('.status').html('');
-            }
-        });
-    };
+													{% if rencontre.equipe1_categorie == 'U17M' %}
+														{% set categoryClass = 'U17M' %}
+													{% elseif rencontre.equipe1_categorie == 'U17F' %}
+														{% set categoryClass = 'U17F' %}
 
-    // Exécutez la fonction au chargement de la page
-    checkScores();
+													{% elseif rencontre.equipe1_categorie == 'U15M' %}
+														{% set categoryClass = 'U15M' %}
 
-    // Exécutez la fonction lorsque les champs sont modifiés
-    $('input[name="equipeScore1"], input[name="equipeScore2"]').on('change', checkScores);
+
+													{% elseif rencontre.equipe1_categorie == 'U11F' %}
+														{% set categoryClass = 'U11F' %}
+
+													{% elseif rencontre.equipe1_categorie == 'U11M' %}
+														{% set categoryClass = 'U11M' %}
+
+													{% elseif rencontre.equipe1_categorie == 'U15F' %}
+														{% set categoryClass = 'U15F' %}
+													{% elseif rencontre.equipe1_categorie == 'U13M' %}
+														{% set categoryClass = 'U13M' %}
+													{% elseif rencontre.equipe1_categorie == 'U13F' %}
+														{% set categoryClass = 'U13F' %}
+													{% elseif rencontre.equipe1_categorie == 'senior' %}
+														{% set categoryClass = 'senior' %}
+													{% elseif rencontre.equipe1_categorie == 'loisir' %}
+														{% set categoryClass = 'loisir' %}
+													{% elseif rencontre.equipe1_categorie == 'MiniDebutant' %}
+														{% set categoryClass = 'MiniDebutant' %}
+													{% elseif rencontre.equipe1_categorie == 'MiniDebrouillard' %}
+														{% set categoryClass = 'MiniDebrouillard' %}
+													{% elseif rencontre.equipe1_categorie == 'MiniConfirme' %}
+														{% set categoryClass = 'MiniConfirme' %}
+
+
+													{% endif %}
+
+
+													<form action="gestionRencontres_traitement.php" method="POST" id="{{rencontre.rencontre_id}}">
+														<input type="hidden" value="{{idTournoi}}" name="idTournoi">
+														<input type="hidden" value="{{idPoule}}" name="idPoule">
+														{% if rencontre.rencontre_id is not null %}
+															<tr class="{{categoryClass}}" style="height:120px">
+
+																<input type="hidden" value="{{rencontre.rencontre_id}}" name="IdRencontre" id="IdRencontre">
+																<td scope="row">
+																	<input class="form-control " type="time" name="heure" data-rencontre-id="{{ rencontre.rencontre_id }}" value="{{ rencontre.heure_rencontre }}" id="heure-{{rencontre.rencontre_id}}" size="8" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
+																	<p class="status"></p>
+
+
+																</td>
+
+																<td><input class="form-control form-control-sm" type="text" name="arbitre" value="{{ rencontre.arbitre }}" size="3" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"></td>
+																<td><input style="width: 40px;" class="form-control form-control-sm" type="number" name="terrain" value="{{ rencontre.num_terrain }}" min="1" max="{{NombreTerrain}}" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>Terrain</td>
+																<td>
+																	<p class="small">{{ rencontre.equipe1_categorie }}</p>
+																</td>
+																<td>
+
+																	<input type="number" style="width: 65px;" placeholder="Score" id="Equipe1" class="form-control form-control-sm" value="{{ rencontre.score1 }}" name="equipeScore1" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
+
+																	<input type="hidden" value="{{ rencontre.equipe1_id }}" name="idEquipe1">
+																	<p class="text-break small fw-bold text-center ">{{ rencontre.equipe1_nom }}</p>
+
+																</td>
+																<td>
+																	<input type="number" style="width: 65px;" placeholder="Score" id="Equipe2" class="form-control form-control-sm" value="{{ rencontre.score2 }}" name="equipeScore2" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
+																	<input type="hidden" value="{{ rencontre.equipe2_id }}" name="idEquipe2">
+																	<p class="text-break small fw-bold text-center ">{{ rencontre.equipe2_nom }}</p>
+
+																</td>
+
+
+															</tr>
+														{% else %}
+															<tr class="align-middle " style="height: 120px;">
+																<td class="table-dark"></td>
+																<td class="table-dark">{{rencontre.heure_rencontre}}</td>
+																<td class="table-dark">Terrain
+																	{{ rencontre.num_terrain }}
+																</td>
+																<td class="table-dark">
+																	Libre
+																</td>
+																<td class="table-dark"></td>
+																<td class="table-dark"></td>
+																<td class="table-dark"></td>
+
+															</tr>
+														{% endif %}
+
+													</form>
+
+												{% endif %}
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+
+
+			</div>
+
+		</body>
+
+		<script>
+			$(document).ready(function () {
+var checkScores = function () {
+$('input[name="equipeScore1"], input[name="equipeScore2"]').each(function () {
+var equipeScore1 = $(this).closest('tr').find('input[name="equipeScore1"]').val();
+var equipeScore2 = $(this).closest('tr').find('input[name="equipeScore2"]').val();
+
+if (equipeScore1 !== "" && equipeScore2 !== "") {
+$(this).closest('tr').find('.status').html('Rencontre terminée').css('color', 'red');
+// $(this).closest('tr').css('background-color', 'gray');
+} else {
+$(this).closest('tr').find('.status').html('');
+}
 });
+};
 
+// Exécutez la fonction au chargement de la page
+checkScores();
 
-</script>
-
-
-
+// Exécutez la fonction lorsque les champs sont modifiés
+$('input[name="equipeScore1"], input[name="equipeScore2"]').on('change', checkScores);
+});
+		</script>
+	</body>
 </html>

@@ -41,14 +41,16 @@
 
 			<div class="container-lg">
 				<div class="row">
-					<div class="col-lg-3">
-						<h6>
-							{% if  countVisibleTournois  > 1 %}
-								Tournois
-							{% else %}
-								Tournoi
-							{% endif %}
-						</h6>
+					<div
+						class="col-lg-3">
+						<!--<h6>
+												{# 
+													{% if  countVisibleTournois  > 1 %}
+														Tournois
+													{% else %}
+														Tournoi
+													{% endif %} #}
+												</h6> -->
 						{% set heureIsVisible = 0 %}
 						{% set visibility = 0 %}
 						{% set IsRankingView = 0 %}
@@ -129,7 +131,7 @@
 						{% if visibility == 1 %}
 							{% if IdEquipe %}
 								<div class="alert alert-success mt-2 ">
-									<h4>Suivre la poule</h4>
+									<h4>Dernière étape: Choisir la poule</h4>
 								</div>
 							{% endif %}
 
@@ -148,7 +150,14 @@
 												{% if IdPoules %}
 													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary " role="button">{{ poule.nom }}</a>
 												{% else %}
-													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary blink" role="button">{{ poule.nom }}</a>
+													<span style="white-space: nowrap;">
+														&#128073;
+														<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary blink" role="button">
+															{{ poule.nom }}
+														</a>
+														&#128072;
+													</span>
+
 												{% endif %}
 											{% endif %}
 										</td>
@@ -181,14 +190,14 @@
 						</thead>
 						<tbody>
 							{# pour aller jusqu'à la poule
-																					{% if IdClub %}
-																						 {% set rencontres = listeDesRencontreByClubs %} 
-																					{% endif %}
-																				
-																					{% if IdEquipe %}
-																						{% set rencontres = listeDesEquipesByEquipeId %}
-																					{% endif %}
-																					#}
+																												{% if IdClub %}
+																													 {% set rencontres = listeDesRencontreByClubs %} 
+																												{% endif %}
+																											
+																												{% if IdEquipe %}
+																													{% set rencontres = listeDesEquipesByEquipeId %}
+																												{% endif %}
+																												#}
 
 							{% if IdPoules %}
 								{% set rencontres = RencontreByPoule %}

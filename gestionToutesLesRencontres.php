@@ -133,7 +133,7 @@ $rencontre1 = ajouterRencontresVides($rencontres,$nombreTerrain,$starttime,$endt
 
 //
 
-
+$pourcentagetermine = new tournoiDao();
 
 $template = $twig->load('gestionToutesLesRencontres.twig');
 echo $template->render([
@@ -143,8 +143,9 @@ echo $template->render([
   //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
   
   'idTournoi'=> $_GET['id_tournoi'],
+  'pourcentTermine' =>$pourcentagetermine->pourcentageRencontresTermineesDuTournoi($_GET['id_tournoi']),
+
  
-  
   //'idPoule' => $_GET['idPoule'],
   
   'tournoiEnCours' => $_SESSION['idTournoi'],
