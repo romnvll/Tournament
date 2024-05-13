@@ -20,42 +20,32 @@ class RencontreDAO
 
 
 
-    public function createRencontreByPoule($pouleId, $tournoi_id, $isClassement = 0)
+    public function createRencontreByPoule($pouleId, $tournoi_id, $isClassement = 0, $isMatchRetour = true)
     {
         // Récupérer uniquement les équipes de cette poule dont le champ 'IsPresent' est vrai
         $equipesPresentes = $this->getEquipesPresentesByPoule($pouleId);
-
+    
         // Vérifier s'il y a au moins deux équipes présentes pour créer des rencontres
         if (count($equipesPresentes) >= 2) {
             // Appliquer l'algorithme du round-robin pour créer les rencontres
-            $rencontres = $this->generateRoundRobin($equipesPresentes);
+            $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
             echo "<pre>";
             //var_dump($rencontres);
             echo "</pre>";
             // Insérer les rencontres dans la table Rencontres
             foreach ($rencontres as $rencontre) {
-                
-                
-                $equipe1Id = $rencontre['equipe1']['id'];
-                $equipe2Id = $rencontre['equipe2']['id'];
-                $tour = $rencontre['tour'];
-
                 // Vérifier si la rencontre existe déjà dans la table Rencontres
-
-                if ($this->isRencontreExist($equipe1Id, $equipe2Id, $tour)) {
-                    $this->updateTour($rencontre['id'], $tour);
-                   
+                if ($this->isRencontreExist($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $rencontre['tour'])) {
+                    $this->updateTour($rencontre['id'], $rencontre['tour']);
                 } else {
                     // Si la rencontre n'existe pas, l'insérer dans la table Rencontres
-                    $this->insertRencontre($equipe1Id, $equipe2Id, $tournoi_id, $isClassement, $tour);
-                     //echo "tour " . $tour . ": " . $equipe1Id . " vs " . $equipe2Id . "<br>";
-
+                    $this->insertRencontre($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $tournoi_id, $isClassement, $rencontre['tour']);
+                    //echo "tour " . $rencontre['tour'] . ": " . $rencontre['equipe1']['id'] . " vs " . $rencontre['equipe2']['id'] . "<br>";
                 }
-                   
             }
         }
     }
-
+    
 
     private function isRencontreExist($equipe1Id, $equipe2Id, $tour)
 {
@@ -80,44 +70,70 @@ class RencontreDAO
 
 
 
-    private function generateRoundRobin($equipes)
-    {
-        $n = count($equipes);
-        $rencontres = [];
-        $dummyTeamAdded = false;
+private function generateRoundRobin($equipes, $isMatchRetour = false)
+{
+    $n = count($equipes);
+    $rencontres = [];
+    $dummyTeamAdded = false;
 
-        if ($n % 2 !== 0) {
-            // Si le nombre d'équipes est impair, ajouter une équipe fictive
-            $equipes[] = ['id' => null, 'name' => 'Dummy'];
-            $n++;
-            $dummyTeamAdded = true;
+    if ($n % 2 !== 0) {
+        // Si le nombre d'équipes est impair, ajouter une équipe fictive
+        $equipes[] = ['id' => null, 'name' => 'Dummy'];
+        $n++;
+        $dummyTeamAdded = true;
+    }
+
+    // Générer les rencontres aller
+    for ($i = 0; $i < $n - 1; $i++) {
+
+        for ($j = 0; $j < $n / 2; $j++) {
+            $equipe1 = $equipes[$j];
+            $equipe2 = $equipes[$n - 1 - $j];
+
+            // Si une équipe fictive a été ajoutée, assurez-vous qu'elle n'est pas incluse dans les rencontres
+            if (!($dummyTeamAdded && ($equipe1['id'] === null || $equipe2['id'] === null))) {
+                $rencontres[] = [
+                    'equipe1' => $equipe1,
+                    'equipe2' => $equipe2,
+                    'tour' => $i + 1
+                ];
+            }
         }
 
+        // Rotation spécifique des équipes pour la prochaine ronde
+        $lastTeam = array_pop($equipes);
+        array_splice($equipes, 1, 0, [$lastTeam]);
+    }
+
+    // Générer les rencontres retour
+    if ($isMatchRetour) {
         for ($i = 0; $i < $n - 1; $i++) {
 
             for ($j = 0; $j < $n / 2; $j++) {
-                $equipe1 = $equipes[$j];
-                $equipe2 = $equipes[$n - 1 - $j];
+                $equipe1 = $equipes[$n - 1 - $j];
+                $equipe2 = $equipes[$j];
 
                 // Si une équipe fictive a été ajoutée, assurez-vous qu'elle n'est pas incluse dans les rencontres
                 if (!($dummyTeamAdded && ($equipe1['id'] === null || $equipe2['id'] === null))) {
                     $rencontres[] = [
                         'equipe1' => $equipe1,
                         'equipe2' => $equipe2,
-                        'tour' => $i + 1
+                        'tour' => $n + $i
                     ];
                 }
             }
-            // Ajouter le numéro du tour et le nom de la poule à chaque rencontre
-
 
             // Rotation spécifique des équipes pour la prochaine ronde
             $lastTeam = array_pop($equipes);
             array_splice($equipes, 1, 0, [$lastTeam]);
         }
-
-        return $rencontres;
     }
+
+    return $rencontres;
+}
+
+
+
 
 
     public function getEquipesPresentesByPoule($pouleId)
