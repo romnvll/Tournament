@@ -125,7 +125,7 @@
       <div class="col">
       <div class="row">
       <table class="table">
-  
+  {% if idPoule != 0 %}
   <tbody>
     <tr>
       <th scope="row">Nombre de rencontre</th>
@@ -147,6 +147,7 @@
   </tbody>
 </table>
       </div>
+  {% endif %}
       <div class="row">
 <div id="resultatsParPoules" hx-target="#resultatsParPoules" hx-post="resultatsParPoules.php" hx-trigger="load, change from:#idScore" hx-vals='{"idPoule": {{idPoule}}}'>
     <!-- Le contenu de resultatsParPoules.php sera chargé ici -->
