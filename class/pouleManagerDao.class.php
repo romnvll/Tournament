@@ -329,6 +329,65 @@ public function compterEquipesParPoule($poule_id) {
     return (int) $result['nombre_equipes'];
 }
 
+public function calculerNombreTours($nombre_equipes) {
+    // Utilisez log2 pour calculer le nombre de tours
+    return ceil(log($nombre_equipes, 2));
+}
+
+public function getInfoPoule($poule_id) {
+    // Utilisez une requête SQL pour compter le nombre d'équipes dans la poule donnée
+    $queryEquipes = "SELECT COUNT(*) AS nombre_equipes FROM EquipePoule WHERE poule_id = :poule_id";
+    $stmtEquipes = $this->connexion->prepare($queryEquipes);
+    $stmtEquipes->bindParam(':poule_id', $poule_id, PDO::PARAM_INT);
+    $stmtEquipes->execute();
+
+    // Récupérez le résultat de la requête pour le nombre d'équipes
+    $resultEquipes = $stmtEquipes->fetch(PDO::FETCH_ASSOC);
+    $nombre_equipes = (int) $resultEquipes['nombre_equipes'];
+
+    // Utilisez une requête SQL pour compter le nombre de rencontres dans la poule donnée
+    $queryRencontres = "SELECT COUNT(*) AS nombre_rencontres FROM Rencontres 
+                        WHERE equipe1_id IN (SELECT equipe_id FROM EquipePoule WHERE poule_id = :poule_id) 
+                        AND equipe2_id IN (SELECT equipe_id FROM EquipePoule WHERE poule_id = :poule_id)";
+    $stmtRencontres = $this->connexion->prepare($queryRencontres);
+    $stmtRencontres->bindParam(':poule_id', $poule_id, PDO::PARAM_INT);
+    $stmtRencontres->execute();
+
+    // Récupérez le résultat de la requête pour le nombre de rencontres
+    $resultRencontres = $stmtRencontres->fetch(PDO::FETCH_ASSOC);
+    $nombre_rencontres = (int) $resultRencontres['nombre_rencontres'];
+
+    // Calculer le nombre de tours nécessaires
+    $nombre_tours = $this->calculerNombreTours($nombre_equipes);
+
+    // Déterminer le type de rencontre
+    $type_rencontre = ($nombre_rencontres == $nombre_equipes * ($nombre_equipes - 1) / 2) ? "Aller simple" : "Aller-retour";
+
+    // Calculer le nombre de rencontres par tour
+    if ($type_rencontre === "Aller-retour") {
+        $nombre_rencontres_par_tour = ceil($nombre_equipes / 2);
+    } else {
+        // Pour les matchs aller simple, le nombre de rencontres par tour est le nombre d'équipes divisé par 2
+        $nombre_rencontres_par_tour = ceil($nombre_equipes / 2);
+    }
+
+    // Retournez un tableau associatif contenant le nombre d'équipes, le nombre de rencontres, le nombre de tours, le nombre de rencontres par tour et le type de rencontre
+    return array(
+        'nombre_equipes' => $nombre_equipes,
+        'nombre_rencontres' => $nombre_rencontres,
+        'nombre_tours' => $nombre_tours,
+        'nombre_rencontres_par_tour' => $nombre_rencontres_par_tour,
+        'type_rencontre' => $type_rencontre
+    );
+}
+
+
+
+
+
+
+
+
 
 
 public function getIdFromNom(string $nom): int {

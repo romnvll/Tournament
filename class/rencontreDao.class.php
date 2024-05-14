@@ -29,9 +29,9 @@ class RencontreDAO
         if (count($equipesPresentes) >= 2) {
             // Appliquer l'algorithme du round-robin pour créer les rencontres
             $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
-            echo "<pre>";
+           
             //var_dump($rencontres);
-            echo "</pre>";
+            
             // Insérer les rencontres dans la table Rencontres
             foreach ($rencontres as $rencontre) {
                 // Vérifier si la rencontre existe déjà dans la table Rencontres
