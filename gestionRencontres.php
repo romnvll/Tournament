@@ -60,7 +60,7 @@ echo $template->render([
   'resultatRencontres' => $GetResultatDesPoules,
   'NombreEquipeParPoules' => $equipeDao->countEquipesPresentesInPoule($_GET['idPoule']),
   'NombreTerrain' => $tournoi->getNbTerrainsById($_GET['idTournoi']),
-
+  'InfoPoule' => $poulemanager->getInfoPoule($_GET['idPoule']),
 
 ]);
 
