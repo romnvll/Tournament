@@ -57,7 +57,7 @@ imagedestroy($logoResized);
     // Ajouter le club à la base de données avec le chemin du logo
     
         $clubDao->ajouterClub($nom, $contact,$logoPath);
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+        //header("Location: " . $_SERVER['HTTP_REFERER']);
     
 }
 ?>
