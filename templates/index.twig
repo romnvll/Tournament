@@ -77,9 +77,9 @@
 							{% if tournoi.isVisible == 1 and tournoi.isArchived == 0  %}
 								{% if tournoi.id == idTournoi %}
 
-									<a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
+									<a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg">{{ tournoi.nom|upper }}</a>
 								{% else %}
-									<a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+									<a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom |upper }}</a>
 								{% endif %}
 							{% endif %}
 
@@ -97,9 +97,9 @@
 								</div>
 								{% for club in listeDesCLubs %}
 									{% if club.id == IdClub %}
-										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-success btn-lg">{{ club.nom }}</a>
+										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-success btn-lg">{{ club.nom |upper }}</a>
 									{% else %}
-										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-secondary">{{ club.nom }}</a>
+										<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="btn btn-secondary">{{ club.nom |upper }}</a>
 									{% endif %}
 								{% endfor %}
 							{% endif %}
@@ -118,9 +118,9 @@
 							{% for equipes in listeDesEquipesByClubs %}
 
 								{% if equipes.id == IdEquipe %}
-									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="btn btn-success btn-lg">{{ equipes.nom }}</a>
+									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="btn btn-success btn-lg">{{ equipes.nom |upper }}</a>
 								{% else %}
-									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="btn btn-secondary">{{ equipes.nom }}</a>
+									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="btn btn-secondary">{{ equipes.nom |upper }}</a>
 								{% endif %}
 							{% endfor %}
 						{% endif %}
@@ -143,17 +143,17 @@
 									<tr>
 										<td>
 											{% if poule.id == IdPoules %}
-												<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-success btn-lg" role="button">{{ poule.nom }}</a>
+												<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-success btn-lg" role="button">{{ poule.nom |upper }}</a>
 
 
 											{% else %}
 												{% if IdPoules %}
-													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary " role="button">{{ poule.nom }}</a>
+													<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary " role="button">{{ poule.nom |upper }}</a>
 												{% else %}
 													<span style="white-space: nowrap;">
 														&#128073;
 														<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="btn btn-secondary blink" role="button">
-															{{ poule.nom }}
+															{{ poule.nom | upper }}
 														</a>
 														&#128072;
 													</span>
@@ -238,8 +238,8 @@
 										{% endif %}
 										<td>
 
-											<p class="h6 text-end">{{equipe.equipe1_nom}}</p>
-											<div class="text-end"><img src="{{equipe.equipe1_logo}}" class="rounded" alt="{{equipe.equipe1_nom}}"></div>
+											<p class="h6 text-end">{{equipe.equipe1_nom|upper }}</p>
+											<div class="text-end"><img src="{{equipe.equipe1_logo}}" class="rounded" alt="{{equipe.equipe1_nom|upper }}"></div>
 
 										</td>
 										<td class="align-middle text-center">
@@ -261,8 +261,8 @@
 
 										</td>
 										<td>
-											<p class="h6 text-left">{{equipe.equipe2_nom}}</p>
-											<img src="{{equipe.equipe2_logo}}" class="rounded" alt="{{equipe.equipe2_nom}}">
+											<p class="h6 text-left">{{equipe.equipe2_nom|upper }}</p>
+											<img src="{{equipe.equipe2_logo}}" class="rounded" alt="{{equipe.equipe2_nom|upper }}">
 										</td>
 
 									</tr>

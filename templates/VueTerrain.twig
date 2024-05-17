@@ -29,9 +29,9 @@
 
 						{% if tournoi.isArchived == 0 %}
 							{% if tournoi.id == idTournoi %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom|upper }}</a>
 							{% else %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom }}</a>
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom|upper }}</a>
 							{% endif %}
 						{% endif %}
 
@@ -104,7 +104,7 @@
 																{{ rencontre.equipe1_categorie}}</td>
 															<td>
 
-																<p class="h6 text-end">{{rencontre.equipe1_nom}}</p>
+																<p class="h6 text-end">{{rencontre.equipe1_nom |upper}}</p>
 																<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
 
 															</td>
@@ -125,7 +125,7 @@
 																{% endif %}
 															</td>
 															<td>
-																<p class="h6 text-left">{{rencontre.equipe2_nom}}</p>
+																<p class="h6 text-left">{{rencontre.equipe2_nom|upper}}</p>
 																<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}">
 															</td>
 

@@ -17,11 +17,11 @@
 			<div class="col ml-5">
 				<form action="modifierClub_traitement.php" method="POST" enctype="multipart/form-data">
 					<input type="hidden" name="idclub" value={{idClub}}>
-					nom :<input type="text" name="nomduclub" {% if isModify == true %} value={{afficheclub.nom}} {% endif %}/>
+					nom :<input type="text" name="nomduclub" {% if isModify == true %} value="{{afficheclub.nom}}" {% endif %}/>
 					<br>
 					contact :<input type="text" name="contactClub" {% if isModify == true %} value={{afficheclub.contact}} {% endif %}/>
 					<br>
-					logo contact :<input type="file" name="logo"/>
+					logo contact :<input type="file" accept="image/png, image/jpeg" name="logo"/>
 					<br/>
 					<!-- Champ de type "file" pour l'upload -->
 					<input type="submit"/>
