@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $clubdao = new ClubDAO();
-    $clubdao->updateClub($_POST['idclub'],$_POST['nomduclub'],$_POST['contactClub'],null,$_POST['contactClub'],$uploadPath);
+    $clubdao->updateClub($_POST['idclub'],$_POST['nomduclub'],null,null,$_POST['contactClub'],$uploadPath);
 
 
 }
