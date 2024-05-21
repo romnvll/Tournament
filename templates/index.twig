@@ -287,19 +287,25 @@
 								</tr>
 							</thead>
 							<tbody>
-
+							
 								{% set classement = 0 %}
-								{% for resultat in resultatRencontres %}
-									{% set classement = classement + 1 %}
-									<tr>
-										<th scope="row">{{classement}}</th>
-										<td>{{resultat.nom}}</td>
-										<td>{{resultat.TotalDesPoints}}</td>
-										<td>{{resultat.nombreButsMarque}}</td>
-										<td>{{resultat.nombreButsEncaisse}}</td>
-										<td>{{resultat.DifferenceButs}}</td>
-									</tr>
-								{% endfor %}
+{% for resultat in resultatRencontres %}
+    {% set classement = classement + 1 %}
+    <tr>
+        <th scope="row">{{ classement }}</th>
+        <td>
+            <div class="d-flex align-items-center">
+                <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                <span>{{ resultat.nom|upper }}</span>
+            </div>
+        </td>
+        <td>{{ resultat.TotalDesPoints }}</td>
+        <td>{{ resultat.nombreButsMarque }}</td>
+        <td>{{ resultat.nombreButsEncaisse }}</td>
+        <td>{{ resultat.DifferenceButs }}</td>
+    </tr>
+{% endfor %}
+
 							</tbody>
 						</table>
 
