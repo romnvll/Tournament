@@ -58,17 +58,42 @@ class ClubDAO {
 
     // Dans clubDao.class.php
 
-public function updateClub($id, $nom, $email, $password, $contact, $logo) {
-    $stmt = $this->connexion->prepare("UPDATE Clubs SET nom = :nom, email = :email, password = :password, contact = :contact, logo = :logo WHERE id = :id");
-    $stmt->bindParam(':id', $id);
-    $stmt->bindParam(':nom', $nom);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':password', $password);
-    $stmt->bindParam(':contact', $contact);
-    $stmt->bindParam(':logo', $logo);
-    return $stmt->execute();
-}
-
+    public function updateClub($id, $nom, $email = null, $password = null, $contact, $logo) {
+        // Commencez la requête de mise à jour
+        $query = "UPDATE Clubs SET nom = :nom, contact = :contact, logo = :logo";
+    
+        // Ajoutez les champs facultatifs s'ils sont fournis
+        if (!is_null($email)) {
+            $query .= ", email = :email";
+        }
+        if (!is_null($password)) {
+            $query .= ", password = :password";
+        }
+    
+        // Complétez la requête avec la condition WHERE
+        $query .= " WHERE id = :id";
+    
+        // Préparez la requête
+        $stmt = $this->connexion->prepare($query);
+    
+        // Lie les paramètres requis
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nom', $nom);
+        $stmt->bindParam(':contact', $contact);
+        $stmt->bindParam(':logo', $logo);
+    
+        // Lie les paramètres facultatifs s'ils sont fournis
+        if (!is_null($email)) {
+            $stmt->bindParam(':email', $email);
+        }
+        if (!is_null($password)) {
+            $stmt->bindParam(':password', $password);
+        }
+    
+        // Exécutez la requête
+        return $stmt->execute();
+    }
+    
 
 // Dans clubDao.class.php
 
