@@ -394,34 +394,42 @@ public function updateTour(int $idrencontre, int $tour)
         public function GetResultatDesPoules(int $idPoule, int $isClassement = 0)
         {
             $query = "
-                SELECT
-                    e.id,
-                    e.nom,
-                    e.categorie,
-                    e.IsPresent,
-                    e.tournoi_id,
-                    ep.poule_id,
-                    e.club_id,
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id AND r.score1 > r.score2) OR (r.equipe2_id = e.id AND r.score2 > r.score1))) * 3) +
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id OR r.equipe2_id = e.id) AND r.score1 = r.score2)) * 2) +
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id AND r.score1 < r.score2) OR (r.equipe2_id = e.id AND r.score2 < r.score1)))) AS TotalDesPoints,
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0) AS nombreButsMarque,
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0) AS nombreButsEncaisse,
-                    (COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0)) -
-                    (COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0)) AS DifferenceButs
-                FROM
-                    Equipes e
-                JOIN EquipePoule ep ON e.id = ep.equipe_id
-                WHERE
-                    ep.poule_id = :pouleId 
-                ORDER BY
-                    TotalDesPoints DESC,
-                    nombreButsMarque DESC,
-                    DifferenceButs DESC;
+            SELECT
+            e.id,
+            e.nom,
+            e.categorie,
+            e.IsPresent,
+            e.tournoi_id,
+            ep.poule_id,
+            e.club_id,
+            c.nom AS club_nom,
+            c.email AS club_email,
+            c.contact AS club_contact,
+            c.logo AS club_logo,
+            ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id AND r.score1 > r.score2) OR (r.equipe2_id = e.id AND r.score2 > r.score1))) * 3) +
+            ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id OR r.equipe2_id = e.id) AND r.score1 = r.score2)) * 2) +
+            ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = :isClassement AND ((r.equipe1_id = e.id AND r.score1 < r.score2) OR (r.equipe2_id = e.id AND r.score2 < r.score1)))) AS TotalDesPoints,
+            COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
+            COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0) AS nombreButsMarque,
+            COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
+            COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0) AS nombreButsEncaisse,
+            (COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
+            COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0)) -
+            (COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement), 0) +
+            COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement), 0)) AS DifferenceButs
+        FROM
+            Equipes e
+        JOIN
+            EquipePoule ep ON e.id = ep.equipe_id
+        JOIN
+            Clubs c ON e.club_id = c.id
+        WHERE
+            ep.poule_id = :pouleId
+        ORDER BY
+            TotalDesPoints DESC,
+            nombreButsMarque DESC,
+            DifferenceButs DESC;
+        
             ";
         
             $stmt = $this->connexion->prepare($query);
