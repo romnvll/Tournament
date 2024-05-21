@@ -293,7 +293,7 @@
 									{% set classement = classement + 1 %}
 									<tr>
 										<th scope="row">{{classement}}</th>
-										<td>{{resultat.nom}}</td>
+										<td>{{resultat.nom|upper}}</td>
 										<td>{{resultat.TotalDesPoints}}</td>
 										<td>{{resultat.nombreButsMarque}}</td>
 										<td>{{resultat.nombreButsEncaisse}}</td>
