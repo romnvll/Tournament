@@ -1,0 +1,141 @@
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.7"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<title>Vue des terrains</title>
+	</head>
+
+	<body>
+	{% set heureIsVisible = 0 %}
+	{% set visibility = 0 %}
+	{% for tournoi in ListeDesTournois %}
+
+			{% if tournoi.id == idTournoi %}
+				{% if tournoi.isVisible == 1 %}
+					{% set visibility = 1 %}
+				{% endif %}
+			{% endif %}
+
+
+			{% if tournoi.heureIsVisible  == 1 and tournoi.id == idTournoi %}
+					{% set heureIsVisible = 1 %}
+			{% endif %}
+
+							
+
+		{% endfor %}
+		<div class="container-fluid">
+			<div class="row">
+			
+				
+					<div class="col-lg-3 col-sm-12">
+						
+					</div>
+
+				</div>
+
+		
+				<div class="row">
+				{% for i in 1..nombreTerrain %}
+					
+						
+							<div class="col-lg-5 col-sm-1 mt-5" id="score">
+								<h3 class="text-center">Terrain N°
+									{{ i }}</h3>
+								<table class="table">
+									<thead>
+										<tr>
+										{% if heureIsVisible == 1 %}
+											<th scope="col" class="text-center">Heure prévue</th>
+										{% endif %}	
+											
+											
+											<th scope="col" class="text-end">Equipe1</th>
+											<th scope="col" class="text-center">Score</th>
+											<th scope="col" class="text-start">Equipe2</th>
+
+										</tr>
+									</thead>
+									<tbody>
+
+										{% for rencontre in rencontres %}
+											{% if isArchived == 0 %}
+												{% if rencontre.terrain == i %}
+													{% if rencontre.score1 != 0 or rencontre.score2 !=0 %}
+														<tr class="rencontre table-success" data-terrain="{{ i }}">
+
+														{% else %}
+															<tr class="rencontre" data-terrain="{{ i }}">
+															{% endif %}
+
+
+															{% if not rencontre.heure is empty %}
+																{% set heure_formatee = rencontre.heure|replace({ ':': 'h' })|slice(0, 2) ~ 'h' ~ rencontre.heure|replace({ ':': 'h' })|slice(3, 2) %}
+																{% if heureIsVisible == 1 %} <td class="align-middle text-center">
+																	<p class="fw-bold">
+																		{{ heure_formatee }}</p>
+																</td>
+																{% endif %}
+															{% else %}
+																<td class="align-middle text-center">
+																	<span class="badge bg-warning text-dark">
+																		A planifier</span>
+																</td>
+															{% endif %}
+															
+															
+															<td>
+
+																<p class="h6 text-end">{{rencontre.equipe1_nom}}</p>
+																<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
+
+															</td>
+															<td class="text-center">
+
+																{% if  rencontre.score1 > rencontre.score2  %}
+																	<span class="badge bg-success">{{ rencontre.score1 }}</span>-<span class="badge bg-danger">{{ rencontre.score2 }}
+																	</span>
+																{% elseif rencontre.score1 < rencontre.score2 %}
+																	<span class="badge bg-danger">{{ rencontre.score1 }}</span>-<span class="badge bg-success">{{ rencontre.score2 }}</span>
+																{% elseif rencontre.score1 is same as(rencontre.score2) and (rencontre.score1 is not null or rencontre.score2 is not null) %}
+																	<span class="badge bg-secondary">{{ rencontre.score1 }}</span>-<span class="badge bg-secondary">{{ rencontre.score2 }}</span>
+
+																{% elseif rencontre.score1 or rencontre.score2 == null %}
+																	<span class="badge bg-warning text-dark">
+																		Rencontre à venir</span>
+																	{{rencontre.score1}}
+																{% endif %}
+															</td>
+															<td>
+																<p class="h6 text-left">{{rencontre.equipe2_nom}}</p>
+																<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}">
+															</td>
+
+														</tr>
+
+													</tr>
+												{% endif %}
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						
+					{% endfor %}
+				
+			</div>
+		</div>
+	</body>
+	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+	<script>
+	setInterval(function () {
+$('#score').load(location.href + ' #score > *');
+}, 2000); // 2000 millisecondes = 2 secondes
+
+
+
+</script>
+</html>
+
