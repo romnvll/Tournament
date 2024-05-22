@@ -227,10 +227,10 @@
 
 										{% if equipe.num_terrain != 0  %}
 											<td class="align-middle text-center position-relative">
-												<img src="img/football.png" class="img-fluid ">
+												<a href="vuePubliqueTerrain.php?id_tournoi={{idTournoi}}"> <img src="img/football.png" class="img-fluid ">
 												<h4 class="position-absolute top-50 start-50 translate-middle">
 													<span class="badge rounded-pill bg-danger">{{ equipe.num_terrain }}</span>
-												</h4>
+												</h4> </a>
 											</td>
 
 										{% else  %}
