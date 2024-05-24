@@ -3,54 +3,57 @@
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=0.7"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-		<title>Vue des terrains</title>
+		<title>Gestion rencontre</title>
 	</head>
 
 	<body>
-	{% set heureIsVisible = 0 %}
-	{% set visibility = 0 %}
-	{% for tournoi in ListeDesTournois %}
-
-			{% if tournoi.id == idTournoi %}
-				{% if tournoi.isVisible == 1 %}
-					{% set visibility = 1 %}
-				{% endif %}
-			{% endif %}
-
-
-			{% if tournoi.heureIsVisible  == 1 and tournoi.id == idTournoi %}
-					{% set heureIsVisible = 1 %}
-			{% endif %}
-
-							
-
-		{% endfor %}
 		<div class="container-fluid">
 			<div class="row">
-			
-				
-					<div class="col-lg-3 col-sm-12">
-						
-					</div>
+				<div class="col-lg-3">
+
+					{% set isArchived = 1 %}
+					{% for tournoi in ListeDesTournois %}
+
+						{% if tournoi.id == idTournoi  %}
+							{% if tournoi.isArchived == 0 %}
+								{% set isArchived = 0 %}
+							{% endif %}
+						{% endif %}
+
+
+						{% if tournoi.isArchived == 0 %}
+							{% if tournoi.id == idTournoi %}
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
+							{% else %}
+								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom }}</a>
+							{% endif %}
+						{% endif %}
+
+
+					{% endfor %}
+				</div>
+				{% if idTournoi is not null and idTournoi != '' %}
+
 
 				</div>
 
-		
-				<div class="row">
-				{% for i in 1..nombreTerrain %}
-					
-						
-							<div class="col-lg-5 col-sm-1 mt-5" id="score">
+
+				<div class="row mt-3">
+
+					{% for i in 1..nombreTerrain %}
+						{% if terrainSelect is null or terrainSelect == i %}
+							<div class="col-lg-8 mx-auto" id="score">
 								<h3 class="text-center">Terrain N°
 									{{ i }}</h3>
-								<table class="table">
+								<table class="table table-striped text-nowrap">
 									<thead>
 										<tr>
-										{% if heureIsVisible == 1 %}
-											<th scope="col" class="text-center">Heure prévue</th>
-										{% endif %}	
+											{% if heureIsVisible == 1 %}
+												<th scope="col" class="text-center">Heure prévue</th>
+											{% endif %}
+											<!-- <th scope="col">Terrain</th>  -->
 											
-											
+											<th scope="col" class="text-center">Catégorie</th>
 											<th scope="col" class="text-end">Equipe1</th>
 											<th scope="col" class="text-center">Score</th>
 											<th scope="col" class="text-start">Equipe2</th>
@@ -69,26 +72,29 @@
 															<tr class="rencontre" data-terrain="{{ i }}">
 															{% endif %}
 
-
-															{% if not rencontre.heure is empty %}
-																{% set heure_formatee = rencontre.heure|replace({ ':': 'h' })|slice(0, 2) ~ 'h' ~ rencontre.heure|replace({ ':': 'h' })|slice(3, 2) %}
-																{% if heureIsVisible == 1 %} <td class="align-middle text-center">
-																	<p class="fw-bold">
-																		{{ heure_formatee }}</p>
-																</td>
+															{% if heureIsVisible == 1 %}
+																{% if not rencontre.heure is empty %}
+																	{% set heure_formatee = rencontre.heure|replace({ ':': 'h' })|slice(0, 2) ~ 'h' ~ rencontre.heure|replace({ ':': 'h' })|slice(3, 2) %}
+																	<td class="align-middle text-center">
+																		<p class="fw-bold">
+																			{{ heure_formatee }}</p>
+																	</td>
+																{% else %}
+																	<td class="align-middle text-center">
+																		<span class="badge bg-warning text-dark">
+																			A planifier</span>
+																	</td>
 																{% endif %}
-															{% else %}
-																<td class="align-middle text-center">
-																	<span class="badge bg-warning text-dark">
-																		A planifier</span>
-																</td>
 															{% endif %}
+															<!--  <td> {{ rencontre.terrain }}</td> -->
 															
-															
+															<td class="align-middle text-center">
+																{{ rencontre.equipe1_categorie}}</td>
 															<td>
-
 																<p class="h6 text-end">{{rencontre.equipe1_nom}}</p>
-																<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
+																<a href="index.php?id_tournoi={{idTournoi}}&id_club={{rencontre.clubId1}}&id_equipe={{rencontre.clubId1}}">
+																	<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
+																</a>
 
 															</td>
 															<td class="text-center">
@@ -109,7 +115,8 @@
 															</td>
 															<td>
 																<p class="h6 text-left">{{rencontre.equipe2_nom}}</p>
-																<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}">
+																<a href="index.php?id_tournoi={{idTournoi}}&id_club={{rencontre.clubId2}}&id_equipe={{rencontre.clubId2}}">
+																	<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}"></a>
 															</td>
 
 														</tr>
@@ -121,21 +128,28 @@
 									</tbody>
 								</table>
 							</div>
-						
+						{% endif %}
 					{% endfor %}
-				
+				{% else %}
+					<div class="row">
+						<div class="alert alert-warning alert-dismissible fade show d-flex" role="alert">
+							<button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+							<div>
+								<strong>Attention!</strong>
+								Il faut choisir un tournoi
+							</div>
+						</div>
+
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</body>
-	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-
-	<script>
-	setInterval(function () {
-$('#score').load(location.href + ' #score > *');
-}, 2000); // 2000 millisecondes = 2 secondes
-
-
-
-</script>
-</html>
-
+</html></div></body></html><script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script><script>setInterval(function () {
+			$('#score').load(location.href + ' #score > *');
+			}, 2000); // 2000 millisecondes = 2 secondes
+			
+			
+			setInterval(function () {
+			$('#classementTableau').load(location.href + ' #classementTableau > *');
+			}, 2000); // 2000 millisecondes = 2 secondes</script>

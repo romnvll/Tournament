@@ -754,7 +754,8 @@ public function updateTour(int $idrencontre, int $tour)
         $query = "SELECT r.*, 
                       e1.nom AS equipe1_nom, e2.nom AS equipe2_nom,
                       e1.categorie AS equipe1_categorie, e2.categorie AS equipe2_categorie,
-                      c1.logo AS equipe1_logo, c2.logo AS equipe2_logo
+                      c1.logo AS equipe1_logo, c2.logo AS equipe2_logo, c1.id AS clubId1, c2.id AS clubId2,
+                      e1.id AS equipeId1, e2.id AS equipeId2
                       FROM Rencontres r
                       LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
                       LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id

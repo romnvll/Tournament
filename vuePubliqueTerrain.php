@@ -25,10 +25,6 @@ $_SESSION['idTournoi'] = $_GET['id_tournoi'];
 $nombreTerrain = $tournoiDao->getNbTerrainsById($_GET['id_tournoi']);
 $terrainSelect=$_GET['terrain'];
 
-
-
-
-
 echo $template->render([
     'ListeDesTournois' => $listeDesTournois,
     'rencontres' => $rencontre->getAllRencontresByTournoiId($_GET['id_tournoi']),
@@ -38,4 +34,6 @@ echo $template->render([
 
 
 ]);
+
+
 ?>
