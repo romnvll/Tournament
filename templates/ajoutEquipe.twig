@@ -225,8 +225,11 @@ $(document).ready(function() {
             "orderable": false // Désactive le tri sur cette colonne
         }],
         "language": {
-            "url": "js/fr-FR.json"
-        }
+            "url": "js/fr-FR.json" // Mettez à jour l'URL pour pointer vers le fichier local
+        },
+        "lengthMenu": [[-1], ["Tous"]], // Affiche tous les résultats
+        "pageLength": -1, // Définit la longueur de page par défaut à tous les résultats
+        "paging": false // Masque la pagination
     });
 });
 
