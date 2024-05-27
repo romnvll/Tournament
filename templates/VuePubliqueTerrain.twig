@@ -11,26 +11,7 @@
 			<div class="row">
 				<div class="col-lg-3">
 
-					{% set isArchived = 1 %}
-					{% for tournoi in ListeDesTournois %}
-
-						{% if tournoi.id == idTournoi  %}
-							{% if tournoi.isArchived == 0 %}
-								{% set isArchived = 0 %}
-							{% endif %}
-						{% endif %}
-
-
-						{% if tournoi.isArchived == 0 %}
-							{% if tournoi.id == idTournoi %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
-							{% else %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom }}</a>
-							{% endif %}
-						{% endif %}
-
-
-					{% endfor %}
+				
 				</div>
 				{% if idTournoi is not null and idTournoi != '' %}
 
