@@ -217,13 +217,18 @@ $(document).ready(function() {
 
 
 
-    $(document).ready(function() {
-       $('#example').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
-            }
-        });
+   $(document).ready(function() {
+    $('#example').DataTable({
+        "columnDefs": [{
+            "targets": [3], // Indice de la colonne à ignorer
+            "searchable": false, // Désactive la recherche sur cette colonne
+            "orderable": false // Désactive le tri sur cette colonne
+        }],
+        "language": {
+            "url": "js/fr-FR.json"
+        }
     });
+});
 
 
 
