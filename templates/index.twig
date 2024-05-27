@@ -178,26 +178,26 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
-
-								{% if heureIsVisible == 1 %}
-									<th scope="col">Heure</th>
-								{% endif %}
-								<th scope="col">Terrain</th>
-								<th scope="col " class="text-center">Equipe1</th>
-								<th scope="col" class="w-25 text-center">Score</th>
-								<th scope="col">Equipe2</th>
+								
+								{% if IdPoules is not null %}
+										{% if heureIsVisible == 1 %}
+											<th scope="col">Heure</th>
+										{% endif %}
+										<th scope="col">Terrain</th>
+										<th scope="col" class="text-center">Equipe1</th>
+										<th scope="col" class="w-25 text-center">Score</th>
+										<th scope="col">Equipe2</th>
+									{% endif %}
 							</tr>
 						</thead>
 						<tbody>
 							{# pour aller jusqu'à la poule
-																												{% if IdClub %}
-																													 {% set rencontres = listeDesRencontreByClubs %} 
-																												{% endif %}
-																											
-																												{% if IdEquipe %}
-																													{% set rencontres = listeDesEquipesByEquipeId %}
-																												{% endif %}
-																												#}
+									{% if IdClub %}
+									 {% set rencontres = listeDesRencontreByClubs %} 
+									{% endif %}
+									{% if IdEquipe %}
+									{% set rencontres = listeDesEquipesByEquipeId %}
+							#}
 
 							{% if IdPoules %}
 								{% set rencontres = RencontreByPoule %}
@@ -227,10 +227,10 @@
 
 										{% if equipe.num_terrain != 0  %}
 											<td class="align-middle text-center position-relative">
-												<img src="img/football.png" class="img-fluid ">
+												<a href="vuePubliqueTerrain.php?id_tournoi={{idTournoi}}&terrain={{equipe.num_terrain}}"> <img src="img/football.png" class="img-fluid ">
 												<h4 class="position-absolute top-50 start-50 translate-middle">
 													<span class="badge rounded-pill bg-danger">{{ equipe.num_terrain }}</span>
-												</h4>
+												</h4> </a>
 											</td>
 
 										{% else  %}
