@@ -12,22 +12,23 @@
 				<div class="col-lg-3">
 
 					{% set isArchived = 1 %}
+					{% set heureIsVisible = 0 %}
+						
 					{% for tournoi in ListeDesTournois %}
+					
+					{% if  tournoi.id == idTournoi and tournoi.heureIsVisible  == 1  %}
+						
+						{% set heureIsVisible = 1 %}
+						
+					{% endif %}	
 
-						{% if tournoi.id == idTournoi  %}
 							{% if tournoi.isArchived == 0 %}
 								{% set isArchived = 0 %}
-							{% endif %}
+							
 						{% endif %}
+					
 
-
-						{% if tournoi.isArchived == 0 %}
-							{% if tournoi.id == idTournoi %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-success btn-lg">{{ tournoi.nom }}</a>
-							{% else %}
-								<a href="vueTerrain.php?id_tournoi={{ tournoi.id }}&terrain=1" class="btn btn-secondary">{{ tournoi.nom }}</a>
-							{% endif %}
-						{% endif %}
+						
 
 
 					{% endfor %}
