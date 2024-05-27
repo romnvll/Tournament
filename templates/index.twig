@@ -178,26 +178,26 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
-
-								{% if heureIsVisible == 1 %}
-									<th scope="col">Heure</th>
-								{% endif %}
-								<th scope="col">Terrain</th>
-								<th scope="col " class="text-center">Equipe1</th>
-								<th scope="col" class="w-25 text-center">Score</th>
-								<th scope="col">Equipe2</th>
+								
+								{% if IdPoules is not null %}
+										{% if heureIsVisible == 1 %}
+											<th scope="col">Heure</th>
+										{% endif %}
+										<th scope="col">Terrain</th>
+										<th scope="col" class="text-center">Equipe1</th>
+										<th scope="col" class="w-25 text-center">Score</th>
+										<th scope="col">Equipe2</th>
+									{% endif %}
 							</tr>
 						</thead>
 						<tbody>
 							{# pour aller jusqu'à la poule
-																												{% if IdClub %}
-																													 {% set rencontres = listeDesRencontreByClubs %} 
-																												{% endif %}
-																											
-																												{% if IdEquipe %}
-																													{% set rencontres = listeDesEquipesByEquipeId %}
-																												{% endif %}
-																												#}
+									{% if IdClub %}
+									 {% set rencontres = listeDesRencontreByClubs %} 
+									{% endif %}
+									{% if IdEquipe %}
+									{% set rencontres = listeDesEquipesByEquipeId %}
+							#}
 
 							{% if IdPoules %}
 								{% set rencontres = RencontreByPoule %}
