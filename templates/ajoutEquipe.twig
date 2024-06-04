@@ -87,7 +87,7 @@
         {% for tournament in ListeDesTournois %}
           {% if tournament.isArchived == 0 %}
 
-<a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %} position-relative ms-2">
+<a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %} position-relative ms-2 mb-2">
     {{tournament.nom}}
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
         {{tournament.nombre_equipes}}
