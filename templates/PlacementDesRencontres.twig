@@ -4,9 +4,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<link href="style/couleurEquipes.css" rel="stylesheet">
-		<script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+		
+		<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 		<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
+
 		<title>Placez vos rencontres</title>
 	</head>
 
@@ -28,8 +30,72 @@
 				{% endfor %}
 			</div>
 
-        <div class="col-lg-3">
-        <pre>
-            {{ dump(ListeEvenements) }}
-        </pre>
+        <div class="col-lg-12">
+    
+	  <table class="table">
+  <thead>
+ <pre>
+	{{ dump(tableauEvenements) }}
+ </pre>
+    <tr>
+	<th scope="col">Créneau</th>
+	
+	{% for i in 0..nbrterrain|length %}
+      <th scope="col">{{nbrterrain[i]["nom"]}}</th>
+	{% endfor %}
+
+    </tr>
+  </thead>
+ <tbody>
+
+<!-- les valeurs possibles : 
+					tableauEvenements[creneau.id][terrain]['rencontre_id']
+					tableauEvenements[creneau.id][terrain]['tour']
+					tableauEvenements[creneau.id][terrain]['equipe1_nom']
+					tableauEvenements[creneau.id][terrain]['equipe1_categorie']
+					tableauEvenements[creneau.id][terrain]['equipe2_nom']
+					tableauEvenements[creneau.id][terrain]['equipe2_categorie']
+					tableauEvenements[creneau.id][terrain]['poule_nom']
+					tableauEvenements[creneau.id][terrain]['poule_categorie']
+				 -->
+       {% for creneau in listCreneaux %}
+  <tr>
+    <td>Créneau {{ creneau.numero }}</td>
+    {% for terrain in 1..nbrterrain|length %}
+	
+      <td>
+        {% if tableauEvenements[creneau.id] is defined and tableauEvenements[creneau.id][terrain] is defined %}
+          {% set default_value = tableauEvenements[creneau.id][terrain]['equipe1_nom'] ~ ' vs ' ~ tableauEvenements[creneau.id][terrain]['equipe2_nom'] %}
+        {% else %}
+          {% set default_value = '' %}
+        {% endif %}
+        
+        <select class="form-select" aria-label="Default select example" name="events" hx-trigger="change"  hx-get="PlacementDesRencontresTraitement.php?action=addEvent" hx-swap="none">
+          {% for idCreneau, terrains in tableauEvenements %}
+            {% for idTerrain, rencontre in terrains %}
+              {% set option_value = rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom %}
+              <option value="{{idTournoi}}-{{ rencontre.rencontre_id }}-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
+                {{ rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom }}
+              </option>
+            {% endfor %}
+          {% endfor %}
+          
+          {% if default_value == '' %}
+            <option value="Vide-{{terrain}}-{{ creneau.numero }}" selected>Choisissez une rencontre</option>
+			 <option value="Pause-{{terrain}}-{{ creneau.numero }}" >Pause</option>
+
+          {% endif %}
+        </select>
+      </td>
+    {% endfor %}
+  </tr>
+{% endfor %}
+
+
+		<tfoot>
+    	<td><a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}">Ajout</a></td>
+  		</tfoot>
+      </tbody>
+</table>
+
         </div>

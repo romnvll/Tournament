@@ -1,12 +1,15 @@
 <?php
 
 class RencontreDAO
+
 {
     private $connexion;
+    
 
     public function __construct()
     {
         require 'databaseInformations.php';
+        //require 'evenementsDao.class.php';
 
         try {
             $this->connexion = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -41,6 +44,7 @@ class RencontreDAO
                     // Si la rencontre n'existe pas, l'insérer dans la table Rencontres
                     $this->insertRencontre($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $tournoi_id, $isClassement, $rencontre['tour']);
                     //echo "tour " . $rencontre['tour'] . ": " . $rencontre['equipe1']['id'] . " vs " . $rencontre['equipe2']['id'] . "<br>";
+                    
                 }
             }
         }
@@ -153,8 +157,10 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
 
     public function insertRencontre($equipe1Id, $equipe2Id, $tournoi_id, $isClassement = 0, $tour = null)
+   
     {
 
+        
         // Vérifiez si la rencontre existe déjà
         $checkQuery = "SELECT * FROM Rencontres WHERE equipe1_id = :equipe1Id AND equipe2_id = :equipe2Id AND tournoi_id = :tournoi_id and isClassement = :isClassement ";
         $checkStmt = $this->connexion->prepare($checkQuery);
@@ -179,6 +185,10 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
         $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_BOOL);
         $stmt->execute();
 
+        //insertion dans la table evenement:
+        
+        $evenement = new EvenementDAO();
+        $evenement->ajouterEvenement(null,$this->connexion->lastInsertId(),null,$tournoi_id);
         return true;  // indication que l'insertion a réussi
     }
 
@@ -695,7 +705,44 @@ public function updateTour(int $idrencontre, int $tour)
         }
     }
 
-
+    public function getRencontreDetails($rencontreId)
+    {
+        // Récupérer les informations de base de la rencontre
+        $query = "
+            SELECT
+                Rencontres.id AS rencontre_id,
+                Rencontres.tour AS tour,
+                Equipes1.nom AS equipe1_nom,
+                Equipes1.categorie AS equipe1_categorie,
+                Equipes2.nom AS equipe2_nom,
+                Equipes2.categorie AS equipe2_categorie,
+                Poules.nom AS poule_nom,
+                Poules.categorie AS poule_categorie
+            FROM
+                Rencontres
+                INNER JOIN Equipes AS Equipes1 ON Rencontres.equipe1_id = Equipes1.id
+                INNER JOIN Equipes AS Equipes2 ON Rencontres.equipe2_id = Equipes2.id
+                LEFT JOIN EquipePoule ON Equipes1.id = EquipePoule.equipe_id
+                LEFT JOIN Poules ON EquipePoule.poule_id = Poules.id
+            WHERE
+                Rencontres.id = :rencontreId
+        ";
+    
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':rencontreId', $rencontreId, PDO::PARAM_INT);
+        $stmt->execute();
+    
+        // Récupérer les détails de la rencontre
+        $rencontreDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        // Vérifier si des détails ont été récupérés
+        if ($rencontreDetails !== false) {
+            return $rencontreDetails; // Retourner les détails de la rencontre
+        } else {
+            return null; // Retourner null si aucun détail n'est trouvé
+        }
+    }
+    
 
     public function getRencontreByTournoi($tournoiId)
     {
