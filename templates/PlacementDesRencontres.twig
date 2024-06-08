@@ -34,9 +34,7 @@
     
 	  <table class="table">
   <thead>
- <pre>
-	{{ dump(tableauEvenements) }}
- </pre>
+ 
     <tr>
 	<th scope="col">Créneau</th>
 	
@@ -69,20 +67,25 @@
         {% else %}
           {% set default_value = '' %}
         {% endif %}
-        
         <select class="form-select" aria-label="Default select example" name="events" hx-trigger="change"  hx-get="PlacementDesRencontresTraitement.php?action=addEvent" hx-swap="none">
           {% for idCreneau, terrains in tableauEvenements %}
             {% for idTerrain, rencontre in terrains %}
               {% set option_value = rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom %}
-              <option value="{{idTournoi}}-{{ rencontre.rencontre_id }}-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
+
+			  {% if rencontre.rencontre_id is null %}
+              <option value="{{idTournoi}}-null-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
                 {{ rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom }}
               </option>
+			{% else %}
+			  <option value="{{idTournoi}}-{{ rencontre.rencontre_id }}-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
+                {{ rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom }}
+              </option>
+			{% endif %}
             {% endfor %}
           {% endfor %}
           
           {% if default_value == '' %}
-            <option value="Vide-{{terrain}}-{{ creneau.numero }}" selected>Choisissez une rencontre</option>
-			 <option value="Pause-{{terrain}}-{{ creneau.numero }}" >Pause</option>
+			 <option value="{{idTournoi}}-pause-{{ creneau.numero }}-{{terrain}}" >Pause</option>
 
           {% endif %}
         </select>
