@@ -30,7 +30,15 @@ if (isset($_GET['action'])) {
 
            
             $idterrain = $terrainDao->AfficherIdTerrain($idtournoi,$terrain);
-            $evenement->ajouterEvenement($idCreneau,$type,$idterrain,$idtournoi);
+
+            if ($type == "pause") {
+            $evenement->ajouterEvenement($idCreneau,null,$idterrain,$idtournoi);
+            }
+            else {
+                $evenement->ajouterEvenement($idCreneau,$type,$idterrain,$idtournoi);
+                
+
+            }
 
         }
 
