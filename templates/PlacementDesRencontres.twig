@@ -1,104 +1,122 @@
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-		<link href="style/couleurEquipes.css" rel="stylesheet">
-		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-		
-		<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-		<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
-
-		<title>Placez vos rencontres</title>
-	</head>
-
-	<body>
-
-		{{ include('header.twig') }}
-
-<div class="row ml-n4">
-			<div class="col-lg-3">
-			
-				{% for tournoi in ListeDesTournois %}
-					{% if tournoi.isArchived == 0 %}
-						{% if tournoi.id == idTournoi %}
-							<a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
-						{% else %}
-							<a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
-						{% endif %}
-					{% endif %}
-				{% endfor %}
-			</div>
-
-        <div class="col-lg-12">
-    
-	  <table class="table">
-  <thead>
- 
-    <tr>
-	<th scope="col">Créneau</th>
-	
-	{% for i in 0..nbrterrain|length %}
-      <th scope="col">{{nbrterrain[i]["nom"]}}</th>
-	{% endfor %}
-
-    </tr>
-  </thead>
- <tbody>
-
-<!-- les valeurs possibles : 
-					tableauEvenements[creneau.id][terrain]['rencontre_id']
-					tableauEvenements[creneau.id][terrain]['tour']
-					tableauEvenements[creneau.id][terrain]['equipe1_nom']
-					tableauEvenements[creneau.id][terrain]['equipe1_categorie']
-					tableauEvenements[creneau.id][terrain]['equipe2_nom']
-					tableauEvenements[creneau.id][terrain]['equipe2_categorie']
-					tableauEvenements[creneau.id][terrain]['poule_nom']
-					tableauEvenements[creneau.id][terrain]['poule_categorie']
-				 -->
-       {% for creneau in listCreneaux %}
-  <tr>
-    <td>Créneau {{ creneau.numero }}</td>
-    {% for terrain in 1..nbrterrain|length %}
-	
-      <td>
-        {% if tableauEvenements[creneau.id] is defined and tableauEvenements[creneau.id][terrain] is defined %}
-          {% set default_value = tableauEvenements[creneau.id][terrain]['equipe1_nom'] ~ ' vs ' ~ tableauEvenements[creneau.id][terrain]['equipe2_nom'] %}
-        {% else %}
-          {% set default_value = '' %}
-        {% endif %}
-        <select class="form-select" aria-label="Default select example" name="events" hx-trigger="change"  hx-get="PlacementDesRencontresTraitement.php?action=addEvent" hx-swap="none">
-          {% for idCreneau, terrains in tableauEvenements %}
-            {% for idTerrain, rencontre in terrains %}
-              {% set option_value = rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom %}
-
-			  {% if rencontre.rencontre_id is null %}
-              <option value="{{idTournoi}}-null-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
-                {{ rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom }}
-              </option>
-			{% else %}
-			  <option value="{{idTournoi}}-{{ rencontre.rencontre_id }}-{{terrain}}-{{ creneau.numero }}" {% if option_value == default_value %}selected{% endif %}  >
-                {{ rencontre.equipe1_nom ~ ' vs ' ~ rencontre.equipe2_nom }}
-              </option>
-			{% endif %}
-            {% endfor %}
-          {% endfor %}
-          
-          {% if default_value == '' %}
-			 <option value="{{idTournoi}}-pause-{{ creneau.numero }}-{{terrain}}" >Pause</option>
-
-          {% endif %}
-        </select>
-      </td>
-    {% endfor %}
-  </tr>
-{% endfor %}
-
-
-		<tfoot>
-    	<td><a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}">Ajout</a></td>
-  		</tfoot>
-      </tbody>
-</table>
-
-        </div>
+   <head>
+      <meta charset="UTF-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+      <link href="style/couleurEquipes.css" rel="stylesheet">
+      <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
+      <title>Placez vos rencontres</title>
+   </head>
+   <body>
+      {{ include('header.twig') }}
+      <div class="row ml-n4">
+      <div class="col-lg-3">
+         {% for tournoi in ListeDesTournois %}
+         {% if tournoi.isArchived == 0 %}
+         {% if tournoi.id == idTournoi %}
+         <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
+         {% else %}
+         <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+      </div>
+      <div class="col-lg-12">
+         <table class="table" id="planification-table">
+            <thead>
+               <tr>
+                  <th scope="col">Créneau</th>
+                  {% for i in 0..terrains|length - 1 %}
+                  <th scope="col">{{terrains[i]["nom"]}}</th>
+                  {% endfor %}
+               </tr>
+            </thead>
+            <tbody>
+               {% for creneau in listCreneaux %}
+               <tr>
+                  <td>
+                  
+                  <div class="input-group flex-nowrap">
+                           <span class="input-group-text" id="addon-wrapping"><a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}"><i class="fa fa-clock-o" aria-hidden="true"></i></span></a>
+                           <input type="text" size="3" class="form-control" placeholder="{{ creneau.nom }}" aria-describedby="addon-wrapping">
+                           </div>
+                  
+                  </td>
+                  {% set Displayed = false %}
+                  {% for j in 0..terrains|length - 1 %}
+                  <td>
+                     {% set planificationFound = false %} {# Variable pour suivre si une planification a été trouvée #}
+                     {% set creneauOqp = false %} {# Variable pour suivre si un creneau est OQP #}
+                     {% for planification in afficherPlanification %}
+                     	{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
+                    	      {% set planificationFound = true %} {# Variable pour suivre si une planification a été trouvée #}
+                    		    {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
+                    		      {% if planification.arbitre_id is not null %}
+                              <!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
+                   			 <i class="fa fa-user" aria-hidden="true"></i> {{planification.arbitre_nom}}
+                              <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}" >
+                              <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
+                              </a>
+                              {% else %}
+                     <form action="PlacementDesRencontresTraitement.php" method="post" >
+                        <select class="form-select"  name="Addevent" onchange="this.form.submit()">
+                           <option value="">Choisir arbitre</option>
+                           {% for arbitre in listeDesArbitres  %}
+                           <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>{{arbitre.nom}}</option>
+                           {% endfor %}
+                        </select>
+                     </form>
+                     {% endif %}
+                     {% if planification.rencontre_id is not null %}
+                     
+                     <p class="card-text">{{planification.equipe1_categorie_nom}}-tour{{planification.tour}}{{planification.equipe1_nom_categorie}}-{{planification.equipe1_nom}} {{planification.equipe2_nom}}
+                     </p>
+                     <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}" >
+                      <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
+                     </a>
+                     {% set creneauOqp = true %}
+                     {% endif %}
+                     <script>
+                        var tdElement = document.currentScript.parentElement;
+                        // Appliquer la couleur de fond au <td> parent
+                        tdElement.style.backgroundColor = '{{planification.equipe1_categorie_couleur}}';														
+                     </script>
+                     
+                     {% elseif planification.label_id is not null %}
+                     <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}">
+                     Delete </a> {{ planification.label_description }}
+                     {% endif %}
+                     {% endif %}
+                       
+                     {% endfor %}
+                  
+                     {% if creneauOqp == false %}  {# permet de ne pas afficher la liste si il y a deja une rencontre #}
+                     <form action="PlacementDesRencontresTraitement.php" method="post" >
+                        <select class="form-select selectpicker"  name="Addevent" onchange="this.form.submit()">
+                           <option value="">Choisir une rencontre ou un label</option>
+                           {% for planif in planificationSansCreneauNiTerrain %}
+                           <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>tour{{planif.tour}}-{{planif.equipe1_nom_categorie}}-{{planif.equipe1_nom}} {{planif.equipe2_nom}}</option> 
+                           {% endfor %}
+                           {% for label in libelleParTournoi %}
+                           <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>{{label.description}}</option>
+                           {% endfor %}
+                        </select>
+                     </form>
+                     {% endif %}
+                     
+                     
+                  </td>
+                  {% endfor %}
+               </tr>
+               {% endfor %}
+            <tfoot>
+               <td>
+                  <a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']}}&newTime={{timeNextCreneau}}"><h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2></a>
+               </td>
+            </tfoot>
+            </tbody>
+            </tbody>
+         </table>
+      </div>
