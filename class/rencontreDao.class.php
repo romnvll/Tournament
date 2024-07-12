@@ -185,10 +185,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
         $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_BOOL);
         $stmt->execute();
 
-        //insertion dans la table evenement:
-        
-        $evenement = new EvenementDAO();
-        $evenement->ajouterEvenement(null,$this->connexion->lastInsertId(),null,$tournoi_id);
+       
         return true;  // indication que l'insertion a réussi
     }
 
