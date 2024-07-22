@@ -455,7 +455,7 @@ function getNbTerrainsById($id) {
 }
 
 
-public function modifierTournoi(int $idTournoi, string $nom, int $nb_terrains, string $heure_debut, int $isClassement, ?int $idParent = null, $heure_fin = 0, int $pasHoraire = 0, int $isVisible = 0, int $heureIsVisible, int $isArchived, int $IsRankingView): void {
+public function modifierTournoi(int $idTournoi, string $nom, int $nb_terrains, string $heure_debut, int $isClassement, ?int $idParent = null, $heure_fin = 0, int $pasHoraire = 0, int $isVisible = 0, int $heureIsVisible, int $isArchived, int $IsRankingView, int $gestionTable = 0, int $gestionArbitres): void {
     $stmt = $this->connexion->prepare("UPDATE Tournois SET 
             nom = :nom, 
             nb_terrains = :nb_terrains, 
@@ -467,7 +467,9 @@ public function modifierTournoi(int $idTournoi, string $nom, int $nb_terrains, s
             heureIsVisible = :heureIsVisible,
             isVisible = :isVisible,
             isArchived = :isArchived,
-            IsRankingView = :IsRankingView
+            IsRankingView = :IsRankingView,
+            gestionTables = :gestionTables,
+            gestionArbitres = :gestionArbitres
         WHERE id = :idTournoi");
 
     $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
@@ -482,7 +484,8 @@ public function modifierTournoi(int $idTournoi, string $nom, int $nb_terrains, s
     $stmt->bindParam(':heureIsVisible', $heureIsVisible, PDO::PARAM_INT);
     $stmt->bindParam(':isArchived', $isArchived, PDO::PARAM_INT);
     $stmt->bindParam(':IsRankingView', $IsRankingView, PDO::PARAM_INT);
-    echo $IsRankingView;
+    $stmt->bindParam(':gestionTables', $gestionTable, PDO::PARAM_INT);
+    $stmt->bindParam(':gestionArbitres', $gestionArbitres, PDO::PARAM_INT);
     $stmt->execute();
    
 }

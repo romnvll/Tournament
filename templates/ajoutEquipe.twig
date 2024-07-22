@@ -36,23 +36,17 @@
               <label for="nomEquipe">Nom de l'équipe</label>
               <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Nom ex: HBCAT2" />
             </div>
+            
             <div class="form-group">
               <label for="Categorie">Choisir la catégorie</label>
               <select class="form-control" name="Categorie" id="Categorie">
+              
               <option value="" disabled selected>Choisir une catégorie...</option>
-              <option value="loisir">Loisir</option>
-                <option value="senior">Senior</option>
-                <option value="U17M">U17M</option>
-                <option value="U17F">U17F</option>
-                <option value="U15M">U15M</option>
-                <option value="U15F">U15F</option>
-                <option value="U13M">U13M</option>
-                <option value="U13F">U13F</option>
-                <option value="U11M">U11M</option>
-                <option value="U11F">U11F</option>
-                <option value="MiniDebutant">MiniDebutant</option>
-                <option value="MiniDebrouillard">MiniDebrouillard</option>
-                <option value="MiniConfirme">MiniConfirme</option>
+              {% for categorie in AfficheLesCategories  %}
+              
+              <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
+              {% endfor %}
+                
               </select>
             </div>
       

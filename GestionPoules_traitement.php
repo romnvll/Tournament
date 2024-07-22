@@ -12,6 +12,7 @@ $rencontre = new RencontreDAO();
 
 //creation des poules:
 
+echo "ici->" . var_dump($categorie) . "<-";
 
 
 $categorie = $_POST["categorie"];
@@ -94,4 +95,4 @@ $equipe->modifierEquipeIdPoule($idPoule,$idequipe);
 
 }
 
-header("location: gestionPoules.php?id_tournoi=".$tournoiId."&NbrEquipeParPoule=".$_POST['nbrEquipePoule']);
+//header("location: gestionPoules.php?id_tournoi=".$tournoiId."&NbrEquipeParPoule=".$_POST['nbrEquipePoule']);

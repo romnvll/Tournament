@@ -12,60 +12,49 @@ $twig = new \Twig\Environment($loader, [
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-if (isset($_GET['NbrEquipeParPoule'])) {
-  $PouleAuto = $_GET['NbrEquipeParPoule'];
-}
-else 
-{
-  $PouleAuto=6;
-}
+$idCategorie=null;
 
 
 $tournois = new tournoiDao();
 $equipesByCategorie = new EquipeDAO();
 $afficheCategorie = new EquipeDAO();
 $poules = new PouleManager();
+//$poules->creerPoulesPourCategorie($_GET['id_tournoi'],$PouleAuto)
 
 
-if (isset ($_GET['NbrEquipeParPoule'])) {
- $nbrEquipeEnCours = $_GET['NbrEquipeParPoule'];
+
+
+if (isset ($_GET['categorie']) ) {
+  $nbrEquipeEnCours = $_GET['NbrEquipeParPoule'];
+  $idCategorie = $_GET['categorie'];
+  $categorieEnCours = $_GET['categorie'];
+ // $poule = $poules->afficherPoulesPourCategorie($_GET['id_tournoi'],2,$idCategorie);
+  
+ if (isset($_GET['NbrEquipeParPoule'])) {
+ $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
+ 
+ $poule =  $poules->afficherPoulesPourCategorie($_GET['id_tournoi'],$nbrEquipeEnCours,$idCategorie);
+ }
+  
 }
 
 
-// si la poule existe l'indiquer sur cette page
-$nomTournoi=$tournois->getTournoiById($_GET['id_tournoi'])['nom'];
-
-//on recupere l'id du tournoi
-if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
-  // Utilisez parse_url pour obtenir les composants de l'URL
-  $refererUrl = parse_url($_SERVER['HTTP_REFERER']);
-
-  // Utilisez parse_str pour extraire les paramètres de la chaîne de requête
-  parse_str($refererUrl['query'], $params);
-
-  // Vérifiez si idTournoi est défini dans les paramètres
-  if (isset($params['idTournoi'])) {
-      $idtournoi = $params['idTournoi'];
-      
-      // Maintenant, $idtournoi contient la valeur passée dans la requête précédente
-  }
-}
-//
 
 $template = $twig->load('GestionPoules.twig');
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionDesPoules',
-  'tournoiEnCours' => $idtournoi,
+  
   'nbrEquipeEnCours' => $nbrEquipeEnCours,
-    'poules' => $poules->getAllPoulesByTournoi($_GET['id_tournoi']),
-    'poulesverif' => $poules->getAllPoulesByTournoi($_GET['id_tournoi']),
-    'nomDuTournoi' => $nomTournoi,
-    'PoulesAuto' => $poules->creerPoules($_GET['id_tournoi'],$PouleAuto),
+    
+  'nomDuTournoi' => $nomTournoi,
+    
     'ListeDesTournois' => $tournois->afficherLesTournois(),
     'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
     'idTournoi' => $_GET['id_tournoi'],
     'nombreEquipeParPoule' => $PouleAuto,
+    'listeDesPoules' =>$poule,
+    'categorieEnCours' => $categorieEnCours,
 
 
 
