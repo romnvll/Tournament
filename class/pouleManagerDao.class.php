@@ -263,48 +263,174 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    public function creerPoules($tournoi_id,$nb_equipes_par_poule) {
+    
+    public function creerPoulesPourCategorie(int $idTournoi, int $idCategorie, int $nombreEquipesParPoule)
+{
+    // Récupérer le nom de la catégorie
+    $stmtNomCategorie = $this->connexion->prepare("
+        SELECT Nom_categorie
+        FROM Categorie
+        WHERE id_categorie = :idCategorie
+    ");
+    $stmtNomCategorie->bindValue(':idCategorie', $idCategorie);
+    $stmtNomCategorie->execute();
+    $nomCategorie = $stmtNomCategorie->fetchColumn();
 
-        $stmt = $this->connexion->prepare("SELECT DISTINCT categorie FROM Equipes WHERE tournoi_id = ?");
-        $stmt->execute(array($tournoi_id));
-        $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-        // Créer les poules pour chaque catégorie
-        $poules_par_categorie = array();
-        foreach ($categories as $categorie) {
-            // Préparer la requête pour récupérer les équipes de la catégorie spécifiée
-            $stmt = $this->connexion->prepare("SELECT * FROM Equipes WHERE tournoi_id = ? AND categorie = ?");
-            $stmt->execute(array($tournoi_id, $categorie));
-            $equipes = $stmt->fetchAll();
-    
-            // Vérifier qu'il y a au moins 2 équipes dans la catégorie
-            if (count($equipes) < 2) {
-                continue;
+    if (!$nomCategorie) {
+        return; // Pas de catégorie trouvée
+    }
+
+    // Étape 1 : Récupérer les équipes de la catégorie spécifique
+    $stmtEquipes = $this->connexion->prepare("
+        SELECT id, nom
+        FROM Equipes
+        WHERE tournoi_id = :idTournoi AND categorie = :idCategorie
+    ");
+    $stmtEquipes->bindValue(':idTournoi', $idTournoi);
+    $stmtEquipes->bindValue(':idCategorie', $idCategorie);
+    $stmtEquipes->execute();
+    $equipes = $stmtEquipes->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($equipes)) {
+        return; // Pas d'équipes dans cette catégorie pour ce tournoi
+    }
+
+    // Étape 2 : Regrouper les équipes en poules selon le nombre d'équipes par poule
+    $poules = [];
+    $currentPoule = [];
+    foreach ($equipes as $index => $equipe) {
+        $currentPoule[] = $equipe;
+        if (count($currentPoule) === $nombreEquipesParPoule) {
+            $poules[] = $currentPoule;
+            $currentPoule = [];
+        }
+    }
+
+    // Ajouter la dernière poule si elle n'est pas vide
+    if (!empty($currentPoule)) {
+        $poules[] = $currentPoule;
+    }
+
+    // Étape 3 : Insérer ou mettre à jour les poules et les équipes associées
+    foreach ($poules as $index => $poule) {
+        $nomPoule = "$nomCategorie - Poule " . ($index + 1);
+
+        // Vérifier si la poule existe déjà
+        $stmtPoule = $this->connexion->prepare("
+            SELECT id FROM Poules WHERE nom = :nomPoule AND tournoi_id = :idTournoi
+        ");
+        $stmtPoule->bindValue(':nomPoule', $nomPoule);
+        $stmtPoule->bindValue(':idTournoi', $idTournoi);
+        $stmtPoule->execute();
+        $pouleId = $stmtPoule->fetchColumn();
+
+        if ($pouleId) {
+            // Supprimer les équipes de la poule existante avant de les réassigner
+            $this->connexion->prepare("DELETE FROM EquipePoule WHERE poule_id = :pouleId")
+                ->execute([':pouleId' => $pouleId]);
+
+            foreach ($poule as $equipe) {
+                // Supprimer l'équipe de toute autre poule à laquelle elle pourrait appartenir
+                $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :equipeId")
+                    ->execute([':equipeId' => $equipe['id']]);
+
+                // Ajouter l'équipe à la poule actuelle
+                $stmtEquipePoule = $this->connexion->prepare("
+                    INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)
+                ");
+                $stmtEquipePoule->bindValue(':equipeId', $equipe['id']);
+                $stmtEquipePoule->bindValue(':pouleId', $pouleId);
+                $stmtEquipePoule->execute();
             }
+        } else {
+            // Créer une nouvelle poule
+            $stmtInsertPoule = $this->connexion->prepare("
+                INSERT INTO Poules (nom, is_classement, fk_idcategorie, tournoi_id) 
+                VALUES (:nom, 0, :idCategorie, :idTournoi)
+            ");
+            $stmtInsertPoule->bindValue(':nom', $nomPoule);
+            $stmtInsertPoule->bindValue(':idCategorie', $idCategorie);
+            $stmtInsertPoule->bindValue(':idTournoi', $idTournoi);
+            $stmtInsertPoule->execute();
+            $newPouleId = $this->connexion->lastInsertId();
+
+            foreach ($poule as $equipe) {
+                // Supprimer l'équipe de toute autre poule à laquelle elle pourrait appartenir
+                $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :equipeId")
+                    ->execute([':equipeId' => $equipe['id']]);
+
+                // Ajouter l'équipe à la nouvelle poule
+                $stmtEquipePoule = $this->connexion->prepare("
+                    INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)
+                ");
+                $stmtEquipePoule->bindValue(':equipeId', $equipe['id']);
+                $stmtEquipePoule->bindValue(':pouleId', $newPouleId);
+                $stmtEquipePoule->execute();
+            }
+        }
+    }
+}
+
+
+
+    public function afficherPoulesPourCategorie(int $idTournoi, int $nombreEquipesParPoule, int $idCategorie): array {
+        // Étape 1 : Récupérer toutes les équipes de la catégorie et du tournoi
+        $stmt = $this->connexion->prepare("
+            SELECT id, nom 
+            FROM Equipes 
+            WHERE tournoi_id = :idTournoi 
+            AND categorie = :idCategorie
+        ");
+        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->bindValue(':idCategorie', $idCategorie, PDO::PARAM_INT);
+        $stmt->execute();
+        $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-           
+        // Étape 2 : Regrouper les équipes par poules
+        $totalEquipes = count($equipes);
+        $nombrePoules = ceil($totalEquipes / $nombreEquipesParPoule);
+        
+        // Stocker les poules et leurs équipes
+        $poules = [];
+        
+        for ($i = 0; $i < $nombrePoules; $i++) {
+            $nomPoule = "Poule " . ($i + 1);
     
-            // Créer les poules pour la catégorie
-            $poules = array();
-            $poule_id = 1;
-            foreach (array_chunk($equipes, $nb_equipes_par_poule) as $poule) {
-                // Affecter les équipes à la poule
-                $poules[$poule_id] = array();
-                foreach ($poule as $equipe) {
-                    // Affecter l'équipe à la poule
-                    $poules[$poule_id][] = $equipe;
+            // Vérifier si la poule existe déjà
+            $stmtCheck = $this->connexion->prepare("
+                SELECT COUNT(*) 
+                FROM Poules 
+                WHERE nom = :nomPoule 
+                AND tournoi_id = :idTournoi
+            ");
+            $stmtCheck->bindValue(':nomPoule', $nomPoule, PDO::PARAM_STR);
+            $stmtCheck->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+            $stmtCheck->execute();
+            $exists = $stmtCheck->fetchColumn();
+    
+            // Ajouter la poule et ses équipes à la liste
+            if ($exists == 0) {
+                $poule = ['nom' => $nomPoule, 'equipes' => []];
+    
+                // Assigner les équipes à la poule
+                for ($j = 0; $j < $nombreEquipesParPoule; $j++) {
+                    $indexEquipe = $i * $nombreEquipesParPoule + $j;
+                    if ($indexEquipe >= $totalEquipes) {
+                        break;
+                    }
+                    $equipe = $equipes[$indexEquipe];
+                    $poule['equipes'][] = $equipe;
                 }
-                $poule_id++;
+                
+                $poules[] = $poule;
             }
-    
-           
-    
-            // Ajouter les poules de la catégorie au tableau des poules par catégorie
-            $poules_par_categorie[$categorie] = $poules;
         }
     
-        return $poules_par_categorie;
-}
+        // Retourner le tableau des poules
+        return $poules;
+    }
+    
+    
     
 public function pouleExists(string $pouleNom, int $idTournoi): bool {
     

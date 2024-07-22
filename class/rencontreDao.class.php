@@ -190,34 +190,45 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     }
 
     public function supprimerRencontresParPoule(int $idPoule): void
-    {
-        // Récupérer le type de poule (is_classement) depuis la table Poules
-        $stmtTypePoule = $this->connexion->prepare("SELECT is_classement FROM Poules WHERE id = :idPoule");
-        $stmtTypePoule->bindParam(':idPoule', $idPoule);
-        $stmtTypePoule->execute();
-        $isClassement = $stmtTypePoule->fetch(PDO::FETCH_COLUMN);
+{
+    // Récupérer le type de poule (is_classement) depuis la table Poules
+    $stmtTypePoule = $this->connexion->prepare("SELECT is_classement FROM Poules WHERE id = :idPoule");
+    $stmtTypePoule->bindParam(':idPoule', $idPoule);
+    $stmtTypePoule->execute();
+    $isClassement = $stmtTypePoule->fetch(PDO::FETCH_COLUMN);
 
+    // Trouver toutes les équipes de la poule
+    $stmtEquipesPoule = $this->connexion->prepare("SELECT equipe_id FROM EquipePoule WHERE poule_id = :idPoule");
+    $stmtEquipesPoule->bindParam(':idPoule', $idPoule);
+    $stmtEquipesPoule->execute();
+    $equipes = $stmtEquipesPoule->fetchAll(PDO::FETCH_COLUMN);
 
+    if (!empty($equipes)) {
+        // Construire les placeholders pour la requête IN
+        $placeholders = implode(',', array_fill(0, count($equipes), '?'));
 
-        // Trouver toutes les équipes de la poule
-        $stmtEquipesPoule = $this->connexion->prepare("SELECT equipe_id FROM EquipePoule WHERE poule_id = :idPoule");
-        $stmtEquipesPoule->bindParam(':idPoule', $idPoule);
-        $stmtEquipesPoule->execute();
-        $equipes = $stmtEquipesPoule->fetchAll(PDO::FETCH_COLUMN);
+        // Récupérer les rencontre_id des rencontres à supprimer
+        if ($isClassement == 0) {
+            $stmtRencontreIds = $this->connexion->prepare("SELECT id FROM Rencontres WHERE equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)");
+        } elseif ($isClassement == 1) {
+            $stmtRencontreIds = $this->connexion->prepare("SELECT id FROM Rencontres WHERE (equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)) AND isClassement = 1");
+        }
+        $stmtRencontreIds->execute(array_merge($equipes, $equipes));
+        $rencontreIds = $stmtRencontreIds->fetchAll(PDO::FETCH_COLUMN);
 
-        if (!empty($equipes)) {
-            // Supprimer toutes les rencontres où les équipes de la poule sont impliquées
-            $placeholders = implode(',', array_fill(0, count($equipes), '?'));
-            if ($isClassement == 0) {
+        if (!empty($rencontreIds)) {
+            // Supprimer les rencontre_id de la table Planification
+            $placeholdersRencontre = implode(',', array_fill(0, count($rencontreIds), '?'));
+            $stmtDeletePlanification = $this->connexion->prepare("DELETE FROM Planification WHERE rencontre_id IN ($placeholdersRencontre)");
+            $stmtDeletePlanification->execute($rencontreIds);
 
-                $stmtRencontres = $this->connexion->prepare("DELETE FROM Rencontres WHERE equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)");
-            } elseif ($isClassement == 1) {
-
-                $stmtRencontres = $this->connexion->prepare("DELETE FROM Rencontres WHERE (equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)) AND isClassement = 1");
-            }
-            $stmtRencontres->execute(array_merge($equipes, $equipes));
+            // Supprimer les rencontres de la table Rencontres
+            $stmtRencontres = $this->connexion->prepare("DELETE FROM Rencontres WHERE id IN ($placeholdersRencontre)");
+            $stmtRencontres->execute($rencontreIds);
         }
     }
+}
+
 
     public function supprimerRencontresParTournoi(int $idtournoi): void
     {

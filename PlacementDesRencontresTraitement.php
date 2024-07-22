@@ -104,6 +104,21 @@ if (isset($_GET['action'])) {
         }
 
 
+        if (($_GET['action'] == "addTerrain")) {
+            require 'class/terrainDao.class.php';
+            $terrain = new TerrainDao();
+           
+            $terrain->ajoutTerrain($_GET['idTournoi'],$terrain->compterTerrains($_GET['idTournoi']) + 1);
+            
+        }
+
+        if (($_GET['action'] == "delTerrain")) {
+            require 'class/terrainDao.class.php';
+            $terrain = new TerrainDao();
+            
+            $terrain->suppressionTerrain($_GET['idTournoi'],$_GET['terrain_id']);
+            
+        }
       
 
 

@@ -18,6 +18,7 @@ require 'class/databaseInformations.php';
 require 'class/tournoiDao.class.php';
 require 'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
+require 'class/categorie.class.php';
 $tournoiDao = new tournoiDao();
 //$tournoiDao->getAllTournoi();
 
@@ -26,6 +27,7 @@ $poules = new PouleManager();
 $listeClub = new ClubDAO();
 $listeDesEquipes= new EquipeDAO();
 
+$listeDesCategorie = new CategorieDao();
 
 $template = $twig->load('ajoutEquipe.twig');
 
@@ -39,6 +41,7 @@ echo $template->render([
 'AfficherClub' => $listeClub->afficherClubs(),
 'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
+'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories(),
 
 ]);
 

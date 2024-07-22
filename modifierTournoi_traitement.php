@@ -2,7 +2,7 @@
 require 'security.php';
 require ('class/tournoiDao.class.php');
 
-//var_dump($_POST);
+var_dump($_POST);
 
 if (!isset ($_POST['isArchived'])) {
 $isArchived = 0;
@@ -43,6 +43,40 @@ else {
 }
 
 
+if ($_POST['gestionTables'] == "") {
+    $gestionTables = 0;
+}
+
+else {
+    $gestionTables = 1;
+}
+
+if ($_POST['gestionArbitres'] == "") {
+    $gestionArbitres = 0;
+}
+
+else {
+    $gestionArbitres = 1;
+}
+
+
+if ($_GET['addPersonne'] == "true") {
+
+   $nom=$_GET['nom'];
+   $prenom=$_GET['prenom'];
+   $mail=$_GET['mail'];
+   $idTournoi = $_GET['tournoiId'];
+
+   require 'class/personneDao.class.php';
+   $personne=new PersonneDao;
+   $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
+   header("Location: " . $_SERVER['HTTP_REFERER']);
+
+}
+
+
+
+
 
 
 
@@ -51,7 +85,7 @@ else {
 
 
 $tournoidao = new tournoiDao();
-$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['nb_terrains'],$_POST['heure_debut'],$isClassement,$idparent,$_POST['heure_fin'],$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView);
+$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['nb_terrains'],$_POST['heure_debut'],$isClassement,$idparent,$_POST['heure_fin'],$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres);
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 ?>

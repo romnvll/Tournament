@@ -32,7 +32,7 @@
 
 							<input
 							type="hidden" name="idTournoi" value="{{infotournoi.id}}">
-							<!-- Remplacez ID_DU_TOURNOI par l'ID réel du tournoi -->
+							
 
 							<div class="form-group">
 								<label for="nom">Nom:</label>
@@ -60,6 +60,9 @@
 								<input type="time" class="form-control" id="heure_fin" name="heure_fin" value="{{infotournoi.heure_fin}}" min="06:00" max="23:59">
 							</div>
 
+						
+							
+							
 
 							{% if infotournoi.isArchived == 1 %}
 								{% set isArchived = 'checked' %}
@@ -88,7 +91,32 @@
 							{%  endif %}
 
 
+							{% if infotournoi.gestionTables == 1 %}
+								{% set gestionTables = 'checked' %}
+							{% else %}
+								{% set gestionTables = '' %}
+							{%  endif %}
+
+
+							{% if infotournoi.gestionArbitres == 1 %}
+								{% set gestionArbitres = 'checked' %}
+							{% else %}
+								{% set gestionArbitres = '' %}
+							{%  endif %}
+
+
+								
 							<div class="form-group">
+
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="{{infotournoi.gestionTables}}" {{ gestionTables }}>
+									<label class="form-check-label" for="mySwitch">Gestion des tables ? </label>
+								</div>
+
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="{{infotournoi.gestionArbitres}}" {{ gestionArbitres}}>
+									<label class="form-check-label" for="mySwitch">Gestion des arbitres ? </label>
+								</div>
 
 								<div class="form-check form-switch">
 									<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }}>
@@ -124,8 +152,11 @@
 						<a href="GenerateQrCode.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">
 							<i class="fa-solid fa-qrcode me-1"></i>QRCODE Publique</a>
 					</div>
+
+					
+					
 					<div class="row">
-						Pour les tables:
+						Pour les tables :
 
 
 						{% for i in 1.. infotournoi.nb_terrains %}
@@ -135,8 +166,70 @@
 								{{i}}</a><br>
 
 						{% endfor %}
+					
+
 
 					</div>
+					
+					{% if infotournoi.gestionTables == 1 %}
+					<div class="row">
+						<div class="col-5">
+							<h3>Ajouter une personne pour les tables</h3>
+							<form action="modifierTournoi_traitement.php">
+							<div class="mb-3">
+									<label for="Email" class="form-label">Email address</label>
+									<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
+									<input type="hidden" name="addPersonne" value="true">
+									<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+									<div id="emailHelp" class="form-text">Email</div>
+								</div>
+								<div class="mb-3">
+									<label for="Nom" class="form-label">Nom</label>
+									<input type="text" class="form-control" id="Nom" name="nom" required>
+								</div>
+								<div class="mb-3">
+									<label for="prenom" class="form-label">prenom</label>
+									<input type="text" class="form-control" id="prenom" name="prenom" required>
+								</div>
+								<button type="submit" class="btn btn-primary">Ajouter</button>
+							</form>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<table class="table">
+								<thead>
+									<tr>
+									
+									<th scope="col">nom</th>
+									<th scope="col">Prenom</th>
+									<th scope="col">mail</th>
+									<th scope="col">Terrain N°</th>
+									</tr>
+								</thead>
+								<tbody>
+								
+								{% for personne in AfficherPersonnes %}
+									<tr>
+									
+									<td>{{personne.Nom}}</td>
+									<td>{{personne.Prenom}}</td>
+									<td>{{personne.Mail}}</td>
+									<td></td>
+									</tr>
+								{% endfor %}
+								</tbody>
+								</table>
+						</div>
+
+						<div class="col">
+							Assigner une personne à un terrain
+						</div>
+
+					</div>
+					{% endif %}
+
+					
 
 					{% if infotournoi.isArchived == 1 %}
 						<div class="row">
@@ -146,8 +239,14 @@
 
 						</div>
 					{% endif %}
+
+
 				</div>
+
+				
 			{% endif %}
+
+
 
 
 			<script>

@@ -14,7 +14,7 @@ class EquipeDAO {
         }
     }
     
-    public function ajouterEquipe(string $nom, string $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void {
+    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void {
         // Insertion de l'équipe
         $stmt = $this->connexion->prepare("INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) VALUES (:nom, :categorie, :tournoi_id, :club_id)");
         $stmt->bindParam(':nom', $nom);
@@ -181,12 +181,17 @@ class EquipeDAO {
 
     public function getAllCategorieByIdTournoi(int $idTournoi) :array {
         
-        $stmt = $this->connexion->prepare("SELECT DISTINCT categorie FROM Equipes WHERE tournoi_id = :idTournoi ");
-        $stmt->bindValue(':idTournoi', $idTournoi);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-       
-        return $result;
+        $stmt = $this->connexion->prepare("
+        SELECT DISTINCT c.id_categorie, c.Nom_categorie 
+        FROM Equipes e
+        JOIN Categorie c ON e.categorie = c.id_categorie
+        WHERE e.tournoi_id = :idTournoi
+    ");
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   
+    return $result;
 
     }
 
