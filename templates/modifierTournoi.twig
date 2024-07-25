@@ -215,7 +215,12 @@
 									<td>{{personne.Nom}}</td>
 									<td>{{personne.Prenom}}</td>
 									<td>{{personne.Mail}}</td>
-									<td></td>
+									<td>
+										{% for terrain in AfficherTerrain %}
+										
+									<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{personne.id}}&idterrain={{terrain.terrain_id}}&tournoiId={{infotournoi.id}}">{{terrain.nom}}</a><br>
+										{% endfor %}
+									</td>
 									</tr>
 								{% endfor %}
 								</tbody>
@@ -223,7 +228,40 @@
 						</div>
 
 						<div class="col">
-							Assigner une personne à un terrain
+						<table class="table">
+								<thead>
+									<tr>
+									
+									<th scope="col">nom</th>
+									<th scope="col">Prenom</th>
+									<th scope="col">mail</th>
+									<th scope="col">Terrain N°</th>
+									<th scope="col">Code pin</th>
+									<th scope="col">URL</th>
+									<th scope="col">envoyer les informations</th>
+									<th scope="col">Suppression de cette personne</th>
+									</tr>
+								</thead>
+								<tbody>
+								
+								{% for personneTable in AfficherLesPersonnesCrees %}
+								<tr>
+									<td>{{personneTable.Nom}}</td>
+									<td>{{personneTable.Prenom}}</td>
+									<td>{{personneTable.Mail}}</td>
+									<td>{{personneTable.terrain_nom}}</td>
+									<td>{{personneTable.code_pin}}</td>
+									<td>{{personneTable.url_key}}</td>
+									<td><a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}">sendMail</a></td>
+									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}">del </a></td>
+									
+								</tr>
+								{% endfor %}
+								</tbody>
+								</table>
+
+
+							
 						</div>
 
 					</div>

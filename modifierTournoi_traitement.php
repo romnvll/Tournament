@@ -2,7 +2,61 @@
 require 'security.php';
 require ('class/tournoiDao.class.php');
 
-var_dump($_POST);
+
+if ($_GET['action'] == "ajoutUserSurTable") {
+    require 'class/PersonneTableDao.class.php';
+    $personneTable = new PersonneTableDao();
+    
+    try {
+    $personneTable->genererUrlEtCodePin($_GET['idPersonne'],$_GET['idterrain'],$_GET['tournoiId']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+    catch (Exception $e) {
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        echo 'Exception reçue : ',  $e->getMessage(), "\n";
+    }
+    
+}
+
+
+if ($_GET['action'] == "delPersonneTable") {
+    require 'class/PersonneTableDao.class.php';
+    $personneTable = new PersonneTableDao();
+    $personneTable->supprimerPersonneTable($_GET['personneTableId']);
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit(0);
+}
+
+if ($_GET['action'] == "sendMail"){
+    require 'class/PersonneTableDao.class.php';
+    $personneTable = new PersonneTableDao();
+    $personneTable->envoyerMail($_GET['personneTableId']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    
+}
+
+
+if ($_GET['addPersonne'] == "true") {
+
+   $nom=$_GET['nom'];
+   $prenom=$_GET['prenom'];
+   $mail=$_GET['mail'];
+   $idTournoi = $_GET['tournoiId'];
+
+   require 'class/personneDao.class.php';
+   $personne=new PersonneDao;
+   $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
+   header("Location: " . $_SERVER['HTTP_REFERER']);
+
+}
+
+
+
+
+
+
+
 
 if (!isset ($_POST['isArchived'])) {
 $isArchived = 0;
@@ -57,21 +111,6 @@ if ($_POST['gestionArbitres'] == "") {
 
 else {
     $gestionArbitres = 1;
-}
-
-
-if ($_GET['addPersonne'] == "true") {
-
-   $nom=$_GET['nom'];
-   $prenom=$_GET['prenom'];
-   $mail=$_GET['mail'];
-   $idTournoi = $_GET['tournoiId'];
-
-   require 'class/personneDao.class.php';
-   $personne=new PersonneDao;
-   $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
-   header("Location: " . $_SERVER['HTTP_REFERER']);
-
 }
 
 

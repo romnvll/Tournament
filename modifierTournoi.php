@@ -20,8 +20,11 @@ require 'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/personneDao.class.php';
 require 'class/terrainDao.class.php';
+require 'class/PersonneTableDao.class.php';
 $tournoiDao = new tournoiDao();
-//$tournoiDao->getAllTournoi();
+
+$terrain = new TerrainDao();
+$personneTable = new PersonneTableDao();
 
 $poules = new PouleManager();
 
@@ -51,5 +54,7 @@ echo $template->render([
 'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficherPersonnes' => $listePersonne->recupererToutesLesPersonnes($_GET['idTournoi']),
+'AfficherTerrain' => $terrain->AfficherTerrains($_GET['idTournoi']),
+'AfficherLesPersonnesCrees' => $personneTable->recupererToutesLesPersonnesParTournoi($_GET['idTournoi'])
 
 ]);

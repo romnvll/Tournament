@@ -47,6 +47,35 @@ if (isset ($_POST['Addevent'])) {
    
 }
 
+if (isset ($_POST['modifMinutes'])) {
+            
+    require 'class/creneauxDao.class.php';
+    $creneau=new creneauxDao();
+    $creneau->mettreAJourCreneauxAvecMinutesAjoutees($_POST['idTournoi'],$_POST['modifMinutes']);
+
+
+    //entest :
+    //$creneau->mettreAJourHoraireDebut($_POST['idTournoi'],"10:15","15");
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+
+}
+
+//permet de modifier dans la bdd les info du tournoi et de mettre à jour les horaires
+if (isset ($_POST['modifHeureDebut'])) {
+    require 'class/creneauxDao.class.php';
+    require 'class/tournoiDao.class.php';
+    $creneau=new creneauxDao();
+    $tournoi = new tournoiDao();
+    
+    //var_dump($_POST);
+    $creneau->mettreAJourHoraireDebut($_POST['idTournoi'],$_POST['modifHeureDebut'],$_POST['modifPasHoraire']);
+    $tournoi->modifierTournoi($_POST['idTournoi'],null,null,$_POST['modifHeureDebut'],null,null,null,$_POST['modifPasHoraire'],null,null,null,null,null,null);
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+}
+
+
+
 if (isset($_GET['action'])) {
 
         if (($_GET['action']=="addCreneau")) {
@@ -119,6 +148,9 @@ if (isset($_GET['action'])) {
             $terrain->suppressionTerrain($_GET['idTournoi'],$_GET['terrain_id']);
             
         }
+
+
+     
       
 
 

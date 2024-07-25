@@ -27,7 +27,27 @@
          <table class="table" id="planification-table">
             <thead>
                <tr>
-                  <th scope="col">Créneau</th>
+                  <th scope="col">
+                  <form method="post" action="PlacementDesRencontresTraitement.php">
+                  <div data-mdb-input-init class="form-outline">
+                  retarder les rencontres:<input type="number" size="2" class="form-control" name="modifMinutes" onchange="this.form.submit()">
+                  </div>
+                              <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+                  </form>
+                  
+                   Ajuster les horaires
+                     <form method="post" action="PlacementDesRencontresTraitement.php">
+                     <input type="time" size="2" name="modifHeureDebut" class="form-control" value="{{tournoiInfo["heure_debut"]}}">
+                    
+                     <input type="number" size="2" name="modifPasHoraire" value="{{tournoiInfo["pasHoraire"]}}" class="form-control" onchange="this.form.submit()">
+                     <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+                     <input type="submit"  class="btn btn-primary">
+                     </form>
+                  </th>
+                  
+
+                 
+
                   {% for i in 0..terrains|length - 1 %}
                        <th scope="col"><input type=text class="form-control" value={{terrains[i]["nom"]}}>{{terrains[i]["nom"]}}
                        <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}"><p class="text-danger"><i class="fa fa-minus-circle" aria-hidden="true"></i></p></a></th>
