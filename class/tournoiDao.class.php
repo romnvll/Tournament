@@ -455,40 +455,96 @@ function getNbTerrainsById($id) {
 }
 
 
-public function modifierTournoi(int $idTournoi, string $nom, int $nb_terrains, string $heure_debut, int $isClassement, ?int $idParent = null, $heure_fin = 0, int $pasHoraire = 0, int $isVisible = 0, int $heureIsVisible, int $isArchived, int $IsRankingView, int $gestionTable = 0, int $gestionArbitres): void {
-    $stmt = $this->connexion->prepare("UPDATE Tournois SET 
-            nom = :nom, 
-            nb_terrains = :nb_terrains, 
-            heure_debut = :heure_debut, 
-            pasHoraire = :pasHoraire, 
-            isClassement = :isClassement, 
-            IdParent = :idParent, 
-            heure_fin = :heure_fin,
-            heureIsVisible = :heureIsVisible,
-            isVisible = :isVisible,
-            isArchived = :isArchived,
-            IsRankingView = :IsRankingView,
-            gestionTables = :gestionTables,
-            gestionArbitres = :gestionArbitres
-        WHERE id = :idTournoi");
+public function modifierTournoi(
+    int $idTournoi, 
+    ?string $nom = null, 
+    ?int $nb_terrains = null, 
+    ?string $heure_debut = null, 
+    ?int $isClassement = null, 
+    ?int $idParent = null, 
+    ?string $heure_fin = null, 
+    ?int $pasHoraire = null, 
+    ?int $isVisible = null, 
+    ?int $heureIsVisible = null, 
+    ?int $isArchived = null, 
+    ?int $IsRankingView = null, 
+    ?int $gestionTable = null, 
+    ?int $gestionArbitres = null
+): void {
+    $fields = [];
+    $params = [':idTournoi' => $idTournoi];
 
-    $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
-    $stmt->bindParam(':nom', $nom);
-    $stmt->bindParam(':nb_terrains', $nb_terrains);
-    $stmt->bindParam(':heure_debut', $heure_debut);
-    $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
-    $stmt->bindParam(':idParent', $idParent, PDO::PARAM_INT);
-    $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT);
-    $stmt->bindParam(':heure_fin', $heure_fin);
-    $stmt->bindParam(':isVisible', $isVisible, PDO::PARAM_INT);
-    $stmt->bindParam(':heureIsVisible', $heureIsVisible, PDO::PARAM_INT);
-    $stmt->bindParam(':isArchived', $isArchived, PDO::PARAM_INT);
-    $stmt->bindParam(':IsRankingView', $IsRankingView, PDO::PARAM_INT);
-    $stmt->bindParam(':gestionTables', $gestionTable, PDO::PARAM_INT);
-    $stmt->bindParam(':gestionArbitres', $gestionArbitres, PDO::PARAM_INT);
+    if ($nom !== null) {
+        $fields[] = "nom = :nom";
+        $params[':nom'] = $nom;
+    }
+    if ($nb_terrains !== null) {
+        $fields[] = "nb_terrains = :nb_terrains";
+        $params[':nb_terrains'] = $nb_terrains;
+    }
+    if ($heure_debut !== null) {
+        $fields[] = "heure_debut = :heure_debut";
+        $params[':heure_debut'] = $heure_debut;
+    }
+    if ($isClassement !== null) {
+        $fields[] = "isClassement = :isClassement";
+        $params[':isClassement'] = $isClassement;
+    }
+    if ($idParent !== null) {
+        $fields[] = "IdParent = :idParent";
+        $params[':idParent'] = $idParent;
+    }
+    if ($heure_fin !== null) {
+        $fields[] = "heure_fin = :heure_fin";
+        $params[':heure_fin'] = $heure_fin;
+    }
+    if ($pasHoraire !== null) {
+        $fields[] = "pasHoraire = :pasHoraire";
+        $params[':pasHoraire'] = $pasHoraire;
+    }
+    if ($isVisible !== null) {
+        $fields[] = "isVisible = :isVisible";
+        $params[':isVisible'] = $isVisible;
+    }
+    if ($heureIsVisible !== null) {
+        $fields[] = "heureIsVisible = :heureIsVisible";
+        $params[':heureIsVisible'] = $heureIsVisible;
+    }
+    if ($isArchived !== null) {
+        $fields[] = "isArchived = :isArchived";
+        $params[':isArchived'] = $isArchived;
+    }
+    if ($IsRankingView !== null) {
+        $fields[] = "IsRankingView = :IsRankingView";
+        $params[':IsRankingView'] = $IsRankingView;
+    }
+    if ($gestionTable !== null) {
+        $fields[] = "gestionTables = :gestionTables";
+        $params[':gestionTables'] = $gestionTable;
+    }
+    if ($gestionArbitres !== null) {
+        $fields[] = "gestionArbitres = :gestionArbitres";
+        $params[':gestionArbitres'] = $gestionArbitres;
+    }
+
+    if (empty($fields)) {
+        throw new Exception("Aucun champ à mettre à jour.");
+    }
+
+    $sql = "UPDATE Tournois SET " . implode(", ", $fields) . " WHERE id = :idTournoi";
+    $stmt = $this->connexion->prepare($sql);
+
+    foreach ($params as $param => $value) {
+        if (is_int($value)) {
+            $stmt->bindValue($param, $value, PDO::PARAM_INT);
+        } else {
+            $stmt->bindValue($param, $value, PDO::PARAM_STR);
+        }
+    }
+
     $stmt->execute();
-   
 }
+
 
 public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
     $stmt = $this->connexion->prepare("
