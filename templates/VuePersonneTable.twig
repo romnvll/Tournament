@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8"/>
@@ -5,76 +6,113 @@
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<title>Gestion de la table</title>
 		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
-
+		<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+			
+			
 	</head>
 
 	<body>
-		<div class="container-fluid">
+		<div class="container container-fluid">
 		
-			{% if keyExist or keyValidation  %}
-				<form class="row" method="POST" action="vuePersonneTable.php">
-					
-					<div class="col-auto">
-						<label for="inputPassword2" class="visually-hidden">Code pin</label>
-						<input type="number" class="form-control" name="codePin" id="codePin" placeholder="Code pin reçu par mail">
-						<input type="hidden" name="key" value="{{key}}">
-						<input type="hidden" name="tournoiId" value="{{tournoiId}}">
-					</div>
-					<div class="col-auto">
-						<button type="submit" class="btn btn-primary mb-3">OK</button>
-					</div>
-				</form>
-
-
-				{% else %}
+			
 			<div class="row">
 			
-			Bonjour {{infoUser['0'].Prenom}}, <br> vous êtes en charge d'inserer les scores pour le terrain  {{infoUser['0'].terrainNom}}
+			Bonjour {{prenom}}, <br> vous êtes en charge d'inserer les scores pour le terrain  {{terrain}}
 			</div> 
 
-			<div class=row>
+			<div class="row">
+				<div class="col-12" id="score">
+					<table class="table table-striped table-responsive" >
+						<thead>
+							<tr>
+							
+							<th scope="col" class="text-center">Heure</th>
+							<th scope="col" class="w-25 text-center">Score equipe1</th>
+							<th scope="col" class="w-25 text-center">Score equipe2</th>
+							<th scope="col">Arbitre</th>
+							</tr>
+						</thead>
+						
+					<tbody>	
+					{% for planification in AffichagePlanification %}
+					<tr>					
 
-			<table class="table table-striped table-responsive">
-				<thead>
-					<tr>
-					<th scope="col" class="text-center">Heure</th>
-					<th scope="col" class="w-25 text-center">Score equipe1</th>
-					<th scope="col" class="w-25 text-center">Score equipe2</th>
-					<th scope="col">Arbitre</th>
+					{% if planification.rencontre_id is not null %}
+
+					<td class="text-center"><h3 class="">{{planification.creneau_nom}}</h3></td>
+					<td class="text-center">
+						<img src="{{planification.club1_logo}}" class="img-fluid rounded">
+					<p class="lead text-uppercase"> {{planification.equipe1_nom}} </p>
+						<input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
+						<input type="hidden" name="idEquipe1" value="{{planification.equipe1_id}}" id="idEquipe1{{planification.rencontre_id}}" >
+						<input type="number" name="scoreEquipe1" class="form-control" value="{{planification.score1}}" id="scoreEquipe1{{planification.rencontre_id}}" min="0" 
+							hx-get="vuePersonneTable.php"
+							hx-trigger="change"
+							hx-include="[id='idRencontre{{planification.rencontre_id}}'], [id='idEquipe1{{planification.rencontre_id}}'], [id='scoreEquipe1{{planification.rencontre_id}}']">
+					</td>
+					<td class="text-center">
+						<img src="{{planification.club2_logo}}" class="img-fluid rounded">
+						<p class="lead text-uppercase">{{planification.equipe2_nom}}</p>
+						<input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
+						<input type="hidden" name="idEquipe2" value="{{planification.equipe2_id}}" id="idEquipe2{{planification.rencontre_id}}" >
+						<input type="number" name="scoreEquipe2" class="form-control" value="{{planification.score2}}" id="scoreEquipe2{{planification.rencontre_id}}" min="0"
+						hx-get="vuePersonneTable.php"
+						hx-trigger="change"
+						hx-include="[id='idRencontre{{planification.rencontre_id}}'], [id='idEquipe2{{planification.rencontre_id}}'], [id='scoreEquipe2{{planification.rencontre_id}}']">
+					</td>
+					<td>{{planification.arbitre_nom}}</td>
+					
+					
+					{% elseif planification.label_description is not null %}
+					
+					
+					
+					<td class="w-25 text-center"><h3>{{planification.creneau_nom}}</h3></td>
+					<td class="w-25 text-center">{{planification.label_description}} </td>
+					<td><p>{{planification.label_description}}<p> </td>
+					<td></td>
+
+					{% endif %}
 					</tr>
-				</thead>
-				
-			{% for planification in AffichagePlanification %}
-			<tr>
+					{% endfor %}
+					</tbody>
+					
+				</table>
+
+
+
+
 			
 
-			{% if planification.rencontre_id is not null %}
-			<td class="w-25 text-center"><h3>{{planification.creneau_nom}}</h3></td>
-			<td class="w-25 text-center"><img src="{{planification.club1_logo}}" class="img-fluid rounded" >{{planification.equipe1_nom}} <input type="number" name="scoreEquipe1" class="form-control"></td>
-			<td class="w-25 text-center"><img src="{{planification.club2_logo}}" class="img-fluid rounded" >{{planification.equipe2_nom}}<input type="number" size="2" name="score2quipe2" class="form-control"></td>
-			<td>{{planification.arbitre_nom}}</td>
-			
-			
-			{% elseif planification.label_description is not null %}
-			<td class="w-25 text-center"><h3>{{planification.creneau_nom}}</h3></td>
-			<td class="w-25 text-center">{{planification.label_description}} </td>
-			<td>{{planification.label_description}} </td>
-			<td></td>
-
-			{% endif %}
-			</tr>
-			{% endfor %}
-
-			
-		</table>
-
-
-
-
-			{% endif %} {#  {% if keyExist or keyValidation  %}  #}
-
-
+			</div>
 		</div>
+
+<script>
+    $(document).ready(function() {
+        setInterval(function () {
+            // Sauvegarder les valeurs des inputs
+            var inputsData = {};
+            $('#score tbody input').each(function() {
+                var inputId = $(this).attr('id');
+                inputsData[inputId] = $(this).val();
+            });
+
+            // Rafraîchir le contenu du tbody
+            $('#score tbody').load(location.href + ' #score tbody > *', function() {
+                // Restaurer les valeurs des inputs
+                $.each(inputsData, function(id, value) {
+                    $('#' + id).val(value);
+                });
+            });
+        }, 10000); // 10000 millisecondes = 10 secondes
+    });
+    </script>
+
+
+
 	</body>
+
+
+
 
 </html>

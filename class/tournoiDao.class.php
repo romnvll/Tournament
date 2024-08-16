@@ -18,17 +18,22 @@ public function __construct() {
 }
 
 
-public function ajouterTournoi(string $nom, int $nb_terrains, string $heure_debut, int $isClassement, ?int $idParent = null, $heure_fin = 0, int $pasHoraire = 0): void {
-    $stmt = $this->connexion->prepare("INSERT INTO Tournois (nom, nb_terrains, heure_debut, pasHoraire, isClassement, IdParent, heure_fin) VALUES (:nom, :nb_terrains, :heure_debut, :pasHoraire, :isClassement, :idParent, :heure_fin)");
+public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0): void {
+    $stmt = $this->connexion->prepare("
+        INSERT INTO Tournois (nom, dateDebut, nb_terrains, heure_debut, pasHoraire, isClassement) 
+        VALUES (:nom, :dateDebut, :nb_terrains, :heure_debut, :pasHoraire, :isClassement)
+    ");
+    
     $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':dateDebut', $dateDebut);
     $stmt->bindParam(':nb_terrains', $nb_terrains);
     $stmt->bindParam(':heure_debut', $heure_debut);
+    $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT);
     $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
-    $stmt->bindParam(':idParent', $idParent, PDO::PARAM_INT);
-    $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT); // Change PasHoraire to pasHoraire
-    $stmt->bindParam(':heure_fin', $heure_fin);
+
     $stmt->execute();
 }
+
 
 
 
@@ -457,12 +462,9 @@ function getNbTerrainsById($id) {
 
 public function modifierTournoi(
     int $idTournoi, 
-    ?string $nom = null, 
-    ?int $nb_terrains = null, 
+    ?string $nom = null,      
     ?string $heure_debut = null, 
     ?int $isClassement = null, 
-    ?int $idParent = null, 
-    ?string $heure_fin = null, 
     ?int $pasHoraire = null, 
     ?int $isVisible = null, 
     ?int $heureIsVisible = null, 
@@ -478,10 +480,7 @@ public function modifierTournoi(
         $fields[] = "nom = :nom";
         $params[':nom'] = $nom;
     }
-    if ($nb_terrains !== null) {
-        $fields[] = "nb_terrains = :nb_terrains";
-        $params[':nb_terrains'] = $nb_terrains;
-    }
+    
     if ($heure_debut !== null) {
         $fields[] = "heure_debut = :heure_debut";
         $params[':heure_debut'] = $heure_debut;
@@ -490,14 +489,8 @@ public function modifierTournoi(
         $fields[] = "isClassement = :isClassement";
         $params[':isClassement'] = $isClassement;
     }
-    if ($idParent !== null) {
-        $fields[] = "IdParent = :idParent";
-        $params[':idParent'] = $idParent;
-    }
-    if ($heure_fin !== null) {
-        $fields[] = "heure_fin = :heure_fin";
-        $params[':heure_fin'] = $heure_fin;
-    }
+   
+   
     if ($pasHoraire !== null) {
         $fields[] = "pasHoraire = :pasHoraire";
         $params[':pasHoraire'] = $pasHoraire;

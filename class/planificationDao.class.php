@@ -133,6 +133,14 @@ class planificationDao {
         $stmt->execute();
     }
 
+
+    public function supprimerPlanificationsParTournoi(int $tournoi_id): void {
+        $stmt = $this->connexion->prepare("DELETE FROM Planification WHERE tournoi_id = :tournoi_id");
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    
+
     public function resetTerrainAndCreneau(int $tournoi_id, int $planification_id): void {
         $stmt = $this->connexion->prepare("
             UPDATE Planification 
@@ -166,6 +174,8 @@ class planificationDao {
                 cat1.Nom_categorie AS equipe1_categorie_nom,
                 cat1.Couleur AS equipe1_categorie_couleur,
                 cat1.fk_id_club AS equipe1_categorie_fk_id_club,
+                e1p.poule_id AS equipe1_poule_id,
+                p1.nom AS equipe1_poule_nom,
                 r.equipe2_id,
                 e2.nom AS equipe2_nom,
                 e2.categorie AS equipe2_categorie,
@@ -176,6 +186,8 @@ class planificationDao {
                 cat2.Nom_categorie AS equipe2_categorie_nom,
                 cat2.Couleur AS equipe2_categorie_couleur,
                 cat2.fk_id_club AS equipe2_categorie_fk_id_club,
+                e2p.poule_id AS equipe2_poule_id,
+                p2.nom AS equipe2_poule_nom,
                 r.score1,
                 r.score2,
                 r.tour,
@@ -187,7 +199,8 @@ class planificationDao {
                 p.arbitre_id,
                 a.nom AS arbitre_nom,
                 p.label_id,
-                l.description AS label_description
+                l.description AS label_description,
+                l.couleur AS label_couleur
             FROM 
                 Planification p
             LEFT JOIN 
@@ -201,9 +214,17 @@ class planificationDao {
             LEFT JOIN 
                 Categorie cat1 ON e1.categorie = cat1.id_categorie
             LEFT JOIN 
+                EquipePoule e1p ON e1.id = e1p.equipe_id
+            LEFT JOIN 
+                Poules p1 ON e1p.poule_id = p1.id
+            LEFT JOIN 
                 Equipes e2 ON r.equipe2_id = e2.id
             LEFT JOIN 
                 Categorie cat2 ON e2.categorie = cat2.id_categorie
+            LEFT JOIN 
+                EquipePoule e2p ON e2.id = e2p.equipe_id
+            LEFT JOIN 
+                Poules p2 ON e2p.poule_id = p2.id
             LEFT JOIN 
                 Arbitres a ON p.arbitre_id = a.arbitre_id
             LEFT JOIN 
@@ -213,10 +234,11 @@ class planificationDao {
                 AND p.terrain_id IS NOT NULL
                 AND p.creneau_id IS NOT NULL
         ");
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     
 
     public function afficherRencontresSansPlanification(int $tournoi_id): array {
@@ -232,6 +254,8 @@ class planificationDao {
     e1.IsPresent AS equipe1_isPresent,
     e1.tournoi_id AS equipe1_tournoi_id,
     e1.club_id AS equipe1_club_id,
+    ep1.poule_id AS equipe1_poule_id,
+    p1.nom AS equipe1_poule_nom,
     r.equipe2_id,
     e2.nom AS equipe2_nom,
     e2.categorie AS equipe2_categorie,
@@ -239,6 +263,8 @@ class planificationDao {
     e2.IsPresent AS equipe2_isPresent,
     e2.tournoi_id AS equipe2_tournoi_id,
     e2.club_id AS equipe2_club_id,
+    ep2.poule_id AS equipe2_poule_id,
+    p2.nom AS equipe2_poule_nom,
     r.score1,
     r.score2,
     r.tour,
@@ -255,12 +281,21 @@ LEFT JOIN
 LEFT JOIN 
     Categorie c1 ON e1.categorie = c1.id_categorie
 LEFT JOIN 
+    EquipePoule ep1 ON e1.id = ep1.equipe_id
+LEFT JOIN 
+    Poules p1 ON ep1.poule_id = p1.id
+LEFT JOIN 
     Equipes e2 ON r.equipe2_id = e2.id
 LEFT JOIN 
     Categorie c2 ON e2.categorie = c2.id_categorie
+LEFT JOIN 
+    EquipePoule ep2 ON e2.id = ep2.equipe_id
+LEFT JOIN 
+    Poules p2 ON ep2.poule_id = p2.id
 WHERE 
     r.tournoi_id = :tournoi_id
-    AND p.rencontre_id IS NULL
+    AND p.rencontre_id IS NULL;
+
 
         ");
         $stmt->bindParam(':tournoi_id', $tournoi_id);

@@ -13,7 +13,16 @@ class TerrainDao {
             exit;
         }
     }
-
+    public function modifierNomTerrain(int $terrain_id, string $nouveauNom): void {
+        $stmt = $this->connexion->prepare("
+            UPDATE Terrains 
+            SET nom = :nouveauNom 
+            WHERE terrain_id = :terrain_id
+        ");
+        $stmt->bindParam(':nouveauNom', $nouveauNom);
+        $stmt->bindParam(':terrain_id', $terrain_id);
+        $stmt->execute();
+    }
 
     public function ajoutTerrain(int $idTournoi, string $nomTerrain): void {
         $stmt = $this->connexion->prepare("
@@ -23,6 +32,13 @@ class TerrainDao {
         $stmt->bindParam(':nomTerrain', $nomTerrain);
         $stmt->execute();
     }
+
+    public function supprimerTerrainsParTournoi(int $idTournoi): void {
+        $stmt = $this->connexion->prepare("DELETE FROM Terrains WHERE fk_idTournoi = :idTournoi");
+        $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    
 
     public function suppressionTerrain(int $idTournoi, int $idTerrain): void {
         try {
@@ -94,6 +110,18 @@ class TerrainDao {
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+
+    public function AfficherTerrainParId(int $terrainId): array {
+        $stmt = $this->connexion->prepare("
+            SELECT * 
+            FROM Terrains
+            WHERE terrain_id = :terrainId");
+        $stmt->bindParam(':terrainId', $terrainId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
 
     public function AfficherIdTerrain(int $idTournoi, int $numTerrain): ?int {
         // Calculer l'offset avant de préparer la requête

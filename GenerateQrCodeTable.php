@@ -1,6 +1,7 @@
 <?php
 require 'security.php';
 require 'class/tournoiDao.class.php';
+require 'class/terrainDao.class.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 
 require_once('vendor/autoload.php');
@@ -13,8 +14,10 @@ $options = new QROptions(
   ]
 );
 
-
+$terrainDao = new TerrainDao();
 $tournoiDao = new tournoiDao();
+
+
 $tournoiDao->getTournoiById($_GET['idTournoi']);
 
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
@@ -38,7 +41,7 @@ $qrcode = (new QRCode($options))->render($url);
   <link rel="stylesheet" href="/css/styles.min.css">
 </head>
 <body>
-<h1>Scanner pour accèder aux informations de la table n° <?= $_GET['terrain'] ?> </h1>
+<h1>Scanner pour accèder aux rencontres du terrain <?= $terrainDao->AfficherTerrainParId($_GET['terrain'])['nom'];?> </h1>
 <div class="container">
   <img src='<?= $qrcode ?>' alt='QR Code' width='800' height='800'>
 </div>

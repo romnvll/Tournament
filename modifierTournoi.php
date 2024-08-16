@@ -49,6 +49,7 @@ echo $template->render([
   'pageEnCours' => 'GestionTournois',
   'infotournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
   'tournoiEnCours' => $idtournoi,
+  'idTournoi' => $idtournoi,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 'AfficherClub' => $listeClub->afficherClubs(),
 'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),

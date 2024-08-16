@@ -39,11 +39,7 @@
 								<input type="text" class="form-control" id="nom" name="nom" value="{{infotournoi.nom}}" readonly>
 							</div>
 
-							<div class="form-group">
-								<label for="nb_terrains">Nombre de terrains:</label>
-								<input type="number" class="form-control" id="nb_terrains" name="nb_terrains" value="{{infotournoi.nb_terrains}}" required>
-							</div>
-
+							
 							<div class="form-group">
 								<label for="heure_debut">Heure de début:</label>
 								<input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{infotournoi.heure_debut}}">
@@ -55,10 +51,7 @@
 							</div>
 
 
-							<div class="form-group">
-								<label for="heure_fin">Heure de fin:</label>
-								<input type="time" class="form-control" id="heure_fin" name="heure_fin" value="{{infotournoi.heure_fin}}" min="06:00" max="23:59">
-							</div>
+						
 
 						
 							
@@ -159,11 +152,11 @@
 						Pour les tables :
 
 
-						{% for i in 1.. infotournoi.nb_terrains %}
-							<a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{i}}" class="btn btn-primary">
+						{% for i in 1.. AfficherTerrain|length %}
+							<a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{AfficherTerrain[i-1].terrain_id}}" class="btn btn-primary">
 								<i class="fa-solid fa-qrcode me-1"></i>
 								QRCODE table
-								{{i}}</a><br>
+								{{AfficherTerrain[i-1].nom}}</a><br>
 
 						{% endfor %}
 					
@@ -218,7 +211,7 @@
 									<td>
 										{% for terrain in AfficherTerrain %}
 										
-									<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{personne.id}}&idterrain={{terrain.terrain_id}}&tournoiId={{infotournoi.id}}">{{terrain.nom}}</a><br>
+									<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{personne.id}}&idterrain={{terrain.terrain_id}}&tournoiId={{infotournoi.id}}"><span class="badge rounded-pill bg-success"> {{terrain.nom}}</span></a>
 										{% endfor %}
 									</td>
 									</tr>
@@ -237,7 +230,7 @@
 									<th scope="col">mail</th>
 									<th scope="col">Terrain N°</th>
 									<th scope="col">Code pin</th>
-									<th scope="col">URL</th>
+									<th scope="col">Clé sécurisée</th>
 									<th scope="col">envoyer les informations</th>
 									<th scope="col">Suppression de cette personne</th>
 									</tr>
@@ -252,8 +245,8 @@
 									<td>{{personneTable.terrain_nom}}</td>
 									<td>{{personneTable.code_pin}}</td>
 									<td>{{personneTable.url_key}}</td>
-									<td><a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}">sendMail</a></td>
-									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}">del </a></td>
+									<td class="align-middle"><a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}"><i class="fa fa-envelope-o" aria-hidden="true"></i></a></td>
+									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
 									
 								</tr>
 								{% endfor %}
@@ -266,8 +259,24 @@
 
 					</div>
 					{% endif %}
-
 					
+					{% if infotournoi.gestionArbitres == 1 %}
+					<div class="row">
+						<div class="col-5">
+							<h3>Ajouter des arbitres</h3>
+							<form action="modifierTournoi_traitement.php">
+							<div class="mb-3">
+									<label for="nomArbitre" class="form-label">Nom</label>
+									<input type="email" class="form-control" id="EmailArbitre" aria-describedby="emailHelp" name="EmailArbitre" required>
+									<input type="hidden" name="addPersonne" value="true">
+									<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+									<div id="emailHelp" class="form-text">Email</div>
+									<label for="nomArbitre" class="form-label">Email address</label>
+									<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
+								</div>					
+
+
+					{% endif %}
 
 					{% if infotournoi.isArchived == 1 %}
 						<div class="row">
@@ -287,31 +296,3 @@
 
 
 
-			<script>
-				// Récupération des éléments HTML
-const heureFinInput = document.getElementById('heure_fin');
-const pasHoraireInput = document.getElementById('pasHoraire');
-
-// Fonction pour arrondir à l'heure la plus proche multiple du pas horaire
-function roundToMultiple(time, multiple) {
-const timeValue = new Date(`2000-01-01T${time}`);
-const minutes = timeValue.getMinutes();
-const roundedMinutes = Math.round(minutes / multiple) * multiple;
-timeValue.setMinutes(roundedMinutes);
-return timeValue.toLocaleTimeString([], {
-hour: '2-digit',
-minute: '2-digit'
-});
-}
-
-// Fonction pour mettre à jour l'heure de fin en fonction du pas horaire
-function updateHeureFin() {
-const pasHoraireValue = parseInt(pasHoraireInput.value, 10);
-const heureFinValue = heureFinInput.value;
-heureFinInput.value = roundToMultiple(heureFinValue, pasHoraireValue);
-}
-
-// Écoute des changements dans le champ Pas Horaire
-pasHoraireInput.addEventListener('input', updateHeureFin);
-heureFinInput.addEventListener('input', updateHeureFin);
-			</script>

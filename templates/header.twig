@@ -1,3 +1,6 @@
+{% if idTournoi is empty %}
+    {% set idTournoi = dernierTournoi %}
+{% endif %}
 <script src="https://kit.fontawesome.com/0315b9fc45.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -39,7 +42,7 @@
 							<a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="modifierTournoi.php?idTournoi=0">2 - Modifier un tournoi</a>
+							<a class="dropdown-item" href="modifierTournoi.php?idTournoi={{idTournoi}}">2 - Modifier un tournoi</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
@@ -48,17 +51,17 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link d-flex align-items-center {% if pageEncours == "ajoutEquipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi=0" tabindex="-1" title="Gestion des équipes"><span class="fa-solid fa-people-group me-1"></span>Equipes</a>
+					<a class="nav-link d-flex align-items-center {% if pageEncours == "ajoutEquipe" %} active {% endif %}" href="ajoutEquipe.php?idTournoi={{idTournoi}}" tabindex="-1" title="Gestion des équipes"><span class="fa-solid fa-people-group me-1"></span>Equipes</a>
 				</li>
 
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesPoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-table-list me-1"></i>Gestion des poules</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="gestionPoules.php?id_tournoi=0">1 - Générer automatiquement</a>
+							<a class="dropdown-item" href="gestionPoules.php?id_tournoi={{idTournoi}}">1 - Générer automatiquement</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="modifierPoules.php">2 - Retoucher les poules</a>
+							<a class="dropdown-item" href="modifierPoules.php?id_tournoi={{idTournoi}}">2 - Retoucher les poules</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
@@ -70,19 +73,20 @@
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesRencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">1 - Création des rencontres</a>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0">1 - Création des rencontres</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="PlacementDesRencontres.php">2a - Placer les rencontres</a>
+							<a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}">2a - Placer les rencontres</a>
+							
 						</li>
 						<li>
-							<a class="dropdown-item" href="RepartitionDesRencontresSurTerrainAuto.php?id_tournoi=0">2b - Placer les rencontres auto</a>
+							<a class="dropdown-item" href="RepartitionDesRencontresSurTerrainAuto.php?id_tournoi={{idTournoi}}">2b - Placer les rencontres auto</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="gestionRencontres.php?idTournoi=0&idPoule=0">3 - Insérer les scores par poules</a>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0">3 - Insérer les scores par poules</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi=0">4 - Insérer les scores par terrain</a>
+							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}">4 - Insérer les scores par terrain</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
@@ -91,7 +95,7 @@
 							<a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase=0">Phases finales</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi=0">Suppressions des rencontres</a>
+							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi{{idTournoi}}">Suppressions des rencontres</a>
 						</li>
 					</ul>
 				</li>
@@ -102,7 +106,7 @@
 							<span class="fa fa-chart-line"></span>Statistiques</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a class="dropdown-item" href="statsByClubs.php?id_tournoi=0">
+								<a class="dropdown-item" href="statsByClubs.php?id_tournoi={{idTournoi}}">
 									<span class="fa fa-people-arrows"></span>Par club</a>
 							</li>
 						</ul>
