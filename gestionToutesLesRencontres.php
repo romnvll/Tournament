@@ -6,7 +6,12 @@ require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
 //require 'class/tournoi.class.php';
 require 'class/pouleManagerDao.class.php';
+require 'class/terrainDao.class.php';
 require 'vendor/autoload.php';
+require 'class/creneauxDao.class.php';
+require 'class/planificationDao.class.php';
+require 'class/arbitreDao.class.php';
+
 session_start();
 $_SESSION['idTournoi'] = $_GET['idTournoi'];
 
@@ -19,123 +24,52 @@ $twig = new \Twig\Environment($loader, [
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-$tournoi = new tournoiDao();
+
 $poulemanager = new PouleManager();
 $rencontre = new RencontreDAO();
 $equipeDao = new EquipeDAO();
-
-$rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['id_tournoi']);
-//var_dump($rencontre->repartirRencontresSurTerrains($rencontre->getRencontreByTournoi($_GET['id_tournoi']),6));
-
-$listeDesTournois = $tournoi->afficherLesTournois();
-$nombreTerrain = $tournoi->getNbTerrainsById($_GET['id_tournoi']);
-
-//si on ne test pas le parametre idPoule --> erreur 500
-if (isset ($_GET['idPoule'])) {
- $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
-}
-
-
-$rencontres = $rencontre->getRencontreByTournoi($_GET['id_tournoi']);
-
-//
-function ajouterRencontresVides($rencontres, $nombreTerrains, $heureDebut = '08:00:00', $heureFin = '18:00:00',$pashoraire) {
-  
-  $dureeCreneau = $pashoraire; // Durée d'un créneau, ici 15 minutes 00:15:00
-  $rencontresCompletes = [];
-
-  // Initialiser les créneaux pour chaque terrain
-  for ($terrain = 1; $terrain <= $nombreTerrains; $terrain++) {
-      $heureActuelle = $heureDebut;
-      while ($heureActuelle < $heureFin) {
-          $rencontresCompletes[$terrain][$heureActuelle] = [
-              'rencontre_id' => null, // Rencontre vide
-              'num_terrain' => $terrain,
-              'heure_rencontre' => $heureActuelle,
-              'equipe1_categorie' => "Aucune Rencontre",
-              // autres champs vides ou par défaut
-          ];
-          $heureActuelle = date('H:i:s', strtotime($heureActuelle) + strtotime($dureeCreneau) - strtotime('TODAY'));
-      }
-  }
-
-  // Placer les rencontres existantes dans les créneaux correspondants
-  foreach ($rencontres as $rencontre) {
-      $terrain = $rencontre['num_terrain'];
-      $heure = $rencontre['heure_rencontre'];
-
-      // S'assurer que le format de l'heure est le même
-      if (isset($rencontresCompletes[$terrain][$heure])) {
-          $rencontresCompletes[$terrain][$heure] = $rencontre;
-      }
-  }
-
-  // Aplatir le tableau pour obtenir la structure souhaitée
-  $resultat = [];
-  foreach ($rencontresCompletes as $terrain => $creneaux) {
-      foreach ($creneaux as $heure => $rencontre) {
-          $resultat[] = $rencontre;
-      }
-  }
-
-  return $resultat;
-}
-
-
-//var_dump($tournoi->getTournoiById($_GET['id_tournoi']));
-
-
-$starttime = $tournoi->getTournoiById($_GET['id_tournoi']);
-
-$starttime = $starttime['heure_debut'];
-$starttime = date('H:i:s', strtotime($starttime));
-
-
-$endtime = $tournoi->afficherLesTournois();
-
-foreach ($endtime as $end) {
-  if ($end['id'] == $_GET['id_tournoi']) {
-    $endtime = $end['heure_fin'];
-    $endtime = date('H:i:s', strtotime($endtime));
-  }
-}
-
-
-
-
-
-$lestournois = $tournoi->afficherLesTournois();
-
-
-foreach ($lestournois as $tournoi) {
-  if ($tournoi['id'] == $_GET['id_tournoi']) {
-      $pashoraire = $tournoi['pasHoraire'];
-      
-  }
-}
-
-
-
-
-// Convertir les minutes en secondes
-$pashoraire = $pashoraire * 60;
-
-// Formater en HH:MM:SS
-$pashoraire = gmdate('H:i:s', $pashoraire);
-
-
-
-$rencontre1 = ajouterRencontresVides($rencontres,$nombreTerrain,$starttime,$endtime,$pashoraire);
-//echo "<pre>";
-//var_dump($rencontre1);
-//echo "<pre>";
+$tournois = new tournoiDao();
+$terrain = new TerrainDao();
+$creneaux = new creneauxDao();
+$planification = new planificationDao();
+$arbitre = new arbitreDao();
 
 
 //
 
-$pourcentagetermine = new tournoiDao();
+
 
 $template = $twig->load('gestionToutesLesRencontres.twig');
+
+if (!isset($_GET['id_tournoi'])) {
+  $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
+  $nbrterrain = null;
+  $table = null;
+  $listdecreneau = null;
+  $planification = null;
+  $planificationSansCreneauNiTerrain = null;
+  $libelleParTournoi = null;
+  $listeDesArbitres = null;
+  $tournoiInfo = null;
+  $lastCreneau=null;
+  
+} else {
+ $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
+ $nbrterrain = $terrain->AfficherTerrains($_GET['id_tournoi']);
+ $listdecreneaux = $creneaux->afficherCreneaux($_GET['id_tournoi']);
+ $ToutesPlanification = $planification->afficherPlanifications($_GET['id_tournoi']);
+  $planificationSansCreneauNiTerrain = $planification->afficherRencontresSansPlanification($_GET['id_tournoi']);
+  $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
+  $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
+  $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
+ 
+  
+}
+
+
+
+
+
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionDesRencontres',
@@ -143,20 +77,23 @@ echo $template->render([
   //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
   
   'idTournoi'=> $_GET['id_tournoi'],
-  'pourcentTermine' =>$pourcentagetermine->pourcentageRencontresTermineesDuTournoi($_GET['id_tournoi']),
 
  
-  //'idPoule' => $_GET['idPoule'],
+
+  'afficherPlanification' =>  $ToutesPlanification,
+    'planificationSansCreneauNiTerrain' => $planificationSansCreneauNiTerrain,
+
+    'ListeDesTournois' => $listedestournois,
+    'terrains' => $nbrterrain,
+    'listCreneaux' => $listdecreneaux,
+    'libelleParTournoi' => $libelleParTournoi,
+    'listeDesArbitres' => $listeDesArbitres,
+    'tournoiInfo'   => $tournoiInfo,
+   
+
   
-  'tournoiEnCours' => $_SESSION['idTournoi'],
-  
 
-  'ToutesLesRencontres' => $rencontre1 ,
-
-  //'ToutesLesRencontres' => $rencontre->getRencontreByTournoi($_GET['id_tournoi']),
-
-  'nombreTerrain' => $nombreTerrain,
-  'ListeDesTournois' => $listeDesTournois,
+ 
  
 
 

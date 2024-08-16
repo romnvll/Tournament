@@ -4,7 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<link href="style/couleurEquipes.css" rel="stylesheet">
-		<script src="https://unpkg.com/htmx.org@1.9.4" integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV" crossorigin="anonymous"></script>
+		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 		<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
 		<title>Gestion rencontre</title>
@@ -12,215 +12,175 @@
 
 	<body>
 
-		{{ include('header.twig') }}
-		<div class="row ml-n4">
-			<div class="col-lg-3">
-				<h6>
-					{% if (ListeDesTournois|length) > 1 %}
-						Tournois
-					{% else %}
-						Tournoi
-					{% endif %}
-				</h6>
-				{% for tournoi in ListeDesTournois %}
-					{% if tournoi.isArchived == 0 %}
-						{% if tournoi.id == idTournoi %}
-							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
-						{% else %}
-							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
-						{% endif %}
-					{% endif %}
-				{% endfor %}
-			</div>
+		  {{ include('header.twig') }}
+      <div class="row ml-n4">
+      <div class="col-lg-3">
+         {% for tournoi in ListeDesTournois %}
+         {% if tournoi.isArchived == 0 %}
+         {% if tournoi.id == idTournoi %}
+         <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
+         {% else %}
+         <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary">{{ tournoi.nom }}</a>
+         {% endif %}
+         {% endif %}
+         {% endfor %}
+      </div>
+      <div class="col-lg-12">
+         <table class="table" id="planification-table">
+            <thead>
+               <tr>
+                  <th scope="col">
+                  
+                  </th>
+                  
 
-			<div class="row mt-1" id="progressbar">
+                 
 
-				<div class="col">
-					<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="{{pourcentTermine}}" aria-valuemin="0" aria-valuemax="100">
-						<div class="progress-bar bg-success progress-bar progress-bar-striped" style="width: {{pourcentTermine}}%">{{pourcentTermine}}% du tournoi terminé</div>
-					</div>
-				</div>
+                  {% for i in 0..terrains|length - 1 %}
+                       <th scope="col">{{terrains[i]["nom"]}}</th>
+                {% endfor %}
+                  
+               </tr>
+            </thead>
+            <tbody>
+               {% for creneau in listCreneaux %}
+               <tr>
+                  <td>
+                  
+                  <div class="input-group flex-nowrap">
+                           <span class="input-group-text" id="addon-wrapping"><a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}"><i class="fa fa-clock-o" aria-hidden="true"></i></span></a>
+                           <input type="text" size="3" class="form-control" placeholder="{{ creneau.nom }}" aria-describedby="addon-wrapping">
+                           </div>
+                  
+                  </td>
+                  {% set Displayed = false %}
+                  {% for j in 0..terrains|length - 1 %}
+                  <td>
+                     {% set planificationFound = false %} {# Variable pour suivre si une planification a été trouvée #}
+                     {% set creneauOqp = false %} {# Variable pour suivre si un creneau est OQP #}
+                     {% for planification in afficherPlanification %}
+					
+                     	{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
+                    	      {% set planificationFound = true %} {# Variable pour suivre si une planification a été trouvée #}
+                    		    {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
+                    		      {% if planification.arbitre_id is not null %}
+                              <!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
+                   			 <i class="fa fa-user" aria-hidden="true"></i> {{planification.arbitre_nom}}
+                             
+	
+                     {% endif %}
+                     {% if planification.rencontre_id is not null %}
+				<div class="mb-3">
+    <!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
+    <p class="fw-bold text-center">{{planification.equipe1_categorie_nom}} - tour {{planification.tour}}</p>
+    
+    <!-- Ligne 2: Noms des équipes et scores, centrée -->
+    <div class="d-flex align-items-center justify-content-center">
+        <p class="mb-0 me-2">{{planification.equipe1_nom}}</p>
+        
+        <input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
+        
+        <input type="number" name="scoreEquipe1" value="{{planification.score1}}" class="form-control me-2" min="0"
+            hx-post="gestionRencontres_traitement.php"
+            hx-trigger="change" 
+            hx-include="#idRencontre{{planification.rencontre_id}}">
 
-			</div>
+        <span class="mx-2">vs</span>
 
-			<div class="row">
+        <input type="number" name="scoreEquipe2" value="{{planification.score2}}" class="form-control me-2" min="0"
+            hx-post="gestionRencontres_traitement.php"
+            hx-trigger="change" 
+            hx-include="#idRencontre{{planification.rencontre_id}}">
 
-				{% for i in 0..nombreTerrain %}
-					{% set RencontresExistent = false %}
-					{% for rencontre in ToutesLesRencontres %}
-						{% if rencontre.num_terrain == i %}
-							{% set RencontresExistent = true %}
-						{% endif %}
-					{% endfor %}
+        <p class="mb-0">{{planification.equipe2_nom}}</p>
+    </div>
+</div>
 
-					{% if terrainSelect is null or terrainSelect == i %}
-						{% if RencontresExistent %}
-
-							<div class="col-lg-4">
-
-
-								<h3 class="text-center">Terrain N°
-									{{ i }}</h3>
-								<div class="table-responsive ">
-									<table class="table table-sm align-left table-responsive" id="tableau">
-										<thead>
-											<tr>
-												<th scope="col">
-													<p class="small">Heure</p>
-												</th>
-												<th scope="col">
-													<p class="small">Arbitre</p>
-												</th>
-												<th scope="col">
-													<p class="small">Terrain</p>
-												</th>
-												<th scope="col">
-													<p class="small">Catégorie</p>
-												</th>
-												<th scope="col">
-													<p class="small">Equipe1</p>
-												</th>
-												<th scope="col">
-													<p class="small">Equipe2</p>
-												</th>
-
-											</tr>
-										</thead>
-										<tbody>
-											{% for rencontre in ToutesLesRencontres %}
-
-												{% if rencontre.num_terrain == i %}
-
-													{% set categoryClass = '' %}
-
-													{% if rencontre.equipe1_categorie == 'U17M' %}
-														{% set categoryClass = 'U17M' %}
-													{% elseif rencontre.equipe1_categorie == 'U17F' %}
-														{% set categoryClass = 'U17F' %}
-
-													{% elseif rencontre.equipe1_categorie == 'U15M' %}
-														{% set categoryClass = 'U15M' %}
-
-
-													{% elseif rencontre.equipe1_categorie == 'U11F' %}
-														{% set categoryClass = 'U11F' %}
-
-													{% elseif rencontre.equipe1_categorie == 'U11M' %}
-														{% set categoryClass = 'U11M' %}
-
-													{% elseif rencontre.equipe1_categorie == 'U15F' %}
-														{% set categoryClass = 'U15F' %}
-													{% elseif rencontre.equipe1_categorie == 'U13M' %}
-														{% set categoryClass = 'U13M' %}
-													{% elseif rencontre.equipe1_categorie == 'U13F' %}
-														{% set categoryClass = 'U13F' %}
-													{% elseif rencontre.equipe1_categorie == 'senior' %}
-														{% set categoryClass = 'senior' %}
-													{% elseif rencontre.equipe1_categorie == 'loisir' %}
-														{% set categoryClass = 'loisir' %}
-													{% elseif rencontre.equipe1_categorie == 'MiniDebutant' %}
-														{% set categoryClass = 'MiniDebutant' %}
-													{% elseif rencontre.equipe1_categorie == 'MiniDebrouillard' %}
-														{% set categoryClass = 'MiniDebrouillard' %}
-													{% elseif rencontre.equipe1_categorie == 'MiniConfirme' %}
-														{% set categoryClass = 'MiniConfirme' %}
+                    
+                     {% set creneauOqp = true %}
+                     {% endif %}
+                     <script>
+                        var tdElement = document.currentScript.parentElement;
+                        // Appliquer la couleur de fond au <td> parent
+                        tdElement.style.backgroundColor = '{{planification.equipe1_categorie_couleur}}';														
+                     </script>
+                     
+                     {% elseif planification.label_id is not null %}
+                      {{ planification.label_description }}
+					  <script>
+                        var tdElement = document.currentScript.parentElement;
+                        // Appliquer la couleur de fond au <td> parent
+                        tdElement.style.backgroundColor = 'grey';														
+                     </script>
+                     {% endif %}
 
 
-													{% endif %}
+                     {% endif %}
+                       
+                     {% endfor %}
+                 
+                    
+                     
+                  </td>
+                  {% endfor %}
+               </tr>
+               {% endfor %}
+            <tfoot>
+               <td>
+                  <a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']}}&newTime={{timeNextCreneau}}"><h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2></a>
+               </td>
+            </tfoot>
+            </tbody>
+            </tbody>
+         </table>
+      </div>
+ <input type="text" id="filter-input" placeholder="Filtrer...">  
+
+<script>
+        // Load the filter value from LocalStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInput = document.getElementById('filter-input');
+            const storedFilter = localStorage.getItem('filterValue');
+            if (storedFilter) {
+                filterInput.value = storedFilter;
+                filterOptions(storedFilter.toLowerCase());
+            }
+
+            filterInput.addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                localStorage.setItem('filterValue', this.value); // Save filter value to LocalStorage
+                filterOptions(filter);
+            });
+        });
+
+        function filterOptions(filter) {
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                const options = select.querySelectorAll('option');
+                options.forEach(option => {
+                    if (option.text.toLowerCase().includes(filter)) {
+                        option.classList.remove('hidden');
+                    } else {
+                        option.classList.add('hidden');
+                    }
+                });
+            });
+        }
+    </script>
 
 
-													<form action="gestionRencontres_traitement.php" method="POST" id="{{rencontre.rencontre_id}}">
-														<input type="hidden" value="{{idTournoi}}" name="idTournoi">
-														<input type="hidden" value="{{idPoule}}" name="idPoule">
-														{% if rencontre.rencontre_id is not null %}
-															<tr class="{{categoryClass}}" style="height:120px">
-
-																<input type="hidden" value="{{rencontre.rencontre_id}}" name="IdRencontre" id="IdRencontre">
-																<td scope="row">
-																	<input class="form-control " type="time" name="heure" data-rencontre-id="{{ rencontre.rencontre_id }}" value="{{ rencontre.heure_rencontre }}" id="heure-{{rencontre.rencontre_id}}" size="8" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
-																	<p class="status"></p>
-
-
-																</td>
-
-																<td><input class="form-control form-control-sm" type="text" name="arbitre" value="{{ rencontre.arbitre }}" size="3" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"></td>
-																<td><input style="width: 40px;" class="form-control form-control-sm" type="number" name="terrain" value="{{ rencontre.num_terrain }}" min="1" max="{{NombreTerrain}}" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>Terrain</td>
-																<td>
-																	<p class="small">{{ rencontre.equipe1_categorie }}</p>
-																</td>
-																<td>
-
-																	<input type="number" style="width: 65px;" placeholder="Score" id="Equipe1" class="form-control form-control-sm" value="{{ rencontre.score1 }}" name="equipeScore1" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
-
-																	<input type="hidden" value="{{ rencontre.equipe1_id }}" name="idEquipe1">
-																	<p class="text-break small fw-bold text-center ">{{ rencontre.equipe1_nom }}</p>
-
-																</td>
-																<td>
-																	<input type="number" style="width: 65px;" placeholder="Score" id="Equipe2" class="form-control form-control-sm" value="{{ rencontre.score2 }}" name="equipeScore2" min="0" max="100" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="[id='{{rencontre.rencontre_id}}']"/>
-																	<input type="hidden" value="{{ rencontre.equipe2_id }}" name="idEquipe2">
-																	<p class="text-break small fw-bold text-center ">{{ rencontre.equipe2_nom }}</p>
-
-																</td>
+<script>
+        $(document).ready(function() {
+            $('.rencontreLabel .form-select').on('change', function() {
+                var $form = $(this).closest('form');
+                var formAction = $form.attr('action');
+                var formData = $form.serialize();
+                
+                $.post(formAction, formData, function() {
+                    location.reload();
+                });
+            });
+        });
+    </script>
 
 
-															</tr>
-														{% else %}
-															<tr class="align-middle " style="height: 120px;">
-																<td class="table-dark"></td>
-																<td class="table-dark">{{rencontre.heure_rencontre}}</td>
-																<td class="table-dark">Terrain
-																	{{ rencontre.num_terrain }}
-																</td>
-																<td class="table-dark">
-																	Libre
-																</td>
-																<td class="table-dark"></td>
-																<td class="table-dark"></td>
-																<td class="table-dark"></td>
-
-															</tr>
-														{% endif %}
-
-													</form>
-
-												{% endif %}
-											{% endfor %}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						{% endif %}
-					{% endif %}
-				{% endfor %}
-
-
-			</div>
-
-		</body>
-
-		<script>
-			$(document).ready(function () {
-var checkScores = function () {
-$('input[name="equipeScore1"], input[name="equipeScore2"]').each(function () {
-var equipeScore1 = $(this).closest('tr').find('input[name="equipeScore1"]').val();
-var equipeScore2 = $(this).closest('tr').find('input[name="equipeScore2"]').val();
-
-if (equipeScore1 !== "" && equipeScore2 !== "") {
-$(this).closest('tr').find('.status').html('Rencontre terminée').css('color', 'red');
-// $(this).closest('tr').css('background-color', 'gray');
-} else {
-$(this).closest('tr').find('.status').html('');
-}
-});
-};
-
-// Exécutez la fonction au chargement de la page
-checkScores();
-
-// Exécutez la fonction lorsque les champs sont modifiés
-$('input[name="equipeScore1"], input[name="equipeScore2"]').on('change', checkScores);
-});
-		</script>
-	</body>
-</html>

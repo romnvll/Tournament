@@ -41,6 +41,16 @@ class PersonneDao {
         $stmt->execute();
     }
 
+
+    public function supprimerPersonneParTournoi($id_tournoi) {
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Personne 
+            WHERE tournoi_id = :tournoi_id
+        ");
+        $stmt->bindValue(':tournoi_id', $id_tournoi);
+        $stmt->execute();
+    }
+
     // Modifier une personne
     public function modifierPersonne($id,  $nom, $prenom, $mail, $tournoi_id) {
         $stmt = $this->connexion->prepare("

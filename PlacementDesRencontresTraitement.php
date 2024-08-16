@@ -1,7 +1,12 @@
 <?php
 require 'security.php';
 
-
+if (isset ($_POST['nomTerrain'])) {
+    require ('class/terrainDao.class.php');
+    $terrain = new TerrainDao();
+    $terrain->modifierNomTerrain($_POST['terrain_id'],$_POST['nomTerrain']);
+    
+}
 
 if (isset ($_POST['Addevent'])) {
     
@@ -69,7 +74,9 @@ if (isset ($_POST['modifHeureDebut'])) {
     
     //var_dump($_POST);
     $creneau->mettreAJourHoraireDebut($_POST['idTournoi'],$_POST['modifHeureDebut'],$_POST['modifPasHoraire']);
-    $tournoi->modifierTournoi($_POST['idTournoi'],null,null,$_POST['modifHeureDebut'],null,null,null,$_POST['modifPasHoraire'],null,null,null,null,null,null);
+    $tournoi->modifierTournoi($_POST['idTournoi'],null,
+    $_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,
+    null,null,null,null,null);
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
 }
@@ -138,7 +145,7 @@ if (isset($_GET['action'])) {
             $terrain = new TerrainDao();
            
             $terrain->ajoutTerrain($_GET['idTournoi'],$terrain->compterTerrains($_GET['idTournoi']) + 1);
-            
+            header("Location: " . $_SERVER['HTTP_REFERER']);
         }
 
         if (($_GET['action'] == "delTerrain")) {
@@ -146,7 +153,7 @@ if (isset($_GET['action'])) {
             $terrain = new TerrainDao();
             
             $terrain->suppressionTerrain($_GET['idTournoi'],$_GET['terrain_id']);
-            
+            header("Location: " . $_SERVER['HTTP_REFERER']);
         }
 
 

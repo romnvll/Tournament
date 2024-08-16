@@ -38,9 +38,9 @@
             </div>
 
             <div class="form-group mb-3">
-              <label for="heurefin" class="form-label">Heure de fin estimée?</label>
+              <label for="dateTournoi" class="form-label">Date du tournoi</label>
 
-              <input type="time" class="form-control" id="heurefin" name="heurefin" class="form-label" id="heurefin" min="06:00" max="23:59"/>les minutes vont s'adapter en fonction de la durée de la rencontre
+              <input type="date" class="form-control" id="dateTournoi" name="dateTournoi" class="form-label" id="dateTournoi" />
             </div>
 
             <input type="submit"  class="btn btn-primary"  />
@@ -51,29 +51,3 @@
   </body>
 </html>
 
-<script>
-  // Récupération des éléments HTML
-  const heureFinInput = document.getElementById('heurefin')
-  const pasHoraireInput = document.getElementById('PasHoraire')
-  
-  // Fonction pour arrondir à l'heure la plus proche multiple du pas horaire
-  function roundToMultiple(time, multiple) {
-    const timeValue = new Date(`2000-01-01T${time}`)
-    const minutes = timeValue.getMinutes()
-    const roundedMinutes = Math.round(minutes / multiple) * multiple
-    timeValue.setMinutes(roundedMinutes)
-    return timeValue.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }
-  
-  // Fonction pour mettre à jour l'heure de fin en fonction du pas horaire
-  function updateHeureFin() {
-    const pasHoraireValue = parseInt(pasHoraireInput.value, 10)
-    const heureFinValue = heureFinInput.value
-    console.log(pasHoraireInput.value)
-    heureFinInput.value = roundToMultiple(heureFinValue, pasHoraireValue)
-  }
-  
-  // Écoute des changements dans le champ Pas Horaire
-  pasHoraireInput.addEventListener('input', updateHeureFin)
-  heureFinInput.addEventListener('input', updateHeureFin)
-</script>

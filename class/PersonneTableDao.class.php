@@ -128,7 +128,7 @@ private function genererCodePin() {
 
         Vous avez été assigné au terrain '$terrainNom' pour noter les scores.
         
-        Voici votre lien sécurisé : http://192.168.92.211/Tournament/vuePersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id
+        Voici votre lien sécurisé : http://192.168.92.211/Tournament/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id
         
         Votre code PIN est : $codePin 
         
@@ -170,6 +170,16 @@ public function supprimerPersonneTable($id) {
     $stmt->bindValue(':id', $id);
     $stmt->execute();
 }
+
+
+public function supprimerPersonnesParTournoi($tournoi_id) {
+    $stmt = $this->connexion->prepare("
+        DELETE FROM PersonneTable WHERE tournoi_id = :tournoi_id;
+    ");
+    $stmt->bindValue(':tournoi_id', $tournoi_id);
+    $stmt->execute();
+}
+
 
 
 

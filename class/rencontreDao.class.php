@@ -261,28 +261,54 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
 public function getRencontreByPoule($pouleid, $isClassement = 0)
 {
-    $query = "SELECT r.id AS rencontre_id,
-                r.tour AS tour,
-                r.terrain AS num_terrain,
-                r.heure AS heure_rencontre,
-                equipe1.id AS equipe1_id,
-                equipe1.nom AS equipe1_nom,
-                c1.logo AS equipe1_logo,
-                equipe2.id AS equipe2_id,
-                equipe2.nom AS equipe2_nom,
-                c2.logo AS equipe2_logo,
-                r.Arbitre AS arbitre,
-                r.score1,
-                r.score2
-             FROM Rencontres r
-             JOIN Equipes equipe1 ON r.equipe1_id = equipe1.id
-             JOIN EquipePoule ep1 ON equipe1.id = ep1.equipe_id
-             JOIN Equipes equipe2 ON r.equipe2_id = equipe2.id
-             JOIN EquipePoule ep2 ON equipe2.id = ep2.equipe_id
-             LEFT JOIN Clubs c1 ON equipe1.club_id = c1.id
-             LEFT JOIN Clubs c2 ON equipe2.club_id = c2.id
-             WHERE ep1.poule_id = :pouleid AND ep2.poule_id = :pouleid AND r.isClassement = :isClassement
-             ORDER BY r.tour, r.heure, r.id;
+    $query = "SELECT 
+    r.id AS rencontre_id,
+    r.tour AS tour,
+    p.terrain_id,
+    t.nom AS terrain_nom,
+    t.fk_idTournoi AS terrain_fk_idTournoi,
+    p.creneau_id,
+    c.nom AS creneau_nom,
+    equipe1.id AS equipe1_id,
+    equipe1.nom AS equipe1_nom,
+    c1.logo AS equipe1_logo,
+    equipe2.id AS equipe2_id,
+    equipe2.nom AS equipe2_nom,
+    c2.logo AS equipe2_logo,
+    a.nom AS arbitre_nom,  -- Ajout du nom de l'arbitre
+    r.score1,
+    r.score2
+FROM 
+    Rencontres r
+JOIN 
+    Equipes equipe1 ON r.equipe1_id = equipe1.id
+JOIN 
+    EquipePoule ep1 ON equipe1.id = ep1.equipe_id
+JOIN 
+    Equipes equipe2 ON r.equipe2_id = equipe2.id
+JOIN 
+    EquipePoule ep2 ON equipe2.id = ep2.equipe_id
+LEFT JOIN 
+    Clubs c1 ON equipe1.club_id = c1.id
+LEFT JOIN 
+    Clubs c2 ON equipe2.club_id = c2.id
+JOIN 
+    Planification p ON r.id = p.rencontre_id
+LEFT JOIN 
+    Creneaux c ON p.creneau_id = c.creneau_id
+LEFT JOIN 
+    Terrains t ON p.terrain_id = t.terrain_id
+LEFT JOIN 
+    Arbitres a ON p.arbitre_id = a.arbitre_id  -- Jointure avec la table Arbitres
+WHERE 
+    ep1.poule_id = :pouleid 
+    AND ep2.poule_id = :pouleid 
+    AND r.isClassement = :isClassement
+ORDER BY 
+    c.nom, r.id;
+
+
+
              ";
 
     $stmt = $this->connexion->prepare($query);
@@ -343,11 +369,13 @@ public function updateTour(int $idrencontre, int $tour)
             ?int $idrencontre,
             ?int $equipeScore1 = null,
             ?int $equipeScore2 = null,
-            ?int $terrain = null,
-            ?string $heure = null,
-            ?string $arbitre = null,
+            
+           
             ?int $tournoi_id = null
-        ) {
+        ) 
+       
+        {
+           
             $query = "UPDATE Rencontres SET";
             $params = [];
         
@@ -367,22 +395,9 @@ public function updateTour(int $idrencontre, int $tour)
                 }
             } else {
                 $query .= " score2 = NULL,";
-            }
+            }         
         
-            if ($terrain !== null) {
-                $query .= " terrain = :terrain,";
-                $params[':terrain'] = $terrain;
-            }
-        
-            if ($heure !== null) {
-                $query .= " heure = :heure,";
-                $params[':heure'] = $heure;
-            }
-        
-            if ($arbitre !== null && $arbitre !== "dontTouch") {
-                $query .= " Arbitre = :arbitre,";
-                $params[':arbitre'] = $arbitre;
-            }
+           
         
             if ($tournoi_id !== null) {
                 $query .= " tournoi_id = :tournoi_id,";
@@ -392,15 +407,17 @@ public function updateTour(int $idrencontre, int $tour)
             // Supprime la virgule finale
             $query = rtrim($query, ',');
             $query .= " WHERE id = :idrencontre";
-        
+            
             $stmt = $this->connexion->prepare($query);
-        
+            
             foreach ($params as $param => $value) {
                 $stmt->bindValue($param, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
             }
-        
+            
             $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
+           
             $stmt->execute();
+            
         }
         
 
@@ -718,22 +735,23 @@ public function updateTour(int $idrencontre, int $tour)
         // Récupérer les informations de base de la rencontre
         $query = "
             SELECT
-                Rencontres.id AS rencontre_id,
-                Rencontres.tour AS tour,
-                Equipes1.nom AS equipe1_nom,
-                Equipes1.categorie AS equipe1_categorie,
-                Equipes2.nom AS equipe2_nom,
-                Equipes2.categorie AS equipe2_categorie,
-                Poules.nom AS poule_nom,
-                Poules.categorie AS poule_categorie
-            FROM
-                Rencontres
-                INNER JOIN Equipes AS Equipes1 ON Rencontres.equipe1_id = Equipes1.id
-                INNER JOIN Equipes AS Equipes2 ON Rencontres.equipe2_id = Equipes2.id
-                LEFT JOIN EquipePoule ON Equipes1.id = EquipePoule.equipe_id
-                LEFT JOIN Poules ON EquipePoule.poule_id = Poules.id
-            WHERE
-                Rencontres.id = :rencontreId
+    Rencontres.id AS rencontre_id,
+    Rencontres.score1 AS score1,
+    Rencontres.score2 AS score2,
+    Rencontres.tour AS tour,
+    Equipes1.nom AS equipe1_nom,
+    Equipes1.categorie AS equipe1_categorie,
+    Equipes2.nom AS equipe2_nom,
+    Equipes2.categorie AS equipe2_categorie
+FROM
+    Rencontres
+INNER JOIN
+    Equipes AS Equipes1 ON Rencontres.equipe1_id = Equipes1.id
+INNER JOIN
+    Equipes AS Equipes2 ON Rencontres.equipe2_id = Equipes2.id
+WHERE
+    Rencontres.id = :rencontreId
+
         ";
     
         $stmt = $this->connexion->prepare($query);

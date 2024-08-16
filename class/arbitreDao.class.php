@@ -65,6 +65,13 @@ class arbitreDao {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function supprimerArbitresParTournoi(int $tournoi_id): void {
+        $stmt = $this->connexion->prepare("DELETE FROM Arbitres WHERE tournoi_id = :tournoi_id");
+        $stmt->bindParam(':tournoi_id', $tournoi_id);
+        $stmt->execute();
+    }
+    
     
 
 }

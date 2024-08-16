@@ -116,6 +116,13 @@ class creneauxDao {
         $stmt->execute();
     }
 
+    public function supprimerCreneauxParTournoi(int $tournoi_id): void {
+        $stmt = $this->connexion->prepare("DELETE FROM Creneaux WHERE tournoi_id = :tournoi_id");
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    
+
 
     public function afficherCreneaux(int $tournoi_id): array {
         $stmt = $this->connexion->prepare("SELECT * FROM Creneaux WHERE tournoi_id = :tournoi_id");

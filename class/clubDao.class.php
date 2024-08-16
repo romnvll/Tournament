@@ -46,10 +46,10 @@ class ClubDAO {
 
     public function clubsParticipatingInTournoi(int $tournoiId): array {
         $stmt = $this->connexion->prepare("
-            SELECT DISTINCT c.id, c.nom
+            SELECT DISTINCT c.id, c.nom,c.logo
             FROM Clubs c
             JOIN Equipes e ON c.id = e.club_id
-            WHERE e.tournoi_id = :tournoiId
+            WHERE e.tournoi_id = :tournoiId order by c.nom
         ");
         $stmt->bindParam(':tournoiId', $tournoiId);
         $stmt->execute();

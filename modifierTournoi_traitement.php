@@ -33,7 +33,7 @@ if ($_GET['action'] == "sendMail"){
     $personneTable = new PersonneTableDao();
     $personneTable->envoyerMail($_GET['personneTableId']);
     header("Location: " . $_SERVER['HTTP_REFERER']);
-    
+    exit(0);
 }
 
 
@@ -124,7 +124,7 @@ else {
 
 
 $tournoidao = new tournoiDao();
-$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['nb_terrains'],$_POST['heure_debut'],$isClassement,$idparent,$_POST['heure_fin'],$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres);
+$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres);
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 ?>

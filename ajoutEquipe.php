@@ -31,12 +31,23 @@ $listeDesCategorie = new CategorieDao();
 
 $template = $twig->load('ajoutEquipe.twig');
 
+$tousLesTournois = $tournoiDao->afficherLesTournois();
+
+$dernierId = null;
+
+foreach ($tousLesTournois as $tournoi) {
+    if (isset($tournoi['isArchived']) && $tournoi['isArchived'] == 0) {
+        $dernierId = $tournoi['id'];
+    }
+}
 
 
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEncours' => 'ajoutEquipe',
   'tournoiEnCours' => $_GET['idTournoi'],
+  'idTournoi' => $dernierId,
+  'dernierTournoi' => $dernierId,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 'AfficherClub' => $listeClub->afficherClubs(),
 'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),

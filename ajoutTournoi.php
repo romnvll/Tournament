@@ -13,10 +13,22 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 $template = $twig->load('ajoutTournoi.twig');
 
 
+$tousLesTournois = $tournoiDao->afficherLesTournois();
+
+$dernierId = null;
+
+foreach ($tousLesTournois as $tournoi) {
+    if (isset($tournoi['isArchived']) && $tournoi['isArchived'] == 0) {
+        $dernierId = $tournoi['id'];
+    }
+}
+
+
 echo $template->render([
   'email' => $_COOKIE['email'],
 'pageEnCours' => 'GestionTournois',
-'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
+'idTournoi' => $dernierId,
+//'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),
 //'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
 //'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
