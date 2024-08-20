@@ -33,13 +33,14 @@ class RencontreDAO
             // Appliquer l'algorithme du round-robin pour créer les rencontres
             $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
            
-            //var_dump($rencontres);
+            
             
             // Insérer les rencontres dans la table Rencontres
             foreach ($rencontres as $rencontre) {
+                
                 // Vérifier si la rencontre existe déjà dans la table Rencontres
                 if ($this->isRencontreExist($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $rencontre['tour'])) {
-                    $this->updateTour($rencontre['id'], $rencontre['tour']);
+                    //$this->updateTour($rencontre['id'], $rencontre['tour']);
                 } else {
                     // Si la rencontre n'existe pas, l'insérer dans la table Rencontres
                     $this->insertRencontre($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $tournoi_id, $isClassement, $rencontre['tour']);
@@ -132,7 +133,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             array_splice($equipes, 1, 0, [$lastTeam]);
         }
     }
-
+    
     return $rencontres;
 }
 
@@ -266,16 +267,25 @@ public function getRencontreByPoule($pouleid, $isClassement = 0)
     r.tour AS tour,
     p.terrain_id,
     t.nom AS terrain_nom,
-    t.fk_idTournoi AS terrain_fk_idTournoi,
     p.creneau_id,
     c.nom AS creneau_nom,
+    
     equipe1.id AS equipe1_id,
     equipe1.nom AS equipe1_nom,
-    c1.logo AS equipe1_logo,
+    club1.id AS club1_id,            -- ID du club de l'équipe 1
+    club1.nom AS club1_nom,          -- Nom du club de l'équipe 1
+    club1.email AS club1_email,      -- Email du club de l'équipe 1
+    club1.contact AS club1_contact,  -- Contact du club de l'équipe 1
+    club1.logo AS club1_logo,        -- Logo du club de l'équipe 1
+    
     equipe2.id AS equipe2_id,
     equipe2.nom AS equipe2_nom,
-    c2.logo AS equipe2_logo,
-    a.nom AS arbitre_nom,  -- Ajout du nom de l'arbitre
+    club2.id AS club2_id,            -- ID du club de l'équipe 2
+    club2.nom AS club2_nom,          -- Nom du club de l'équipe 2
+    club2.email AS club2_email,      -- Email du club de l'équipe 2
+    club2.contact AS club2_contact,  -- Contact du club de l'équipe 2
+    club2.logo AS club2_logo,        -- Logo du club de l'équipe 2
+    
     r.score1,
     r.score2
 FROM 
@@ -285,27 +295,26 @@ JOIN
 JOIN 
     EquipePoule ep1 ON equipe1.id = ep1.equipe_id
 JOIN 
+    Clubs club1 ON equipe1.club_id = club1.id   -- Jointure pour obtenir les infos du club de l'équipe 1
+JOIN 
     Equipes equipe2 ON r.equipe2_id = equipe2.id
 JOIN 
     EquipePoule ep2 ON equipe2.id = ep2.equipe_id
-LEFT JOIN 
-    Clubs c1 ON equipe1.club_id = c1.id
-LEFT JOIN 
-    Clubs c2 ON equipe2.club_id = c2.id
 JOIN 
+    Clubs club2 ON equipe2.club_id = club2.id   -- Jointure pour obtenir les infos du club de l'équipe 2
+LEFT JOIN 
     Planification p ON r.id = p.rencontre_id
 LEFT JOIN 
     Creneaux c ON p.creneau_id = c.creneau_id
 LEFT JOIN 
     Terrains t ON p.terrain_id = t.terrain_id
-LEFT JOIN 
-    Arbitres a ON p.arbitre_id = a.arbitre_id  -- Jointure avec la table Arbitres
 WHERE 
     ep1.poule_id = :pouleid 
     AND ep2.poule_id = :pouleid 
     AND r.isClassement = :isClassement
 ORDER BY 
-    c.nom, r.id;
+    r.tour, c.nom, r.id;
+
 
 
 

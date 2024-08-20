@@ -7,13 +7,15 @@ require 'class/pouleManagerDao.class.php';
 
 
 $poulemanager = new PouleManager();
+
 $pouleinfo = $poulemanager->getPouleById($_POST['dstpoule']);
-$nouvelleCategorie = $pouleinfo['categorie'];
+
+$nouvelleCategorie = $pouleinfo['fk_idcategorie'];
 
 
 if (isset ($_GET['idPoule'])) {
     $idPoule = (int)$_GET['idPoule'];
-    var_dump($idPoule);
+   
     $poulemanager->deletePoule($idPoule);
     header("Location: " . $_SERVER['HTTP_REFERER']);
 }

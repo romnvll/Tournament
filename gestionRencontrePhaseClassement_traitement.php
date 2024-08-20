@@ -9,7 +9,7 @@ $rencontreDao = new RencontreDAO();
 if (isset ($_GET['addpoule'])) {
     
 
-    $pouledao->addEquipeToPoule($_GET['idequipe'],$_GET['pouleNom'],$_GET['tournoiId']);
+    $pouledao->addEquipeToPoule($_GET['idequipe'],$_GET['pouleId'],$_GET['tournoiId']);
     header("Location: " . $_SERVER['HTTP_REFERER']);
     
 }
@@ -35,7 +35,7 @@ if (isset($_GET['CreerRencontre'])) {
         if ($_GET['CreerRencontre'] == 1) {
         $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],1);
        
-      header("Location:  RepartitionDesTours.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);
+      header("Location:  PlacementDesRencontres.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);
         }
 
 }

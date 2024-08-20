@@ -233,6 +233,8 @@ class planificationDao {
                 p.tournoi_id = :tournoi_id
                 AND p.terrain_id IS NOT NULL
                 AND p.creneau_id IS NOT NULL
+            GROUP BY 
+            p.planification_id
         ");
         $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -243,58 +245,30 @@ class planificationDao {
 
     public function afficherRencontresSansPlanification(int $tournoi_id): array {
         $stmt = $this->connexion->prepare("
-           SELECT 
-    r.id,
-    r.isClassement,
-    r.equipe1_id,
-    r.id AS idRencontre,
-    e1.nom AS equipe1_nom,
-    e1.categorie AS equipe1_categorie,
-    c1.Nom_categorie AS equipe1_nom_categorie,
-    e1.IsPresent AS equipe1_isPresent,
-    e1.tournoi_id AS equipe1_tournoi_id,
-    e1.club_id AS equipe1_club_id,
-    ep1.poule_id AS equipe1_poule_id,
-    p1.nom AS equipe1_poule_nom,
-    r.equipe2_id,
-    e2.nom AS equipe2_nom,
-    e2.categorie AS equipe2_categorie,
-    c2.Nom_categorie AS equipe2_nom_categorie,
-    e2.IsPresent AS equipe2_isPresent,
-    e2.tournoi_id AS equipe2_tournoi_id,
-    e2.club_id AS equipe2_club_id,
-    ep2.poule_id AS equipe2_poule_id,
-    p2.nom AS equipe2_poule_nom,
-    r.score1,
-    r.score2,
-    r.tour,
-    r.heure,
-    r.terrain AS rencontre_terrain,
-    r.Arbitre AS rencontre_arbitre,
-    r.tournoi_id AS rencontre_tournoi_id
-FROM 
-    Rencontres r
-LEFT JOIN 
-    Planification p ON r.id = p.rencontre_id
-LEFT JOIN 
-    Equipes e1 ON r.equipe1_id = e1.id
-LEFT JOIN 
-    Categorie c1 ON e1.categorie = c1.id_categorie
-LEFT JOIN 
-    EquipePoule ep1 ON e1.id = ep1.equipe_id
-LEFT JOIN 
-    Poules p1 ON ep1.poule_id = p1.id
-LEFT JOIN 
-    Equipes e2 ON r.equipe2_id = e2.id
-LEFT JOIN 
-    Categorie c2 ON e2.categorie = c2.id_categorie
-LEFT JOIN 
-    EquipePoule ep2 ON e2.id = ep2.equipe_id
-LEFT JOIN 
-    Poules p2 ON ep2.poule_id = p2.id
-WHERE 
-    r.tournoi_id = :tournoi_id
-    AND p.rencontre_id IS NULL;
+     SELECT r.*, 
+       e1.nom AS equipe1_nom, 
+       e1.IsPresent AS equipe1_IsPresent, 
+       e1.club_id AS equipe1_club_id, 
+       e1.categorie AS equipe1_categorie_id,
+       e1_cat.Nom_categorie AS equipe1_categorie_nom,
+       e2.id AS equipe2_id,
+       e2.nom AS equipe2_nom, 
+       e2.IsPresent AS equipe2_IsPresent, 
+       e2.club_id AS equipe2_club_id, 
+       e2.categorie AS equipe2_categorie_id,
+       e2_cat.Nom_categorie AS equipe2_categorie_nom
+FROM Rencontres r
+LEFT JOIN Planification pl ON r.id = pl.rencontre_id
+LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
+LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
+LEFT JOIN Categorie e1_cat ON e1.categorie = e1_cat.id_categorie
+LEFT JOIN Categorie e2_cat ON e2.categorie = e2_cat.id_categorie
+WHERE pl.rencontre_id IS NULL
+AND r.tournoi_id = :tournoi_id;
+
+
+
+
 
 
         ");

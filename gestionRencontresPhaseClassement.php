@@ -5,6 +5,7 @@ require 'class/tournoiDao.class.php';
 require 'class/rencontreDao.class.php';
 require  'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
+require 'class/categorie.class.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -18,12 +19,15 @@ $poulemanager = new PouleManager();
 $rencontreDao = new RencontreDAO();
 $tournoiDao = new tournoiDao();
 $equipeDao = new EquipeDAO();
+$categorie = new CategorieDao();
+
+
 //afficher les phase de classement uniquement:
 
 
 if (isset ($_GET['idTournoiBase'])){
 $tournoiId = $_GET['idTournoiBase']; // Remplacez cela par l'ID du tournoi pour lequel vous souhaitez créer les rencontres
-$tournoiEnCours = $tournoiDao->getIdTournoiParIdParent($tournoiId);
+//$tournoiEnCours = $tournoiDao->getIdTournoiParIdParent($tournoiId);
 
 }
 
@@ -35,7 +39,7 @@ $poules = $poulemanager->getAllPoulesByTournoi($tournoiId);
 // recuperer les categorie pour creer uniquement les rencontres
 // de phase de classement qui sont terminées
 
-$categorie = $tournoiDao->getCategoriesPourTournoi($tournoiId);
+$categorie = $categorie->obtenirToutesLesCategories();
 
 if (isset($_GET['categorie'])) {
 
@@ -82,10 +86,11 @@ echo $template->render([
   'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
   'PouleDuTournoi' => $poulemanager->getAllPoulesByTournoi($tournoiId),
   'pouleEnCours' => $_GET['idPoule'],
+  'listeCategorie' => $categorie,
   
   'ResultatDesPoules' =>$GetResultatDesPoules,
   //'resultatPoules' => $GetResultatDesPoules,
-  'idtournoi' => $tournoiId,
+  'idTournoi' => $tournoiId,
   //'RencontresByPoulephase1' => $rencontreDao->GetEquipesClasseesParPoule($tournoiId),
   
   //'PoulesClassement' =>$tournoiDao->afficherPoulesDeClassement($tournoiId),

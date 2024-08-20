@@ -21,17 +21,19 @@
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionClub" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-city me-1"></i>Gestion des clubs</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="creerClub.php">1 - Creer un club</a>
+							<a class="dropdown-item" href="creerClub.php"><i class="fa-solid fa-house-user"></i> 1 - Creer un club</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="modifierClub.php">2 - Modifier un club</a>
+							<a class="dropdown-item" href="modifierClub.php"><i class="fa-solid fa-gears"></i> 2 - Modifier un club</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
 						</li>
+						<!-- 
 						<li>
 							<a class="dropdown-item" href="#">Something else here</a>
 						</li>
+						 -->
 					</ul>
 				</li>
 
@@ -39,10 +41,10 @@
 					<a class="nav-link dropdown-toggle {% if pageEnCours == "GestionTournois" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-trophy me-1"></i>Gestion des tournois</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="ajoutTournoi.php">1 - Creer un tournoi</a>
+							<a class="dropdown-item" href="ajoutTournoi.php"><i class="fa-solid fa-folder-plus"></i> 1 - Creer un tournoi</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="modifierTournoi.php?idTournoi={{idTournoi}}">2 - Modifier un tournoi</a>
+							<a class="dropdown-item" href="modifierTournoi.php?idTournoi={{idTournoi}}"><i class="fa-solid fa-wrench"></i> 2 - Paramètrer un tournoi</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
@@ -58,10 +60,10 @@
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesPoules" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-table-list me-1"></i>Gestion des poules</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="gestionPoules.php?id_tournoi={{idTournoi}}">1 - Générer automatiquement</a>
+							<a class="dropdown-item" href="gestionPoules.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-arrows-rotate"></i> 1 - Générer automatiquement</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="modifierPoules.php?id_tournoi={{idTournoi}}">2 - Retoucher les poules</a>
+							<a class="dropdown-item" href="modifierPoules.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-pencil"></i> 2 - Retoucher les poules</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>
@@ -73,20 +75,21 @@
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesRencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<li>
-							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0">1 - Création des rencontres</a>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0"><i class="fa-solid fa-plus"></i> 1 - Création des rencontres</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}">2a - Placer les rencontres</a>
+							<a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-calendar-days"></i> 2a - Placer les rencontres</a>
 							
 						</li>
+						<!--
 						<li>
 							<a class="dropdown-item" href="RepartitionDesRencontresSurTerrainAuto.php?id_tournoi={{idTournoi}}">2b - Placer les rencontres auto</a>
+						</li>-->
+						<li>
+							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0"><i class="fa-solid fa-trophy"></i> 3 - Resultats par poules</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0">3 - Insérer les scores par poules</a>
-						</li>
-						<li>
-							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}">4 - Insérer les scores par terrain</a>
+							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-book-open"></i> 4 - Insérer les scores par terrain</a>
 						</li>
 						<li>
 							<hr class="dropdown-divider"/>

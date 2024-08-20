@@ -22,11 +22,11 @@ class PouleManager {
         }
     
         // Insérer la nouvelle poule
-        $query = "INSERT INTO Poules (nom, tournoi_id, categorie, is_classement) VALUES (:nom, :idTournoi, :categorie, :is_classement)";
+        $query = "INSERT INTO Poules (nom, tournoi_id, fk_idcategorie, is_classement) VALUES (:nom, :idTournoi, :fk_idcategorie, :is_classement)";
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':nom', $nomPoule);
         $stmt->bindValue(':idTournoi', $idTournoi);
-        $stmt->bindValue(':categorie', $categorie);
+        $stmt->bindValue(':fk_idcategorie', $categorie);
         $stmt->bindValue(':is_classement', $is_classement, PDO::PARAM_INT);
         $stmt->execute();
     
@@ -173,22 +173,8 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
 
 
 
-    public function addEquipeToPoule($equipeId, $pouleNom, $tournoiId) {
-         // Trouver l'ID de la poule en fonction de son nom
-        $queryPoule = "SELECT id FROM Poules WHERE nom = :pouleNom and tournoi_id = :tournoiId";
-        $stmtPoule = $this->connexion->prepare($queryPoule);
-        $stmtPoule->bindValue(':pouleNom',  $pouleNom );
-        $stmtPoule->bindValue(':tournoiId', $tournoiId);
-        
-        $stmtPoule->execute();
-        $poule = $stmtPoule->fetch(PDO::FETCH_ASSOC);
-       
-        // Vérifier si la poule existe
-        if (!$poule) {
-            throw new Exception("Poule non trouvée avec le nom : " . $pouleNom);
-        }
-    
-        $pouleId = $poule['id'];
+    public function addEquipeToPoule($equipeId, $pouleId, $tournoiId) {
+      
     
         // Vérifier si l'équipe est déjà dans la poule
         $queryCheck = "SELECT * FROM EquipePoule WHERE equipe_id = :equipeId AND poule_id = :pouleId";
@@ -218,12 +204,22 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     
 
     public function getAllPoulesFinalesByTournoi($idTournoi) {
-        $query = "SELECT * FROM Poules WHERE tournoi_id = :idTournoi and is_classement = '1' order by nom";
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':idTournoi', $idTournoi);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $query = "
+        SELECT p.*, c.Nom_categorie
+        FROM Poules p
+        INNER JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
+        WHERE p.tournoi_id = :idTournoi
+        AND p.is_classement = '1'
+        ORDER BY c.Nom_categorie, p.nom
+    ";
+    $stmt = $this->connexion->prepare($query);
+    
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
     public function getEquipesInPoule($idPoule) {
         $query = "SELECT

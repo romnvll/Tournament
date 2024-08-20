@@ -29,22 +29,28 @@
 				</div>
 			</div>
 
-			<div class="row">
-				<div class="col-lg-3">
+			<div class="row mt-2">
+				<div class="col-lg-6">
+				<h4>Choisir la categorie </h4>
+				
 				{% for categorie in ListeDesCategorie %}
 				
 					{% if categorie.id_categorie == categorieEnCours  %}
-					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}" class="btn btn-success btn-lg">{{categorie.Nom_categorie}}</a><br>
-					<p>Selectionner le nombre d'équipe par poule</p>
-					{% for i in 1..15 %}
+					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}" class="btn btn-success btn-lg">{{categorie.Nom_categorie}} ({{categorie.nombre_equipes}})</a>
 					
-					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}&NbrEquipeParPoule={{i}}" class="btn btn-success btn-lg">{{i}}</a>
-					{% endfor %}
+					
 					{% else %}
-					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}" class="btn btn-secondary btn-lg" >{{categorie.Nom_categorie}}</a>
+					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}" class="btn btn-secondary btn-lg" >{{categorie.Nom_categorie}} ({{categorie.nombre_equipes}})</a>
 
 					{% endif %}
+
+					
 				{% endfor %}
+			<br><p>Selectionner le nombre d'équipe par poule</p>
+				{% for i in 1..15 %}
+					
+					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{i}}" class="btn btn-success btn-lg">{{i}}</a>
+					{% endfor %}
 				
 				
 
@@ -57,6 +63,11 @@
 					{% endfor %}
 					</ul>
 				{% endfor %}
+		<br>
+		
+		{% if nbrEquipe is not null %}
+		<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok" class="btn btn-success btn-lg">OK!</a>
+		{% endif %}
 			</div>
 			
 		</div>

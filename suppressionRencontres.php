@@ -35,6 +35,7 @@ echo $template->render([
     //'afficherLesTournois' => $tournoi->getAllTournoi(),
     'ListeDesTournois' => $tournois->afficherLesTournois(),
     'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_GET['id_tournoi'],true),
+    'idTournoi' => $idtournoi,
     'tournoiEnCours' => $idtournoi,
     'pouleEnCours' => $_GET['idPoule'],
     
