@@ -77,16 +77,22 @@
                         <tbody>
                         
                          {% for equipe in afficherEquipeParPoule %}
+                         
                                 <form action="modifierPoules_traitement.php" method="post">              
                             <tr>
                             <th scope="row">{{ equipe.nom }}</th>
-                            <td><select class="form-select" aria-label="Default select example" name="dstpoule">
+                            <td>
+                            
+                            
+                            <select class="form-select" aria-label="Default select example" name="dstpoule">
                               <option value="" disabled selected>Poule de destination</option>
                               {% for poule in poules %}
-                               {% set pouleCategorieParts = poule.nomPoule|split('-') %}
                              
+                               {% set pouleCategorieParts = poule.nomPoule|split('-')|map(part => part|trim) %}
                              
-                            {% if pouleCategorieParts|length > 1 and pouleCategorieParts[1] == equipe.categorie %}
+                              
+                            {% if pouleCategorieParts|length > 1 and pouleCategorieParts[0] == equipe.Nom_categorie %}
+                            
                             <option value="{{poule.idPoule}}">{{poule.nomPoule}}</option>
                             {% endif %}
                                {% endfor %}

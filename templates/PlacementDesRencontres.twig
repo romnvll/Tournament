@@ -137,10 +137,16 @@
                         </select>
                      </form>
                      {% endif %}
+                        
                      {% if planification.rencontre_id is not null %}
-                     
-                     <p class="card-text">{{planification.equipe1_categorie_nom}}-tour{{planification.tour}}{{planification.equipe1_nom_categorie}}-{{planification.equipe1_nom}} {{planification.equipe2_nom}} {{ planification.equipe2_poule_nom | split(' - ') | last }}
-                     </p>
+                      {% if planification.isClassement == 0 %}
+                     <p class="card-text">tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} 
+                                          </p>
+                    
+                    {% elseif planification.isClassement == 1 %}
+                     <p class="card-text">PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} 
+                                          </p>
+                    {% endif %}
                      <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}" >
                       <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                      </a>
@@ -162,10 +168,20 @@
                  
                      {% if creneauOqp == false %}  {# permet de ne pas afficher la liste si il y a deja une rencontre #}
                      <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel" >
+              
                         <select class="form-select"   name="Addevent" >
                            <option value="">Choisir une rencontre ou un label</option>
                            {% for planif in planificationSansCreneauNiTerrain %}
-                           <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>tour{{planif.tour}}-{{ planif.equipe1_poule_nom | split(' - poule ') | first }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} ({{planif.equipe1_poule_nom | split(' - ') | last}}) </option> 
+                                {% if planif.isClassement == 0 %}
+                             <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}}  </option> 
+                             
+                             {% elseif planif.isClassement == 1 %}
+                                 <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} </option> 
+
+                             {% endif %}
+
+
+
                            {% endfor %}
                               <script>
                         var tdElement = document.currentScript.parentElement;

@@ -36,7 +36,7 @@ class EquipeDAO {
     }
     
 
-    public function modifierEquipe(int $id, string $nom, string $categorie): void {
+    public function modifierEquipe(int $id, string $nom, int $categorie): void {
         $stmt = $this->connexion->prepare("UPDATE Equipes SET nom = :nom, categorie = :categorie WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':nom', $nom);
@@ -70,7 +70,8 @@ class EquipeDAO {
                     $errorCode = $e->errorInfo[1];
                     if ($errorCode === 1062) {
                        // session_start();
-                        echo "Impossible de déplacer cette équipe de poule, car elle est présente dans une poule de phase finale.";
+                       
+                       echo "Impossible de déplacer cette équipe de poule, car elle est présente dans une poule de phase finale.";
                         //echo "Impossible de déplacer cette équipe de poule, car elle est présente dans une poule de phase finale.";
                        
                         exit();
@@ -157,18 +158,20 @@ class EquipeDAO {
 
     public function getAllEquipesByPouleId(int $pouleId): array {
         $stmt = $this->connexion->prepare(
-            "SELECT e.* 
+            "SELECT e.*, c.Nom_categorie 
              FROM Equipes e
              JOIN EquipePoule ep ON e.id = ep.equipe_id
+             JOIN Poules p ON ep.poule_id = p.id
+             JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
              WHERE ep.poule_id = :pouleId"
         );
-        
-        $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    
+        $stmt->bindParam(':pouleId', $pouleId, PDO::PARAM_INT);
         $stmt->execute();
-        $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        return $equipes;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     
     public function supprimerEquipesParTournoi(int $idTournoi): void {
         $query = "DELETE FROM Equipes WHERE tournoi_id = :idTournoi";
@@ -179,21 +182,22 @@ class EquipeDAO {
     }
     
 
-    public function getAllCategorieByIdTournoi(int $idTournoi) :array {
-        
-        $stmt = $this->connexion->prepare("
-        SELECT DISTINCT c.id_categorie, c.Nom_categorie 
-        FROM Equipes e
-        JOIN Categorie c ON e.categorie = c.id_categorie
-        WHERE e.tournoi_id = :idTournoi
-    ");
-    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-   
-    return $result;
+    public function getAllCategorieByIdTournoi(int $idTournoi) : array {
 
+        $stmt = $this->connexion->prepare("
+            SELECT DISTINCT c.id_categorie, c.Nom_categorie, COUNT(e.id) AS nombre_equipes
+            FROM Equipes e
+            JOIN Categorie c ON e.categorie = c.id_categorie
+            WHERE e.tournoi_id = :idTournoi
+            GROUP BY c.id_categorie, c.Nom_categorie
+        ");
+        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return $result;
     }
+    
 
     public function countEquipesPresentesInPoule($pouleId) {
         // Utilisation de la table de liaison EquipePoule pour obtenir le compte
@@ -218,9 +222,11 @@ class EquipeDAO {
         $query = "
             SELECT e.*, 
             c.nom AS nom_club,
-            c.logo AS logo
+            c.logo AS logo,
+            cat.Nom_categorie AS nom_categorie
             FROM Equipes e
             INNER JOIN Clubs c ON e.club_id = c.id
+            INNER JOIN Categorie cat ON e.categorie = cat.id_categorie
             WHERE e.tournoi_id = :tournoi_id
             ORDER BY e.categorie
         ";
@@ -228,8 +234,9 @@ class EquipeDAO {
         $stmt->bindValue(':tournoi_id', $idTournoi, PDO::PARAM_INT);
         $stmt->execute();
     
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     
 
     public function getAllEquipeByIdTournoiAndClub (int $idTournoi, int $clubId) {

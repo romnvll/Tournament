@@ -1,5 +1,5 @@
 <?php
-require ('security.php');
+require('security.php');
 require 'vendor/autoload.php';
 require 'class/pouleManagerDao.class.php';
 require 'class/tournoiDao.class.php';
@@ -12,7 +12,7 @@ $twig = new \Twig\Environment($loader, [
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-$idCategorie=null;
+$idCategorie = null;
 
 
 $tournois = new tournoiDao();
@@ -24,18 +24,25 @@ $poules = new PouleManager();
 
 
 
-if (isset ($_GET['categorie']) ) {
+if (isset($_GET['categorie'])) {
   $nbrEquipeEnCours = $_GET['NbrEquipeParPoule'];
   $idCategorie = $_GET['categorie'];
   $categorieEnCours = $_GET['categorie'];
- // $poule = $poules->afficherPoulesPourCategorie($_GET['id_tournoi'],2,$idCategorie);
-  
- if (isset($_GET['NbrEquipeParPoule'])) {
- $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
- 
- $poule =  $poules->afficherPoulesPourCategorie($_GET['id_tournoi'],$nbrEquipeEnCours,$idCategorie);
- }
-  
+  // $poule = $poules->afficherPoulesPourCategorie($_GET['id_tournoi'],2,$idCategorie);
+
+  if (isset($_GET['NbrEquipeParPoule'])) {
+
+
+    $poule =  $poules->afficherPoulesPourCategorie($_GET['id_tournoi'], $nbrEquipeEnCours, $idCategorie);
+
+      if (isset($_GET['creation'])) {
+        if ($_GET['creation'] == "ok") {
+              $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
+
+        }
+      }
+
+  }
 }
 
 
@@ -44,21 +51,18 @@ $template = $twig->load('GestionPoules.twig');
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionDesPoules',
-  
-  'nbrEquipeEnCours' => $nbrEquipeEnCours,
-    
-  'nomDuTournoi' => $nomTournoi,
-    
-    'ListeDesTournois' => $tournois->afficherLesTournois(),
-    'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
-    'idTournoi' => $_GET['id_tournoi'],
-    'nombreEquipeParPoule' => $PouleAuto,
-    'listeDesPoules' =>$poule,
-    'categorieEnCours' => $categorieEnCours,
 
+  'nbrEquipeEnCours' => $nbrEquipeEnCours,
+
+  'nomDuTournoi' => $nomTournoi,
+
+  'ListeDesTournois' => $tournois->afficherLesTournois(),
+  'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
+  'idTournoi' => $_GET['id_tournoi'],
+  'nombreEquipeParPoule' => $PouleAuto,
+  'listeDesPoules' => $poule,
+  'categorieEnCours' => $categorieEnCours,
+  'nbrEquipe' => $_GET['NbrEquipeParPoule'],
 
 
 ]);
-
-
-?>

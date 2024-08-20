@@ -113,7 +113,7 @@
     </tr>
   </thead>
   <tbody>
- 
+
   {% for equipe in AfficherLesEquipes %}
 
     <tr>
@@ -127,7 +127,7 @@
       <input type="text" value="{{equipe.nom}}" class="form-control" size="1" name="nomEquipe"> 
       </td>
       
-     <td>{{ equipe.categorie}}</td>
+     <td>{{ equipe.nom_categorie}}</td>
       <td> 
       <select id="categorie" name="categorie" class="form-select">
       <optgroup label="{{equipe.categorie}}">
@@ -207,6 +207,24 @@ $(document).ready(function() {
             localStorage.setItem('savedCategory', selectedCategory);
         });
     });
+
+
+
+    // Lors du chargement de la page
+$(document).ready(function() {
+    // Récupérer le tournoi précédemment sélectionné (si il existe)
+    const savedTournament = localStorage.getItem('savedTournament');
+    if (savedTournament) {
+        $('#Idtournoi').val(savedTournament);
+    }
+
+    // Lors de la soumission du formulaire, sauvegarder le tournoi sélectionné
+    $('form').on('submit', function() {
+        const selectedTournament = $('#Idtournoi').val();
+        localStorage.setItem('savedTournament', selectedTournament);
+    });
+});
+
 
 
 

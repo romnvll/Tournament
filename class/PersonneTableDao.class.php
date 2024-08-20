@@ -128,7 +128,7 @@ private function genererCodePin() {
 
         Vous avez été assigné au terrain '$terrainNom' pour noter les scores.
         
-        Voici votre lien sécurisé : http://192.168.92.211/Tournament/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id
+        Voici votre lien sécurisé : http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id
         
         Votre code PIN est : $codePin 
         

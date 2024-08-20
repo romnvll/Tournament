@@ -217,6 +217,7 @@
 						
 							
 							{% for equipe in rencontres %}
+							
 								{% if equipe.score1 != 0 or equipe.score2 !=0 %}
 									<tr class="table-success">
 									{% else %}
@@ -249,9 +250,9 @@
 											<td class="align-middle text-center"></td>
 										{% endif %}
 										<td>
-
+											
 											<p class="h6 text-end">{{equipe.equipe1_nom|upper }}</p>
-											<div class="text-end"><img src="{{equipe.equipe1_logo}}" class="rounded" alt="{{equipe.equipe1_nom|upper }}"></div>
+											<div class="text-end"><img src="{{equipe.club1_logo}}" class="rounded" alt="{{equipe.equipe1_nom|upper }}"></div>
 
 										</td>
 										<td class="align-middle text-center">
@@ -274,7 +275,7 @@
 										</td>
 										<td>
 											<p class="h6 text-left">{{equipe.equipe2_nom|upper }}</p>
-											<img src="{{equipe.equipe2_logo}}" class="rounded" alt="{{equipe.equipe2_nom|upper }}">
+											<img src="{{equipe.club2_logo}}" class="rounded" alt="{{equipe.equipe2_nom|upper }}">
 										</td>
 
 										{% if gestionArbitres == 1 %}

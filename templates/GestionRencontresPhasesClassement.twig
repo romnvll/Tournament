@@ -17,7 +17,7 @@
         {% if tournoi.isArchived == 0 %}
           {% set lastTournoiIdParent = tournoi.id %}
             {% set btnClass = "btn btn-secondary" %}
-            {% if idtournoi ==  tournoi.id %}
+            {% if idTournoi ==  tournoi.id %}
             {% set btnClass = "btn btn-danger" %}
                    {% endif %}
           <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ tournoi.id }}" class="{{ btnClass }}">{{ tournoi.nom }}</a>
@@ -43,7 +43,7 @@
                    {% if pouleEnCours == poule.id %}
                       {% set btnClass = "btn btn-danger" %}
                    {% endif %}
-            <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idtournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
+            <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
                      
 
           {% endfor %}
@@ -65,10 +65,10 @@
     </thead>
     <tbody>
         {% for equipe in ResultatDesPoules %}
-       
+
             <tr>
                 
-                <td>{{ equipe.nom }}</td>
+                <td>{{ equipe.nom }} {{equipe.categorie}}</td>
                 
                 
                 <td>{{ equipe.TotalDesPoints }}</td>
@@ -76,9 +76,11 @@
                 <td>{{ equipe.nombreButsEncaisse }}</td>
                 <td>{{ equipe.DifferenceButs }}</td>
                 <td> {% for poule in afficherLespoulesFinales %}
-                  
-                 <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{equipe.id}}&pouleNom={{poule.nom}}&tournoiId={{idtournoi}}"><span class="badge rounded-pill bg-success">{{poule.nom}}</span></a>
-                
+                 
+                  {% if equipe.categorie == poule.fk_idcategorie %}
+                 
+                 <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{equipe.id}}&pouleId={{poule.id}}&tournoiId={{idTournoi}}"><span class="badge rounded-pill bg-success">{{poule.nom}}</span></a>
+                  {% endif %}
                {% endfor %} </td>
                <td> 
                 {% for poule in equipe.poules %}
@@ -105,8 +107,16 @@
       {% if pouleEnCours is not empty %}
         <h3>Poules de classement</h3>
         <form action="GestionRencontresPhasesFinalesCreationPoules_traitement.php" method="GET">
-        <input type="hidden" name="idtournoi" value="{{idtournoi}}">    
+        <input type="hidden" name="idtournoi" value="{{idTournoi}}">    
         <input type="text" class="form-control" id="inlineFormInputGroupUsername2" placeholder="Ex:Poule1erU15" name="pouledeClassmeent">
+        <select class="form-select" aria-label="Default select example" name="categorie">
+      {% for categorie in listeCategorie %}
+      
+           
+            <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
+        {% endfor %}
+          </select>
+        
         <button type="submit" class="btn btn-primary mb-2">Créer</button>
          {% else %}
          <h3><--Choisir une poule</h3>
@@ -118,7 +128,7 @@
     {% for poule in afficherLespoulesFinales  %}
     <div class="card mb-3"> <!-- mb-3 pour ajouter de la marge entre les cartes -->
         <div class="card-header">
-       <span class="badge rounded-pill bg-info text-dark"> {{ poule.nom }} </span> <a class="btn btn-primary" href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{poule.id}}&tournoiId={{idtournoi}}">Creer les rencontres et les placer</a> 
+       <span class="badge rounded-pill bg-info text-dark"> {{ poule.nom }} </span> <a class="btn btn-primary" href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{poule.id}}&tournoiId={{idTournoi}}">Creer les rencontres et les placer</a> 
        
         {% if poule.contenu|length == 0 %}
        <p class="text-end"><a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{poule.id}}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">

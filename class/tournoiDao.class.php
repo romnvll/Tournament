@@ -103,7 +103,7 @@ public function getIdTournoiParIdParent($idParent) : array {
 
 public function getCategoriesPourTournoi(int $idTournoi) {
     // Requête pour récupérer les catégories distinctes pour un tournoi spécifié
-    $query = "SELECT DISTINCT p.categorie 
+    $query = "SELECT DISTINCT p.nom 
               FROM Poules p
               WHERE p.tournoi_id = :idTournoi and is_classement=0";
 
