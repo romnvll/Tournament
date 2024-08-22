@@ -66,10 +66,46 @@
 		<br>
 		
 		{% if nbrEquipe is not null %}
-		<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok" class="btn btn-success btn-lg">OK!</a>
+		<br><a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok" class="btn btn-success btn-lg">Creer cette poule ?</a>
 		{% endif %}
 			</div>
+
+		{% if modal == 'success' %}
+<div id="successModal" class="modal" tabindex="-1" role="dialog" style="display: block;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Succès</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>La poule a été créée avec succès.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+{% endif %}
+
+
+
+
+
 			
 		</div>
+
+		
+		<script>
+$(document).ready(function(){
+    // Vérifie si la modale doit être affichée
+    if ($("#successModal").length) {
+        $("#successModal").modal('show');
+    }
+});
+</script>
 	</body>
 </html>

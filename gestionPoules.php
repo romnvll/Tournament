@@ -38,6 +38,9 @@ if (isset($_GET['categorie'])) {
       if (isset($_GET['creation'])) {
         if ($_GET['creation'] == "ok") {
               $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
+              // Rediriger avec un paramètre supplémentaire pour afficher la modale
+        header("Location: gestionPoules.php?id_tournoi=" . $_GET['id_tournoi'] . "&categorie=" . $categorieEnCours . "&NbrEquipeParPoule=" . $_GET['NbrEquipeParPoule'] . "&modal=success");
+        exit();
 
         }
       }
@@ -63,6 +66,7 @@ echo $template->render([
   'listeDesPoules' => $poule,
   'categorieEnCours' => $categorieEnCours,
   'nbrEquipe' => $_GET['NbrEquipeParPoule'],
+  'modal' => isset($_GET['modal']) ? $_GET['modal'] : null, // Passez la variable de modal à Twig
 
 
 ]);
