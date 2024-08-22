@@ -21,7 +21,7 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:/
 $domainName = $_SERVER['HTTP_HOST'];
 $path = explode('/Tournament/', $_SERVER['REQUEST_URI'])[0] . '/Tournament/';
 
-$url = $protocol . $domainName . $path ."index.php?id_tournoi=".$_GET['idTournoi'] ;
+$url = $protocol . $domainName . "/index.php?id_tournoi=".$_GET['idTournoi'] ;
 //echo $url;  // Cela affichera "http://172.17.12.231/Tournament/"
 
 

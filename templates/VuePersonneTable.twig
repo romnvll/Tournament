@@ -30,6 +30,7 @@
 							<th scope="col" class="w-25 text-center">Score equipe1</th>
 							<th scope="col" class="w-25 text-center">Score equipe2</th>
 							<th scope="col">Arbitre</th>
+							<th scope="col"></th>
 							</tr>
 						</thead>
 						
@@ -39,28 +40,37 @@
 
 					{% if planification.rencontre_id is not null %}
 
-					<td class="text-center"><h3 class="">{{planification.creneau_nom}}</h3></td>
-					<td class="text-center">
-						<img src="{{planification.club1_logo}}" class="img-fluid rounded">
-					<p class="lead text-uppercase"> {{planification.equipe1_nom}} </p>
-						<input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
-						<input type="hidden" name="idEquipe1" value="{{planification.equipe1_id}}" id="idEquipe1{{planification.rencontre_id}}" >
-						<input type="number" name="scoreEquipe1" class="form-control" value="{{planification.score1}}" id="scoreEquipe1{{planification.rencontre_id}}" min="0" 
-							hx-get="vuePersonneTable.php"
-							hx-trigger="change"
-							hx-include="[id='idRencontre{{planification.rencontre_id}}'], [id='idEquipe1{{planification.rencontre_id}}'], [id='scoreEquipe1{{planification.rencontre_id}}']">
+					<td class="text-center"><h3 class="">{{planification.creneau_nom}}</h3>
 					</td>
-					<td class="text-center">
-						<img src="{{planification.club2_logo}}" class="img-fluid rounded">
-						<p class="lead text-uppercase">{{planification.equipe2_nom}}</p>
-						<input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
-						<input type="hidden" name="idEquipe2" value="{{planification.equipe2_id}}" id="idEquipe2{{planification.rencontre_id}}" >
-						<input type="number" name="scoreEquipe2" class="form-control" value="{{planification.score2}}" id="scoreEquipe2{{planification.rencontre_id}}" min="0"
-						hx-get="vuePersonneTable.php"
-						hx-trigger="change"
-						hx-include="[id='idRencontre{{planification.rencontre_id}}'], [id='idEquipe2{{planification.rencontre_id}}'], [id='scoreEquipe2{{planification.rencontre_id}}']">
-					</td>
-					<td>{{planification.arbitre_nom}}</td>
+				<td class="text-center">
+    <img src="{{planification.club1_logo}}" class="img-fluid rounded">
+    <p class="lead text-uppercase"> {{planification.equipe1_nom}} </p>
+    <input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
+    <input type="hidden" name="idEquipe1" value="{{planification.equipe1_id}}" id="idEquipe1{{planification.rencontre_id}}">
+    <input type="number" name="scoreEquipe1" class="form-control" value="{{planification.score1}}" id="scoreEquipe1{{planification.rencontre_id}}" min="0" data-rencontre-id="{{planification.rencontre_id}}">
+				</td>
+			<td class="text-center">
+    <img src="{{planification.club2_logo}}" class="img-fluid rounded">
+    <p class="lead text-uppercase">{{planification.equipe2_nom}}</p>
+    <input type="hidden" name="idRencontre" value="{{planification.rencontre_id}}" id="idRencontre{{planification.rencontre_id}}">
+    <input type="hidden" name="idEquipe2" value="{{planification.equipe2_id}}" id="idEquipe2{{planification.rencontre_id}}">
+    <input type="number" name="scoreEquipe2" class="form-control" value="{{planification.score2}}" id="scoreEquipe2{{planification.rencontre_id}}" min="0" data-rencontre-id="{{planification.rencontre_id}}">
+			</td>
+
+			<td>{{planification.arbitre_nom}}</td>
+<td class="text-center align-middle">
+    <button type="button" class="btn btn-primary"
+            hx-get="vuePersonneTable.php"
+            hx-trigger="click"
+            hx-swap="none"
+            hx-include="[id='idRencontre{{planification.rencontre_id}}'], [id='idEquipe1{{planification.rencontre_id}}'], [id='scoreEquipe1{{planification.rencontre_id}}'], [id='idEquipe2{{planification.rencontre_id}}'], [id='scoreEquipe2{{planification.rencontre_id}}']"
+            data-rencontre-id="{{planification.rencontre_id}}"
+            onclick="submitScores('{{planification.rencontre_id}}')">
+        Soumettre
+    </button>
+</td>
+
+					
 					
 					
 					{% elseif planification.label_description is not null %}
@@ -86,28 +96,43 @@
 
 			</div>
 		</div>
-
 <script>
-    $(document).ready(function() {
-        setInterval(function () {
-            // Sauvegarder les valeurs des inputs
-            var inputsData = {};
-            $('#score tbody input').each(function() {
-                var inputId = $(this).attr('id');
-                inputsData[inputId] = $(this).val();
-            });
-
-            // Rafraîchir le contenu du tbody
-            $('#score tbody').load(location.href + ' #score tbody > *', function() {
-                // Restaurer les valeurs des inputs
-                $.each(inputsData, function(id, value) {
-                    $('#' + id).val(value);
-                });
-            });
-        }, 10000); // 10000 millisecondes = 10 secondes
+document.addEventListener("DOMContentLoaded", function() {
+    // Get all score fields on the page
+    document.querySelectorAll('input[data-rencontre-id]').forEach(function(input) {
+        const rencontreId = input.getAttribute('data-rencontre-id');
+        if (localStorage.getItem(`submitted_${rencontreId}`)) {
+            // Disable both score fields for this rencontre
+            document.getElementById(`scoreEquipe1${rencontreId}`).readOnly = true;
+            document.getElementById(`scoreEquipe2${rencontreId}`).readOnly = true;
+            document.getElementById(`scoreEquipe1${rencontreId}`).classList.add('readonly');
+            document.getElementById(`scoreEquipe2${rencontreId}`).classList.add('readonly');
+        }
     });
-    </script>
+});
 
+function submitScores(rencontreId) {
+    const scoreEquipe1 = document.getElementById(`scoreEquipe1${rencontreId}`).value;
+    const scoreEquipe2 = document.getElementById(`scoreEquipe2${rencontreId}`).value;
+
+    // Check if both scores are filled
+    if (scoreEquipe1 === "" || scoreEquipe2 === "") {
+        alert("Veuillez remplir les deux scores avant de soumettre.");
+        return;
+    }
+
+    // Assume data is submitted successfully
+    localStorage.setItem(`submitted_${rencontreId}`, true);
+
+    // Disable the fields after submission
+    document.getElementById(`scoreEquipe1${rencontreId}`).readOnly = true;
+    document.getElementById(`scoreEquipe2${rencontreId}`).readOnly = true;
+    document.getElementById(`scoreEquipe1${rencontreId}`).classList.add('readonly');
+    document.getElementById(`scoreEquipe2${rencontreId}`).classList.add('readonly');
+}
+
+
+</script>
 
 
 	</body>
