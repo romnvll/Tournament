@@ -113,22 +113,34 @@ class EquipeDAO {
     
     
     public function supprimerEquipeParId(int $idEquipe): void {
-       
-         // Supprimer d'abord les correspondances de l'équipe à une poule
-    $stmtEquipePoule = $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :idEquipe");
-    $stmtEquipePoule->bindParam(':idEquipe', $idEquipe);
-    $stmtEquipePoule->execute();
-
-    // Ensuite, supprimer les rencontres où l'équipe est impliquée
-    $stmtRencontres = $this->connexion->prepare("DELETE FROM Rencontres WHERE equipe1_id = :idEquipe OR equipe2_id = :idEquipe");
-    $stmtRencontres->bindParam(':idEquipe', $idEquipe);
-    $stmtRencontres->execute();
-
-    // Enfin, supprimer l'équipe elle-même
-    $stmtEquipe = $this->connexion->prepare("DELETE FROM Equipes WHERE id = :idEquipe");
-    $stmtEquipe->bindParam(':idEquipe', $idEquipe);
-    $stmtEquipe->execute();
-}
+        // Supprimer d'abord les correspondances de l'équipe à une poule
+        $stmtEquipePoule = $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :idEquipe");
+        $stmtEquipePoule->bindParam(':idEquipe', $idEquipe);
+        $stmtEquipePoule->execute();
+    
+        // Récupérer les IDs des rencontres impliquant l'équipe
+        $stmtRecupRencontreIds = $this->connexion->prepare("SELECT id FROM Rencontres WHERE equipe1_id = :idEquipe OR equipe2_id = :idEquipe");
+        $stmtRecupRencontreIds->bindParam(':idEquipe', $idEquipe);
+        $stmtRecupRencontreIds->execute();
+        $rencontreIds = $stmtRecupRencontreIds->fetchAll(PDO::FETCH_COLUMN);
+    
+        if (!empty($rencontreIds)) {
+            // Supprimer les enregistrements de Planification associés aux rencontres de l'équipe
+            $stmtPlanification = $this->connexion->prepare("DELETE FROM Planification WHERE rencontre_id IN (" . implode(',', $rencontreIds) . ")");
+            $stmtPlanification->execute();
+        }
+    
+        // Ensuite, supprimer les rencontres où l'équipe est impliquée
+        $stmtRencontres = $this->connexion->prepare("DELETE FROM Rencontres WHERE equipe1_id = :idEquipe OR equipe2_id = :idEquipe");
+        $stmtRencontres->bindParam(':idEquipe', $idEquipe);
+        $stmtRencontres->execute();
+    
+        // Enfin, supprimer l'équipe elle-même
+        $stmtEquipe = $this->connexion->prepare("DELETE FROM Equipes WHERE id = :idEquipe");
+        $stmtEquipe->bindParam(':idEquipe', $idEquipe);
+        $stmtEquipe->execute();
+    }
+    
     public function confirmerEquipe(int $id, string $etat): void {
 
         if ($etat == "presente") {
