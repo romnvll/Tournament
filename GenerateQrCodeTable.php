@@ -9,7 +9,8 @@ require_once('vendor/autoload.php');
 $options = new QROptions(
   [
     'eccLevel' => QRCode::ECC_L,
-    'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+    'outputType' => QRCode::OUTPUT_IMAGE_PNG ,
+    
     'version' => 5,
   ]
 );
@@ -24,7 +25,7 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:/
 $domainName = $_SERVER['HTTP_HOST'];
 $path = explode('/Tournament/', $_SERVER['REQUEST_URI'])[0] . '/Tournament/';
 
-$url = $protocol . $domainName . $path ."vueTerrain.php?id_tournoi=".$_GET['idTournoi']."&terrain=".$_GET['terrain'] ;
+$url = $protocol . $domainName . "/vueTerrain.php?id_tournoi=".$_GET['idTournoi']."&terrain=".$_GET['terrain'] ;
 //echo $url;  // Cela affichera "http://172.17.12.231/Tournament/"
 
 

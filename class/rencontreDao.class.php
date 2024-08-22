@@ -263,60 +263,64 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 public function getRencontreByPoule($pouleid, $isClassement = 0)
 {
     $query = "SELECT 
-    r.id AS rencontre_id,
-    r.tour AS tour,
-    p.terrain_id,
-    t.nom AS terrain_nom,
-    p.creneau_id,
-    c.nom AS creneau_nom,
-    
-    equipe1.id AS equipe1_id,
-    equipe1.nom AS equipe1_nom,
-    club1.id AS club1_id,            -- ID du club de l'équipe 1
-    club1.nom AS club1_nom,          -- Nom du club de l'équipe 1
-    club1.email AS club1_email,      -- Email du club de l'équipe 1
-    club1.contact AS club1_contact,  -- Contact du club de l'équipe 1
-    club1.logo AS club1_logo,        -- Logo du club de l'équipe 1
-    
-    equipe2.id AS equipe2_id,
-    equipe2.nom AS equipe2_nom,
-    club2.id AS club2_id,            -- ID du club de l'équipe 2
-    club2.nom AS club2_nom,          -- Nom du club de l'équipe 2
-    club2.email AS club2_email,      -- Email du club de l'équipe 2
-    club2.contact AS club2_contact,  -- Contact du club de l'équipe 2
-    club2.logo AS club2_logo,        -- Logo du club de l'équipe 2
-    
-    r.score1,
-    r.score2
-FROM 
-    Rencontres r
-JOIN 
-    Equipes equipe1 ON r.equipe1_id = equipe1.id
-JOIN 
-    EquipePoule ep1 ON equipe1.id = ep1.equipe_id
-JOIN 
-    Clubs club1 ON equipe1.club_id = club1.id   -- Jointure pour obtenir les infos du club de l'équipe 1
-JOIN 
-    Equipes equipe2 ON r.equipe2_id = equipe2.id
-JOIN 
-    EquipePoule ep2 ON equipe2.id = ep2.equipe_id
-JOIN 
-    Clubs club2 ON equipe2.club_id = club2.id   -- Jointure pour obtenir les infos du club de l'équipe 2
-LEFT JOIN 
-    Planification p ON r.id = p.rencontre_id
-LEFT JOIN 
-    Creneaux c ON p.creneau_id = c.creneau_id
-LEFT JOIN 
-    Terrains t ON p.terrain_id = t.terrain_id
-WHERE 
-    ep1.poule_id = :pouleid 
-    AND ep2.poule_id = :pouleid 
-    AND r.isClassement = :isClassement
-ORDER BY 
-    r.tour, c.nom, r.id;
+        r.id AS rencontre_id,
+        r.tour AS tour,
+        p.terrain_id,
+        t.nom AS terrain_nom,
+        p.creneau_id,
+        c.nom AS creneau_nom,
+        
+        equipe1.id AS equipe1_id,
+        equipe1.nom AS equipe1_nom,
+        club1.id AS club1_id,            -- ID du club de l'équipe 1
+        club1.nom AS club1_nom,          -- Nom du club de l'équipe 1
+        club1.email AS club1_email,      -- Email du club de l'équipe 1
+        club1.contact AS club1_contact,  -- Contact du club de l'équipe 1
+        club1.logo AS club1_logo,        -- Logo du club de l'équipe 1
+        
+        equipe2.id AS equipe2_id,
+        equipe2.nom AS equipe2_nom,
+        club2.id AS club2_id,            -- ID du club de l'équipe 2
+        club2.nom AS club2_nom,          -- Nom du club de l'équipe 2
+        club2.email AS club2_email,      -- Email du club de l'équipe 2
+        club2.contact AS club2_contact,  -- Contact du club de l'équipe 2
+        club2.logo AS club2_logo,        -- Logo du club de l'équipe 2
+        
+        r.score1,
+        r.score2,
 
-
-
+        l.label_id AS label_id,            -- ID du label
+        l.description AS label_description, -- Description du label
+        l.couleur AS label_couleur          -- Couleur du label
+        
+    FROM 
+        Rencontres r
+    JOIN 
+        Equipes equipe1 ON r.equipe1_id = equipe1.id
+    JOIN 
+        EquipePoule ep1 ON equipe1.id = ep1.equipe_id
+    JOIN 
+        Clubs club1 ON equipe1.club_id = club1.id   -- Jointure pour obtenir les infos du club de l'équipe 1
+    JOIN 
+        Equipes equipe2 ON r.equipe2_id = equipe2.id
+    JOIN 
+        EquipePoule ep2 ON equipe2.id = ep2.equipe_id
+    JOIN 
+        Clubs club2 ON equipe2.club_id = club2.id   -- Jointure pour obtenir les infos du club de l'équipe 2
+    LEFT JOIN 
+        Planification p ON r.id = p.rencontre_id
+    LEFT JOIN 
+        Creneaux c ON p.creneau_id = c.creneau_id
+    LEFT JOIN 
+        Terrains t ON p.terrain_id = t.terrain_id
+    LEFT JOIN 
+        Labels l ON p.label_id = l.label_id         -- Jointure pour obtenir les infos du label
+    WHERE 
+        ep1.poule_id = :pouleid 
+        AND ep2.poule_id = :pouleid 
+        AND r.isClassement = :isClassement
+    ORDER BY 
+        r.tour, c.nom, r.id;
 
              ";
 

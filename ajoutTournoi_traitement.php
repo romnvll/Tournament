@@ -1,6 +1,7 @@
 <?php
 require 'security.php';
 require 'class/tournoiDao.class.php';
+require 'class/terrainDao.class.php';
 
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
@@ -9,13 +10,13 @@ ini_set("display_errors", 1);
 
 
 
-
+$terrainDao=new TerrainDao();
 $tournoiDao = new tournoiDao();
 
 
 echo $_POST['dateTournoi'];
 
-$tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],$_POST['nbr_terrain'],$_POST['heuredebut'],0,$_POST['pasHoraire']);
+$tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire']);
 
 
 $tournoiDao = new tournoiDao();
@@ -29,6 +30,7 @@ foreach ($tousLesTournois as $tournoi) {
     }
 }
 
+$terrainDao->ajoutTerrain($dernierId,"1");
 header("location: modifierTournoi.php?idTournoi=".$dernierId);
 
 

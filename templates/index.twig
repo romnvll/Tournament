@@ -256,7 +256,7 @@
 
 										</td>
 										<td class="align-middle text-center">
-
+											
 											{% if  equipe.score1 > equipe.score2  %}
 												<span class="badge bg-success">{{ equipe.score1 }}</span>-<span class="badge bg-danger">{{ equipe.score2 }}
 												</span>
@@ -341,7 +341,7 @@
 <script>
 	setInterval(function () {
 $('#score').load(location.href + ' #score > *');
-}, 2000); // 2000 millisecondes = 2 secondes
+}, 200000); // 2000 millisecondes = 2 secondes
 
 
 setInterval(function () {
