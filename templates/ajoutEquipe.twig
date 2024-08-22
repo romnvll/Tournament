@@ -129,11 +129,12 @@
       
      <td>{{ equipe.nom_categorie}}</td>
       <td> 
+    
       <select id="categorie" name="categorie" class="form-select">
-      <optgroup label="{{equipe.categorie}}">
+      <optgroup label="{{equipe.AfficheLesCategories}}">
 
-      {% for categorie in AfficherLesPoules %}
-      <option value="{{categorie['categorie']}}">{{categorie['categorie']}}</option>
+      {% for categorie in AfficheLesCategories %}
+      <option value="{{categorie['id_categorie']}}">{{categorie['Nom_categorie']}}</option>
        {% endfor %}
       </optgroup>
       </select>
