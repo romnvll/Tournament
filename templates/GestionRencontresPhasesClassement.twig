@@ -43,7 +43,7 @@
                    {% if pouleEnCours == poule.id %}
                       {% set btnClass = "btn btn-danger" %}
                    {% endif %}
-            <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
+            <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{poule.fk_idcategorie}}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
                      
 
           {% endfor %}
@@ -68,7 +68,7 @@
 
             <tr>
                 
-                <td>{{ equipe.nom }} {{equipe.categorie}}</td>
+                <td>{{ equipe.nom }}</td>
                 
                 
                 <td>{{ equipe.TotalDesPoints }}</td>
@@ -107,26 +107,28 @@
       {% if pouleEnCours is not empty %}
         <h3>Poules de classement</h3>
         <form action="GestionRencontresPhasesFinalesCreationPoules_traitement.php" method="GET">
-        <input type="hidden" name="idtournoi" value="{{idTournoi}}">    
-        <input type="text" class="form-control" id="inlineFormInputGroupUsername2" placeholder="Ex:Poule1erU15" name="pouledeClassmeent">
-        <select class="form-select" aria-label="Default select example" name="categorie">
-      {% for categorie in listeCategorie %}
-      
-           
-            <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
-        {% endfor %}
-          </select>
+        <input type="hidden" name="idtournoi" value="{{idTournoi}}"> 
+         <input type="hidden" name="categorie" value="{{idCategorieEnCours}}">   
+        <input type="text" class="form-control" id="inlineFormInputGroupUsername2" placeholder="Ex:Poule1erU15" name="pouledeClassement">
         
-        <button type="submit" class="btn btn-primary mb-2">Créer</button>
+        
+        <button type="submit" class="btn btn-primary mb-2">Créer la poule de classement</button>
          {% else %}
          <h3><--Choisir une poule</h3>
         {% endif %}
 
         </div>
     
-      <div class="row">
+      <div class="row ">
+      
     {% for poule in afficherLespoulesFinales  %}
-    <div class="card mb-3"> <!-- mb-3 pour ajouter de la marge entre les cartes -->
+   
+    {% if poule.fk_idcategorie == idCategorieEnCours %} 
+     <div class="card mb-3 ">
+     <!-- mb-3 pour ajouter de la marge entre les cartes -->
+    {% else %}
+    <div class="card mb-3 d-none">
+    {% endif %} 
         <div class="card-header">
        <span class="badge rounded-pill bg-info text-dark"> {{ poule.nom }} </span> <a class="btn btn-primary" href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{poule.id}}&tournoiId={{idTournoi}}">Creer les rencontres et les placer</a> 
        
@@ -162,6 +164,7 @@
             {% endfor %}
         </tbody>
     </table>
+    
 {% else %}
     <p class="card-text">Aucune équipe dans cette poule.</p>
 {% endif %}
