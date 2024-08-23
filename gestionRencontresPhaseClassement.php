@@ -39,7 +39,6 @@ $poules = $poulemanager->getAllPoulesByTournoi($tournoiId);
 // recuperer les categorie pour creer uniquement les rencontres
 // de phase de classement qui sont terminées
 
-$categorie = $categorie->obtenirToutesLesCategories();
 
 if (isset($_GET['categorie'])) {
 
@@ -86,13 +85,13 @@ echo $template->render([
   'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
   'PouleDuTournoi' => $poulemanager->getAllPoulesByTournoi($tournoiId),
   'pouleEnCours' => $_GET['idPoule'],
-  'listeCategorie' => $categorie,
+ 
   
   'ResultatDesPoules' =>$GetResultatDesPoules,
   //'resultatPoules' => $GetResultatDesPoules,
   'idTournoi' => $tournoiId,
   //'RencontresByPoulephase1' => $rencontreDao->GetEquipesClasseesParPoule($tournoiId),
-  
+  'idCategorieEnCours' => $_GET['idCategorie'],
   //'PoulesClassement' =>$tournoiDao->afficherPoulesDeClassement($tournoiId),
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
   'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement(),
