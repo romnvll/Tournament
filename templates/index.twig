@@ -142,11 +142,9 @@
 						{% endif %}
 					</div>
 
-					{% if IdPoules %}
-					<div class="col-lg-3 d-none" >
-					{% else  %}
+					
 					<div class="col-lg-3" >
-					{% endif %}
+					
 						{% if visibility == 1 %}
 							{% if IdEquipe %}
 							<div class="alert alert-success mt-2 ">
@@ -341,7 +339,7 @@
 <script>
 	setInterval(function () {
 $('#score').load(location.href + ' #score > *');
-}, 200000); // 2000 millisecondes = 2 secondes
+}, 2000); // 2000 millisecondes = 2 secondes
 
 
 setInterval(function () {
