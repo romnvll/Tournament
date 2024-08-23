@@ -16,10 +16,10 @@ class PouleManager {
 
     public function createPoule($nomPoule, $idTournoi, $categorie, $is_classement = 0) {
         // Utiliser la méthode pouleExists pour vérifier si la poule existe déjà
-        if ($this->pouleExists($nomPoule, $idTournoi)) {
+        //if ($this->pouleExists($nomPoule, $idTournoi)) {
             // La poule existe déjà, donc on ne procède pas à l'insertion
-            return false;
-        }
+         //   return false;
+        //}
     
         // Insérer la nouvelle poule
         $query = "INSERT INTO Poules (nom, tournoi_id, fk_idcategorie, is_classement) VALUES (:nom, :idTournoi, :fk_idcategorie, :is_classement)";
