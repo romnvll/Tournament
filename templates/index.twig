@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=0.8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.65"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<link href="style/index.css" rel="stylesheet" crossorigin="anonymous"/>
 
@@ -180,13 +180,13 @@
 
 			<div class="row mt-3">
 				<div class="col-lg-4" id="score">
-					<table class="table table-striped">
+					<table class="table table-striped table-responsive">
 						<thead>
 							<tr>
 								
 								{% if IdPoules is not null %}
 										{% if heureIsVisible == 1 %}
-											<th scope="col">Heure</th>
+											<th scope="col-1">Heure</th>
 										{% endif %}
 										<th scope="col">Terrain</th>
 										<th scope="col" class="text-center">Equipe1</th>
@@ -224,7 +224,7 @@
 										{% if heureIsVisible == 1 %}
 											{% if not equipe.creneau_nom is empty %}
 												<td class="align-middle text-center">
-													<p class="fw-bold">
+													<p class="fw-bold ">
 														{{ equipe.creneau_nom }}</p>
 												</td>
 											{% else %}
@@ -249,8 +249,8 @@
 										{% endif %}
 										<td>
 											
-											<p class="h6 text-end">{{equipe.equipe1_nom|upper }}</p>
-											<div class="text-end"><img src="{{equipe.club1_logo}}" class="rounded" alt="{{equipe.equipe1_nom|upper }}"></div>
+											<p class="fs-6 text-end fw-bold">{{equipe.equipe1_nom|upper }}</p>
+											<div class="text-end"><img src="{{equipe.club1_logo}}" class="shadow-lg  rounded img-fluid img-thumbnail" alt="{{equipe.equipe1_nom|upper }}"></div>
 
 										</td>
 										<td class="align-middle text-center">
@@ -272,8 +272,8 @@
 
 										</td>
 										<td>
-											<p class="h6 text-left">{{equipe.equipe2_nom|upper }}</p>
-											<img src="{{equipe.club2_logo}}" class="rounded" alt="{{equipe.equipe2_nom|upper }}">
+											<p class="fs-6 text-left fw-bold">{{equipe.equipe2_nom|upper }}</p>
+											<img src="{{equipe.club2_logo}}" class="shadow-lg  rounded img-fluid img-thumbnail" alt="{{equipe.equipe2_nom|upper }}">
 										</td>
 
 										{% if gestionArbitres == 1 %}
@@ -294,7 +294,7 @@
 						<table class="table" id="classementTableau">
 							<thead>
 								<tr>
-									<th scope="col">Classement</th>
+									
 									<th scope="col" class="text-center">Equipe</th>
 									<th scope="col">Points</th>
 									<th scope="col">Buts+</th>
@@ -308,9 +308,10 @@
 {% for resultat in resultatRencontres %}
     {% set classement = classement + 1 %}
     <tr>
-        <th scope="row">{{ classement }}</th>
+        
         <td>
             <div class="d-flex align-items-center">
+			{{ classement }}
                 <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
                 <span>{{ resultat.nom|upper }}</span>
             </div>
@@ -392,3 +393,13 @@ $('#classementTableau').load(location.href + ' #classementTableau > *');
 			
         });
     </script>
+
+<td class="align-middle text-center">
+  <p class="fw-bold" id="equipeNom">
+    {{ equipe.creneau_nom }}
+  </p>
+</td>
+
+
+
+
