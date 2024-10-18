@@ -241,96 +241,115 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     }
 
 
-    public function rencontresExistByCategorieAndTournoi(string $categorie, int $idtournoi): bool
-{
-    $query = "SELECT COUNT(*) FROM Rencontres r
-              JOIN Equipes e1 ON r.equipe1_id = e1.id
-              JOIN Equipes e2 ON r.equipe2_id = e2.id
-              WHERE e1.categorie = :categorie AND e2.categorie = :categorie AND r.tournoi_id = :idtournoi";
+    function rencontresCategorieDejaPlanifiees($categorieId, $tournoiId) {
+        // Étape 1: Récupérer les identifiants des équipes de la catégorie concernée.
+        $query = "SELECT id FROM Equipes WHERE categorie = :categorieId";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':categorieId', $categorieId, PDO::PARAM_INT);
+        $stmt->execute();
+        $equipes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+        if (empty($equipes)) {
+            return false; // Aucune équipe dans cette catégorie
+        }
+    
+        // Étape 2: Vérifier si l'une de ces équipes a une rencontre planifiée pour le tournoi spécifié
+        $query = "
+            SELECT p.*, r.equipe1_id, r.equipe2_id
+            FROM Planification p
+            JOIN Rencontres r ON p.rencontre_id = r.id
+            WHERE (r.equipe1_id IN (" . implode(',', array_map('intval', $equipes)) . ")
+               OR r.equipe2_id IN (" . implode(',', array_map('intval', $equipes)) . "))
+               AND r.tournoi_id = :tournoiId
+        ";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
+        $stmt->execute();
+        $planifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        return !empty($planifications);
+    }
+    
 
-    $stmt = $this->connexion->prepare($query);
-    $stmt->bindValue(':categorie', $categorie, PDO::PARAM_STR);
-    $stmt->bindValue(':idtournoi', $idtournoi, PDO::PARAM_INT);
-    $stmt->execute();
-
-    $count = $stmt->fetchColumn();
-
-    return $count > 0;
-}
 
 
+    public function getRencontreByPoule($pouleid, $tournoiId, $isClassement = 0)
+    {
 
-public function getRencontreByPoule($pouleid, $isClassement = 0)
-{
-    $query = "SELECT 
-        r.id AS rencontre_id,
-        r.tour AS tour,
-        p.terrain_id,
-        t.nom AS terrain_nom,
-        p.creneau_id,
-        c.nom AS creneau_nom,
-        
-        equipe1.id AS equipe1_id,
-        equipe1.nom AS equipe1_nom,
-        club1.id AS club1_id,            -- ID du club de l'équipe 1
-        club1.nom AS club1_nom,          -- Nom du club de l'équipe 1
-        club1.email AS club1_email,      -- Email du club de l'équipe 1
-        club1.contact AS club1_contact,  -- Contact du club de l'équipe 1
-        club1.logo AS club1_logo,        -- Logo du club de l'équipe 1
-        
-        equipe2.id AS equipe2_id,
-        equipe2.nom AS equipe2_nom,
-        club2.id AS club2_id,            -- ID du club de l'équipe 2
-        club2.nom AS club2_nom,          -- Nom du club de l'équipe 2
-        club2.email AS club2_email,      -- Email du club de l'équipe 2
-        club2.contact AS club2_contact,  -- Contact du club de l'équipe 2
-        club2.logo AS club2_logo,        -- Logo du club de l'équipe 2
-        
-        r.score1,
-        r.score2,
+           
 
-        l.label_id AS label_id,            -- ID du label
-        l.description AS label_description, -- Description du label
-        l.couleur AS label_couleur          -- Couleur du label
-        
-    FROM 
-        Rencontres r
-    JOIN 
-        Equipes equipe1 ON r.equipe1_id = equipe1.id
-    JOIN 
-        EquipePoule ep1 ON equipe1.id = ep1.equipe_id
-    JOIN 
-        Clubs club1 ON equipe1.club_id = club1.id   -- Jointure pour obtenir les infos du club de l'équipe 1
-    JOIN 
-        Equipes equipe2 ON r.equipe2_id = equipe2.id
-    JOIN 
-        EquipePoule ep2 ON equipe2.id = ep2.equipe_id
-    JOIN 
-        Clubs club2 ON equipe2.club_id = club2.id   -- Jointure pour obtenir les infos du club de l'équipe 2
-    LEFT JOIN 
-        Planification p ON r.id = p.rencontre_id
-    LEFT JOIN 
-        Creneaux c ON p.creneau_id = c.creneau_id
-    LEFT JOIN 
-        Terrains t ON p.terrain_id = t.terrain_id
-    LEFT JOIN 
-        Labels l ON p.label_id = l.label_id         -- Jointure pour obtenir les infos du label
-    WHERE 
-        ep1.poule_id = :pouleid 
-        AND ep2.poule_id = :pouleid 
-        AND r.isClassement = :isClassement
-    ORDER BY 
-        r.tour, c.nom, r.id;
 
-             ";
-
-    $stmt = $this->connexion->prepare($query);
-    $stmt->bindValue(':pouleid', $pouleid, PDO::PARAM_INT);
-    $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
-    $stmt->execute();
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+$query = "SELECT 
+            r.id AS rencontre_id,
+            r.tour AS tour,
+            p.terrain_id,
+            t.nom AS terrain_nom,
+            p.creneau_id,
+            c.nom AS creneau_nom,
+            
+            equipe1.id AS equipe1_id,
+            equipe1.nom AS equipe1_nom,
+            club1.id AS club1_id,
+            club1.nom AS club1_nom,
+            club1.email AS club1_email,
+            club1.contact AS club1_contact,
+            club1.logo AS club1_logo,
+            
+            equipe2.id AS equipe2_id,
+            equipe2.nom AS equipe2_nom,
+            club2.id AS club2_id,
+            club2.nom AS club2_nom,
+            club2.email AS club2_email,
+            club2.contact AS club2_contact,
+            club2.logo AS club2_logo,
+            
+            r.score1,
+            r.score2,
+    
+            l.label_id AS label_id,
+            l.description AS label_description,
+            l.couleur AS label_couleur
+            
+        FROM 
+            Rencontres r
+        JOIN 
+            Equipes equipe1 ON r.equipe1_id = equipe1.id
+        JOIN 
+            EquipePoule ep1 ON equipe1.id = ep1.equipe_id
+        JOIN 
+            Clubs club1 ON equipe1.club_id = club1.id
+        JOIN 
+            Equipes equipe2 ON r.equipe2_id = equipe2.id
+        JOIN 
+            EquipePoule ep2 ON equipe2.id = ep2.equipe_id
+        JOIN 
+            Clubs club2 ON equipe2.club_id = club2.id
+        LEFT JOIN 
+            Planification p ON r.id = p.rencontre_id
+        LEFT JOIN 
+            Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN 
+            Terrains t ON p.terrain_id = t.terrain_id
+        LEFT JOIN 
+            Labels l ON l.tournoi_id = :tournoiId  -- Récupère tous les labels du tournoi
+        WHERE 
+            ep1.poule_id = :pouleid 
+            AND ep2.poule_id = :pouleid 
+            AND r.isClassement = :isClassement
+        ORDER BY 
+            r.tour, c.nom, r.id;
+    
+                 ";
+    
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':pouleid', $pouleid, PDO::PARAM_INT);
+        $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT); // Bind du tournoiId
+        $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
+        $stmt->execute();
+    
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 
 
 
@@ -434,6 +453,38 @@ public function updateTour(int $idrencontre, int $tour)
         }
         
 
+/**
+ * Récupère les scores de l'équipe 1 et de l'équipe 2 pour une rencontre donnée.
+ *
+ * @param int $idrencontre ID de la rencontre dont les scores doivent être récupérés.
+ * @return array Associatif contenant 'score1' et 'score2', ou null si aucune donnée n'est trouvée.
+ */
+public function getScore(int $idrencontre): ?array
+{
+    // Préparer la requête pour récupérer les scores
+    $query = "SELECT score1, score2 FROM Rencontres WHERE id = :idrencontre";
+    $stmt = $this->connexion->prepare($query);
+
+    // Lier l'ID de la rencontre à la requête
+    $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
+    
+    // Exécuter la requête
+    $stmt->execute();
+    
+    // Récupérer les résultats
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Si aucune ligne n'est trouvée, renvoyer null
+    if ($result === false) {
+        return null;
+    }
+
+    // Renvoyer les scores sous forme de tableau associatif
+    return [
+        'score1' => $result['score1'],
+        'score2' => $result['score2']
+    ];
+}
 
 
 
@@ -705,6 +756,35 @@ public function updateTour(int $idrencontre, int $tour)
         // Pour l'exemple, on renvoie toujours faux pour éviter la duplication.
         //return false;
     }
+
+
+    function rencontrePouleDejaPlanifiee($pouleId) {
+        // Étape 1: Récupérer les identifiants des équipes de la poule concernée.
+        $query = "SELECT equipe_id FROM EquipePoule WHERE poule_id = :pouleId";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+        $stmt->execute();
+        $equipes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+        if (empty($equipes)) {
+            return false; // Aucune équipe dans cette poule
+        }
+    
+        // Étape 2: Vérifier si l'une de ces équipes figure dans une rencontre planifiée
+        $query = "
+            SELECT COUNT(*) 
+            FROM Planification p
+            JOIN Rencontres r ON p.rencontre_id = r.id
+            WHERE r.equipe1_id IN (" . implode(',', array_map('intval', $equipes)) . ")
+               OR r.equipe2_id IN (" . implode(',', array_map('intval', $equipes)) . ")
+        ";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+    
+        return ($count > 0);
+    }
+    
 
     function updateEtatRencontre($etat, $tournoi_id, $heure)
     {

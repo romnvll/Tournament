@@ -44,6 +44,8 @@ if (isset($_POST['btn-login'])) {
 <!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
     <title>Login</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="assets/css/style.css" type="text/css"/>
@@ -54,14 +56,14 @@ if (isset($_POST['btn-login'])) {
 
 
     <div id="login-form">
-        <form method="post" autocomplete="off">
+        <form method="post" autocomplete="on">
 
             <div class="col-md-12">
-
-                <div class="form-group">
-                    <h2 class="">Login:</h2>
+            <div class="form-group">
+                    <img src="../logos/matcheventPro.webp" class="img-thumbnail">
                 </div>
 
+              
                 <div class="form-group">
                     <hr/>
                 </div>
@@ -104,12 +106,12 @@ if (isset($_POST['btn-login'])) {
                 <div class="form-group">
                     <hr/>
                 </div>
-
+                <!--
                 <div class="form-group">
                     <a href="register.php" type="button" class="btn btn-block btn-danger"
                        name="btn-login">Register</a>
                 </div>
-
+            -->
             </div>
 
         </form>

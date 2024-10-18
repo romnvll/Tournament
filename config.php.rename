@@ -1,0 +1,14 @@
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
+// Configuration SMTP
+$mail = new PHPMailer(true);
+$mail->isSMTP();
+$mail->Host       = 'smtp.smtp.fr';
+$mail->SMTPAuth   = true;
+$mail->Username   = 'noreply@domain.fr';
+$mail->Password   = 'Password';
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+$mail->Port       = 465;

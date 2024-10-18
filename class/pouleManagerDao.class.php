@@ -307,6 +307,9 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
         $poules[] = $currentPoule;
     }
 
+    // Variable pour stocker les IDs des nouvelles poules créées
+    $newPouleIds = [];
+
     // Étape 3 : Insérer ou mettre à jour les poules et les équipes associées
     foreach ($poules as $index => $poule) {
         $nomPoule = "$nomCategorie - Poule " . ($index + 1);
@@ -350,6 +353,9 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
             $stmtInsertPoule->execute();
             $newPouleId = $this->connexion->lastInsertId();
 
+            // Ajouter l'ID de la nouvelle poule créée à la liste
+            $newPouleIds[] = $newPouleId;
+
             foreach ($poule as $equipe) {
                 // Supprimer l'équipe de toute autre poule à laquelle elle pourrait appartenir
                 $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :equipeId")
@@ -365,7 +371,11 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
             }
         }
     }
+
+    // Retourner les IDs des nouvelles poules créées
+    return $newPouleIds;
 }
+
 
 
 

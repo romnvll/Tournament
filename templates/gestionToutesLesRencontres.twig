@@ -25,6 +25,18 @@
          {% endif %}
          {% endfor %}
       </div>
+
+  <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 1000;">
+        <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
+            <div data-mdb-input-init class="form-outline me-2">
+                <label class="form-label mb-0">Retarder les rencontres:</label>
+                <input type="number" size="2" class="form-control" name="modifMinutes" onfocusout="this.form.submit()">
+            </div>
+            <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+        </form>
+    </div>
+
+
       <div class="col-lg-12">
          <table class="table" id="planification-table">
             <thead>
@@ -48,8 +60,7 @@
                   <td>
                   
                   <div class="input-group flex-nowrap">
-                           <span class="input-group-text" id="addon-wrapping"><a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}"><i class="fa fa-clock-o" aria-hidden="true"></i></span></a>
-                           <input type="text" size="3" class="form-control" placeholder="{{ creneau.nom }}" aria-describedby="addon-wrapping">
+                         {{ creneau.nom }}
                            </div>
                   
                   </td>
@@ -96,6 +107,9 @@
     </div>
 </div>
 
+
+
+
                     
                      {% set creneauOqp = true %}
                      {% endif %}
@@ -125,16 +139,12 @@
                   {% endfor %}
                </tr>
                {% endfor %}
-            <tfoot>
-               <td>
-                  <a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']}}&newTime={{timeNextCreneau}}"><h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2></a>
-               </td>
-            </tfoot>
-            </tbody>
+            
+            
             </tbody>
          </table>
       </div>
- <input type="text" id="filter-input" placeholder="Filtrer...">  
+ 
 
 <script>
         // Load the filter value from LocalStorage on page load

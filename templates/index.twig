@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=0.65"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.9"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<link href="style/index.css" rel="stylesheet" crossorigin="anonymous"/>
 
@@ -179,8 +179,10 @@
 			</div>
 
 			<div class="row mt-3">
-				<div class="col-lg-4" id="score">
-					<table class="table table-striped table-responsive">
+			
+				<div class="col-lg-6 col-md-6 col-sm-12 col-12" id="score">
+				<div class="table-responsive">
+					<table class="table table-striped ">
 						<thead>
 							<tr>
 								
@@ -189,12 +191,12 @@
 											<th scope="col-1">Heure</th>
 										{% endif %}
 										<th scope="col">Terrain</th>
-										<th scope="col" class="text-center">Equipe1</th>
-										<th scope="col" class="w-25 text-center">Score</th>
-										<th scope="col">Equipe2</th> 
+										<th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center">Equipe1</th>
+										<th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center">Score</th>
+										<th scope="col" class="col-lg-2 col-md-3 col-sm-4">Equipe2</th> 
 										
 										{% if gestionArbitres == 1 %}
-										<th scope="col">arbitre</th>
+										<th scope="col-lg-2 col-md-3 col-sm-4">arbitre</th>
 										{% endif %}
 									{% endif %}
 							</tr>
@@ -238,42 +240,45 @@
 											
 										{% if equipe.terrain_nom != 0  %}
 											<td class="align-middle text-center position-relative">
-												<a href="vuePubliqueTerrain.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}"> <img src="img/football.png" class="img-fluid ">
-												<h4 class="position-absolute top-50 start-50 translate-middle">
+												<a href="vuePubliqueTerrain.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}"> <img src="img/football.png" class="w-100 img-fluid ">
+												<h6 class="position-absolute top-50 start-50 translate-middle">
 													<span class="badge rounded-pill bg-danger">{{ equipe.terrain_nom }}</span>
-												</h4> </a>
+												</h6> </a>
 											</td>
 
 										{% else  %}
 											<td class="align-middle text-center"></td>
 										{% endif %}
-										<td>
-											
-											<p class="fs-6 text-end fw-bold">{{equipe.equipe1_nom|upper }}</p>
-											<div class="text-end"><img src="{{equipe.club1_logo}}" class="shadow-lg  rounded img-fluid img-thumbnail" alt="{{equipe.equipe1_nom|upper }}"></div>
-
+										<td class="align-middle text-center">
+											<p  style="font-size: 12px;" class="text-end fw-bold ">{{equipe.equipe1_nom|upper }}</p>
+											<div class="text-end">
+												<img src="{{equipe.club1_logo}}" class="w-50 img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}">
+											</div>
 										</td>
 										<td class="align-middle text-center">
-											
-											{% if  equipe.score1 > equipe.score2  %}
-												<span class="badge bg-success">{{ equipe.score1 }}</span>-<span class="badge bg-danger">{{ equipe.score2 }}
-												</span>
-											{% elseif equipe.score1 < equipe.score2 %}
-												<span class="badge bg-danger">{{ equipe.score1 }}</span>-<span class="badge bg-success">{{ equipe.score2 }}</span>
-											{% elseif equipe.score1 is same as(equipe.score2) and (equipe.score1 is not null or equipe.score2 is not null) %}
-												<span class="badge bg-secondary">{{ equipe.score1 }}</span>-<span class="badge bg-secondary">{{ equipe.score2 }}</span>
-
-											{% elseif equipe.score1 or equipe.score2 == null %}
-												<span class="badge bg-warning text-dark">
-													Rencontre à venir</span>
-												{{equipe.score1}}
-											{% endif %}
-
-
+											<div class="d-flex justify-content-center flex-nowrap">
+												{% if equipe.score1 > equipe.score2 %}
+													<span class="badge bg-success">{{ equipe.score1 }}</span>-
+													<span class="badge bg-danger">{{ equipe.score2 }}</span>
+												{% elseif equipe.score1 < equipe.score2 %}
+													<span class="badge bg-danger">{{ equipe.score1 }}</span>-
+													<span class="badge bg-success">{{ equipe.score2 }}</span>
+												{% elseif equipe.score1 is same as(equipe.score2) and (equipe.score1 is not null or equipe.score2 is not null) %}
+													<span class="badge bg-secondary">{{ equipe.score1 }}</span>-
+													<span class="badge bg-secondary">{{ equipe.score2 }}</span>
+												{% elseif equipe.score1 or equipe.score2 == null %}
+													<span class="badge bg-warning text-dark">Rencontre à venir</span>
+													{{equipe.score1}}
+												{% endif %}
+											</div>
 										</td>
-										<td>
-											<p class="fs-6 text-left fw-bold">{{equipe.equipe2_nom|upper }}</p>
-											<img src="{{equipe.club2_logo}}" class="shadow-lg  rounded img-fluid img-thumbnail" alt="{{equipe.equipe2_nom|upper }}">
+
+
+										<td class="align-middle text-center">
+											<p style="font-size: 12px;" class=" text-start fw-bold ">{{equipe.equipe2_nom|upper }}</p>
+											<div class="text-start">
+												<img src="{{equipe.club2_logo}}" class="w-50 img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}">
+											</div>
 										</td>
 
 										{% if gestionArbitres == 1 %}
@@ -287,7 +292,9 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="col-lg-5 offset-lg-1">
+				</div>
+				
+				<div class="col-lg-4 col-md-6 col-sm-12 col-12">
 
 					{% if IsRankingView == 1 and IdPoules != null  %}
 
@@ -393,12 +400,6 @@ $('#classementTableau').load(location.href + ' #classementTableau > *');
 			
         });
     </script>
-
-<td class="align-middle text-center">
-  <p class="fw-bold" id="equipeNom">
-    {{ equipe.creneau_nom }}
-  </p>
-</td>
 
 
 

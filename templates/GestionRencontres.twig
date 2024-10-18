@@ -100,8 +100,8 @@
               <span class="badge {% if equipe.tour is even %}bg-success{% else %}bg-primary{% endif %}">Tour N°{{ equipe.tour }}</span>
                 </td>
                
-                <td><p class="text-center">{{ equipe.equipe1_nom }}</p> </td>
-                <td><p class="text-center">{{ equipe.equipe2_nom }} </p></td>
+                <td><p class="text-center">{{ equipe.equipe1_nom }} {{equipe.score1}}</p> </td>
+                <td><p class="text-center">{{equipe.score2}} {{ equipe.equipe2_nom }} </p></td>
                 
                   
                 </td>
