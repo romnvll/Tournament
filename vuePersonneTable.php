@@ -51,35 +51,7 @@ else {
 
 
 
-if (isset($_GET['scoreEquipe1']) ) {
-  $rencontre = new RencontreDAO();
-  
-  // A faire : si le champ est vide, passer le score à null
-  if ($_GET['scoreEquipe1'] == "") {
-    $rencontre->modifierRencontre($_GET['idRencontre'],null,9999);
 
-  }
-  else {
-  // Mettre à jour la rencontre avec les scores
-  $rencontre->modifierRencontre($_GET['idRencontre'],$_GET['scoreEquipe1'],9999);
-  }
-} 
-
-if (isset($_GET['scoreEquipe2']) ) {
-  $rencontre = new RencontreDAO();
-  if ($_GET['scoreEquipe2'] == "") {
-    // si le score est vide, on passe l'argument 9999 pour ne pas toucher au score
-    $rencontre->modifierRencontre($_GET['idRencontre'],9999,null);
-
-  }
-  else {
-    $rencontre->modifierRencontre($_GET['idRencontre'],9999,$_GET['scoreEquipe2']);
-
-  }
-  
-
-  
-} 
 
 
 
@@ -93,8 +65,9 @@ echo $template->render([
   'AffichagePlanification' => $affichagePlanification,
   'tournoiId' => $tournoiId,
   'prenom' => $_SESSION['infoUser'][0]['Prenom'],
-  'terrain' => $_SESSION['infoUser'][0]['terrainNom']
-  
+  'terrain' => $_SESSION['infoUser'][0]['terrainNom'],
+  'missingScore' => $_GET['
+  '],
   
  
   

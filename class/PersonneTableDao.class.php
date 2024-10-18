@@ -1,5 +1,8 @@
 <?php
+ require 'vendor/autoload.php'; // Assurez-vous que le chemin est correct
 
+ use PHPMailer\PHPMailer\PHPMailer;
+ use PHPMailer\PHPMailer\Exception;
 class PersonneTableDao {
 private $connexion;
 
@@ -101,10 +104,14 @@ private function genererCodePin() {
 
 
  // Méthode pour envoyer un mail
- public function envoyerMail($PersonneTableId) {
+
+ 
+public function envoyerMail($PersonneTableId) {
+  
+
     // Récupérer les informations de la personne, du terrain et du tournoi à partir de PersonneTable
     $stmt = $this->connexion->prepare("
-        SELECT pr.id AS personne_rencontre_id, p.Mail, p.Prenom, p.Nom, t.nom AS terrain_nom, pr.code_pin, pr.url_key,pr.tournoi_id
+        SELECT pr.id AS personne_rencontre_id, p.Mail, p.Prenom, p.Nom, t.nom AS terrain_nom, pr.code_pin, pr.url_key, pr.tournoi_id
         FROM PersonneTable pr
         INNER JOIN Personne p ON pr.personne_id = p.id
         INNER JOIN Terrains t ON pr.terrain_id = t.terrain_id
@@ -123,27 +130,48 @@ private function genererCodePin() {
         $urlKey = $result['url_key'];
         $tournoi_id = $result['tournoi_id'];
 
-        $subject = "Accès sécurisé pour saisir les résultats";
-        $message = "Bonjour $prenom $nom,
+        // Créer une instance de PHPMailer
+        
 
-        Vous avez été assigné au terrain '$terrainNom' pour noter les scores.
-        
-        Voici votre lien sécurisé : http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id
-        
-        Votre code PIN est : $codePin 
-        
-        Merci de votre collaboration.";
-        
-        $headers = "From: noreply@hbcat.fr\r\n";
-        
-        if(mail($email, $subject, $message, $headers)) {
+        try {
+            
+            include ('./config.php');
+           
+
+           $mail->setFrom('noreply@hbcat.fr', 'HBCAT');
+           
+           
+            $mail->isHTML(true);     
+
+            // Configuration du serveur SMTP
+            // Configurer le format de l'email à HTML
+            $mail->addAddress($email, "$prenom $nom"); 
+            $mail->Subject ="Accès sécurisé pour saisir les résultats";
+            $mail->Body    = "Bonjour $prenom $nom,<br><br>
+                              Vous avez été assigné au terrain '$terrainNom' pour noter les scores.<br><br>
+                              Voici votre lien sécurisé : <a href='http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id'>Lien sécurisé</a><br><br>
+                              Votre code PIN est : <b>$codePin</b> <br><br>
+                              Merci de votre collaboration.";
+            $mail->AltBody = "Bonjour $prenom $nom,\n\n
+                              Vous avez été assigné au terrain '$terrainNom' pour noter les scores.\n\n
+                              Voici votre lien sécurisé : http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id\n\n
+                              Votre code PIN est : <b>$codePin</b> \n\n
+                              Merci de votre collaboration.";
+            $mail->CharSet = 'UTF-8';
+
+            // Envoyer l'email
+           
+            $mail->send();
+           
             return true;
-        } else {
+        } catch (Exception $e) {
+            echo "L'email n'a pas pu être envoyé. Mailer Error: {$mail->ErrorInfo}";
             return false;
         }
     }
     return false;
 }
+
 
 
 

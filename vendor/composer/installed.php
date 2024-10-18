@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => '2.0.x-dev',
+        'version' => '2.0.9999999.9999999-dev',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => '24a3ffec421dc64646e716a99d75962e2e23d6ac',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => '2.0.x-dev',
+            'version' => '2.0.9999999.9999999-dev',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => '24a3ffec421dc64646e716a99d75962e2e23d6ac',
             'dev_requirement' => false,
         ),
         'chillerlan/php-qrcode' => array(
@@ -35,6 +35,15 @@
             'install_path' => __DIR__ . '/../chillerlan/php-settings-container',
             'aliases' => array(),
             'reference' => 'c41e89f8bf963d1e88584a47fb78d1cd204b6e2a',
+            'dev_requirement' => false,
+        ),
+        'phpmailer/phpmailer' => array(
+            'pretty_version' => 'v6.9.1',
+            'version' => '6.9.1.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpmailer/phpmailer',
+            'aliases' => array(),
+            'reference' => '039de174cd9c17a8389754d3b877a2ed22743e18',
             'dev_requirement' => false,
         ),
         'symfony/polyfill-ctype' => array(
