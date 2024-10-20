@@ -486,7 +486,22 @@ public function getScore(int $idrencontre): ?array
     ];
 }
 
+public function rencontresExistByCategorieAndTournoi(string $categorie, int $idtournoi): bool
+{
+    $query = "SELECT COUNT(*) FROM Rencontres r
+              JOIN Equipes e1 ON r.equipe1_id = e1.id
+              JOIN Equipes e2 ON r.equipe2_id = e2.id
+              WHERE e1.categorie = :categorie AND e2.categorie = :categorie AND r.tournoi_id = :idtournoi";
 
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+    $stmt->bindValue(':idtournoi', $idtournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $count = $stmt->fetchColumn();
+
+    return $count > 0;
+}
 
 
 
