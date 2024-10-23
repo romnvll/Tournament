@@ -38,6 +38,8 @@ if (isset ($_SESSION['infoUser'][0]['url_key'])) {
 
  $idterrain = $_SESSION['idterrain'];
  $tournoiId = $_SESSION['tournoiId'];
+
+
 $affichagePlanification = $affichagePlanification->getPlanificationsTerrainAvecDetails($idterrain,$tournoiId);
 $infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);
 
@@ -66,8 +68,7 @@ echo $template->render([
   'tournoiId' => $tournoiId,
   'prenom' => $_SESSION['infoUser'][0]['Prenom'],
   'terrain' => $_SESSION['infoUser'][0]['terrainNom'],
-  'missingScore' => $_GET['
-  '],
+  'missingScore' => $_GET['missing_score'],
   
  
   

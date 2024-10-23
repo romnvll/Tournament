@@ -12,14 +12,14 @@ if (isset ($_POST['codePin'])) {
     
     $afficherCodePin = false ;
     
-    $idterrain = substr($_POST['key'], -1);
-    
+    $idterrain = explode('-', $_POST['key'])[1];
+    session_destroy();
     session_start();
     $_SESSION['idterrain'] = $idterrain;
     $_SESSION['tournoiId'] = $tournoiId;
     $_SESSION['infoUser'] = $infoUser;
 
-   
+
     header("Location: vuePersonneTable.php");
    
     

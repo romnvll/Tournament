@@ -80,7 +80,7 @@ WHERE pr.url_key = :urlKey AND pr.code_pin = :codePin
 
 // Génération d'une URL sécurisée et d'un code PIN pour une personne
 public function genererUrlEtCodePin($personneId, $terrainId, $tournoi_id) {
-    $urlKey = $this->genererChaineAleatoire(30) . $terrainId;
+    $urlKey = $this->genererChaineAleatoire(30) ."-". $terrainId;
     $codePin = $this->genererCodePin();
     $this->creerPersonneRencontre($personneId, $terrainId, $codePin, $urlKey, $tournoi_id);
     return ['urlKey' => $urlKey, 'codePin' => $codePin];

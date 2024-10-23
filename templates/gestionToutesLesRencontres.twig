@@ -6,7 +6,6 @@
 		<link href="style/couleurEquipes.css" rel="stylesheet">
 		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-		<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
 		<title>Gestion rencontre</title>
 	</head>
 
@@ -26,7 +25,7 @@
          {% endfor %}
       </div>
 
-  <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 1000;">
+  <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
         <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
             <div data-mdb-input-init class="form-outline me-2">
                 <label class="form-label mb-0">Retarder les rencontres:</label>
@@ -84,7 +83,9 @@
 				<div class="mb-3">
     <!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
     <p class="fw-bold text-center">{{planification.equipe1_categorie_nom}} - tour {{planification.tour}}</p>
-    
+    {% if planification.isTerminated == 1 %} <p class="fw-bold text-center text-success">Rencontre terminée</p> {% endif %}
+    {% if planification.isTerminated == 2 %} <p class="fw-bold text-center text-warning">Rencontre en cours</p> {% endif %}
+
     <!-- Ligne 2: Noms des équipes et scores, centrée -->
     <div class="d-flex align-items-center justify-content-center">
         <p class="mb-0 me-2">{{planification.equipe1_nom}}</p>
@@ -194,3 +195,11 @@
     </script>
 
 
+<script>
+$(document).ready(function () {
+      setTimeout(function () {
+        // alert('Reloading Page');
+        location.reload(true);
+      }, 5000);
+    });
+</script>
