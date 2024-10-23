@@ -21,8 +21,8 @@
 			</div> 
 
 			<div class="row">
-				<div class="col-12" id="score">
-					<table class="table table-striped table-responsive" >
+				<div class="col-12" id="scoreRefresh">
+					<table class="table table-striped table-responsive">
 						<thead>
 							<tr>
 							
@@ -30,11 +30,12 @@
 							<th scope="col" class="w-25 text-center">Score equipe1</th>
 							<th scope="col" class="w-25 text-center">Score equipe2</th>
 							<th scope="col">Arbitre</th>
-							<th scope="col"></th>
+							<th scope="col">Etat</th>
 							</tr>
 						</thead>
 						
 					<tbody>	
+       
 					{% for planification in AffichagePlanification %}
 					<tr id="planification-{{ planification.rencontre_id }}">					
 
@@ -54,14 +55,21 @@
     
     <!-- Affichage visuel du score pour l'équipe 1 -->
     <p>Score: <span id="displayScoreEquipe1{{planification.rencontre_id}}">{{planification.score1}}</span></p>
-    
+    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
     <!-- Boutons pour ajouter ou retirer un but -->
-    <button type="button" class="btn btn-success" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{planification.rencontre_id}}&team=1" hx-trigger="click" 
+    <button type="button" class="btn btn-success" 
+    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{planification.rencontre_id}}&team=1" 
+    hx-trigger="click" 
+     hx-on="htmx:afterRequest:vibrate(50)"
 	hx-swap="innerHTML" 
 	hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But +</button>
-    <button type="button" class="btn btn-danger" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=1" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But -</button>
+    <button type="button" class="btn btn-danger" 
+    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=1" 
+     hx-on="htmx:afterRequest:vibrate(200)"
+    hx-trigger="click" hx-swap="innerHTML" 
+    hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But -</button>
   </td>
-
+    {% endif %}
   <td class="text-center">
     <img src="{{planification.club2_logo}}" class="img-fluid rounded">
     <p class="lead text-uppercase">{{planification.equipe2_nom}}</p>
@@ -71,16 +79,47 @@
     
     <!-- Affichage visuel du score pour l'équipe 2 -->
     <p>Score: <span id="displayScoreEquipe2{{planification.rencontre_id}}">{{planification.score2}}</span></p>
-    
+    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
     <!-- Boutons pour ajouter ou retirer un but -->
-    <button type="button" class="btn btn-success" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{planification.rencontre_id}}&team=2" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{planification.rencontre_id}}">But +</button>
-    <button type="button" class="btn btn-danger" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{planification.rencontre_id}}">But -</button>
-  </td>
+    <button type="button" class="btn btn-success" 
+    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{planification.rencontre_id}}&team=2" 
+    hx-trigger="click" 
+    hx-on="htmx:afterRequest:vibrate(50)" 
 
-  <td>{{planification.arbitre_nom}}</td>
-  <td class="text-center align-middle">
-    <!--<button type="submit" class="btn btn-primary">Soumettre</button> -->
+    hx-swap="innerHTML"
+    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
+    >
+  But +
+</button>
+    <button type="button" class="btn btn-danger" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" 
+    hx-trigger="click"
+       hx-on="htmx:afterRequest:vibrate(200)" 
+
+    hx-swap="innerHTML"     
+    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
+   >
+  But -</button>
   </td>
+    {% endif %}
+  <td>{{planification.arbitre_nom}}</td>
+ <td class="align-left">
+  <a class="btn btn-primary" id="State{{planification.rencontre_id}}" role="button"
+     hx-trigger="click"
+     hx-post="vuePersonneTable_traitement.php?action=updateStatus&idRencontre={{planification.rencontre_id}}"
+     hx-target="#State{{planification.rencontre_id}}"
+     
+     hx-swap="outerHTML">
+  
+    {% if planification.isTerminated == 0 %}
+      À venir
+    {% elseif planification.isTerminated == 2 %}
+      En cours
+    {% else %}
+      Terminé
+    {% endif %}
+  </a>
+</td>
+
 </form>
 
 
@@ -114,31 +153,6 @@
 		</div>
 
 
-<!-- Modale Bootstrap pour les scores manquants -->
-
-
-
-<!-- Modale Bootstrap 5 pour les scores manquants -->
-{% if missingScore == "missing_score" %}
-<div class="modal fade" id="missingScoreModal" tabindex="-1" aria-labelledby="missingScoreModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="missingScoreModalLabel">Attention</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Un ou plusieurs scores sont manquants. Veuillez les remplir avant de soumettre le formulaire.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% endif %}
-
 
 
 	</body>
@@ -150,50 +164,35 @@
 
 
 
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Sélectionner tous les inputs dans le formulaire qui ont une valeur définie
-    const inputs = document.querySelectorAll('input[type="number"]');
-
-    inputs.forEach(function(input) {
-        // Si l'input a une valeur non vide, on le désactive
-        if (input.value.trim() !== "") {
-            input.readOnly  = true;
-			 // Appliquer le style directement en JavaScript
-                input.style.backgroundColor = '#f0f0f0'; // Gris clair
-                input.style.color = '#6c757d'; // Couleur du texte pour un contraste avec le fond
-                input.style.borderColor = '#ced4da'; // Couleur de la bordure
+    function vibrate(temps) {
+      
+        if (navigator.vibrate) {
+            navigator.vibrate(temps); // Fait vibrer le téléphone pendant 200 millisecondes
         }
-    });
-});
-
-</script>
-
-
-	<script>
-$(document).ready(function(){
-    // Vérifie si la modale doit être affichée
-    if ($("#missingScoreModal").length) {
-        $("#missingScoreModal").modal('show');
     }
-});
+
+
 </script>
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form'); // Cibler le formulaire spécifique si nécessaire
-
-        if (form) {
-            form.addEventListener('submit', function() {
-                sessionStorage.setItem('scrollPosition', window.scrollY);
-            });
-        }
+$(document).ready(function () {
+      setTimeout(function () {
+        // alert('Reloading Page');
+        location.reload(true);
+      }, 3000);
     });
-
-
-
 </script>
+
+
+
+
 
 
 

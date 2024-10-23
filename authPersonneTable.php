@@ -12,6 +12,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">
+                <img src="logos/matcheventPro.webp" class="card-img-top img-thumbnail" alt="...">
                     <div class="card-body">
                         <form method="POST" action="authPersonneTableVerif.php" id="verificationForm">
                             <div class="form-group">

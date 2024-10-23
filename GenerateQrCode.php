@@ -43,7 +43,31 @@ $qrcode = (new QRCode($options))->render($url);
 <body>
 <div class="container-fluid">
 <div class="row justify-content-md-center">
-<h4>Scanner pour savoir quand et où votre équipe doit jouer</h4>
+<h4 class="text-center">Scanner pour savoir quand et où votre équipe doit jouer</h4>
+</div>
+<div class="row justify-content-md-center">
+<?php
+// Définir la locale en français
+// Assurez-vous que l'extension Intl est activée sur votre serveur
+$dateDebut = $tournoiDao->getTournoiById($_GET['idTournoi'])['dateDebut'];
+$date = new DateTime($dateDebut);
+
+// Créer un formatteur pour la date
+$formatter = new IntlDateFormatter(
+    'fr_FR', // Locale
+    IntlDateFormatter::LONG, // Type de format
+    IntlDateFormatter::NONE, // Pas d'heure
+    null, // Fuseau horaire par défaut
+    IntlDateFormatter::GREGORIAN, // Calendrier
+    'dd MMMM yyyy' // Format
+);
+
+$dateFormatted = $formatter->format($date);
+
+echo "<p class=\"text-primary text-center fs-1\">" . $tournoiDao->getTournoiById($_GET['idTournoi'])['nom'] . " le " . $dateFormatted . "</p>";
+
+
+?>
 </div>
   <div class="row">
     <div class="col-6">

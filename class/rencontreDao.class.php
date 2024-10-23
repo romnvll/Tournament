@@ -352,7 +352,25 @@ $query = "SELECT
     
 
 
+    public function updateStatus(int $idrencontre, int $status)
+    {
+        $query = "UPDATE Rencontres SET isTerminated = :status WHERE id = :idrencontre";
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindValue(':status', $status, PDO::PARAM_INT);
+        $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 
+    public function getRencontre(int $idrencontre)
+{
+    $query = "SELECT score1, score2 FROM Rencontres WHERE id = :idrencontre";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+    
 
 
     public function resetRencontre(int $idrencontre)
