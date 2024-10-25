@@ -51,6 +51,14 @@ if ($_GET['addPersonne'] == "true") {
 
 }
 
+if ($_GET['addArbitre'] == true) {
+    require 'class/arbitreDao.class.php';
+    $arbitre=new arbitreDao();
+    $arbitre->ajouterArbitre($_GET['NomArbitre'],$_GET['tournoiId'],$_GET['clubID']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+   exit();
+}
+
 
 
 

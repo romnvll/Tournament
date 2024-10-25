@@ -14,6 +14,7 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 
 
 require 'class/clubDao.class.php';
+require 'class/arbitreDao.class.php';
 require 'class/databaseInformations.php';
 require 'class/tournoiDao.class.php';
 require 'class/pouleManagerDao.class.php';
@@ -31,6 +32,7 @@ $poules = new PouleManager();
 $listeClub = new ClubDAO();
 $listeDesEquipes= new EquipeDAO();
 $listePersonne = new PersonneDao();
+$arbitre = new arbitreDao();
 
 if (!isset($_GET['idTournoi']) ){
 $idtournoi = 0;
@@ -56,6 +58,8 @@ echo $template->render([
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficherPersonnes' => $listePersonne->recupererToutesLesPersonnes($_GET['idTournoi']),
 'AfficherTerrain' => $terrain->AfficherTerrains($_GET['idTournoi']),
-'AfficherLesPersonnesCrees' => $personneTable->recupererToutesLesPersonnesParTournoi($_GET['idTournoi'])
+'AfficherLesPersonnesCrees' => $personneTable->recupererToutesLesPersonnesParTournoi($_GET['idTournoi']),
+'AfficherLesClubsPourArbitres' => $listeClub->clubsParticipatingInTournoi($_GET['idTournoi']),
+'AfficherLesArbitres' => $arbitre->afficherArbitres($_GET['idTournoi']),
 
 ]);

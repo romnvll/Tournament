@@ -45,7 +45,7 @@ if (!isset($_GET['id_tournoi'])) {
     $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
     $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
     $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
-   
+  
     
 
 //création du premier creneau :

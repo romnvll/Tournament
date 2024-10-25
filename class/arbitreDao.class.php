@@ -59,18 +59,32 @@ class arbitreDao {
         $stmt->execute();
     }
 
+   
+    
+
     public function afficherArbitres(int $tournoi_id): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM Arbitres WHERE tournoi_id = :tournoi_id");
+        $stmt = $this->connexion->prepare("
+            SELECT a.*, c.nom AS club_nom 
+            FROM Arbitres a 
+            JOIN Clubs c ON a.club_id = c.id 
+            WHERE a.tournoi_id = :tournoi_id
+        ");
         $stmt->bindParam(':tournoi_id', $tournoi_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+    
     public function supprimerArbitresParTournoi(int $tournoi_id): void {
-        $stmt = $this->connexion->prepare("DELETE FROM Arbitres WHERE tournoi_id = :tournoi_id");
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->execute();
+        try {
+            $stmt = $this->connexion->prepare("DELETE FROM Arbitres WHERE tournoi_id = :tournoi_id");
+            $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+            $stmt->execute();
+            echo "totoSuppression des arbitres réussie pour le tournoi $tournoi_id";
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression des arbitres : " . $e->getMessage();
+        }
     }
+    
     
     
 

@@ -266,14 +266,37 @@
 							<h3>Ajouter des arbitres</h3>
 							<form action="modifierTournoi_traitement.php">
 							<div class="mb-3">
+									<input type="hidden" name="addArbitre" value="true">
 									<label for="nomArbitre" class="form-label">Nom</label>
-									<input type="email" class="form-control" id="EmailArbitre" aria-describedby="emailHelp" name="EmailArbitre" required>
-									<input type="hidden" name="addPersonne" value="true">
-									<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
-									<div id="emailHelp" class="form-text">Email</div>
-									<label for="nomArbitre" class="form-label">Email address</label>
-									<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
-								</div>					
+									<input type="text" class="form-control" id="NomArbitre" aria-describedby="emailHelp" name="NomArbitre" required>
+								    <input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+									<label for="nomArbitre" class="form-label">Club</label>
+									<select class="form-select" name="clubID">
+									
+									<option selected>Quel Club?</option>
+									{% for club in AfficherLesClubsPourArbitres  %}
+									<option value="{{club.id}}">{{club.nom}}</option>
+									{% endfor %}
+									</select>
+								<input type="submit">
+							</div>
+						</div>
+
+						<div class="col">
+						
+						<table class="table">
+						{% for arbitre in AfficherLesArbitres %}
+						
+						 <tr>
+     					 	<td>{{arbitre.nom}}</td>
+      						<td>{{arbitre.club_nom}}</td>
+							<td>X</td>
+						 </tr>
+						 {% endfor %}
+						</table>
+						
+						</div>
+					</div>			
 
 
 					{% endif %}

@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 require ('security.php');
 require 'class/equipeDao.class.php';
 //require 'class/equipe.class.php';
@@ -13,7 +15,7 @@ require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
 
 session_start();
-$_SESSION['idTournoi'] = $_GET['idTournoi'];
+$_SESSION['id_tournoi'] = $_GET['id_tournoi'];
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
