@@ -199,6 +199,8 @@ class planificationDao {
                 p.tournoi_id,
                 p.arbitre_id,
                 a.nom AS arbitre_nom,
+                a.club_id AS arbitre_club_id,
+                c_club.nom AS club_nom_arbitre,
                 p.label_id,
                 l.description AS label_description,
                 l.couleur AS label_couleur
@@ -229,19 +231,20 @@ class planificationDao {
             LEFT JOIN 
                 Arbitres a ON p.arbitre_id = a.arbitre_id
             LEFT JOIN 
+                Clubs c_club ON a.club_id = c_club.id
+            LEFT JOIN 
                 Labels l ON p.label_id = l.label_id
             WHERE 
                 p.tournoi_id = :tournoi_id
                 AND p.terrain_id IS NOT NULL
                 AND p.creneau_id IS NOT NULL
             GROUP BY 
-            p.planification_id
+                p.planification_id
         ");
         $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
     
 
     public function afficherRencontresSansPlanification(int $tournoi_id): array {

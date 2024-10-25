@@ -89,7 +89,7 @@ if (isset($_GET['action'])) {
             require 'class/creneauxDao.class.php';
             $creneau = new creneauxDao();
             $creneau->ajouterCreneau($_GET['newTime'],$_GET['idTournoi']);
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+            header("Location: " . $_SERVER['HTTP_REFERER'] ."#bottom");
         }
 
         if  (($_GET['action']=="delCreneau")) {
@@ -98,7 +98,7 @@ if (isset($_GET['action'])) {
             try {
             $creneau = new creneauxDao();
             $creneau->supprimerCreneau($_GET['creneauId']);
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+            header("Location: " . $_SERVER['HTTP_REFERER']."#bottom");
             }catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
                     echo "Erreur: Impossible de supprimer ce créneau car il est deja utilisé, il faut deplanifier les evenements .";
