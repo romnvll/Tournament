@@ -150,11 +150,18 @@ if (isset($_GET['action'])) {
 
         if (($_GET['action'] == "delTerrain")) {
             require 'class/terrainDao.class.php';
-            $terrain = new TerrainDao();
-            
-            $terrain->suppressionTerrain($_GET['idTournoi'],$_GET['terrain_id']);
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+            try {
+                $terrain = new TerrainDao();
+                $terrain->suppressionTerrain($_GET['idTournoi'], $_GET['terrain_id']);
+                header("Location: " . $_SERVER['HTTP_REFERER']);
+            } catch (PDOException $e) {
+                
+                    echo "Erreur: Impossible de supprimer ce terrain car il est déjà utilisé, il faut deplanifier les événements.";
+               
+                
+            }
         }
+        
 
 
      
