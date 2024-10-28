@@ -26,11 +26,13 @@ $idterrain = null;
 $tournoiId = null;
 $infoUser=null;
 $affichagePlanification=null;
+$key = null;
 
 session_start();
 
 
 if (isset ($_SESSION['infoUser'][0]['url_key'])) {
+
  $affichagePlanification = new planificationDao();
  $tablePersonne = new PersonneTableDao();
 
@@ -41,8 +43,10 @@ if (isset ($_SESSION['infoUser'][0]['url_key'])) {
 
 
 $affichagePlanification = $affichagePlanification->getPlanificationsTerrainAvecDetails($idterrain,$tournoiId);
-$infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);
 
+if (isset($_GET['key'])) {
+$infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);
+}
 
 }
 
@@ -68,7 +72,7 @@ echo $template->render([
   'tournoiId' => $tournoiId,
   'prenom' => $_SESSION['infoUser'][0]['Prenom'],
   'terrain' => $_SESSION['infoUser'][0]['terrainNom'],
-  'missingScore' => $_GET['missing_score'],
+  
   
  
   

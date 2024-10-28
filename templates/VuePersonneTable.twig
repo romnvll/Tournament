@@ -63,7 +63,7 @@
      hx-on="htmx:afterRequest:vibrate(50)"
 	hx-swap="innerHTML" 
 	hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But +</button>
-    <button type="button" class="btn btn-danger btn-sm" 
+    <button type="button" class="btn btn-danger btn-sm order-md-last" 
     hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=1" 
      hx-on="htmx:afterRequest:vibrate(200)"
     hx-trigger="click" hx-swap="innerHTML" 
@@ -80,16 +80,7 @@
     <!-- Affichage visuel du score pour l'équipe 2 -->
     <p>Score: <span id="displayScoreEquipe2{{planification.rencontre_id}}">{{planification.score2}}</span></p>
     {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-    <!-- Boutons pour ajouter ou retirer un but -->
-
-    <button type="button" class="btn btn-danger btn-sm" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" 
-    hx-trigger="click"
-       hx-on="htmx:afterRequest:vibrate(200)" 
-
-    hx-swap="innerHTML"     
-    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
-   >
-  But -</button>
+    <!-- Boutons pour ajouter ou retirer un but -->  
 
     <button type="button" class="btn btn-success btn-lg" 
     hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{planification.rencontre_id}}&team=2" 
@@ -97,21 +88,22 @@
     hx-on="htmx:afterRequest:vibrate(50)" 
 
     hx-swap="innerHTML"
-    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
-    >
-  But +
+    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}">But +
 </button>
+  <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" 
+    hx-trigger="click"
+       hx-on="htmx:afterRequest:vibrate(200)" 
 
+    hx-swap="innerHTML"     
+    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
+   >
+  But -</button>
   </td>
     {% endif %}
   <td>{{planification.arbitre_nom}}</td>
  <td class="align-left">
   <a class="btn btn-primary" id="State{{planification.rencontre_id}}" role="button"
-     hx-trigger="click"
-     hx-post="vuePersonneTable_traitement.php?action=updateStatus&idRencontre={{planification.rencontre_id}}"
-     hx-target="#State{{planification.rencontre_id}}"
-     
-     hx-swap="outerHTML">
+     onclick="updateStatus({{planification.rencontre_id}})">
   
     {% if planification.isTerminated == 0 %}
       À venir
@@ -120,7 +112,8 @@
     {% else %}
       Terminé
     {% endif %}
-  </a>
+</a>
+
 </td>
 
 </form>
@@ -165,8 +158,16 @@
 
 </html>
 
-
-
+<script>
+  function updateStatus(idRencontre) {
+    if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
+      htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
+        target: `#State${idRencontre}`,
+        swap: 'outerHTML'
+      });
+    }
+  }
+</script>
 <script>
     function vibrate(temps) {
       
@@ -189,7 +190,7 @@ $(document).ready(function () {
       setTimeout(function () {
         // alert('Reloading Page');
         location.reload(true);
-      }, 3000);
+      }, 5000);
     });
 </script>
 

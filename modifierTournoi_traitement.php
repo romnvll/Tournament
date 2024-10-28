@@ -59,6 +59,28 @@ if ($_GET['addArbitre'] == true) {
    exit();
 }
 
+if ($_GET['delArbitre'] == true) {
+    require 'class/arbitreDao.class.php';
+    $arbitre=new arbitreDao();
+    try {
+        $arbitre->supprimerArbitre($_GET['arbitre_id']);
+        echo "Arbitre supprimé avec succès.";
+        echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "'; }, 0);</script>";
+
+    } catch (PDOException $e) {
+        // Vérifie si l'exception est une violation de contrainte d'intégrité
+        if ($e->getCode() == 23000) {
+            echo "Erreur : impossible de supprimer cet arbitre car il est encore associé à une planification.";
+            echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "'; }, 5000);</script>";
+        } else {
+            // Affiche le message d'erreur pour toute autre exception
+            echo "Erreur lors de la suppression de l'arbitre : " . $e->getMessage();
+        }
+    }
+    
+   exit();
+}
+
 
 
 

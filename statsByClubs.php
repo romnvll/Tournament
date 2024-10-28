@@ -19,6 +19,35 @@ $template = $twig->load('statsByClubs.twig');
 
 
 
+// Créer un formatteur pour la date
+// Récupérer la date en tant que chaîne
+$dateString = $tournois->getTournoiById($_GET['id_tournoi'])['dateDebut'];
+
+// Convertir la chaîne de date en objet DateTime
+$dateTime = DateTime::createFromFormat('Y-m-d', $dateString);
+
+if ($dateTime === false) {
+    // Gérer l'erreur de conversion si nécessaire
+    var_dump('Erreur de conversion de la date');
+} else {
+    // Créer l'IntlDateFormatter
+    $formatter = new IntlDateFormatter(
+        'fr_FR', // Locale
+        IntlDateFormatter::LONG, // Type de format
+        IntlDateFormatter::NONE, // Pas d'heure
+        null, // Fuseau horaire par défaut
+        IntlDateFormatter::GREGORIAN, // Calendrier
+        'dd MMMM yyyy' // Format
+    );
+
+    // Formatter la date
+    $dateFormatted = $formatter->format($dateTime);
+
+    // Afficher la date formatée
+    //var_dump($dateFormatted); // Devrait retourner "28 octobre 2024"
+}
+
+
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'Stats',
@@ -27,6 +56,8 @@ echo $template->render([
     'ListeDesTournois' => $tournois->afficherLesTournois(),
     'idTournoi' => $_GET['id_tournoi'],
     'statTournoi' => $tournois->statsTournoi($_GET['id_tournoi']),
+    'infoTournoiEnCours' => $tournois->getTournoiById($_GET['id_tournoi']),
+    'dateformat' =>  $dateFormatted
   
   
   ]);
