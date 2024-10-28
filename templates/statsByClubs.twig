@@ -59,6 +59,31 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
+ <div class="col-lg-6">
+
+ {% autoescape false %}
+📅 Le {{ dateformat }}, s'est déroulé le {{ infoTournoiEnCours.nom }} ! 🎉<br>
+
+Un grand merci à toutes les équipes pour leur participation et leur esprit sportif 🙏 !<br> Voici un remerciement spécial à chaque club :
+
+{% for club in statTournoi %}
+<br>
+- {{ club.ClubNom }} : ⚽️✨
+  {% if club.ButsMarques is not null %}
+    🥅 Buts Marqués: {{ club.ButsMarques }}, 🏆 Victoires: {{ club.Victoires }}, ❌ Buts Encaissés: {{ club.ButsEncaisses }}
+  {% else %}
+    🚫 Pas de buts marqués, mais votre participation est ce qui compte le plus ! 💪
+  {% endif %}
+{% endfor %}
+<br>
+Merci à tous d'avoir fait de ce tournoi un moment inoubliable 🎉🙌 !<br>
+
+Nous espérons vous revoir nombreux pour la prochaine édition ! 🤞⚽
+{% endautoescape %}
+ </div>
+</div>
+
 <script>
     $(document).ready(function() {
        $('#example').DataTable({

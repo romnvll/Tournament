@@ -40,12 +40,16 @@
 
 
 				<div class="row mt-3">
-
-					{% for i in 1..nombreTerrain %}
-						{% if terrainSelect is null or terrainSelect == i %}
+				
+						{% set nomTerrain = null %}
+						{% for rencontre in rencontres %}
+							{% if nomTerrain is null %}
+								{% set nomTerrain = rencontre.terrain_nom %}
+							{% endif %}
+						{% endfor %}
+						
 							<div class="col-lg-8" id="score">
-								<h3 class="text-center">Terrain N°
-									{{ i }}</h3>
+								<h3 class="text-center">Terrain {{nomTerrain}} </h3>
 								<table class="table table-striped">
 									<thead>
 										<tr>
@@ -62,10 +66,10 @@
 										</tr>
 									</thead>
 									<tbody>
-
+										
 										{% for rencontre in rencontres %}
 											{% if isArchived == 0 %}
-												{% if rencontre.terrain == i %}
+												
 													{% if rencontre.score1 != 0 or rencontre.score2 !=0 %}
 														<tr class="rencontre table-success" data-terrain="{{ i }}">
 
@@ -94,7 +98,7 @@
 															<td>
 																<p class="h6 text-end">{{rencontre.equipe1_nom}}</p>
 																<a href="index.php?id_tournoi={{idTournoi}}&id_club={{rencontre.clubId1}}&id_equipe={{rencontre.clubId1}}">
-																	<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
+																	<div class="text-end"><img src="{{rencontre.club1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
 																</a>
 
 															</td>
@@ -117,20 +121,20 @@
 															<td>
 																<p class="h6 text-left">{{rencontre.equipe2_nom}}</p>
 																<a href="index.php?id_tournoi={{idTournoi}}&id_club={{rencontre.clubId2}}&id_equipe={{rencontre.clubId2}}">
-																	<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}"></a>
+																	<img src="{{rencontre.club2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}"></a>
 															</td>
 
 														</tr>
 
 													</tr>
-												{% endif %}
+												
 											{% endif %}
 										{% endfor %}
 									</tbody>
 								</table>
 							</div>
-						{% endif %}
-					{% endfor %}
+						
+					
 				{% else %}
 					<div class="row">
 						<div class="alert alert-warning alert-dismissible fade show d-flex" role="alert">
