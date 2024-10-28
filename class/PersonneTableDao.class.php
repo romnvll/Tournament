@@ -146,7 +146,7 @@ public function envoyerMail($PersonneTableId) {
             // Configuration du serveur SMTP
             // Configurer le format de l'email à HTML
             $mail->addAddress($email, "$prenom $nom"); 
-            $mail->Subject ="Accès sécurisé pour saisir les résultats";
+            $mail->Subject ="Accès sécurisé pour saisir les résultats sur le terrain '$terrainNom'";
             $mail->Body    = "Bonjour $prenom $nom,<br><br>
                               Vous avez été assigné au terrain '$terrainNom' pour noter les scores.<br><br>
                               Voici votre lien sécurisé : <a href='http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id'>Lien sécurisé</a><br><br>
