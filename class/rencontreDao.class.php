@@ -274,11 +274,9 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
 
     public function getRencontreByPoule($pouleid, $tournoiId, $isClassement = 0)
-    {
-
-           
-
-$query = "SELECT 
+{
+    $query = "
+        SELECT 
             r.id AS rencontre_id,
             r.tour AS tour,
             p.terrain_id,
@@ -304,11 +302,14 @@ $query = "SELECT
             
             r.score1,
             r.score2,
-    
+
             l.label_id AS label_id,
             l.description AS label_description,
-            l.couleur AS label_couleur
-            
+            l.couleur AS label_couleur,
+
+            a.nom AS arbitre_nom,
+            clubArbitre.nom AS arbitre_club_nom
+
         FROM 
             Rencontres r
         JOIN 
@@ -330,24 +331,28 @@ $query = "SELECT
         LEFT JOIN 
             Terrains t ON p.terrain_id = t.terrain_id
         LEFT JOIN 
-            Labels l ON l.tournoi_id = :tournoiId  -- Récupère tous les labels du tournoi
+            Labels l ON l.tournoi_id = :tournoiId
+        LEFT JOIN 
+            Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN 
+            Clubs clubArbitre ON a.club_id = clubArbitre.id
         WHERE 
             ep1.poule_id = :pouleid 
             AND ep2.poule_id = :pouleid 
             AND r.isClassement = :isClassement
         ORDER BY 
             r.tour, c.nom, r.id;
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindParam(':pouleid', $pouleid, PDO::PARAM_INT);
+    $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
     
-                 ";
-    
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':pouleid', $pouleid, PDO::PARAM_INT);
-        $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT); // Bind du tournoiId
-        $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
-        $stmt->execute();
-    
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
     
 
 
