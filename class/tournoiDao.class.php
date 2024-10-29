@@ -542,9 +542,10 @@ public function modifierTournoi(
 public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
     $stmt = $this->connexion->prepare("
         SELECT
-            (COUNT(CASE WHEN score1 IS NOT NULL AND score2 IS NOT NULL THEN 1 END) / COUNT(*)) * 100 AS pourcentage_termine
-        FROM Rencontres
-        WHERE tournoi_id = :idTournoi
+            (COUNT(CASE WHEN r.score1 IS NOT NULL AND r.score2 IS NOT NULL THEN 1 END) / COUNT(*)) * 100 AS pourcentage_termine
+        FROM Rencontres r
+        INNER JOIN Planification p ON r.id = p.rencontre_id
+        WHERE r.tournoi_id = :idTournoi
     ");
 
     $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
@@ -554,6 +555,7 @@ public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
     $pourcentage = round($result['pourcentage_termine']);
     return intval($pourcentage);
 }
+
 
 
 

@@ -278,7 +278,6 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
            
 
-
 $query = "SELECT 
             r.id AS rencontre_id,
             r.tour AS tour,
