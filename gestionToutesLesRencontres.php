@@ -54,6 +54,7 @@ if (!isset($_GET['id_tournoi'])) {
   $listeDesArbitres = null;
   $tournoiInfo = null;
   $lastCreneau=null;
+  $pourcentage=null;
   
 } else {
  $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
@@ -64,6 +65,7 @@ if (!isset($_GET['id_tournoi'])) {
   $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
   $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
   $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
+  $pourcentage = $tournois->pourcentageRencontresTermineesDuTournoi($_GET['id_tournoi']);
  
   
 }
@@ -91,6 +93,7 @@ echo $template->render([
     'libelleParTournoi' => $libelleParTournoi,
     'listeDesArbitres' => $listeDesArbitres,
     'tournoiInfo'   => $tournoiInfo,
+    'pourcentage' => $pourcentage
    
 
   

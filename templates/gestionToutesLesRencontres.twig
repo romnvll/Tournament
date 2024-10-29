@@ -1,7 +1,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.7"/>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
 		<link href="style/couleurEquipes.css" rel="stylesheet">
 		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
@@ -24,6 +24,12 @@
          {% endif %}
          {% endfor %}
       </div>
+      <div class="col-lg-6">
+      <div class="progress">
+  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{pourcentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{pourcentage}}%"> {{pourcentage}}%</div>
+</div>
+     
+      </div>
 
   <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
         <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
@@ -38,7 +44,7 @@
 
       <div class="col-lg-12">
       
-         <table class="table" id="planification-table">
+         <table class="table table-responsive" id="planification-table">
             <thead>
                <tr>
                   <th scope="col">
