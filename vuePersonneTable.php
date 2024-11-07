@@ -42,7 +42,38 @@ if (isset ($_SESSION['infoUser'][0]['url_key'])) {
  $tournoiId = $_SESSION['tournoiId'];
 
 
-$affichagePlanification = $affichagePlanification->getPlanificationsTerrainAvecDetails($idterrain,$tournoiId);
+//$affichagePlanification = $affichagePlanification->getPlanificationsTerrainAvecDetails($idterrain,$tournoiId);
+
+//detection du premier 0 dans le status des rencontres
+
+// Supposons que $affichagePlanification soit le tableau renvoyé par getPlanificationsTerrainAvecDetails
+$affichagePlanification = $affichagePlanification->getPlanificationsTerrainAvecDetails($idterrain, $tournoiId);
+
+// Variable pour suivre si on a trouvé la première rencontre avec isTerminated = 0 ou 2
+$premierTrouve = false;
+
+// Parcours du tableau de planification
+foreach ($affichagePlanification as &$planification) {
+    // Si isTerminated est null, on passe à l'itération suivante
+    if (is_null($planification['isTerminated'])) {
+        $planification['est_premier_zero'] = false; // Ajoute explicitement false si besoin
+        continue;
+    }
+    
+    // Vérifie si c'est la première rencontre avec isTerminated à 0 ou 2
+    if (!$premierTrouve && ($planification['isTerminated'] == 0 || $planification['isTerminated'] == 2)) {
+        $planification['est_premier_zero'] = true; // Ajoute le champ avec la valeur true
+        $premierTrouve = true; // Marque qu'on a trouvé le premier
+    } else {
+        $planification['est_premier_zero'] = false; // Ajoute le champ avec la valeur false pour les autres
+    }
+}
+
+
+
+//fin de detection
+
+
 
 if (isset($_GET['key'])) {
 $infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);

@@ -35,7 +35,7 @@
 						</thead>
 						
 					<tbody>	
-       
+      
 					{% for planification in AffichagePlanification %}
 					<tr id="planification-{{ planification.rencontre_id }}">					
 
@@ -62,12 +62,24 @@
     hx-trigger="click" 
      hx-on="htmx:afterRequest:vibrate(50)"
 	hx-swap="innerHTML" 
-	hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But +</button>
+	hx-target="#displayScoreEquipe1{{planification.rencontre_id}}"
+
+  {% if planification.est_premier_zero == false %}
+  disabled
+  {% endif %}
+  >
+  
+  But +</button>
     <button type="button" class="btn btn-danger btn-sm order-md-last" 
     hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=1" 
      hx-on="htmx:afterRequest:vibrate(200)"
     hx-trigger="click" hx-swap="innerHTML" 
-    hx-target="#displayScoreEquipe1{{planification.rencontre_id}}">But -</button>
+    hx-target="#displayScoreEquipe1{{planification.rencontre_id}}"
+    
+  {% if planification.est_premier_zero == false %}
+  disabled
+  {% endif %}>
+    But -</button>
   </td>
     {% endif %}
   <td class="text-center">
@@ -88,16 +100,27 @@
     hx-on="htmx:afterRequest:vibrate(50)" 
 
     hx-swap="innerHTML"
-    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}">But +
+    hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
+    
+  {% if planification.est_premier_zero == false %}
+  disabled
+  {% endif %}>
+    But +
 </button>
+
   <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" 
     hx-trigger="click"
        hx-on="htmx:afterRequest:vibrate(200)" 
 
     hx-swap="innerHTML"     
     hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
+    
+  {% if planification.est_premier_zero == false %}
+  disabled
+  {% endif %}
    >
-  But -</button>
+  But -
+  </button>
   </td>
     {% endif %}
   <td>{{planification.arbitre_nom}}</td>
@@ -107,10 +130,11 @@
   
     {% if planification.isTerminated == 0 %}
       À venir
+      
     {% elseif planification.isTerminated == 2 %}
-      En cours
+      En cours      
     {% else %}
-      Terminé
+      Terminé    
     {% endif %}
 </a>
 
@@ -126,8 +150,7 @@
 					
 					{% elseif planification.label_description is not null %}
 					
-					
-					
+									
 					<td class="w-25 text-center"><h3>{{planification.creneau_nom}}</h3></td>
 					<td class="w-25 text-center">{{planification.label_description}} </td>
 					<td><p>{{planification.label_description}}<p> </td>
@@ -195,30 +218,7 @@ $(document).ready(function () {
 </script>
 
 
-<script>
-$(document).ready(function() {
-  $('table tr').each(function() {
-    const $currentRow = $(this);
-    const $nextRow = $currentRow.next();
-    const $button = $currentRow.find('.btn');
 
-    if ($button.text().trim() !== 'Terminé') {
-      $nextRow.find('.btn').prop('disabled', true);
-    } else {
-      $nextRow.find('.btn').prop('disabled', false);
-    }
-
-    $button.on('click', function() {
-      const statusText = $(this).text().trim();
-      if (statusText === 'Terminé') {
-        $nextRow.find('.btn').prop('disabled', false);
-      } else {
-        $nextRow.find('.btn').prop('disabled', true);
-      }
-    });
-  });
-});
-</script>
 
 
 

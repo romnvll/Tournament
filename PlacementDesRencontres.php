@@ -45,7 +45,7 @@ if (!isset($_GET['id_tournoi'])) {
     $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
     $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
     $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
-  
+    
     
 
 //création du premier creneau :
@@ -54,7 +54,7 @@ if (!isset($_GET['id_tournoi'])) {
     if ($creneaux->existeCreneauPourTournoi($_GET['id_tournoi'])) {
         //echo "Il existe au moins une entrée dans la table Planification pour le tournoi ID $tournoi_id.";
     } else {
-        //var_dump($tournoiInfo['heure_debut']);
+        
         $creneaux= new creneauxDao();
         $creneaux->ajouterCreneau($tournoiInfo['heure_debut'],$_GET['id_tournoi']);
         header("Location: " . $_SERVER['HTTP_REFERER']);

@@ -331,6 +331,7 @@ public function getPlanificationsTerrainAvecDetails($terrainId, $tournoiId) {
             r.isClassement, r.equipe1_id, r.equipe2_id, r.score1, r.score2, r.tour, r.heure, r.terrain, r.isTerminated,
             e1.nom AS equipe1_nom, e2.nom AS equipe2_nom,
             c.nom AS creneau_nom,
+            r.IsTerminated AS status,
             c1.nom AS club1_nom, c1.email AS club1_email, c1.contact AS club1_contact, c1.logo AS club1_logo,
             c2.nom AS club2_nom, c2.email AS club2_email, c2.contact AS club2_contact, c2.logo AS club2_logo,
             CASE 

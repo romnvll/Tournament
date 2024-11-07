@@ -57,10 +57,7 @@ if (isset ($_POST['modifMinutes'])) {
     require 'class/creneauxDao.class.php';
     $creneau=new creneauxDao();
     $creneau->mettreAJourCreneauxAvecMinutesAjoutees($_POST['idTournoi'],$_POST['modifMinutes']);
-
-
-    //entest :
-    //$creneau->mettreAJourHoraireDebut($_POST['idTournoi'],"10:15","15");
+   
     header("Location: " . $_SERVER['HTTP_REFERER']);
 
 }
@@ -72,14 +69,32 @@ if (isset ($_POST['modifHeureDebut'])) {
     $creneau=new creneauxDao();
     $tournoi = new tournoiDao();
     
-    //var_dump($_POST);
+    
     $creneau->mettreAJourHoraireDebut($_POST['idTournoi'],$_POST['modifHeureDebut'],$_POST['modifPasHoraire']);
+    
     $tournoi->modifierTournoi($_POST['idTournoi'],null,
     $_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,
     null,null,null,null,null);
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
 }
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    require 'class/creneauxDao.class.php';
+    $action = $_POST['action'];
+    
+    if ($action === 'updateCreneau') {
+        $creneauId = $_POST['creneau_id'] ?? null;
+        $nom = $_POST['creneau'] ?? null;
+        
+        if ($creneauId && $nom !== null) {
+            $creneau = new creneauxDao();
+            $creneau->modifierCreneau((int)$creneauId, $nom);
+        }
+    }
+}
+
 
 
 
