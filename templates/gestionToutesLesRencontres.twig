@@ -38,11 +38,16 @@
             </div>
 
         </div>
+        <div class="col">
+                 <button id="toggle-button" class="btn btn-success btn-lg" >Pause</button>
 
+        </div>
         <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
+        
             <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
                 <div data-mdb-input-init class="form-outline me-2">
                     <label class="form-label mb-0">Retarder les rencontres:</label>
+                     
                     <input type="number" size="2" class="form-control" name="modifMinutes"
                         onfocusout="this.form.submit()">
                 </div>
@@ -186,13 +191,34 @@
 
 
         <script>
-            $(document).ready(function () {
-                setTimeout(function () {
-                    // alert('Reloading Page');
-                    location.reload(true);
+        $(document).ready(function () {
+            let isPaused = false;
+            let reloadInterval;
+
+            function startReloading() {
+                reloadInterval = setInterval(function () {
+                    if (!isPaused) {
+                        location.reload(true);
+                    }
                 }, 5000);
+            }
+
+            // Démarrer le rechargement
+            startReloading();
+
+            // Gérer le clic sur le bouton pour mettre en pause ou reprendre
+            $('#toggle-button').click(function () {
+                isPaused = !isPaused;
+                $(this).text(isPaused ? 'Lecture' : 'Pause');
+
+                if (isPaused) {
+                    clearInterval(reloadInterval);
+                } else {
+                    startReloading();
+                }
             });
-        </script>
+        });
+    </script>
 
 </body>
 
