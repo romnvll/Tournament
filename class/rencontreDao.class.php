@@ -273,8 +273,10 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
 
 
-    public function getRencontreByPoule($pouleid, $tournoiId, $isClassement = 0)
+    public function getRencontreByPoule($pouleid, $tournoiId, $isClassement = 0, $from = 'index')
 {
+    $orderBy = ($from === 'tour') ? "r.tour, c.nom, r.id" : "c.nom, r.id";
+    
     $query = "
         SELECT 
             r.id AS rencontre_id,
@@ -341,8 +343,11 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             AND ep2.poule_id = :pouleid 
             AND r.isClassement = :isClassement
         ORDER BY 
-            r.tour, c.nom, r.id;
+            $orderBy;
     ";
+
+    // Execute the query using your preferred method
+
 
     $stmt = $this->connexion->prepare($query);
     $stmt->bindParam(':pouleid', $pouleid, PDO::PARAM_INT);
