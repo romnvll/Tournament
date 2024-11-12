@@ -324,45 +324,53 @@ public function retireArbitre(int $tournoi_id, int $planification_id): void {
 public function getPlanificationsTerrainAvecDetails($terrainId, $tournoiId) {
     $sql = "
         SELECT 
-            p.*, 
-            t.nom AS terrain_nom, 
-            l.description AS label_description, 
-            a.nom AS arbitre_nom,
-            r.isClassement, r.equipe1_id, r.equipe2_id, r.score1, r.score2, r.tour, r.heure, r.terrain, r.isTerminated,
-            e1.nom AS equipe1_nom, e2.nom AS equipe2_nom,
-            c.nom AS creneau_nom,
-            r.IsTerminated AS status,
-            c1.nom AS club1_nom, c1.email AS club1_email, c1.contact AS club1_contact, c1.logo AS club1_logo,
-            c2.nom AS club2_nom, c2.email AS club2_email, c2.contact AS club2_contact, c2.logo AS club2_logo,
-            CASE 
-                WHEN STR_TO_DATE(c.nom, '%H:%i') < STR_TO_DATE('06:00', '%H:%i') 
-                THEN DATE_ADD(STR_TO_DATE(c.nom, '%H:%i'), INTERVAL 1 DAY) 
-                ELSE STR_TO_DATE(c.nom, '%H:%i') 
-            END AS sorted_creneau
-        FROM 
-            Planification p
-        LEFT JOIN 
-            Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN 
-            Labels l ON p.label_id = l.label_id
-        LEFT JOIN 
-            Arbitres a ON p.arbitre_id = a.arbitre_id
-        LEFT JOIN 
-            Rencontres r ON p.rencontre_id = r.id
-        LEFT JOIN 
-            Equipes e1 ON r.equipe1_id = e1.id
-        LEFT JOIN 
-            Equipes e2 ON r.equipe2_id = e2.id
-        LEFT JOIN 
-            Creneaux c ON p.creneau_id = c.creneau_id
-        LEFT JOIN 
-            Clubs c1 ON e1.club_id = c1.id
-        LEFT JOIN 
-            Clubs c2 ON e2.club_id = c2.id
-        WHERE 
-            p.terrain_id = :terrainId AND p.tournoi_id = :tournoiId
-        ORDER BY 
-            sorted_creneau
+    p.*, 
+    t.nom AS terrain_nom, 
+    l.description AS label_description, 
+    a.nom AS arbitre_nom,
+    r.isClassement, r.equipe1_id, r.equipe2_id, r.score1, r.score2, r.tour, r.heure, r.terrain, r.isTerminated,
+    e1.nom AS equipe1_nom, e2.nom AS equipe2_nom,
+    c.nom AS creneau_nom,
+    r.IsTerminated AS status,
+    t.nom AS terrainNom,
+    c1.nom AS club1_nom, c1.email AS club1_email, c1.contact AS club1_contact, c1.logo AS club1_logo,
+    c2.nom AS club2_nom, c2.email AS club2_email, c2.contact AS club2_contact, c2.logo AS club2_logo,
+    cat1.Nom_categorie AS categorie_equipe1_nom, 
+    cat2.Nom_categorie AS categorie_equipe2_nom,
+    CASE 
+        WHEN STR_TO_DATE(c.nom, '%H:%i') < STR_TO_DATE('06:00', '%H:%i') 
+        THEN DATE_ADD(STR_TO_DATE(c.nom, '%H:%i'), INTERVAL 1 DAY) 
+        ELSE STR_TO_DATE(c.nom, '%H:%i') 
+    END AS sorted_creneau
+FROM 
+    Planification p
+LEFT JOIN 
+    Terrains t ON p.terrain_id = t.terrain_id
+LEFT JOIN 
+    Labels l ON p.label_id = l.label_id
+LEFT JOIN 
+    Arbitres a ON p.arbitre_id = a.arbitre_id
+LEFT JOIN 
+    Rencontres r ON p.rencontre_id = r.id
+LEFT JOIN 
+    Equipes e1 ON r.equipe1_id = e1.id
+LEFT JOIN 
+    Equipes e2 ON r.equipe2_id = e2.id
+LEFT JOIN 
+    Categorie cat1 ON e1.categorie = cat1.id_categorie
+LEFT JOIN 
+    Categorie cat2 ON e2.categorie = cat2.id_categorie
+LEFT JOIN 
+    Creneaux c ON p.creneau_id = c.creneau_id
+LEFT JOIN 
+    Clubs c1 ON e1.club_id = c1.id
+LEFT JOIN 
+    Clubs c2 ON e2.club_id = c2.id
+WHERE 
+    p.terrain_id = :terrainId AND p.tournoi_id = :tournoiId
+ORDER BY 
+    sorted_creneau;
+
     ";
 
     $stmt = $this->connexion->prepare($sql);

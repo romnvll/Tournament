@@ -39,26 +39,16 @@
 					{% endfor %}
 				</div>
 				{% if idTournoi is not null and idTournoi != '' %}
-					<div class="col-lg-3 col-sm-12">
-						<h3>Liste des terrains</h3>
+				
 
-						{% for i in 1..nombreTerrain %}
-
-							<a href="vueTerrain.php?id_tournoi={{idTournoi}}&terrain={{i}}" {% if terrainSelect == i %} class="btn btn-primary" {% endif %} class="btn btn-secondary">{{ i }}</a>
-
-						{% endfor %}
-						<!-- <a href="vueTerrain.php?id_tournoi={{idTournoi}}" class="btn btn-success">Tous</a>-->
-					</div>
-
-				</div>
-
-
+					
 				<div class="row ">
 
-					{% for i in 1..nombreTerrain %}
-						{% if terrainSelect is null or terrainSelect == i %}
+					
+						
 							<div class="col-lg-8 sol-sm-12" id="score">
-								<h3 class="text-center">Terrain N°{{ i }}</h3>
+							
+								<h3 class="text-center">Terrain N°{{ terrainEnCours['nom'] }}</h3>
 								<table class="table text-nowrap">
 									<thead>
 										<tr>
@@ -73,10 +63,10 @@
 										</tr>
 									</thead>
 									<tbody>
-
+											
 										{% for rencontre in rencontres %}
 											{% if isArchived == 0 %}
-												{% if rencontre.terrain == i %}
+												
 													{% if rencontre.score1 != 0 or rencontre.score2 !=0 %}
 														<tr class="rencontre table-success" data-terrain="{{ i }}">
 
@@ -85,11 +75,10 @@
 															{% endif %}
 
 
-															{% if not rencontre.heure is empty %}
-																{% set heure_formatee = rencontre.heure|replace({ ':': 'h' })|slice(0, 2) ~ 'h' ~ rencontre.heure|replace({ ':': 'h' })|slice(3, 2) %}
+															{% if not rencontre.creneau_nom is empty %}
 																<td class="align-middle text-center">
 																	<p class="fw-bold">
-																		{{ heure_formatee }}</p>
+																		{{ rencontre.creneau_nom}}</p>
 																</td>
 															{% else %}
 																<td class="align-middle text-center">
@@ -98,13 +87,13 @@
 																</td>
 															{% endif %}
 															<!--  <td> {{ rencontre.terrain }}</td> -->
-															<td class="align-middle text-center">{{ rencontre.Arbitre }}</td>
+															<td class="align-middle text-center">{{ rencontre.arbitre_nom }}</td>
 															<td class="align-middle text-center" >
-																{{ rencontre.equipe1_categorie}}</td>
+																{{ rencontre.categorie_equipe1_nom}}</td>
 															<td>
 
 																<p class="h6 text-end">{{rencontre.equipe1_nom |upper}}</p>
-																<div class="text-end"><img src="{{rencontre.equipe1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
+																<div class="text-end"><img src="{{rencontre.club1_logo}}" class="rounded" alt="{{rencontre.equipe1_nom}}"></div>
 
 															</td>
 															<td class="text-center">
@@ -125,20 +114,20 @@
 															</td>
 															<td>
 																<p class="h6 text-left">{{rencontre.equipe2_nom|upper}}</p>
-																<img src="{{rencontre.equipe2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}">
+																<img src="{{rencontre.club2_logo}}" class="rounded" alt="{{rencontre.equipe2_nom}}">
 															</td>
 
 														</tr>
 
 													</tr>
 												{% endif %}
-											{% endif %}
+											
 										{% endfor %}
 									</tbody>
 								</table>
 							</div>
-						{% endif %}
-					{% endfor %}
+						
+					
 				{% else %}
 					<div class="row">
 						<div class="alert alert-warning alert-dismissible fade show d-flex" role="alert">
