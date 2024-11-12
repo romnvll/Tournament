@@ -17,13 +17,17 @@ $options = new QROptions(
 $tournoiDao = new tournoiDao();
 $tournoiDao->getTournoiById($_GET['idTournoi']);
 
+// Détermine le protocole HTTP ou HTTPS
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+// Récupère le nom de domaine
 $domainName = $_SERVER['HTTP_HOST'];
-$path = explode('/Tournament/', $_SERVER['REQUEST_URI'])[0] . '/Tournament/';
+// Récupère le chemin de base en excluant la page actuelle
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-$url = $protocol . $domainName . "/index.php?id_tournoi=".$_GET['idTournoi'] ;
-//echo $url;  // Cela affichera "http://172.17.12.231/Tournament/"
+// Construit l'URL finale avec le chemin de base et "index.php"
+$url = $protocol . $domainName . $basePath . "index.php?id_tournoi=" . urlencode($_GET['idTournoi']);
 
+//echo $url;
 
 
 $qrcode = (new QRCode($options))->render($url);

@@ -21,12 +21,19 @@ $tournoiDao = new tournoiDao();
 
 $tournoiDao->getTournoiById($_GET['idTournoi']);
 
+// Détermine le protocole HTTP ou HTTPS
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+// Récupère le nom de domaine
 $domainName = $_SERVER['HTTP_HOST'];
-$path = explode('/Tournament/', $_SERVER['REQUEST_URI'])[0] . '/Tournament/';
+// Récupère le chemin de base sans inclure le fichier actuel
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-$url = $protocol . $domainName . "/vueTerrain.php?id_tournoi=".$_GET['idTournoi']."&terrain=".$_GET['terrain'] ;
-//echo $url;  // Cela affichera "http://172.17.12.231/Tournament/"
+// Construit l'URL finale avec le chemin de base et "vueTerrain.php"
+$url = $protocol . $domainName . $basePath . "vueTerrain.php?id_tournoi=" . urlencode($_GET['idTournoi']) . "&terrain=" . urlencode($_GET['terrain']);
+
+// Affiche l'URL générée
+echo $url;
+
 
 
 
