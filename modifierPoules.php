@@ -81,6 +81,7 @@ echo $template->render([
     'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']),
     'message' => $message,
     'afficherEquipeParPoule' => $equipes,
+    'RencontresExistesDansPoules'=>$poules->checkRencontresInPoule($_GET['id_poule']),
 
     //'nombreEquipeParPoule' => $PouleAuto,
 
