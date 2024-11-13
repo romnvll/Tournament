@@ -116,7 +116,7 @@
 
   {% for equipe in AfficherLesEquipes %}
 
-    <tr>
+    <tr bgcolor="{{equipe.cat_couleur}}">
       <td>
       {{equipe.nom_club}} <img class="img-thumbnail float-end shadow" src="{{equipe.logo}}">
       </td>

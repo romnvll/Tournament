@@ -235,7 +235,8 @@ class EquipeDAO {
             SELECT e.*, 
             c.nom AS nom_club,
             c.logo AS logo,
-            cat.Nom_categorie AS nom_categorie
+            cat.Nom_categorie AS nom_categorie,
+            cat.Couleur AS cat_couleur
             FROM Equipes e
             INNER JOIN Clubs c ON e.club_id = c.id
             INNER JOIN Categorie cat ON e.categorie = cat.id_categorie
