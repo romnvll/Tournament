@@ -139,8 +139,6 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
 
 
-
-
     public function getEquipesPresentesByPoule($pouleId)
     {
         // Effectuez une requête SQL pour récupérer les équipes présentes pour la poule donnée en utilisant une jointure

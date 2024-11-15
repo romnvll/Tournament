@@ -19,7 +19,7 @@
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav me-auto mb-2 ">
 				<li class="nav-item">
-					<a class="nav-link d-flex align-items-center" aria-current="page" href="." title="Vue Coach"><i class="fa-solid fa-binoculars me-1"></i></a>
+					<a class="nav-link d-flex align-items-center" aria-current="page" href="index.php?id_tournoi={{idTournoi}}" target="_blank" title="Vue Coach"><i class="fa-solid fa-binoculars me-1"></i></a>
 				</li>
 					
 				<li class="nav-item dropdown">
@@ -100,10 +100,10 @@
 							<hr class="dropdown-divider"/>
 						</li>
             <li>
-							<a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}">Phases finales</a>
+							<a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}"><i class="fa-solid fa-ranking-star"></i>Phases finales</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi{{idTournoi}}">Suppressions des rencontres</a>
+							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi{{idTournoi}}"><i class="fa-solid fa-trash"></i>Suppressions des rencontres </a>
 						</li>
 					</ul>
 				</li>
