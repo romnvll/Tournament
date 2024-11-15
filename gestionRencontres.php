@@ -30,10 +30,12 @@ $equipeDao = new EquipeDAO();
 
 if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
   $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],0,true);
+  
 }
 
 else {
   $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi']);
+ 
 }
 
 
