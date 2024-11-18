@@ -43,6 +43,7 @@ class ClubDAO {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 
     public function clubsParticipatingInTournoi(int $tournoiId): array {
         $stmt = $this->connexion->prepare("
