@@ -124,13 +124,17 @@
 				<div class="d-flex mr-auto">
 					<ul class="navbar-nav mr-auto">
 						<li class="nav-item dropdown">
-							<a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+							<a href="#" class="nav-link dropdown-toggle {% if pageEnCours == "Users" %} active {% endif %}" data-bs-toggle="dropdown" role="button" aria-expanded="false">
 								<span class="fa fa-user"></span>
 								{{email}}</a>
 							<ul class="dropdown-menu">
 								<li>
 									<a class="dropdown-item" href="Auth/logout.php?logout">
 										<span class="fa fa-sign-out-alt"></span>Logout</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href="mesPreferences.php">
+										<span class="fa-solid fa-gear"></span>Mes préférences</a>
 								</li>
 							</ul>
 						</li>

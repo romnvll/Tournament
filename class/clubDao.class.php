@@ -38,11 +38,19 @@ class ClubDAO {
         $stmt->execute();
     }
 
+    public function afficherClubsDetailByMail(string $email): array {
+        $stmt = $this->connexion->prepare("SELECT * FROM Clubs where email=:email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function afficherClubs(): array {
         $stmt = $this->connexion->prepare("SELECT * FROM Clubs");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 
     public function clubsParticipatingInTournoi(int $tournoiId): array {
         $stmt = $this->connexion->prepare("

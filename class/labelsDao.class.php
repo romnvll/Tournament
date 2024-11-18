@@ -35,6 +35,15 @@ class LabelDao {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+
+    public function getLabelByClubs(int $club_id) {
+        $stmt = $this->connexion->prepare("SELECT * FROM Labels WHERE club_id = :club_id");
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Méthode pour récupérer tous les labels d'un tournoi
     public function getLabelsByTournoiId(int $tournoi_id) {
         $stmt = $this->connexion->prepare("SELECT * FROM Labels WHERE tournoi_id = :tournoi_id");
