@@ -55,13 +55,14 @@ if ($_GET['action'] == "delete") {
             echo "Erreur lors de la suppression des label : " . $e->getMessage();
 
         }
-
+ // Suppression des personnes
+ $personneTableDao = new PersonneTableDao();
+ $personneTableDao->supprimerPersonnesParTournoi($tournoi);
+ 
         $personneDao = new PersonneDao();
         $personneDao->supprimerPersonneParTournoi($tournoi);
 
-        // Suppression des personnes
-        $personneTableDao = new PersonneTableDao();
-        $personneTableDao->supprimerPersonnesParTournoi($tournoi);
+       
 
         // Suppression des créneaux
         $creneauxDao = new creneauxDao();
