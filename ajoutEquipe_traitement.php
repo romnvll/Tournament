@@ -7,7 +7,7 @@ ini_set("display_errors", 1);
 //require('class/equipe.class.php');
 require('class/equipeDao.class.php');
 require ('class/rencontreDao.class.php');
-//print_r($_POST);
+print_r($_POST);
 //$Equipe = new Equipe($_POST['nomEquipe'],$_POST['categorie'],0);
 
 
