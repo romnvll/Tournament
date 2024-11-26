@@ -340,6 +340,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             ep1.poule_id = :pouleid 
             AND ep2.poule_id = :pouleid 
             AND r.isClassement = :isClassement
+            AND t.nom IS NOT NULL
         ORDER BY 
             $orderBy;
     ";
