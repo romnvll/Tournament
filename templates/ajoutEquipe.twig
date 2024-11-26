@@ -28,7 +28,7 @@
 
    
 
-
+{% if tournoiEnCours != 0 %}
       <div class="row justify-content-center">
         <div class="col-3">
           <form action="ajoutEquipe_traitement.php" method="POST">
@@ -49,24 +49,7 @@
                 
               </select>
             </div>
-          <!--
-            <div class="form-group">
-            
-              <label for="nomEquipe">Choisir le tournoi</label>
-            
-              <select class="form-control form-control-sm" name="IdTournoi" id="Idtournoi">
-
-                
-
-                 {% for tournament in ListeDesTournois %}
-                
-            {% if tournament.isArchived == 0 %}
-              <option value="{{ tournament.id }}">{{ tournament.nom }}</option>
-             {% endif %}                 
-                {% endfor %}
-              </select>
-            </div>
-            -->
+          
             <input type="hidden" value="{{tournoiEnCours}}" name="IdTournoi">
             <div class="form-group">
               <label for="nomEquipe">Choisir le club de l'équipe</label>
@@ -79,7 +62,13 @@
             <input type="submit" />
           </form>
         </div>
-        
+        {% else %}
+         <div class="row justify-content-center">
+         <div class="col-3">
+        Selectionner un tournoi
+         </div>
+
+      {% endif %}  
         <div class="col-lg-7"><h5>Choisir un tournoi</h5>
         {% for tournament in ListeDesTournois %}
           {% if tournament.isArchived == 0 %}
