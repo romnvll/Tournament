@@ -49,7 +49,7 @@
                 
               </select>
             </div>
-      
+          <!--
             <div class="form-group">
             
               <label for="nomEquipe">Choisir le tournoi</label>
@@ -66,6 +66,8 @@
                 {% endfor %}
               </select>
             </div>
+            -->
+            <input type="hidden" value="{{tournoiEnCours}}" name="IdTournoi">
             <div class="form-group">
               <label for="nomEquipe">Choisir le club de l'équipe</label>
               <select name="idClubs" id="club">
@@ -77,6 +79,7 @@
             <input type="submit" />
           </form>
         </div>
+        
         <div class="col-lg-7"><h5>Choisir un tournoi</h5>
         {% for tournament in ListeDesTournois %}
           {% if tournament.isArchived == 0 %}
@@ -104,6 +107,7 @@
         <table class="table mt-2" id="example">
   <thead>
     <tr>
+      <th scope="col" class="text-center" style="display:none">Id</th>
       <th scope="col" class="text-center">Club</th>
       <th scope="col" class="text-center">Nom de l'équipe</th>
       <th scope="col">Categorie</th>
@@ -114,9 +118,11 @@
   </thead>
   <tbody>
 
-  {% for equipe in AfficherLesEquipes %}
+
+  {% for equipe in AfficherLesEquipes  %}
 
     <tr bgcolor="{{equipe.cat_couleur}}">
+    <td style="display:none">{{equipe.id}}</td>
       <td>
       {{equipe.nom_club}} <img class="img-thumbnail float-end shadow" src="{{equipe.logo}}">
       </td>
@@ -211,20 +217,6 @@ $(document).ready(function() {
 
 
 
-    // Lors du chargement de la page
-$(document).ready(function() {
-    // Récupérer le tournoi précédemment sélectionné (si il existe)
-    const savedTournament = localStorage.getItem('savedTournament');
-    if (savedTournament) {
-        $('#Idtournoi').val(savedTournament);
-    }
-
-    // Lors de la soumission du formulaire, sauvegarder le tournoi sélectionné
-    $('form').on('submit', function() {
-        const selectedTournament = $('#Idtournoi').val();
-        localStorage.setItem('savedTournament', selectedTournament);
-    });
-});
 
 
 
@@ -233,7 +225,7 @@ $(document).ready(function() {
    $(document).ready(function() {
     $('#example').DataTable({
         "columnDefs": [{
-            "targets": [3], // Indice de la colonne à ignorer
+            "targets": [4], // Indice de la colonne à ignorer
             "searchable": false, // Désactive la recherche sur cette colonne
             "orderable": false // Désactive le tri sur cette colonne
         }],
@@ -242,9 +234,11 @@ $(document).ready(function() {
         },
         "lengthMenu": [[-1], ["Tous"]], // Affiche tous les résultats
         "pageLength": -1, // Définit la longueur de page par défaut à tous les résultats
-        "paging": false // Masque la pagination
+        "paging": false, // Masque la pagination
+        "order": [[0, "desc"]] // Tri par la colonne 0 en ordre décroissant
     });
 });
+
 
 
 
