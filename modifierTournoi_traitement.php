@@ -9,10 +9,12 @@ if ($_GET['action'] == "ajoutUserSurTable") {
     
     try {
     $personneTable->genererUrlEtCodePin($_GET['idPersonne'],$_GET['idterrain'],$_GET['tournoiId']);
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
+
     }
     catch (Exception $e) {
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+        header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
+
         echo 'Exception reçue : ',  $e->getMessage(), "\n";
     }
     
@@ -24,15 +26,16 @@ if ($_GET['action'] == "delPersonneTable") {
     $personneTable = new PersonneTableDao();
     $personneTable->supprimerPersonneTable($_GET['personneTableId']);
     
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
     exit(0);
 }
 
-if ($_GET['action'] == "sendMail"){
+if ($_GET['action'] == "sendMail") {
     require 'class/PersonneTableDao.class.php';
     $personneTable = new PersonneTableDao();
-    $personneTable->envoyerMail($_GET['personneTableId']);
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+    $status = $personneTable->envoyerMail($_GET['personneTableId']);
+    $statusParam = $status ? 'success' : 'error';
+    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#personneTable");
     exit(0);
 }
 

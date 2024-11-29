@@ -106,10 +106,7 @@ private function genererCodePin() {
  // Méthode pour envoyer un mail
 
  
-public function envoyerMail($PersonneTableId) {
-  
-
-    // Récupérer les informations de la personne, du terrain et du tournoi à partir de PersonneTable
+ public function envoyerMail($PersonneTableId) {
     $stmt = $this->connexion->prepare("
         SELECT pr.id AS personne_rencontre_id, p.Mail, p.Prenom, p.Nom, t.nom AS terrain_nom, pr.code_pin, pr.url_key, pr.tournoi_id
         FROM PersonneTable pr
@@ -122,54 +119,30 @@ public function envoyerMail($PersonneTableId) {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($result) {
-        $email = $result['Mail'];
-        $prenom = $result['Prenom'];
-        $nom = $result['Nom'];
-        $terrainNom = $result['terrain_nom'];
-        $codePin = $result['code_pin'];
-        $urlKey = $result['url_key'];
-        $tournoi_id = $result['tournoi_id'];
-
-        // Créer une instance de PHPMailer
-        
-
         try {
-            
-            include ('./config.php');
-           
-
-           $mail->setFrom('noreply@hbcat.fr', 'HBCAT');
-           
-           
-            $mail->isHTML(true);     
-
-            // Configuration du serveur SMTP
-            // Configurer le format de l'email à HTML
-            $mail->addAddress($email, "$prenom $nom"); 
-            $mail->Subject ="Accès sécurisé pour saisir les résultats sur le terrain '$terrainNom'";
-            $mail->Body    = "Bonjour $prenom $nom,<br><br>
-                              Vous avez été assigné au terrain '$terrainNom' pour noter les scores.<br><br>
-                              Voici votre lien sécurisé : <a href='http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id'>Lien sécurisé</a><br><br>
-                              Votre code PIN est : <b>$codePin</b> <br><br>
-                              Merci de votre collaboration.";
-            $mail->AltBody = "Bonjour $prenom $nom,\n\n
-                              Vous avez été assigné au terrain '$terrainNom' pour noter les scores.\n\n
-                              Voici votre lien sécurisé : http://".$_SERVER['SERVER_NAME']."/authPersonneTable.php?key=$urlKey&tournoi_id=$tournoi_id\n\n
-                              Votre code PIN est : <b>$codePin</b> \n\n
+            include('./config.php');
+            $mail->setFrom('noreply@hbcat.fr', 'HBCAT');
+            $mail->isHTML(true);
+            $mail->addAddress($result['Mail'], "{$result['Prenom']} {$result['Nom']}");
+            $mail->Subject = "Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";
+            $mail->Body = "Bonjour {$result['Prenom']} {$result['Nom']},<br><br>
+                           Vous avez été assigné au terrain '{$result['terrain_nom']}' pour noter les scores.<br><br>
+                           Voici votre lien sécurisé : <a href='http://".$_SERVER['SERVER_NAME']. dirname($_SERVER['SCRIPT_NAME']) ."/authPersonneTable.php?key={$result['url_key']}&tournoi_id={$result['tournoi_id']}'>Lien sécurisé</a><br><br>
+                           Votre code PIN est : <b>{$result['code_pin']}</b><br><br>
+                           Merci de votre collaboration.";
+            $mail->AltBody = "Bonjour {$result['Prenom']} {$result['Nom']},\n\n
+                              Vous avez été assigné au terrain '{$result['terrain_nom']}' pour noter les scores.\n\n
+                              Voici votre lien sécurisé : http://".$_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) ."/authPersonneTable.php?key={$result['url_key']}&tournoi_id={$result['tournoi_id']}\n\n
+                              Votre code PIN est : {$result['code_pin']}\n\n
                               Merci de votre collaboration.";
             $mail->CharSet = 'UTF-8';
-
-            // Envoyer l'email
-           
             $mail->send();
-           
-            return true;
+            return true; // Succès
         } catch (Exception $e) {
-            echo "L'email n'a pas pu être envoyé. Mailer Error: {$mail->ErrorInfo}";
-            return false;
+            return false; // Échec
         }
     }
-    return false;
+    return false; // Aucun résultat trouvé
 }
 
 
