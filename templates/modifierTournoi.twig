@@ -190,7 +190,7 @@
 					</div>
 					<div class="row">
 						<div class="col">
-							<table class="table">
+							<table class="table" id="personneTable">
 								<thead>
 									<tr>
 									
@@ -221,7 +221,7 @@
 						</div>
 
 						<div class="col">
-						<table class="table">
+						<table class="table" >
 								<thead>
 									<tr>
 									
@@ -246,7 +246,7 @@
 									<td>{{personneTable.code_pin}}</td>
 									<td>{{personneTable.url_key}}</td>
 									<td class="align-middle"><a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}"><i class="fa fa-envelope-o" aria-hidden="true"></i></a></td>
-									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
+									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}&tournoiId={{idTournoi}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
 									
 								</tr>
 								{% endfor %}
@@ -319,3 +319,38 @@
 
 
 
+<div class="toast-container position-fixed bottom-50 end-0 p-3">
+    <div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Email envoyé avec succès !
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Échec de l'envoi de l'email.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+
+        if (status === 'success') {
+            const successToast = new bootstrap.Toast(document.getElementById('mailToast'));
+            successToast.show();
+        } else if (status === 'error') {
+            const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+        }
+    });
+</script>
