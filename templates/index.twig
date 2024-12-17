@@ -9,7 +9,7 @@
 
 		<link href="style/index.css" rel="stylesheet" crossorigin="anonymous"/>
 
-		<script src="js/RemoveEquipe.js"></script>
+		<!--<script src="js/RemoveEquipe.js"></script>-->
 
 		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
 		<title>Gestion rencontre</title>
@@ -260,6 +260,7 @@
 										</td>
 										<td class="align-middle text-center">
 											<div class="d-flex justify-content-center flex-nowrap">
+											
 												{% if equipe.score1 > equipe.score2 %}
 													<span class="badge bg-success">{{ equipe.score1 }}</span>-
 													<span class="badge bg-danger">{{ equipe.score2 }}</span>
@@ -270,9 +271,22 @@
 													<span class="badge bg-secondary">{{ equipe.score1 }}</span>-
 													<span class="badge bg-secondary">{{ equipe.score2 }}</span>
 												{% elseif equipe.score1 or equipe.score2 == null %}
-													<span class="badge bg-warning text-dark">Rencontre à venir</span>
-													{{equipe.score1}}
+												<span class="badge bg-secondary">0</span>-
+													<span class="badge bg-secondary">0</span>
+													
 												{% endif %}
+											</div>
+											 <div class="d-flex justify-content-center mt-2">
+												{% if equipe.isTerminated == 0 %}
+													<span class="badge bg-warning text-dark">À venir</span>
+												{% elseif equipe.isTerminated == 1 %}
+													<span class="badge bg-danger">Rencontre terminée</span>
+												{% elseif equipe.isTerminated == 2 %}
+											<span class="badge bg-info text-dark d-inline-flex align-items-center">
+												<span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+												Rencontre en cours
+											</span>
+											{% endif %}
 											</div>
 										</td>
 
@@ -350,12 +364,12 @@
 <script>
 	setInterval(function () {
 $('#score').load(location.href + ' #score > *');
-}, 2000); // 2000 millisecondes = 2 secondes
+}, 10000); // 10000 millisecondes = 10 secondes
 
 
-setInterval(function () {
-$('#classementTableau').load(location.href + ' #classementTableau > *');
-}, 2000); // 2000 millisecondes = 2 secondes
+//setInterval(function () {
+//$('#classementTableau').load(location.href + ' #classementTableau > *');
+//}, 10000); // 10000 millisecondes = 10 secondes
 </script>
 
 

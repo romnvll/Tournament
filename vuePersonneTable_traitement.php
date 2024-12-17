@@ -50,19 +50,19 @@ if (isset($_GET['action']) && isset($_GET['idRencontre']) && isset($_GET['team']
   // Récupérer les scores actuels
   $currentScores = $rencontre->getScore($idRencontre); // Suppose que cette méthode existe et renvoie un tableau avec score1 et score2
 
-  $scoreEquipe1 = $currentScores['score1'];
-  $scoreEquipe2 = $currentScores['score2'];
+  $scoreEquipe1 = $currentScores['score1'] ?? 0;
+  $scoreEquipe2 = $currentScores['score2'] ?? 0;
 
   // Ajouter ou retirer un but en fonction de l'équipe
   if ($_GET['action'] === 'addGoal') {
     if ($team == 1) {
-      $rencontre->updateStatus($idRencontre, 2);
-      // Retourner le code HTML du bouton mis à jour
-
       $scoreEquipe1 += 1;
-    } elseif ($team == 2) {
+      // Retourner le code HTML du bouton mis à jour
       $rencontre->updateStatus($idRencontre, 2);
+    } elseif ($team == 2) {
+      
       $scoreEquipe2 += 1;
+      $rencontre->updateStatus($idRencontre, 2);
     }
   } elseif ($_GET['action'] === 'removeGoal') {
     if ($team == 1 && $scoreEquipe1 > 0) {
