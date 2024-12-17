@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 			
 			 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-			 <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+		 <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
 	</head>
 
 	<body>
@@ -20,15 +20,17 @@
 			<p class="text-center">Bonjour {{prenom}}, vous êtes en charge d'inserer les scores pour le terrain <b> {{terrain}} </b></p>
 			  </div> 
       </div> 
+          
+
 			<div class="row">
 				<div class="col-12" id="scoreRefresh">
-					<table class="table table-striped table-responsive">
+					<table class="table table-striped table-responsive" id="myTable">
 						<thead>
 							<tr>
 							
 							<th scope="col" class="text-center">Heure</th>
-							<th scope="col" class="w-25 text-center">Score equipe1</th>
-							<th scope="col" class="w-25 text-center">Score equipe2</th>
+							<th scope="col order-2" class="w-25 text-center">Score equipe1</th>
+							<th scope="col order-1" class="w-25 text-center">Score equipe2</th>
 							<th scope="col">Arbitre</th>
 							<th scope="col">Etat</th>
 							</tr>
@@ -46,7 +48,7 @@
 
 <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{planification.rencontre_id}}">
   <input type="hidden" name="return_id" value="row-{{planification.rencontre_id}}">
-  <td class="text-center">
+  <td class="text-center order-2">
     <img src="{{planification.club1_logo}}" class="img-fluid rounded">
     <p class="lead text-uppercase">{{planification.equipe1_nom}}</p>
     
@@ -82,7 +84,7 @@
     But -</button>
   </td>
     {% endif %}
-  <td class="text-center">
+  <td class="text-center order-1">
     <img src="{{planification.club2_logo}}" class="img-fluid rounded">
     <p class="lead text-uppercase">{{planification.equipe2_nom}}</p>
     
@@ -103,12 +105,15 @@
     hx-target="#displayScoreEquipe2{{planification.rencontre_id}}"
     
   {% if planification.est_premier_zero == false %}
+  
   disabled
+ 
   {% endif %}>
     But +
 </button>
 
   <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{planification.rencontre_id}}&team=2" 
+   
     hx-trigger="click"
        hx-on="htmx:afterRequest:vibrate(200)" 
 
@@ -125,20 +130,22 @@
     {% endif %}
   <td>{{planification.arbitre_nom}}</td>
  <td class="align-left">
-  <a class="btn btn-primary" id="State{{planification.rencontre_id}}" role="button"
-     onclick="updateStatus({{planification.rencontre_id}})">
-  
-    {% if planification.isTerminated == 0 %}
-      À venir
+  {% if planification.isTerminated == 1 %}
+    <span class="badge bg-danger">rencontre terminée</span>
+  {% else %}
+    {% if planification.est_premier_zero == true %}
+     
+        {% if planification.isTerminated == 0 %}
+           <span class="badge bg-danger">Saisir le score</span>
+        {% elseif planification.isTerminated == 2 %}
+          <a class="badge bg-primary" id="State{{planification.rencontre_id}}" role="button"
+         onclick="updateStatus({{planification.rencontre_id}})">En cours</a>
+        {% endif %}
       
-    {% elseif planification.isTerminated == 2 %}
-      En cours      
-    {% else %}
-      Terminé    
     {% endif %}
-</a>
-
+  {% endif %}
 </td>
+
 
 </form>
 
@@ -187,9 +194,17 @@
       htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
         target: `#State${idRencontre}`,
         swap: 'outerHTML'
+        
       });
     }
+
+    location.reload(true);
   }
+
+
+
+  
+
 </script>
 <script>
     function vibrate(temps) {
@@ -213,9 +228,11 @@ $(document).ready(function () {
       setTimeout(function () {
         // alert('Reloading Page');
         location.reload(true);
-      }, 5000);
+      }, 30000);
     });
 </script>
+
+
 
 
 

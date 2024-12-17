@@ -6,7 +6,30 @@ require 'class/equipeDao.class.php';
 
 
 
+if (isset ($_POST['etat'])) {
+  if ($_POST['etat'] == "Avenir") {
+    
+    $rencontre = new RencontreDAO();
+    $rencontre->updateStatus($_POST['idRencontre'],0);
+    
+    echo "<p class='fw-bold text-center text-danger bg-dark' >Rencontre à venir</p>";
+      }
 
+  if ($_POST['etat'] == "enCours") {
+    $rencontre = new RencontreDAO();
+    $rencontre->updateStatus($_POST['idRencontre'],2);
+   echo " <p class='fw-bold text-center text-warning bg-dark' >Rencontre en cours</p>";
+
+  }
+
+  if ($_POST['etat'] == "terminee") {
+    $rencontre = new RencontreDAO();
+    $rencontre->updateStatus($_POST['idRencontre'],1);
+    echo "<p class='fw-bold text-center text-success bg-dark'>Rencontre terminée  </p>";
+  }
+
+
+}
 
 
 

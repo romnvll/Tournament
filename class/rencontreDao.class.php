@@ -305,6 +305,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             
             r.score1,
             r.score2,
+            r.isTerminated,
 
             l.label_id AS label_id,
             l.description AS label_description,
@@ -356,6 +357,8 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $this->connexion = null;
+    
 }
 
     
@@ -373,7 +376,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
     public function getRencontre(int $idrencontre)
 {
-    $query = "SELECT score1, score2 FROM Rencontres WHERE id = :idrencontre";
+    $query = "SELECT score1, score2, isTerminated FROM Rencontres WHERE id = :idrencontre";
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':idrencontre', $idrencontre, PDO::PARAM_INT);
     $stmt->execute();

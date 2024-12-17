@@ -1,0 +1,23 @@
+.table-container {
+    position: relative;
+}
+
+.table-header-fixed {
+    position: fixed; /* Fixe l'en-tête */
+    top: 0; /* Toujours visible en haut */
+    z-index: 1030; /* Au-dessus des autres contenus */
+    background-color: white; /* Fond blanc pour lisibilité */
+    width: 100%; /* Assure la largeur */
+}
+
+.table-responsive {
+    margin-top: 60px; /* Décalage pour ne pas superposer les données */
+}
+
+
+    .point {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin: 0 5px;
+    }
