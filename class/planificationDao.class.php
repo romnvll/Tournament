@@ -260,15 +260,19 @@ class planificationDao {
        e2.IsPresent AS equipe2_IsPresent, 
        e2.club_id AS equipe2_club_id, 
        e2.categorie AS equipe2_categorie_id,
-       e2_cat.Nom_categorie AS equipe2_categorie_nom
+       e2_cat.Nom_categorie AS equipe2_categorie_nom,
+       p1.nom AS equipe1_poule_nom
 FROM Rencontres r
 LEFT JOIN Planification pl ON r.id = pl.rencontre_id
 LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
 LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
 LEFT JOIN Categorie e1_cat ON e1.categorie = e1_cat.id_categorie
 LEFT JOIN Categorie e2_cat ON e2.categorie = e2_cat.id_categorie
+LEFT JOIN EquipePoule ep1 ON e1.id = ep1.equipe_id
+LEFT JOIN Poules p1 ON ep1.poule_id = p1.id
 WHERE pl.rencontre_id IS NULL
 AND r.tournoi_id = :tournoi_id;
+
 
 
 
