@@ -252,10 +252,16 @@
 										{% else  %}
 											<td class="align-middle text-center"></td>
 										{% endif %}
+										
 										<td class="align-middle text-center">
 											<p  style="font-size: 12px;" class="text-end fw-bold ">{{equipe.equipe1_nom|upper }}</p>
 											<div class="text-end">
+<<<<<<< HEAD
 												<img src="{{equipe.club1_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}">
+=======
+											
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true"> <img src="{{equipe.club1_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}"> </a>
+>>>>>>> f19613f (add view by team)
 											</div>
 										</td>
 										<td class="align-middle text-center">
@@ -294,8 +300,12 @@
 										<td class="align-middle text-center">
 											<p style="font-size: 12px;" class=" text-start fw-bold ">{{equipe.equipe2_nom|upper }}</p>
 											<div class="text-start">
+<<<<<<< HEAD
 												<img src="{{equipe.club2_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}">
 											</div>
+=======
+									<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true"> <img src="{{equipe.club2_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}"> </a>											</div>
+>>>>>>> f19613f (add view by team)
 										</td>
 
 										{% if gestionArbitres == 1 %}

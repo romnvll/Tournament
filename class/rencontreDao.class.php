@@ -727,27 +727,82 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
 
     function afficherRencontreByTournoiByClub(int $idTournoi, int $club)
     {
-        $query = "SELECT r.id AS rencontre_id,
-            r.equipe1_id,
-            equipe1.nom AS equipe1_nom,
-            c1.logo AS equipe1_logo,
-            r.equipe2_id,
-            equipe2.nom AS equipe2_nom,
-            c2.logo AS equipe2_logo,
-            r.score1,
-            r.score2,
-            r.heure AS heure_rencontre,
-            r.terrain AS num_terrain,
-            r.Arbitre
-     FROM Rencontres r
-     JOIN Equipes equipe1 ON r.equipe1_id = equipe1.id
-     JOIN Equipes equipe2 ON r.equipe2_id = equipe2.id
-     LEFT JOIN Clubs c1 ON equipe1.club_id = c1.id
-     LEFT JOIN Clubs c2 ON equipe2.club_id = c2.id
-     WHERE (equipe1.tournoi_id = :idTournoi AND equipe1.club_id = :club)
-        OR (equipe2.tournoi_id = :idTournoi AND equipe2.club_id = :club) 
-     ORDER BY heure";
-
+        $query = "
+            SELECT 
+                r.id AS rencontre_id,
+                r.tour AS tour,
+                p.terrain_id,
+                t.nom AS terrain_nom,
+                p.creneau_id,
+                c.nom AS creneau_nom,
+                
+                equipe1.id AS equipe1_id,
+                equipe1.nom AS equipe1_nom,
+                club1.id AS club1_id,
+                club1.nom AS club1_nom,
+                club1.email AS club1_email,
+                club1.contact AS club1_contact,
+                club1.logo AS club1_logo,
+                cat1.id_categorie AS equipe1_categorie_id,
+                cat1.Nom_categorie AS equipe1_categorie_nom,
+                cat1.Couleur AS equipe1_categorie_couleur,
+                
+                equipe2.id AS equipe2_id,
+                equipe2.nom AS equipe2_nom,
+                club2.id AS club2_id,
+                club2.nom AS club2_nom,
+                club2.email AS club2_email,
+                club2.contact AS club2_contact,
+                club2.logo AS club2_logo,
+                cat2.id_categorie AS equipe2_categorie_id,
+                cat2.Nom_categorie AS equipe2_categorie_nom,
+                cat2.Couleur AS equipe2_categorie_couleur,
+                
+                r.score1,
+                r.score2,
+                r.isTerminated,
+    
+                l.label_id AS label_id,
+                l.description AS label_description,
+                l.couleur AS label_couleur,
+    
+                a.nom AS arbitre_nom,
+                clubArbitre.nom AS arbitre_club_nom
+    
+            FROM 
+                Rencontres r
+            JOIN 
+                Equipes equipe1 ON r.equipe1_id = equipe1.id
+            JOIN 
+                Clubs club1 ON equipe1.club_id = club1.id
+            JOIN 
+                Categorie cat1 ON equipe1.categorie = cat1.id_categorie
+            JOIN 
+                Equipes equipe2 ON r.equipe2_id = equipe2.id
+            JOIN 
+                Clubs club2 ON equipe2.club_id = club2.id
+            JOIN 
+                Categorie cat2 ON equipe2.categorie = cat2.id_categorie
+            LEFT JOIN 
+                Planification p ON r.id = p.rencontre_id
+            LEFT JOIN 
+                Creneaux c ON p.creneau_id = c.creneau_id
+            LEFT JOIN 
+                Terrains t ON p.terrain_id = t.terrain_id
+            LEFT JOIN 
+                Labels l ON l.tournoi_id = :idTournoi
+            LEFT JOIN 
+                Arbitres a ON p.arbitre_id = a.arbitre_id
+            LEFT JOIN 
+                Clubs clubArbitre ON a.club_id = clubArbitre.id
+            WHERE 
+                (equipe1.club_id = :club OR equipe2.club_id = :club)
+                AND (equipe1.tournoi_id = :idTournoi OR equipe2.tournoi_id = :idTournoi)
+                AND p.creneau_id IS NOT NULL
+            ORDER BY 
+                p.creneau_id, r.tour;
+        ";
+    
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
         $stmt->bindValue(':club', $club, PDO::PARAM_INT);
