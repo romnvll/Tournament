@@ -148,7 +148,7 @@
 					<div class="col-lg-3" >
 					
 						{% if visibility == 1 %}
-							{% if IdEquipe %}
+							{% if IdEquipe and affichageByClubs is not defined %}
 							<div class="alert alert-success mt-2 ">
 								
 								
@@ -204,10 +204,13 @@
 							</tr>
 						</thead>
 						<tbody>
-							{# pour aller jusqu'à la poule
-									{% if IdClub %}
-									 {% set rencontres = listeDesRencontreByClubs %} 
-									{% endif %}
+						
+								{% if affichageByClubs %}
+									
+										{% set rencontres = listeDesRencontreByClubs %}
+								{% endif %}
+
+									{# pour aller jusqu'à la poule
 									{% if IdEquipe %}
 									{% set rencontres = listeDesEquipesByEquipeId %}
 							#}
@@ -255,10 +258,18 @@
 										<td class="align-middle text-center">
 											<p  style="font-size: 12px;" class="text-end fw-bold ">{{equipe.equipe1_nom|upper }}</p>
 											<div class="text-end">
-												<img src="{{equipe.club1_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}">
+											
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.club1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true"> <img src="{{equipe.club1_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}"> </a>
 											</div>
 										</td>
 										<td class="align-middle text-center">
+
+											<div class="d-flex justify-content-center flex-nowrap mb-2">
+											
+											<span class="badge" style="background-color: {{equipe.equipe2_categorie_couleur}}; color: #000;">{{equipe.equipe2_categorie_nom}}</span>
+
+											</div>
+
 											<div class="d-flex justify-content-center flex-nowrap">
 											
 												{% if equipe.score1 > equipe.score2 %}
@@ -294,8 +305,7 @@
 										<td class="align-middle text-center">
 											<p style="font-size: 12px;" class=" text-start fw-bold ">{{equipe.equipe2_nom|upper }}</p>
 											<div class="text-start">
-												<img src="{{equipe.club2_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}">
-											</div>
+									<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.club2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true"> <img src="{{equipe.club2_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}"> </a>											</div>
 										</td>
 
 										{% if gestionArbitres == 1 %}
