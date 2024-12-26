@@ -798,6 +798,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             WHERE 
                 (equipe1.club_id = :club OR equipe2.club_id = :club)
                 AND (equipe1.tournoi_id = :idTournoi OR equipe2.tournoi_id = :idTournoi)
+                AND p.creneau_id IS NOT NULL
             ORDER BY 
                 p.creneau_id, r.tour;
         ";
