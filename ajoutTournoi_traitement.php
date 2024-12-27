@@ -15,7 +15,7 @@ $tournoiDao = new tournoiDao();
 
 
 echo $_POST['dateTournoi'];
-
+var_dump($_POST);
 $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire']);
 
 
@@ -30,7 +30,12 @@ foreach ($tousLesTournois as $tournoi) {
     }
 }
 
-$terrainDao->ajoutTerrain($dernierId,"1");
+$nbrterrain = $_POST['nbrterrain'] + 1;
+for ($i=1; $i<$nbrterrain;$i++){
+$terrainDao->ajoutTerrain($dernierId,$i);
+}
+
+
 header("location: modifierTournoi.php?idTournoi=".$dernierId);
 
 
