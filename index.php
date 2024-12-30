@@ -28,6 +28,11 @@ if (isset ($_GET['affichageByClubs'])) {
   $affichageByClubs = true;
 }
 
+if (isset ($_GET['affichageByTeam'])) {
+  $affichageByTeam = true;
+  $listeDesRencontresByTeam = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
+}
+
 if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
 }
@@ -115,11 +120,13 @@ echo $template->render([
     'IdPoules' => $idPoule,
     'IdClub' => $idclub,
     'affichageByClubs'=> $affichageByClubs,
+    'affichageByTeam' =>$affichageByTeam,
     'listeDesCLubs' => $listeClubsParticipants,
     'listeDesRencontreByClubs' => $listeDesRencontreByClubs,
     'listeDesEquipesByClubs' =>$listeDesEquipesByClubs,
     'listeDesEquipesByEquipeId' => $listeDesRenbcontreByEquipe,
     'IdEquipe' => $idequipe,
+    'listeDesRencontreByTeam' =>$listeDesRencontresByTeam,
     'resultatRencontres'=> $GetResultatDesPoules
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),
