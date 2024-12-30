@@ -23,6 +23,19 @@ $equipeDao = new EquipeDAO();
 $listeDesTournois = $tournoiDao->afficherLesTournois();
 $RencontreByPoule=null;
 
+<<<<<<< HEAD
+=======
+
+if (isset ($_GET['affichageByClubs'])) {
+  $affichageByClubs = true;
+}
+
+if (isset ($_GET['affichageByTeam'])) {
+  $affichageByTeam = true;
+  $listeDesRencontresByTeam = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
+}
+
+>>>>>>> f42c26c (amelioration vue public)
 if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
 }
@@ -109,11 +122,17 @@ echo $template->render([
     'RencontreByPoule' => $RencontreByPoule,
     'IdPoules' => $idPoule,
     'IdClub' => $idclub,
+<<<<<<< HEAD
+=======
+    'affichageByClubs'=> $affichageByClubs,
+    'affichageByTeam' =>$affichageByTeam,
+>>>>>>> f42c26c (amelioration vue public)
     'listeDesCLubs' => $listeClubsParticipants,
     'listeDesRencontreByClubs' => $listeDesRencontreByClubs,
     'listeDesEquipesByClubs' =>$listeDesEquipesByClubs,
     'listeDesEquipesByEquipeId' => $listeDesRenbcontreByEquipe,
     'IdEquipe' => $idequipe,
+    'listeDesRencontreByTeam' =>$listeDesRencontresByTeam,
     'resultatRencontres'=> $GetResultatDesPoules
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),
