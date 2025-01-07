@@ -2,7 +2,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=0.7"/>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 		<title>Gestion rencontre</title>
 	</head>
 
@@ -102,21 +102,29 @@
 
 															</td>
 															<td class="text-center">
+																		
+														<div class="d-flex flex-column align-items-center">
+															<!-- Nom de l'équipe -->
+															<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true">
+																<h5>
+																	<span class="badge text-bg-dark">{{ rencontre.equipe1_nom|upper }}</span>
+																</h5>
+															</a>
 
-																{% if  rencontre.score1 > rencontre.score2  %}
-																	<span class="badge bg-success">{{ rencontre.score1 }}</span>-<span class="badge bg-danger">{{ rencontre.score2 }}
-																	</span>
-																{% elseif rencontre.score1 < rencontre.score2 %}
-																	<span class="badge bg-danger">{{ rencontre.score1 }}</span>-<span class="badge bg-success">{{ rencontre.score2 }}</span>
-																{% elseif rencontre.score1 is same as(rencontre.score2) and (rencontre.score1 is not null or rencontre.score2 is not null) %}
-																	<span class="badge bg-secondary">{{ rencontre.score1 }}</span>-<span class="badge bg-secondary">{{ rencontre.score2 }}</span>
+															<!-- Logo du club -->
+															<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true">
+																<img src="{{ equipe.club1_logo }}" 
+																	class="w-100 img-fluid w-md-50 w-lg-50" 
+																	alt="{{ rencontre.equipe1_nom|upper }}">
+															</a>
+														</div>
+																<div class="d-flex justify-content-center flex-nowrap mb-2">
+											
+																	<span class="badge" style="background-color: {{rencontre.Couleur}}; color: #000;">{{rencontre.categorie_equipe1_nom}}</span>
 
-																{% elseif rencontre.score1 or rencontre.score2 == null %}
-																	<span class="badge bg-warning text-dark">
-																		Rencontre à venir</span>
-																	{{rencontre.score1}}
-																{% endif %}
+																</div>
 															</td>
+
 															<td>
 																<p class="h6 text-left">{{rencontre.equipe2_nom}}</p>
 																<a href="index.php?id_tournoi={{idTournoi}}&id_club={{rencontre.clubId2}}&id_equipe={{rencontre.clubId2}}">
