@@ -3,22 +3,18 @@
 
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=0.9"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.8"/>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
-
-		<link href="style/index.css" rel="stylesheet" crossorigin="anonymous"/>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
 		
-
-		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
-		<title>Gestion rencontre</title>
+<title>MatchEvent PRO !</title>
 	</head>
 
 	<body>
+	
 		{% set countVisibleTournois = 0 %}
 		{% for tournoi in ListeDesTournois %}
 			{% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
@@ -167,9 +163,9 @@
 						
 												
 												
-														<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action blinke" >
-															{{ poule.nom | upper }}
-														</a>
+								<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action" >
+								{{ poule.nom | upper }}
+								</a>
 					
 									
 								{% endfor %}
@@ -182,14 +178,19 @@
 
 				</div>
 			</div>
-			
+		
 {% if affichageByTeam %}
 			<div class="alert alert-primary mt-1" role="alert">
-			Rencontres de votre équipe
+			Toutes les rencontre de l'équipe {{getNomEquipeCourant}}
 			</div>
 		{% elseif affichageByClubs %}
 			<div class="alert alert-primary mt-1" role="alert">
-			Rencontres de votre club
+			toutes les rencontre du club de {{getNomClubCourant}}
+			</div>
+
+	{% elseif affichageByTerrain %}
+	<div class="alert alert-primary mt-1" role="alert">
+			toutes les rencontre du terrain {{listeDesRencontresByTerrain[0]['terrain_nom']}}
 			</div>
 	{% else %}
 	<div class="alert alert-primary mt-1" role="alert">
@@ -206,7 +207,7 @@
 						<thead>
 							<tr>
 								
-								{% if IdPoules is not null %}
+								
 										{% if heureIsVisible == 1 %}
 											<th scope="col-1">Heure</th>
 										{% endif %}
@@ -218,7 +219,7 @@
 										{% if gestionArbitres == 1 %}
 										<th scope="col-lg-2 col-md-3 col-sm-4">arbitre</th>
 										{% endif %}
-									{% endif %}
+									
 							</tr>
 						</thead>
 						<tbody>
@@ -231,7 +232,10 @@
 								{% if affichageByTeam %}
 										{% set rencontres = listeDesRencontreByTeam %}
 								{% endif %}
-									
+
+								{% if affichageByTerrain %}
+										{% set rencontres = listeDesRencontresByTerrain %}
+								{% endif %}
 									{# pour aller jusqu'à la poule
 									{% if IdEquipe %}
 									{% set rencontres = listeDesEquipesByEquipeId %}
@@ -268,7 +272,7 @@
 											
 										{% if equipe.terrain_nom != 0  %}
 											<td class="align-middle text-center position-relative">
-												<a href="vuePubliqueTerrain.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}"> <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50 ">
+												<a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true"> <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50 ">
 												<h6 class="position-absolute top-50 start-50 translate-middle">
 													<span class="badge rounded-pill bg-danger">{{ equipe.terrain_nom }}</span>
 												</h6> </a>
@@ -279,12 +283,23 @@
 										{% endif %}
 										
 										<td class="align-middle text-center">
-											<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true"><h5><span class="badge text-bg-dark">{{equipe.equipe1_nom|upper }}</span></h5></a>
-											<div class="text-end">
-											
-												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true"> <img src="{{equipe.club1_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe1_nom|upper }}"> </a>
+											<div class="d-flex flex-column align-items-center">
+												<!-- Nom de l'équipe -->
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true">
+													<h5>
+														<span class="badge text-bg-dark">{{ equipe.equipe1_nom|upper }}</span>
+													</h5>
+												</a>
+
+												<!-- Logo du club -->
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true">
+													<img src="{{ equipe.club1_logo }}" 
+														class="w-100 img-fluid w-md-50 w-lg-50" 
+														alt="{{ equipe.equipe1_nom|upper }}">
+												</a>
 											</div>
 										</td>
+
 										<td class="align-middle text-center">
 
 											<div class="d-flex justify-content-center flex-nowrap mb-2">
@@ -326,10 +341,23 @@
 
 
 										<td class="align-middle text-center">
-											<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByTeam=true"><h5><span class="badge text-bg-dark">{{equipe.equipe2_nom|upper }}</span></h5></a>
-											<div class="text-start">
-									<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true"> <img src="{{equipe.club2_logo}}" class="img-fluid shadow-lg rounded img-thumbnail" alt="{{equipe.equipe2_nom|upper }}"> </a>											</div>
+											<div class="d-flex flex-column align-items-center">
+												<!-- Nom de l'équipe -->
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByTeam=true">
+													<h5>
+														<span class="badge text-bg-dark">{{ equipe.equipe2_nom|upper }}</span>
+													</h5>
+												</a>
+
+												<!-- Logo du club -->
+												<a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true">
+													<img src="{{ equipe.club2_logo }}" 
+														class="w-100 img-fluid w-md-50 w-lg-50" 
+														alt="{{ equipe.equipe2_nom|upper }}">
+												</a>
+											</div>
 										</td>
+
 
 										{% if gestionArbitres == 1 %}
 											<td> 
@@ -408,7 +436,7 @@ $('#score').load(location.href + ' #score > *');
 
 
 <script>
-        document.addEventListener("DOMContentLoaded", function() {
+       document.addEventListener("DOMContentLoaded", function() {
             // Fonction pour obtenir les paramètres de l'URL
             function getUrlParams() {
                 let params = {};

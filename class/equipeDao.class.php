@@ -13,7 +13,23 @@ class EquipeDAO {
             exit;
         }
     }
-    
+    public function getEquipeById($id_equipe) {
+
+        // Implement the logic to get the team by its ID
+
+        // Example:
+
+        $query = "SELECT * FROM Equipes WHERE id = :id_equipe";
+
+        $stmt = $this->connexion->prepare($query);
+
+        $stmt->bindParam(':id_equipe', $id_equipe);
+
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    }
     public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void {
         // Insertion de l'équipe
         $stmt = $this->connexion->prepare("INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) VALUES (:nom, :categorie, :tournoi_id, :club_id)");
