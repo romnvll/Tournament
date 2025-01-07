@@ -36,13 +36,19 @@ if (isset ($_GET['affichageByTeam'])) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> f42c26c (amelioration vue public)
 =======
+=======
+>>>>>>> 0566b18 (fix : harmonisation de la vue terrain)
 if (isset ($_GET['affichageByTerrain'])) {
   $affichageByTerrain = true;
   $listeDesRencontresByTerrain = $rencontre->afficherRencontresParTerrainEtTournoi($_GET['terrain'],$_GET['id_tournoi']);
 }
 
+<<<<<<< HEAD
+>>>>>>> 0566b18 (fix : harmonisation de la vue terrain)
+=======
 >>>>>>> 0566b18 (fix : harmonisation de la vue terrain)
 if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);

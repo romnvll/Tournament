@@ -811,7 +811,10 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 0566b18 (fix : harmonisation de la vue terrain)
     function afficherRencontresParTerrainEtTournoi(int $terrainId, int $idTournoi)
 {
     $query = "
@@ -848,6 +851,57 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             r.score1,
             r.score2,
             r.isTerminated,
+<<<<<<< HEAD
+=======
+    
+            l.label_id AS label_id,
+            l.description AS label_description,
+            l.couleur AS label_couleur,
+    
+            a.nom AS arbitre_nom,
+            clubArbitre.nom AS arbitre_club_nom
+    
+        FROM 
+            Rencontres r
+        JOIN 
+            Equipes equipe1 ON r.equipe1_id = equipe1.id
+        JOIN 
+            Clubs club1 ON equipe1.club_id = club1.id
+        JOIN 
+            Categorie cat1 ON equipe1.categorie = cat1.id_categorie
+        JOIN 
+            Equipes equipe2 ON r.equipe2_id = equipe2.id
+        JOIN 
+            Clubs club2 ON equipe2.club_id = club2.id
+        JOIN 
+            Categorie cat2 ON equipe2.categorie = cat2.id_categorie
+        LEFT JOIN 
+            Planification p ON r.id = p.rencontre_id
+        LEFT JOIN 
+            Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN 
+            Terrains t ON p.terrain_id = t.terrain_id
+        LEFT JOIN 
+            Labels l ON l.tournoi_id = :idTournoi
+        LEFT JOIN 
+            Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN 
+            Clubs clubArbitre ON a.club_id = clubArbitre.id
+        WHERE 
+            p.terrain_id = :terrainId
+            AND equipe1.tournoi_id = :idTournoi
+        ORDER BY 
+            p.creneau_id, r.tour;
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':terrainId', $terrainId, PDO::PARAM_INT);
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+>>>>>>> 0566b18 (fix : harmonisation de la vue terrain)
     
             l.label_id AS label_id,
             l.description AS label_description,
