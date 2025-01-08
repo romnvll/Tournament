@@ -192,7 +192,8 @@
 	<div class="alert alert-primary mt-1" role="alert">
 			toutes les rencontre du terrain {{listeDesRencontresByTerrain[0]['terrain_nom']}}
 			</div>
-	{% else %}
+	{% elseif IdPoules != null %}
+	
 	<div class="alert alert-primary mt-1" role="alert">
 			Rencontres par poule {% if IsRankingView == 1 %} et classement {% endif %}
 			</div>
@@ -206,20 +207,21 @@
 					<table class="table table-striped ">
 						<thead>
 							<tr>
-								
-								
-										{% if heureIsVisible == 1 %}
-											<th scope="col-1">Heure</th>
-										{% endif %}
-										<th scope="col">Terrain</th>
-										<th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center">Equipe1</th>
-										<th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center">Score</th>
-										<th scope="col" class="col-lg-2 col-md-3 col-sm-4">Equipe2</th> 
-										
-										{% if gestionArbitres == 1 %}
-										<th scope="col-lg-2 col-md-3 col-sm-4">arbitre</th>
-										{% endif %}
-									
+						
+			
+			{% if affichageByTeam != null or affichageByClubs != null or affichageByTerrain != null or IdPoules != null   %}
+			{% if heureIsVisible == 1 %}
+				<th scope="col-1">Heure</th>
+						{% endif %}
+						<th scope="col">Terrain</th>
+						<th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center">Equipe1</th>
+						<th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center">Score</th>
+						<th scope="col" class="col-lg-2 col-md-3 col-sm-4">Equipe2</th> 
+						{% if gestionArbitres == 1 %}
+							<th scope="col-lg-2 col-md-3 col-sm-4">arbitre</th>
+						{% endif %}
+					{% endif %}
+
 							</tr>
 						</thead>
 						<tbody>
