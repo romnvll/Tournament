@@ -117,10 +117,46 @@ class creneauxDao {
     }
 
     public function supprimerCreneau(int $creneau_id): void {
-        $stmt = $this->connexion->prepare("DELETE FROM Creneaux WHERE creneau_id = :creneau_id");
-        $stmt->bindParam(':creneau_id', $creneau_id);
-        $stmt->execute();
+        // Commencer une transaction pour garantir l'intégrité
+        $this->connexion->beginTransaction();
+    
+        try {
+            // Supprimer d'abord les lignes dans Planification si les conditions sont remplies
+            $stmtPlanification = $this->connexion->prepare("
+                DELETE FROM Planification
+                WHERE creneau_id = :creneau_id
+                AND rencontre_id IS NULL
+                AND label_id IS NULL
+            ");
+            $stmtPlanification->bindParam(':creneau_id', $creneau_id);
+            $stmtPlanification->execute();
+    
+            // Vérifier si des lignes dans Planification sont encore liées au creneau_id
+            $stmtCheck = $this->connexion->prepare("
+                SELECT COUNT(*) FROM Planification WHERE creneau_id = :creneau_id
+            ");
+            $stmtCheck->bindParam(':creneau_id', $creneau_id);
+            $stmtCheck->execute();
+            $count = $stmtCheck->fetchColumn();
+    
+            // Si aucune ligne restante, supprimer le créneau
+            if ($count == 0) {
+                $stmtCreneaux = $this->connexion->prepare("
+                    DELETE FROM Creneaux WHERE creneau_id = :creneau_id
+                ");
+                $stmtCreneaux->bindParam(':creneau_id', $creneau_id);
+                $stmtCreneaux->execute();
+            }
+    
+            // Valider la transaction
+            $this->connexion->commit();
+        } catch (Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            $this->connexion->rollBack();
+            throw $e; // Relancer l'exception pour traitement
+        }
     }
+    
 
     public function supprimerCreneauxParTournoi(int $tournoi_id): void {
         $stmt = $this->connexion->prepare("DELETE FROM Creneaux WHERE tournoi_id = :tournoi_id");
