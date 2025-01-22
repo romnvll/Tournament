@@ -20,9 +20,7 @@ if (isset($_POST['btn-login'])) {
     
     $stmt = $conn->prepare("SELECT id, nom, email, password FROM Clubs WHERE email= ?");
     $stmt->bind_param("s", $email);
-    /* execute query */
     $stmt->execute();
-    //get result
     $res = $stmt->get_result();
     $stmt->close();
 
@@ -30,15 +28,32 @@ if (isset($_POST['btn-login'])) {
 
     $count = $res->num_rows;
     if ($count == 1 && $row['password'] == $password) {
+        // Définir les cookies
         setcookie('user', $row['id'], time() + (48 * 60 * 60), "/");
         setcookie('email', $row['email'], time() + (48 * 60 * 60), "/");
-       
-        //var_dump($row);
-       header("Location: ../ajoutEquipe.php?idTournoi=0");
+
+        // Vérifier si tous les tournois sont archivés
+        $stmtTournois = $conn->prepare("SELECT COUNT(*) AS total, SUM(isArchived) AS archived FROM Tournois");
+        $stmtTournois->execute();
+        $resultTournois = $stmtTournois->get_result();
+        $dataTournois = $resultTournois->fetch_assoc();
+        $stmtTournois->close();
+
+        if ($dataTournois['total'] > 0 && $dataTournois['total'] == $dataTournois['archived']) {
+            // Tous les tournois sont archivés
+            header("Location: ../ajoutTournoi.php");
+        } else {
+            // Il y a au moins un tournoi non archivé
+            header("Location: ../ajoutEquipe.php?idTournoi=0");
+        }
+        exit;
     } elseif ($count == 1) {
         $errMSG = "Mauvais mot de passe";
-    } else $errMSG = "Club non trouvé";
+    } else {
+        $errMSG = "Club non trouvé";
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
