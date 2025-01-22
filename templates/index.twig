@@ -426,7 +426,9 @@
 
 <script>
 	setInterval(function () {
-$('#score').load(location.href + ' #score > *');
+$('#score').load(location.href + ' #score > *')
+  // Rafraîchir la table avec l'ID 'classementTableau'
+    $('#classementTableau').load(location.href + ' #classementTableau > *');
 }, 10000); // 10000 millisecondes = 10 secondes
 
 
