@@ -3,6 +3,7 @@
 <html lang="fr">
 
 	<head>
+	   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-3NFVPTP2MY"></script>
 		<script>
@@ -17,7 +18,7 @@ gtag('config', 'G-3NFVPTP2MY');
 		<meta charset="UTF-8"/>
 
 		{% if ListeDesTournois[0]['gestionArbitres'] == 1 %}
-		<meta name="viewport" content="width=device-width, initial-scale=0.6"/>
+		<meta name="viewport" content="width=device-width, initial-scale=0.5"/>
 		{% else %}
 		<meta name="viewport" content="width=device-width, initial-scale=0.7"/>
 		{% endif %}
@@ -67,14 +68,7 @@ gtag('config', 'G-3NFVPTP2MY');
 				<div class="row">
 					<div
 						class="col-lg-3">
-						<!--<h6>
-																		{# 
-																			{% if  countVisibleTournois  > 1 %}
-																				Tournois
-																			{% else %}
-																				Tournoi
-																			{% endif %} #}
-																		</h6> -->
+			
 						{% set heureIsVisible = 0 %}
 						{% set visibility = 0 %}
 						{% set IsRankingView = 0 %}
@@ -227,7 +221,7 @@ gtag('config', 'G-3NFVPTP2MY');
 
 		<div class="row mt-3">
 
-			<div class="col-lg-6 col-md-6 col-sm-12 col-12" id="score">
+			<div class="col-lg-12 col-md-6 col-sm-12 col-12" id="score">
 				<div class="table-responsive">
 					<table class="table table-striped ">
 						<thead>
@@ -240,11 +234,9 @@ gtag('config', 'G-3NFVPTP2MY');
 									{% endif %}
 									<th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center">Terrain</th>
 									<th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center">Equipe1</th>
-									<th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center">Score</th>
+									<th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center">Informations</th>
 									<th scope="col" class="col-lg-2 col-md-3 col-sm-4">Equipe2</th>
-									{% if gestionArbitres == 1 %}
-										<th scope="col" class="col-lg-2 col-md-3 col-sm-4">arbitre</th>
-									{% endif %}
+									
 								{% endif %}
 
 							</tr>
@@ -328,15 +320,23 @@ gtag('config', 'G-3NFVPTP2MY');
 											</td>
 
 											<td class="align-middle text-center">
+												<div class="d-flex justify-content-center flex-column align-items-center mb-2">
+													{% if gestionArbitres == 1 %}
+														<div class="d-flex align-items-center">
+														<i class="material-icons me-2" style="color: red;font-size: 20px;">sports</i>
+														<span> {{ equipe.arbitre_nom }} {{ equipe.arbitre_club_nom }}</span>
+													</div>
+
+													{% endif %}
+												</div>
 
 												<div class="d-flex justify-content-center flex-nowrap mb-2">
-
-													<span class="badge" style="background-color: {{equipe.equipe2_categorie_couleur}}; color: #000;">{{equipe.equipe2_categorie_nom}}</span>
-
+													<span class="badge" style="background-color: {{ equipe.equipe2_categorie_couleur }}; color: #000;">
+														{{ equipe.equipe2_categorie_nom }}
+													</span>
 												</div>
 
 												<div class="d-flex justify-content-center flex-nowrap">
-
 													{% if equipe.score1 > equipe.score2 %}
 														<span class="badge bg-success">{{ equipe.score1 }}</span>-
 														<span class="badge bg-danger">{{ equipe.score2 }}</span>
@@ -349,9 +349,9 @@ gtag('config', 'G-3NFVPTP2MY');
 													{% elseif equipe.score1 or equipe.score2 == null %}
 														<span class="badge bg-secondary">0</span>-
 														<span class="badge bg-secondary">0</span>
-
 													{% endif %}
 												</div>
+
 												<div class="d-flex justify-content-center mt-2">
 													{% if equipe.isTerminated == 0 %}
 														<span class="badge bg-warning text-dark">À venir</span>
@@ -365,6 +365,7 @@ gtag('config', 'G-3NFVPTP2MY');
 													{% endif %}
 												</div>
 											</td>
+
 
 
 											<td class="align-middle text-center">
@@ -385,13 +386,7 @@ gtag('config', 'G-3NFVPTP2MY');
 											</td>
 
 
-											{% if gestionArbitres == 1 %}
-												<td>
-													<i class="fa fa-user" aria-hidden="true"></i>
-													<p>{{equipe.arbitre_club_nom}}
-														{{equipe.arbitre_nom}}</p>
-												</td>
-											{% endif %}
+											
 										</tr>
 									{% endfor %}
 								</tbody>
