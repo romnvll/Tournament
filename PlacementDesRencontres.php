@@ -35,6 +35,8 @@ if (!isset($_GET['id_tournoi'])) {
     $listeDesArbitres = null;
     $tournoiInfo = null;
     $lastCreneau=null;
+    $nombreDeRencontresPlanifiee=null;
+    $nombreRencontreAPlanifier=null;
     
 } else {
    $listedestournois = $tournois->afficherLesTournois();
@@ -45,7 +47,8 @@ if (!isset($_GET['id_tournoi'])) {
     $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
     $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
     $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
-    
+    $nombreDeRencontresPlanifiee = $tournois->rencontresPlanifieeDuTournoi($_GET['id_tournoi']);
+    $nombreRencontreAPlanifier = $tournois->nombreRencontreAPlanifier($_GET['id_tournoi']);
     
 
 //création du premier creneau :
@@ -81,6 +84,7 @@ echo $template->render([
     'idTournoi' => $_GET['id_tournoi'],
     'afficherPlanification' =>  $ToutesPlanification,
     'planificationSansCreneauNiTerrain' => $planificationSansCreneauNiTerrain,
+    'nombreDeRencontresPlanifiee' => $nombreDeRencontresPlanifiee,
 
     'ListeDesTournois' => $listedestournois,
     'terrains' => $nbrterrain,
@@ -90,6 +94,7 @@ echo $template->render([
     'tournoiInfo'   => $tournoiInfo,
     'lastCreneau' => $lastCreneau,
     'timeNextCreneau' => $timeNextCreneau,
+    'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier
     
 
 
