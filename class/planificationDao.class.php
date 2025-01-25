@@ -292,6 +292,7 @@ public function listerLabelsParTournoi(int $tournoi_id): array {
         SELECT 
             l.label_id,
             l.description,
+            l.couleur,
             l.tournoi_id
         FROM 
             Labels l

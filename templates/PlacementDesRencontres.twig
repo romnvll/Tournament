@@ -185,6 +185,7 @@
                      {% set creneauOqp = false %} {# Variable pour suivre si un creneau est OQP #}
                     
                      {% for planification in afficherPlanification %}
+                     
                      	{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
                     	      {% set planificationFound = true %} {# Variable pour suivre si une planification a été trouvée #}
                     		    {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
@@ -218,17 +219,30 @@
                      <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}" >
                       <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                      </a>
-                     {% set creneauOqp = true %}
-                     {% endif %}
-                     <script>
-                        var tdElement = document.currentScript.parentElement;
-                        // Appliquer la couleur de fond au <td> parent
-                        tdElement.style.backgroundColor = '{{planification.equipe1_categorie_couleur}}';														
-                     </script>
                      
+                     {% endif %}
+                    <script>
+                        var tdElement = document.currentScript.parentElement;
+                        // Déterminer la couleur de fond à utiliser
+                        var backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
+                        // Appliquer la couleur de fond au <td> parent
+                        tdElement.style.backgroundColor = backgroundColor;
+                 </script>
+
+                    
                      {% elseif planification.label_id is not null %}
+                      <script>
+                        var tdElement = document.currentScript.parentElement;
+                        // Déterminer la couleur de fond à utiliser
+                        var backgroundColor = '{{ planification.label_couleur }}';
+                        // Appliquer la couleur de fond au <td> parent
+                        tdElement.style.backgroundColor = backgroundColor;
+                 </script>
+                      
                      <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}">
-                     Delete </a> {{ planification.label_description }}
+                    <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p> </a><p class="text-light">{{ planification.label_description }}</p>
+
+                     {% set creneauOqp = true %}
                      {% endif %}
                      {% endif %}
                        
@@ -251,13 +265,10 @@
 
 
                            {% endfor %}
-                              <script>
-                        var tdElement = document.currentScript.parentElement;
-                        // Appliquer la couleur de fond au <td> parent
-                        tdElement.style.backgroundColor = '{{planification.label_couleur}}';														
-                     </script>
+                              
                            {% for label in libelleParTournoi %}
-                           <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>{{label.description}}</option>
+                          
+                           <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>Label: {{label.description}}</option>
                            {% endfor %}
                         </select>
                      </form>
