@@ -52,8 +52,8 @@ if (isset ($_POST['Addevent'])) {
    
 }
 
-if (isset ($_POST['modifMinutes'])) {
-            
+if ($_POST['modifMinutes'] != "" ) {
+    
     require 'class/creneauxDao.class.php';
     $creneau=new creneauxDao();
     $creneau->mettreAJourCreneauxAvecMinutesAjoutees($_POST['idTournoi'],$_POST['modifMinutes']);
@@ -64,6 +64,8 @@ if (isset ($_POST['modifMinutes'])) {
 
 //permet de modifier dans la bdd les info du tournoi et de mettre à jour les horaires
 if (isset ($_POST['modifHeureDebut'])) {
+var_dump($_POST);
+    
     require 'class/creneauxDao.class.php';
     require 'class/tournoiDao.class.php';
     $creneau=new creneauxDao();
@@ -72,11 +74,11 @@ if (isset ($_POST['modifHeureDebut'])) {
     
     $creneau->mettreAJourHoraireDebut($_POST['idTournoi'],$_POST['modifHeureDebut'],$_POST['modifPasHoraire']);
     
-    $tournoi->modifierTournoi($_POST['idTournoi'],null,
-    $_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,
-    null,null,null,null,null);
+    $tournoi->modifierTournoi($_POST['idTournoi'],null,$_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,null,null,null,null,null);
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
+   
+    
 }
 
 

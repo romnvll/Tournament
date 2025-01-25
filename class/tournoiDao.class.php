@@ -557,6 +557,41 @@ public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
 }
 
 
+public function rencontresPlanifieeDuTournoi(int $idTournoi): int {
+   
+    $stmt = $this->connexion->prepare("
+        SELECT
+            COUNT(*) AS rencontres_planifiees
+        FROM Planification p
+        INNER JOIN Rencontres r ON p.rencontre_id = r.id
+        WHERE r.tournoi_id = :idTournoi
+    ");
+
+    $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return intval($result['rencontres_planifiees']);
+}
+
+public function nombreRencontreAPlanifier (int $idTournoi): int {
+    $stmt = $this->connexion->prepare("
+        SELECT
+            COUNT(*) AS rencontres_a_planifier
+        FROM Rencontres r
+        WHERE r.tournoi_id = :idTournoi
+    ");
+
+    $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return intval($result['rencontres_a_planifier']);
+}
+
+
+
+
 
 
 
