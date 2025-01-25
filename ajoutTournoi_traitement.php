@@ -2,6 +2,7 @@
 require 'security.php';
 require 'class/tournoiDao.class.php';
 require 'class/terrainDao.class.php';
+require 'class/labelsDao.class.php';
 
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
@@ -36,6 +37,8 @@ for ($i=1; $i<=$_POST['nbrterrain'];$i++){
 $terrainDao->ajoutTerrain($dernierId,$i);
 }
 
+$labelsDao = new LabelDao();
+$labelsDao->ajouterLabel("Pause","#000000",$dernierId);
 
 header("location: modifierTournoi.php?idTournoi=".$dernierId);
 
