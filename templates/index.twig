@@ -209,6 +209,58 @@ gtag('config', 'G-3NFVPTP2MY');
 {% endif %}
 
 
+		{# gestion des labels #}
+		
+{% set current_time = "now"|date("H:i") %}
+
+{# Filtrer les labels futurs #}
+{% set labels_to_display = labels|filter(label => label['first_creneau_nom'] > current_time) %}
+
+{# Regrouper les labels ayant le même premier créneau #}
+{% set grouped_labels = [] %}
+{% for label in labels_to_display %}
+    {% if grouped_labels is empty %}
+        {% set grouped_labels = [label] %}
+    {% else %}
+        {% set last_label = grouped_labels|last %}
+        {% if label['first_creneau_nom'] == last_label['first_creneau_nom'] %}
+            {% set grouped_labels = grouped_labels|slice(0, -1) %}
+            {% set grouped_labels = grouped_labels|merge([label]) %}
+        {% else %}
+            {% set grouped_labels = grouped_labels|merge([label]) %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{# Afficher le div uniquement si grouped_labels n'est pas vide #}
+{% if grouped_labels|length > 0 %}
+    <div class="alert alert-primary p-4 rounded shadow-sm" role="alert" id="labels">
+        <div class="d-flex align-items-center mb-3">
+            <i class="fa-solid fa-circle-info me-2 text-info" style="font-size: 1.5rem;"></i>
+            <h5 class="mb-0">Informations du tournoi</h5>
+                    </div>
+        <div class="d-flex flex-wrap gap-3">
+            {% for label in grouped_labels %}
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-check-circle me-2 text-success" style="font-size: 1.2rem;"></i>
+                    <span>
+                        {{ label['last_label'] }} à <strong>{{ label['first_creneau_nom'] }}</strong>
+                        {% if label['first_creneau_nom'] != label['last_creneau_nom'] %}
+                            à <strong>{{ label['last_creneau_nom'] }}</strong>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+
+{# fin gestion des labels #}
+
+
+
+
 		<div class="row mt-3">
 
 			<div class="col-lg-12 col-md-6 col-sm-12 col-12" id="score">
@@ -257,7 +309,7 @@ gtag('config', 'G-3NFVPTP2MY');
 					
 							
 							{% for equipe in rencontres %}
-							
+								
 								{% if equipe.score1 != 0 or equipe.score2 !=0 %}
 									<tr class="table-success">
 									{% else %}
@@ -493,71 +545,32 @@ gtag('config', 'G-3NFVPTP2MY');
 
 				</div>
 			</div>
+		</div>
+	{% endif %}
+</html></body></html>
 
-		{% endif %}
-	</body>
-
-</html>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 
 <script>
-	setInterval(function () {
-$('#score').load(location.href + ' #score > *')
-  // Rafraîchir la table avec l'ID 'classementTableau'
+// Rafraîchir les sections toutes les 10 secondes
+setInterval(function () {
+    // Rafraîchir le div 'score'
+    $('#score').load(location.href + ' #score > *');
+    
+    // Rafraîchir la table avec l'ID 'classementTableau'
     $('#classementTableau').load(location.href + ' #classementTableau > *');
-}, 10000); // 10000 millisecondes = 10 secondes
+    
+    // Rafraîchir le div contenant les labels
+    $('#labels').load(location.href + ' #labels > *', function () {
+        // Vérifier si le div est vide après le rafraîchissement
+        if ($.trim($('#labels').text()) === '') {
+            $('#labels').hide(); // Masquer le div s'il est vide
+        } else {
+            $('#labels').show(); // Afficher le div s'il contient des informations
+        }
+    });
+}, 10000);
 
-
-//setInterval(function () {
-//$('#classementTableau').load(location.href + ' #classementTableau > *');
-//}, 10000); // 10000 millisecondes = 10 secondes
-</script>
-
-
-
-<script>
-       document.addEventListener("DOMContentLoaded", function() {
-            // Fonction pour obtenir les paramètres de l'URL
-            function getUrlParams() {
-                let params = {};
-                let queryString = window.location.search.substring(1);
-                let regex = /([^&=]+)=([^&]*)/g;
-                let m;
-                while (m = regex.exec(queryString)) {
-                    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-                }
-                return params;
-            }
-
-            // Récupération des paramètres de l'URL
-            let params = getUrlParams();
-
-            // Si le paramètre id_equipe est présent dans l'URL, cacher le div avec la classe choisirClub
-            if (params.hasOwnProperty('id_equipe')) {
-                let choisirEquipeDiv = document.querySelector('.choisirEquipe');
-                if (choisirEquipeDiv) {
-                    choisirEquipeDiv.style.display = 'none';
-                }
-            }
-
-			 if (params.hasOwnProperty('idPoule')) {
-                let choisirEquipeDiv = document.querySelector('.choisirEquipe');
-                if (choisirEquipeDiv) {
-                    choisirEquipeDiv.style.display = 'none';
-                }
-            }
-
-			 if (params.hasOwnProperty('id_club')) {
-                let choisirClubDiv = document.querySelector('.choisirClub');
-                if (choisirClubDiv) {
-                    choisirClubDiv.style.display = 'none';
-                }
-            }
-
-
-			
-        });
-    </script>
 
 
 
