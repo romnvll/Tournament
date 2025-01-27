@@ -6,6 +6,9 @@ require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/clubDao.class.php';
+require 'class/planificationDao.class.php';
+require 'class/labelsDao.class.php';
+
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
@@ -22,6 +25,7 @@ $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
 $listeDesTournois = $tournoiDao->afficherLesTournois();
 $RencontreByPoule=null;
+$Labels= new LabelDao();
 
 
 if (isset ($_GET['affichageByClubs'])) {
@@ -137,6 +141,7 @@ echo $template->render([
     'resultatRencontres'=> $GetResultatDesPoules,
     'getNomClubCourant' => $clubdao->getClubById($_GET['id_club'])['nom'],
     'getNomEquipeCourant' => $equipeDao->getEquipeById($_GET['id_equipe'])['nom'],
+    'labels' => $Labels->getLabelsWithCreneauxByTournoiId($_GET['id_tournoi']),
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
