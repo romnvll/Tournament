@@ -102,39 +102,37 @@
 							<div class="form-group">
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="{{infotournoi.gestionTables}}" {{ gestionTables }}>
+									<input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="{{infotournoi.gestionTables}}" {{ gestionTables }} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">Gestion des tables ? </label>
 								</div>
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="{{infotournoi.gestionArbitres}}" {{ gestionArbitres}}>
+									<input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="{{infotournoi.gestionArbitres}}" {{ gestionArbitres}} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">Gestion des arbitres ? </label>
 								</div>
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }}>
+									<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">Tournoi visible du public ? (n'affecte pas les tables)</label>
 								</div>
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isArchived" name="heureIsVisible" value="{{infotournoi.heureIsVisible}}" {{ heureIsVisible }}>
+									<input class="form-check-input" type="checkbox" id="isArchived" name="heureIsVisible" value="{{infotournoi.heureIsVisible}}" {{ heureIsVisible }} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">Horaires visible du public ?</label>
 								</div>
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="{{infotournoi.IsRankingView}}" {{ IsRankingView }}>
+									<input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="{{infotournoi.IsRankingView}}" {{ IsRankingView }} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">Classement visible du public ?</label>
 								</div>
 
 								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="{{infotournoi.isArchived}}" {{ isArchived }}>
+									<input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="{{infotournoi.isArchived}}" {{ isArchived }} onChange="this.form.submit()">
 									<label class="form-check-label" for="mySwitch">On archive le tournoi?</label>
 								</div>
 
 							</div>
 
-
-							<button type="submit" class="btn btn-primary">Modifier</button>
 
 						</form>
 					</div>
@@ -261,19 +259,20 @@
 					{% endif %}
 					
 					{% if infotournoi.gestionArbitres == 1 %}
-					<div class="row">
+					<hr>
+					<div class="row mt-5">
 						<div class="col-5">
 							<h3>Ajouter des arbitres</h3>
 							<form action="modifierTournoi_traitement.php">
 							<div class="mb-3">
 									<input type="hidden" name="addArbitre" value="true">
-									<label for="nomArbitre" class="form-label">Nom</label>
-									<input type="text" class="form-control" id="NomArbitre" aria-describedby="emailHelp" name="NomArbitre" required>
+									<label for="nomArbitre" class="form-label">Nom (optionnel)</label>
+									<input type="text" class="form-control" id="NomArbitre" aria-describedby="emailHelp" name="NomArbitre">
 								    <input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
 									<label for="nomArbitre" class="form-label">Club</label>
 									<select class="form-select" name="clubID">
 									
-									<option selected>Quel Club?</option>
+									
 									{% for club in AfficherLesClubsPourArbitres  %}
 									<option value="{{club.id}}">{{club.nom}}</option>
 									{% endfor %}
