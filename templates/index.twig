@@ -208,27 +208,19 @@ gtag('config', 'G-3NFVPTP2MY');
 			</div>
 {% endif %}
 
-
-		{# gestion des labels #}
-		
+{# Gestion des labels #}
 {% set current_time = "now"|date("H:i") %}
 
 {# Filtrer les labels futurs #}
-{% set labels_to_display = labels|filter(label => label['first_creneau_nom'] > current_time) %}
+{% set labels_to_display = labels|filter(label => label['creneau_horaire'] > current_time) %}
 
-{# Regrouper les labels ayant le même premier créneau #}
+{# Regrouper les labels par créneau horaire et éviter les doublons #}
 {% set grouped_labels = [] %}
+{% set seen_creneaux = [] %}
 {% for label in labels_to_display %}
-    {% if grouped_labels is empty %}
-        {% set grouped_labels = [label] %}
-    {% else %}
-        {% set last_label = grouped_labels|last %}
-        {% if label['first_creneau_nom'] == last_label['first_creneau_nom'] %}
-            {% set grouped_labels = grouped_labels|slice(0, -1) %}
-            {% set grouped_labels = grouped_labels|merge([label]) %}
-        {% else %}
-            {% set grouped_labels = grouped_labels|merge([label]) %}
-        {% endif %}
+    {% if label['creneau_horaire'] not in seen_creneaux %}
+        {% set grouped_labels = grouped_labels|merge([label]) %}
+        {% set seen_creneaux = seen_creneaux|merge([label['creneau_horaire']]) %}
     {% endif %}
 {% endfor %}
 
@@ -238,16 +230,13 @@ gtag('config', 'G-3NFVPTP2MY');
         <div class="d-flex align-items-center mb-3">
             <i class="fa-solid fa-circle-info me-2 text-info" style="font-size: 1.5rem;"></i>
             <h5 class="mb-0">Informations du tournoi</h5>
-                    </div>
-        <div class="d-flex flex-wrap gap-3">
+        </div>
+        <div class="d-flex flex-column">
             {% for label in grouped_labels %}
                 <div class="d-flex align-items-center">
                     <i class="fa-solid fa-check-circle me-2 text-success" style="font-size: 1.2rem;"></i>
                     <span>
-                        {{ label['last_label'] }} à <strong>{{ label['first_creneau_nom'] }}</strong>
-                        {% if label['first_creneau_nom'] != label['last_creneau_nom'] %}
-                            à <strong>{{ label['last_creneau_nom'] }}</strong>
-                        {% endif %}
+                        <strong>{{ label['creneau_horaire'] }}</strong> -> {{ label['labels'] }}
                     </span>
                 </div>
             {% endfor %}
@@ -256,7 +245,8 @@ gtag('config', 'G-3NFVPTP2MY');
 {% endif %}
 
 
-{# fin gestion des labels #}
+{# fin Gestion des labels #}
+
 
 
 
@@ -427,13 +417,13 @@ gtag('config', 'G-3NFVPTP2MY');
 
 											<td class="align-middle text-center">
 												<div class="d-flex justify-content-center flex-column align-items-center mb-2">
-													{% if gestionArbitres == 1 %}
-														<div class="d-flex align-items-center">
-														<i class="material-icons me-2" style="color: red;font-size: 20px;">sports</i>
-														<span> {{ equipe.arbitre_nom }} {{ equipe.arbitre_club_nom }}</span>
-													</div>
+												{% if gestionArbitres == 1 and equipe.arbitre_nom or equipe.arbitre_club_nom %}
+												<div class="d-flex align-items-center">
+													<i class="material-icons me-2" style="color: red; font-size: 20px;">sports</i>
+													<span>{{ equipe.arbitre_nom }} {{ equipe.arbitre_club_nom }}</span>
+												</div>
+											{% endif %}
 
-													{% endif %}
 												</div>
 
 												<div class="d-flex justify-content-center flex-nowrap mb-2">
