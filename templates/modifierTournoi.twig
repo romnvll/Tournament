@@ -164,8 +164,9 @@
 					
 					{% if infotournoi.gestionTables == 1 %}
 					<div class="row">
+					<h3>Ajouter une personne pour gérer les score à la une table d'un terrain</h3>
 						<div class="col-5">
-							<h3>Ajouter une personne pour les tables</h3>
+							
 							<form action="modifierTournoi_traitement.php">
 							<div class="mb-3">
 									<label for="Email" class="form-label">Email address</label>
@@ -188,6 +189,7 @@
 					</div>
 					<div class="row">
 						<div class="col">
+						{% if AfficherPersonnes |length > 0 %}
 							<table class="table" id="personneTable">
 								<thead>
 									<tr>
@@ -199,7 +201,7 @@
 									</tr>
 								</thead>
 								<tbody>
-								
+						{% endif %}		
 								{% for personne in AfficherPersonnes %}
 									<tr>
 									
@@ -219,6 +221,10 @@
 						</div>
 
 						<div class="col">
+
+						{% if AfficherLesPersonnesCrees |length > 0 %}
+							
+						
 						<table class="table" >
 								<thead>
 									<tr>
@@ -234,7 +240,7 @@
 									</tr>
 								</thead>
 								<tbody>
-								
+							{% endif %}	
 								{% for personneTable in AfficherLesPersonnesCrees %}
 								<tr>
 									<td>{{personneTable.Nom}}</td>

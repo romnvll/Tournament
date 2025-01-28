@@ -32,7 +32,7 @@ $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 $url = $protocol . $domainName . $basePath . "vueTerrain.php?id_tournoi=" . urlencode($_GET['idTournoi']) . "&terrain=" . urlencode($_GET['terrain']);
 
 // Affiche l'URL générée
-echo $url;
+
 
 
 
@@ -46,12 +46,53 @@ $qrcode = (new QRCode($options))->render($url);
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <title>Tables</title>
-  <link rel="stylesheet" href="/css/styles.min.css">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+      @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white; /* Fond blanc pour éviter les problèmes */
+      }
+      .container {
+        width: 100%;
+        max-width: 100%;
+      }
+      .qr-code {
+        max-width: 80%; /* QR code plus grand */
+        height: auto;
+      }
+      .logo {
+        max-width: 30%; /* Logo plus petit */
+        height: auto;
+        margin-top: 1rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      /* Masquer le bouton lors de l'impression */
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+ 
 </head>
 <body>
-<h1>Scanner pour accèder aux rencontres du terrain <?= $terrainDao->AfficherTerrainParId($_GET['terrain'])['nom'];?> </h1>
-<div class="container">
-  <img src='<?= $qrcode ?>' alt='QR Code' width='800' height='800'>
-</div>
+  <div class="container text-center">
+  <button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
+
+    <h1>Scanner pour accéder aux rencontres du terrain <?= $terrainDao->AfficherTerrainParId($_GET['terrain'])['nom']; ?></h1>
+    <div class="row">
+      <div class="col-6">
+        <img src='<?= $qrcode ?>' alt='QR Code' class="img-fluid img-thumbnail"  width="800" height="500" />
+      </div>
+      <div class="col-6">
+        <img src="logos/matcheventPro.webp" alt="Logo" class="img-fluid img-thumbnail "  width="800" height="500" />
+      </div>
+    </div>
+  </div>
 </body>
 </html>
