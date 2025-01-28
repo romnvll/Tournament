@@ -7,6 +7,7 @@ require 'class/rencontreDao.class.php';
 require 'class/creneauxDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
+require 'class/labelsDao.class.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -23,6 +24,7 @@ $creneaux = new creneauxDao();
 $terrain = new TerrainDao();
 $planification = new planificationDao();
 $arbitre = new arbitreDao();
+$labels = new labelDao();
 
 if (!isset($_GET['id_tournoi'])) {
     $listedestournois = $tournois->afficherLesTournois();
@@ -37,6 +39,7 @@ if (!isset($_GET['id_tournoi'])) {
     $lastCreneau=null;
     $nombreDeRencontresPlanifiee=null;
     $nombreRencontreAPlanifier=null;
+    $nombreDeLabel=null;
     
 } else {
    $listedestournois = $tournois->afficherLesTournois();
@@ -49,6 +52,7 @@ if (!isset($_GET['id_tournoi'])) {
     $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
     $nombreDeRencontresPlanifiee = $tournois->rencontresPlanifieeDuTournoi($_GET['id_tournoi']);
     $nombreRencontreAPlanifier = $tournois->nombreRencontreAPlanifier($_GET['id_tournoi']);
+    $nombreDeLabel = $labels->getLabelsByTournoiId($_GET['id_tournoi']);
     
 
 //création du premier creneau :
@@ -94,7 +98,8 @@ echo $template->render([
     'tournoiInfo'   => $tournoiInfo,
     'lastCreneau' => $lastCreneau,
     'timeNextCreneau' => $timeNextCreneau,
-    'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier
+    'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier,
+    'nombreDeLabel' => $nombreDeLabel
     
 
 
