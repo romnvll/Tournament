@@ -106,13 +106,13 @@ class ClubDAO {
 // Dans clubDao.class.php
 
 public function getClubById($id) {
-    
-    $stmt = $this->connexion->prepare("SELECT * FROM Clubs WHERE id = :id");
+    $query = "SELECT * FROM Clubs WHERE id = :id";
+    $stmt = $this->connexion->prepare($query);
     $stmt->bindParam(':id', $id);
     $stmt->execute();
-    
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
 
     
 
