@@ -43,13 +43,48 @@ $qrcode = (new QRCode($options))->render($url);
   <title>Tournoi Handball</title>
   <link rel="stylesheet" href="/css/styles.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+      @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white; /* Fond blanc pour éviter les problèmes */
+      }
+      .container {
+        width: 100%;
+        max-width: 100%;
+      }
+      .qr-code {
+        max-width: 80%; /* QR code plus grand */
+        height: auto;
+      }
+      .logo {
+        max-width: 30%; /* Logo plus petit */
+        height: auto;
+        margin-top: 1rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      /* Masquer le bouton lors de l'impression */
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+
+
 </head>
 <body>
 <div class="container-fluid">
 <div class="row justify-content-md-center">
+
+
 <h4 class="text-center">Scanner pour savoir quand et où votre équipe doit jouer</h4>
 </div>
 <div class="row justify-content-md-center">
+
 <?php
 // Définir la locale en français
 // Assurez-vous que l'extension Intl est activée sur votre serveur
@@ -73,7 +108,9 @@ echo "<p class=\"text-primary text-center fs-1\">" . $tournoiDao->getTournoiById
 
 ?>
 </div>
+<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
   <div class="row">
+
     <div class="col-6">
   <img class="img-fluid" src='<?= $qrcode ?>' alt='QR Code'>
     </div>
@@ -82,5 +119,6 @@ echo "<p class=\"text-primary text-center fs-1\">" . $tournoiDao->getTournoiById
   </div>
   </div>
 </div>
+
 </body>
 </html>

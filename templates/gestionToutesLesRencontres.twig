@@ -10,45 +10,72 @@
         integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Gestion rencontre</title>
+
+<style>
+      @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white; /* Fond blanc pour éviter les problèmes */
+      }
+      .container {
+        width: 100%;
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      /* Masquer le bouton lors de l'impression */
+      .no-print {
+        display: none !important;
+      }
+    
+      }
+  </style>
+
 </head>
 
 <body>
-
+    <div class="no-print">
     {{ include('header.twig') }}
+    </div>
     <div class="row ml-n4">
         <div class="col-lg-3">
             {% for tournoi in ListeDesTournois %}
             {% if tournoi.isArchived == 0 %}
             {% if tournoi.id == idTournoi %}
             <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}"
-                class="btn btn-success btn-sm">{{ tournoi.nom }}</a>
+                class="btn btn-success btn-sm no-print">{{ tournoi.nom }}</a>
             {% else %}
             <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}"
-                class="btn btn-secondary">{{ tournoi.nom }}</a>
+                class="btn btn-secondary no-print">{{ tournoi.nom }}</a>
             {% endif %}
             {% endif %}
             {% endfor %}
         </div>
         <div class="col-lg-6">
-            <div class="progress">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+            <div class="progress no-print">
+                <div class="progress-bar progress-bar-striped progress-bar-animated no-print" role="progressbar"
                     aria-valuenow="{{pourcentage}}" aria-valuemin="0" aria-valuemax="100"
                     style="width: {{pourcentage}}%"> {{pourcentage}}%</div>
             </div>
 
         </div>
         <div class="col">
-                 <button id="toggle-button" class="btn btn-success btn-lg" >Pause</button>
+                 <button id="toggle-button" class="btn btn-success btn-lg no-print" >Pause</button>
+                 <button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
 
         </div>
         <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
         
             <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
                 <div data-mdb-input-init class="form-outline me-2">
-                    <label class="form-label mb-0">Retarder les rencontres:</label>
+                    <label class="form-label mb-0 no-print">Retarder les rencontres:</label>
                      
-                    <input type="number" size="2" class="form-control" name="modifMinutes"
+                    <input type="number" size="2" class="form-control no-print" name="modifMinutes"
                         onfocusout="this.form.submit()">
                 </div>
                 <input type="hidden" name="idTournoi" value="{{idTournoi}}">
@@ -95,7 +122,7 @@
                                     {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
                                     {% if planification.arbitre_id is not null %}
                                     <!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
-                                    <i class="fa fa-user" aria-hidden="true"></i> {{planification.arbitre_nom}}
+                                     <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}
 
                                     {% endif %}
                                     {% if planification.rencontre_id is not null %}
@@ -115,7 +142,7 @@
                                         {% endif %}
 
                                         <div class="d-flex justify-content-center">
-                                                <span class="point" data-bs-toggle="tooltip" title="passer la rencontre à : 'à venir' " data-bs-placement="bottom" style="background-color: red;" name="etat"
+                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à : 'à venir' " data-bs-placement="bottom" style="background-color: red;" name="etat"
                                                 hx-post="gestionRencontres_traitement.php"
                                                 hx-trigger="click"
                                                 hx-target="#Label{{planification.rencontre_id}}"
@@ -124,7 +151,7 @@
                                                 hx-vals='{"etat": "Avenir"}'>
                                                 
                                                 </span>
-                                                <span class="point" data-bs-toggle="tooltip" title="passer la rencontre à 'en cours' " data-bs-placement="bottom"  style="background-color: orange;"
+                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à 'en cours' " data-bs-placement="bottom"  style="background-color: orange;"
                                                  hx-post="gestionRencontres_traitement.php"
                                                 hx-trigger="click"
                                                 hx-swap="innerHTML"
@@ -132,7 +159,7 @@
                                                 hx-include="#idRencontre{{ planification.rencontre_id }}"
                                                  hx-vals='{"etat": "enCours"}'>
                                                 </span>
-                                                <span class="point" data-bs-toggle="tooltip" title="passer la rencontre à 'terminer' " data-bs-placement="bottom"  style="background-color: green;"
+                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à 'terminer' " data-bs-placement="bottom"  style="background-color: green;"
                                                  hx-post="gestionRencontres_traitement.php"
                                                 hx-trigger="click"
                                                 hx-swap="innerHTML"
