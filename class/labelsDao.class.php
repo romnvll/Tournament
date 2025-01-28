@@ -60,45 +60,17 @@ class LabelDao {
     public function getLabelsWithCreneauxByTournoiId(int $tournoi_id)
 {
     $sql = "
-        WITH LabelledCreneaux AS (
-            SELECT 
-                p.creneau_id,
-                c.nom AS creneau_nom,
-                p.label_id,
-                l.description AS label_nom,
-                c.creneau_id - ROW_NUMBER() OVER (ORDER BY c.creneau_id) AS grp
-            FROM 
-                Planification p
-            JOIN 
-                Creneaux c ON p.creneau_id = c.creneau_id
-            JOIN 
-                Labels l ON p.label_id = l.label_id
-            WHERE 
-                p.tournoi_id = :tournoi_id
-        ),
-        GroupedLabels AS (
-            SELECT 
-                grp,
-                MIN(creneau_id) AS first_creneau_id,
-                MAX(creneau_id) AS last_creneau_id
-            FROM 
-                LabelledCreneaux
-            GROUP BY 
-                grp
-        )
         SELECT 
-            gl.first_creneau_id,
-            gl.last_creneau_id,
-            c1.nom AS first_creneau_nom,
-            c2.nom AS last_creneau_nom,
-            (SELECT label_nom FROM LabelledCreneaux lc WHERE lc.creneau_id = gl.first_creneau_id) AS first_label,
-            (SELECT label_nom FROM LabelledCreneaux lc WHERE lc.creneau_id = gl.last_creneau_id) AS last_label
-        FROM 
-            GroupedLabels gl
-        JOIN 
-            Creneaux c1 ON c1.creneau_id = gl.first_creneau_id
-        JOIN 
-            Creneaux c2 ON c2.creneau_id = gl.last_creneau_id;
+    c.nom AS creneau_horaire, 
+    GROUP_CONCAT(l.description ORDER BY l.description SEPARATOR ' + ') AS labels
+FROM Planification p
+JOIN Creneaux c ON p.creneau_id = c.creneau_id
+JOIN Labels l ON p.label_id = l.label_id
+WHERE p.label_id IS NOT NULL AND p.tournoi_id = :tournoi_id
+GROUP BY c.nom
+ORDER BY c.nom
+
+
     ";
 
     // Préparer et exécuter la requête
@@ -109,6 +81,8 @@ class LabelDao {
     // Récupérer les résultats
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+    
 
 
 

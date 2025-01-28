@@ -26,6 +26,7 @@ $equipeDao = new EquipeDAO();
 $listeDesTournois = $tournoiDao->afficherLesTournois();
 $RencontreByPoule=null;
 $Labels= new LabelDao();
+$listeDesRencontresByTerrain = null;
 
 
 if (isset ($_GET['affichageByClubs'])) {
