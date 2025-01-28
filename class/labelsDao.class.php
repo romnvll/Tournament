@@ -90,12 +90,19 @@ ORDER BY c.nom
         $stmt->execute();
     }
 
-    // Méthode pour supprimer un label
     public function supprimerLabel(int $label_id): void {
-        $stmt = $this->connexion->prepare("DELETE FROM Labels WHERE label_id = :label_id");
-        $stmt->bindParam(':label_id', $label_id, PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            $stmt = $this->connexion->prepare("DELETE FROM Labels WHERE label_id = :label_id");
+            $stmt->bindParam(':label_id', $label_id, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') { // Code SQLSTATE pour une violation de clé étrangère
+                throw new Exception("Impossible de supprimer ce label car il est actuellement utilisé dans une ou plusieurs planifications.");
+            }
+            throw $e; // Relancer les autres exceptions
+        }
     }
+    
 
     // Méthode pour supprimer tous les labels d'un tournoi
     public function supprimerLabelsParTournoi(int $tournoi_id): void {
