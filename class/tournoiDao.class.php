@@ -18,21 +18,35 @@ public function __construct() {
 }
 
 
-public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0): void {
-    $stmt = $this->connexion->prepare("
-        INSERT INTO Tournois (nom, dateDebut, nb_terrains, heure_debut, pasHoraire, isClassement) 
-        VALUES (:nom, :dateDebut, :nb_terrains, :heure_debut, :pasHoraire, :isClassement)
-    ");
-    
-    $stmt->bindParam(':nom', $nom);
-    $stmt->bindParam(':dateDebut', $dateDebut);
-    $stmt->bindParam(':nb_terrains', $nb_terrains);
-    $stmt->bindParam(':heure_debut', $heure_debut);
-    $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT);
-    $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
+public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0): int {
+    try {
+        $this->connexion->beginTransaction(); // Début de la transaction
 
-    $stmt->execute();
+        $stmt = $this->connexion->prepare("
+            INSERT INTO Tournois (nom, dateDebut, nb_terrains, heure_debut, pasHoraire, isClassement) 
+            VALUES (:nom, :dateDebut, :nb_terrains, :heure_debut, :pasHoraire, :isClassement)
+        ");
+        
+        $stmt->bindParam(':nom', $nom);
+        $stmt->bindParam(':dateDebut', $dateDebut);
+        $stmt->bindParam(':nb_terrains', $nb_terrains);
+        $stmt->bindParam(':heure_debut', $heure_debut);
+        $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT);
+        $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        $id = (int) $this->connexion->lastInsertId(); // Récupération de l'ID
+
+        $this->connexion->commit(); // Validation de la transaction
+        
+        return $id;
+    } catch (Exception $e) {
+        $this->connexion->rollBack(); // Annulation en cas d'erreur
+        throw $e;
+    }
 }
+
 
 
 

@@ -47,6 +47,7 @@
 
 					
 				{% endfor %}
+			{% if categorieEnCours is not null %}
 			<br><p>Selectionner le nombre d'équipe par poule</p>
 				{% for i in 1..15 %}
 						{% if i == nbrEquipe %}
@@ -55,7 +56,7 @@
 					<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{i}}" class="btn btn-secondary btn-lg">{{i}}</a>
 						{% endif %}
 					{% endfor %}
-				
+			{% endif %}
 				
 
 <div class="container">

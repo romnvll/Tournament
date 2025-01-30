@@ -67,7 +67,7 @@ class EquipeDAO {
 
 
     public function modifierEquipeIdPoule(int $idPoule, int $idequipe): void {
-        echo $idPoule;
+        
         // Vérifier d'abord si une association pour cette équipe existe déjà
         $stmtCheck = $this->connexion->prepare("SELECT * FROM EquipePoule WHERE equipe_id = :idequipe");
         $stmtCheck->bindParam(':idequipe', $idequipe);

@@ -2,10 +2,11 @@
 require ('security.php');
 require 'class/equipeDao.class.php';
 require 'class/pouleManagerDao.class.php';
+require 'class/rencontreDao.class.php';
 
 
 
-
+$rencontres = new RencontreDAO();
 $poulemanager = new PouleManager();
 
 $pouleinfo = $poulemanager->getPouleById($_POST['dstpoule']);
@@ -20,11 +21,35 @@ if (isset ($_GET['idPoule'])) {
     header("Location: " . $_SERVER['HTTP_REFERER']);
 }
 
-$equipe = new EquipeDAO();
-$equipe->modifierEquipe($_POST['equipe'],$_POST['equipeNom'],$nouvelleCategorie);
+
+if ($poulemanager->pouleHasRencontreProgrammee($_POST['id_poule'],$_POST['id_tournoi'])) {
+    echo "Impossible de déplacer l'équipe, des rencontres sont déjà programmées pour cette poule";
+}
+
+else {
+    
+    $rencontres->supprimerRencontresParPoule($_POST['id_poule']);
+    $rencontres->supprimerRencontresParPoule($_POST['dstpoule']);
+
+    $equipe = new EquipeDAO();
+    $equipe->modifierEquipe($_POST['equipe'],$_POST['equipeNom'],$nouvelleCategorie);
+    $equipe->modifierEquipeIdPoule($_POST['dstpoule'],$_POST['equipe']);
 
 
-$equipe->modifierEquipeIdPoule($_POST['dstpoule'],$_POST['equipe']);
+  // var_dump($_POST['id_poule']);
+    
+    $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi']);
+   
+    $rencontres->createRencontreByPoule($_POST['dstpoule'],$_POST['id_tournoi']);
+    
+   
+  
+    
+    
+}
+
+
+
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 

@@ -16,17 +16,29 @@ $twig = new \Twig\Environment($loader, [
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
 $equipe = new EquipeDAO();
+
+
 if (isset ($_GET['id_tournoi'])) {
     //on recup les poules
     $poulesEtNombreEquipe=[];
+   
     foreach($poules->getAllPoulesByTournoi($_GET['id_tournoi']) as $poule) {
+        
+      
             
             $poulesEtNombreEquipe[]=[
                'nomPoule' => $poule['nom'],
                'nbrEquipeParPoule' => $poules->compterEquipesParPoule($poule['id']),
+               'rencontresExistesDeja' =>$poules->pouleHasRencontreProgrammee($poule['id'],$_GET['id_tournoi']),
                'idPoule' => $poule['id']
             ];
-          
+               // Récupérer l'index du dernier élément ajouté
+                    $index = array_key_last($poulesEtNombreEquipe);
+                    
+                    if ($poulesEtNombreEquipe[$index]['nbrEquipeParPoule'] == 0) {
+                       // echo $poule['nom'] . " à " . $poulesEtNombreEquipe[$index]['nbrEquipeParPoule'] . "<br>";
+                        $poules->deletePoule($poule['id']);
+                    }
         
     }
 
@@ -40,8 +52,11 @@ if (isset ($_GET['id_tournoi'])) {
 
 if (isset($_GET['id_poule'])) {
     $equipes = $equipe->getAllEquipesByPouleId($_GET['id_poule']);
+    $pouleHasRencontre  = $poules->pouleHasRencontreProgrammee($_GET['id_poule'],$_GET['id_tournoi']);
 
     
+} else {
+    $pouleHasRencontre  = $poules->pouleHasRencontreProgrammee(0,$_GET['id_tournoi']);
 }
 
 if (isset ($_SESSION['message'])) {
@@ -81,7 +96,7 @@ echo $template->render([
     'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']),
     'message' => $message,
     'afficherEquipeParPoule' => $equipes,
-    'RencontresExistesDansPoules'=>$poules->checkRencontresInPoule($_GET['id_poule']),
+    'RencontresExistesDansPoules'=>$pouleHasRencontre,
 
     //'nombreEquipeParPoule' => $PouleAuto,
 
