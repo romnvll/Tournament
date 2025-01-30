@@ -15,9 +15,11 @@ $terrainDao=new TerrainDao();
 $tournoiDao = new tournoiDao();
 
 
-echo $_POST['dateTournoi'];
+//echo $_POST['dateTournoi'];
 
-$tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire']);
+$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire']);
+
+
 
 
 $tournoiDao = new tournoiDao();
@@ -34,7 +36,8 @@ foreach ($tousLesTournois as $tournoi) {
 
 for ($i=1; $i<=$_POST['nbrterrain'];$i++){
 
-$terrainDao->ajoutTerrain($dernierId,$i);
+$terrainDao->ajoutTerrain($ajoutTournoi,$i);
+
 }
 
 $labelsDao = new LabelDao();

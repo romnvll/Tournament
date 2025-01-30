@@ -18,7 +18,7 @@
    <div class="alert alert-danger alert-dismissible fade show d-flex" role="alert">
   <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
   <div>
-    <strong>Attention!</strong> Des rencontres sont deja créées dans cette poule, si vous devez modifier une poule, il faut supprimer les rencontres existantes <a href="suppressionRencontres.php?id_tournoi={{ idTournoi }}">ici</a> .
+    <strong>Attention!</strong> Des rencontres sont deja créées dans cette poule, si vous devez modifier une poule, il faut supprimer les rencontres existantes <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">ici</a> .
   </div>
 </div>
 {% endif %}
@@ -87,19 +87,19 @@
                             <th scope="row">{{ equipe.nom }}</th>
                             <td>
                            
-                            
+                          
                             
                             <select class="form-select" aria-label="Default select example" name="dstpoule">
                               <option value="" disabled selected>Poule de destination</option>
                               {% for poule in poules %}
-                             
-                               {% set pouleCategorieParts = poule.nomPoule|split('-') %}
+                                  {% set pouleCategorieParts = poule.nomPoule|split('-') %}
+                                  {% if poule.nomPoule starts with 'Mini' or (pouleCategorieParts|length > 1 and pouleCategorieParts[0]|trim == equipe.Nom_categorie) %}
+                                      <option value="{{ poule.idPoule }}" {% if poule.rencontresExistesDeja %}disabled{% endif %}>
+                                          {{ poule.nomPoule }} {% if poule.rencontresExistesDeja %}(Rencontres déjà planifiées){% endif %}
+                                      </option>
+                                  {% endif %}
+                              {% endfor %}
 
-{% if poule.nomPoule starts with 'Mini' or (pouleCategorieParts|length > 1 and pouleCategorieParts[0]|trim == equipe.Nom_categorie) %}
-    <option value="{{ poule.idPoule }}">{{ poule.nomPoule }}</option>
-{% endif %}
-
-                               {% endfor %}
                                <input type="hidden" name="equipeNom" value="{{equipe.nom}}">
                                <input type="hidden" name="equipe" value="{{equipe.id}}">
                                <input type="hidden" name="id_tournoi" value="{{idTournoi}}">
@@ -108,7 +108,7 @@
                               </select>
                               
                              </td>
-                            <td> <input type="submit">   </td>
+                            <td> <input type="submit" class="btn btn-primary" value="Déplacer">   </td>
                             </form>
                              </tr>
                             {% endfor %}
