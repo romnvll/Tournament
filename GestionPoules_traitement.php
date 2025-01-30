@@ -12,7 +12,6 @@ $rencontre = new RencontreDAO();
 
 //creation des poules:
 
-echo "ici->" . var_dump($categorie) . "<-";
 
 
 $categorie = $_POST["categorie"];
