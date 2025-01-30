@@ -307,10 +307,6 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             r.score2,
             r.isTerminated,
 
-            l.label_id AS label_id,
-            l.description AS label_description,
-            l.couleur AS label_couleur,
-
             a.nom AS arbitre_nom,
             clubArbitre.nom AS arbitre_club_nom
 
@@ -319,13 +315,13 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
         JOIN 
             Equipes equipe1 ON r.equipe1_id = equipe1.id
         JOIN 
-            EquipePoule ep1 ON equipe1.id = ep1.equipe_id
+            EquipePoule ep1 ON equipe1.id = ep1.equipe_id AND ep1.poule_id = :pouleid
         JOIN 
             Clubs club1 ON equipe1.club_id = club1.id
         JOIN 
             Equipes equipe2 ON r.equipe2_id = equipe2.id
         JOIN 
-            EquipePoule ep2 ON equipe2.id = ep2.equipe_id
+            EquipePoule ep2 ON equipe2.id = ep2.equipe_id AND ep2.poule_id = :pouleid
         JOIN 
             Clubs club2 ON equipe2.club_id = club2.id
         LEFT JOIN 
@@ -335,30 +331,23 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
         LEFT JOIN 
             Terrains t ON p.terrain_id = t.terrain_id
         LEFT JOIN 
-            Labels l ON l.tournoi_id = :tournoiId
-        LEFT JOIN 
             Arbitres a ON p.arbitre_id = a.arbitre_id
         LEFT JOIN 
             Clubs clubArbitre ON a.club_id = clubArbitre.id
         WHERE 
-            ep1.poule_id = :pouleid 
-            AND ep2.poule_id = :pouleid 
-            AND r.isClassement = :isClassement
+            r.isClassement = :isClassement
             $additionalCondition
         ORDER BY 
             $orderBy;
     ";
 
-    // Execute the query using your preferred method
-
+    // Exécution de la requête
     $stmt = $this->connexion->prepare($query);
     $stmt->bindParam(':pouleid', $pouleid, PDO::PARAM_INT);
-    $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
     $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
     $stmt->execute();
+
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $this->connexion = null;
-    
 }
 
     

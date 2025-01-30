@@ -79,12 +79,13 @@
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle  {% if pageEnCours == "GestionDesRencontres" %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-handshake"></i>Gestion des rencontres</a>
 					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						
 						<li>
-							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0"><i class="fa-solid fa-plus"></i> 1 - Création des rencontres</a>
+							<a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-calendar-days"></i> 1 - Placer les rencontres</a>
+							
 						</li>
 						<li>
-							<a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-calendar-days"></i> 2a - Placer les rencontres</a>
-							
+							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-book-open"></i> 2 - Insérer les scores par terrain</a>
 						</li>
 						<!--
 						<li>
@@ -93,15 +94,15 @@
 						<li>
 							<a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0"><i class="fa-solid fa-trophy"></i> 3 - Resultats par poules</a>
 						</li>
+
 						<li>
-							<a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-book-open"></i> 4 - Insérer les scores par terrain</a>
+							<a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}"><i class="fa-solid fa-ranking-star"></i>4 - Phases finales</a>
 						</li>
+						
 						<li>
 							<hr class="dropdown-divider"/>
 						</li>
-            <li>
-							<a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}"><i class="fa-solid fa-ranking-star"></i>Phases finales</a>
-						</li>
+         				
 						<li>
 							<a class="dropdown-item" href="suppressionRencontres.php?id_tournoi={{idTournoi}}"><i class="fa-solid fa-trash"></i>Suppressions des rencontres </a>
 						</li>
