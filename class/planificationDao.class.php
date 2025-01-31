@@ -348,7 +348,8 @@ public function getPlanificationsTerrainAvecDetails($terrainId, $tournoiId) {
         WHEN STR_TO_DATE(c.nom, '%H:%i') < STR_TO_DATE('06:00', '%H:%i') 
         THEN DATE_ADD(STR_TO_DATE(c.nom, '%H:%i'), INTERVAL 1 DAY) 
         ELSE STR_TO_DATE(c.nom, '%H:%i') 
-    END AS sorted_creneau
+    END AS sorted_creneau,
+    arb_club.nom AS arbitre_club_nom  -- Ajout du nom du club de l'arbitre
 FROM 
     Planification p
 LEFT JOIN 
@@ -373,10 +374,13 @@ LEFT JOIN
     Clubs c1 ON e1.club_id = c1.id
 LEFT JOIN 
     Clubs c2 ON e2.club_id = c2.id
+LEFT JOIN 
+    Clubs arb_club ON a.club_id = arb_club.id  -- Jointure avec la table Clubs pour l'arbitre
 WHERE 
     p.terrain_id = :terrainId AND p.tournoi_id = :tournoiId
 ORDER BY 
     sorted_creneau;
+
 
     ";
 
