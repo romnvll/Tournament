@@ -30,38 +30,51 @@
 
 {% if tournoiEnCours != 0 %}
       <div class="row justify-content-center">
-        <div class="col-3">
-          <form action="ajoutEquipe_traitement.php" method="POST">
-            <div class="form-group">
-              <label for="nomEquipe">Nom de l'équipe</label>
-              <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Nom ex: HBCAT2" />
+        
+      <div class="col-md-6 col-lg-3">
+    <form action="ajoutEquipe_traitement.php" method="POST">
+        <!-- Formulaire de création d'équipe -->
+        <div class="card shadow-sm p-4">
+            <h5 class="text-center mb-3">Ajouter une équipe</h5>
+
+            <div class="form-group mb-3">
+                <label for="nomEquipe" class="form-label">Nom de l'équipe</label>
+                <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Ex: HBCAT2" required />
             </div>
             
-            <div class="form-group">
-              <label for="Categorie">Choisir la catégorie</label>
-              <select class="form-control" name="Categorie" id="Categorie">
-              
-              <option value="" disabled selected>Choisir une catégorie...</option>
-              {% for categorie in AfficheLesCategories  %}
-              
-              <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
-              {% endfor %}
-                
-              </select>
+            <div class="form-group mb-3">
+                <label for="Categorie" class="form-label">Choisir la catégorie</label>
+                <select class="form-select" name="Categorie" id="Categorie" required>
+                    <option value="" disabled selected>Choisir une catégorie...</option>
+                    {% for categorie in AfficheLesCategories %}
+                        <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
+                    {% endfor %}
+                </select>
             </div>
           
             <input type="hidden" value="{{tournoiEnCours}}" name="IdTournoi">
-            <div class="form-group">
-              <label for="nomEquipe">Choisir le club de l'équipe</label>
-              <select class="form-select" name="idClubs" id="club">
-                {% for club in AfficherClub %}
-                  <option value="{{ club.id }}">{{ club.nom }}</option>
-                {% endfor %}
-              </select>
+
+            <div class="form-group mb-3">
+                <label for="club" class="form-label">Choisir le club de l'équipe</label>
+                <select class="form-select" name="idClubs" id="club" required>
+                    {% for club in AfficherClub %}
+                        <option value="{{ club.id }}">{{ club.nom }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <input type="submit" class="btn btn-success"/>
-          </form>
+
+            <div class="d-grid gap-2">
+                <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
+            </div>
         </div>
+    </form>
+</div>
+
+
+
+
+
+
         {% else %}
          <div class="row justify-content-center">
          <div class="col-3">
