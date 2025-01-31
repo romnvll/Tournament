@@ -18,344 +18,333 @@
 						<a href="modifierTournoi.php?idTournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
 					{% endfor %}
 				</div>
-				
+
 
 			</div>
 			{% if tournoiEnCours != 0 %}
 
 
-				<div class="col">
+				<div class="col-lg-6 mx-auto">
 					<div class="container mt-5">
-						<h2>Modifier Tournoi</h2>
-
-						<form action="modifierTournoi_traitement.php" method="post">
-
-							<input
-							type="hidden" name="idTournoi" value="{{infotournoi.id}}">
-							
-
-							<div class="form-group">
-								<label for="nom">Nom:</label>
-								<input type="text" class="form-control" id="nom" name="nom" value="{{infotournoi.nom}}" readonly>
+						<div class="card shadow-lg">
+							<div class="card-header bg-primary text-white text-center">
+								<h4>Modifier Tournoi</h4>
 							</div>
+							<div class="card-body p-4">
+								<form action="modifierTournoi_traitement.php" method="post">
+									<input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
 
-							
-							<div class="form-group">
-								<label for="heure_debut">Heure de début:</label>
-								<input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{infotournoi.heure_debut}}" onChange="this.form.submit()">
+									<div class="mb-3">
+										<label for="nom" class="form-label">Nom du tournoi</label>
+										<input type="text" class="form-control" id="nom" name="nom" value="{{ infotournoi.nom }}" readonly>
+									</div>
+
+									<div class="mb-3">
+										<label for="heure_debut" class="form-label">Heure de début</label>
+										<input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{ infotournoi.heure_debut }}" onchange="this.form.submit()">
+									</div>
+
+									<div class="mb-3">
+										<label for="pasHoraire" class="form-label">Pas Horaire (en minutes)</label>
+										<input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()">
+									</div>
+
+									<h5 class="mt-4">Options</h5>
+									<div class="form-group">
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="1" {% if infotournoi.gestionTables == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="gestionTables">Gestion des tables</label>
+										</div>
+
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="1" {% if infotournoi.gestionArbitres == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="gestionArbitres">Gestion des arbitres</label>
+										</div>
+
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="1" {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="isVisible">Tournoi visible du public ?</label>
+										</div>
+
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="heureIsVisible" name="heureIsVisible" value="1" {% if infotournoi.heureIsVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="heureIsVisible">Horaires visibles du public</label>
+										</div>
+
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="1" {% if infotournoi.IsRankingView == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="IsRankingView">Classement visible du public</label>
+										</div>
+
+										<div class="form-check form-switch">
+											<input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="1" {% if infotournoi.isArchived == 1 %} checked {% endif %} onchange="this.form.submit()">
+											<label class="form-check-label" for="isArchived">Archiver le tournoi</label>
+										</div>
+									</div>
+								</form>
 							</div>
-
-							<div class="form-group">
-								<label for="pasHoraire">Pas Horaire:</label>
-								<input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{infotournoi.pasHoraire}}" onChange="this.form.submit()">
-							</div>
-
-
-						
-
-						
-							
-							
-
-							{% if infotournoi.isArchived == 1 %}
-								{% set isArchived = 'checked' %}
-							{% else %}
-								{% set isArchived = '' %}
-							{%  endif %}
-
-
-							{% if infotournoi.isVisible == 1 %}
-								{% set isVisible = 'checked' %}
-							{% else %}
-								{% set isVisible = '' %}
-							{%  endif %}
-
-							{% if infotournoi.heureIsVisible == 1 %}
-								{% set heureIsVisible = 'checked' %}
-							{% else %}
-								{% set heureIsVisible = '' %}
-							{%  endif %}
-
-
-							{% if infotournoi.IsRankingView == 1 %}
-								{% set IsRankingView = 'checked' %}
-							{% else %}
-								{% set IsRankingView = '' %}
-							{%  endif %}
-
-
-							{% if infotournoi.gestionTables == 1 %}
-								{% set gestionTables = 'checked' %}
-							{% else %}
-								{% set gestionTables = '' %}
-							{%  endif %}
-
-
-							{% if infotournoi.gestionArbitres == 1 %}
-								{% set gestionArbitres = 'checked' %}
-							{% else %}
-								{% set gestionArbitres = '' %}
-							{%  endif %}
-
-
-								
-							<div class="form-group">
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="{{infotournoi.gestionTables}}" {{ gestionTables }} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">Gestion des tables ? </label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="{{infotournoi.gestionArbitres}}" {{ gestionArbitres}} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">Gestion des arbitres ? </label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="{{infotournoi.isVisible}}" {{ isVisible }} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">Tournoi visible du public ? (n'affecte pas les tables)</label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isArchived" name="heureIsVisible" value="{{infotournoi.heureIsVisible}}" {{ heureIsVisible }} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">Horaires visible du public ?</label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="{{infotournoi.IsRankingView}}" {{ IsRankingView }} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">Classement visible du public ?</label>
-								</div>
-
-								<div class="form-check form-switch">
-									<input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="{{infotournoi.isArchived}}" {{ isArchived }} onChange="this.form.submit()">
-									<label class="form-check-label" for="mySwitch">On archive le tournoi?</label>
-								</div>
-
-							</div>
-
-
-						</form>
+						</div>
 					</div>
 				</div>
+
+
 				<div class="col">
-					<div class="row">
-						Pour les coachs:
-						<a href="GenerateQrCode.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">
-							<i class="fa-solid fa-qrcode me-1"></i>QRCODE public</a>
-					</div>
+					<div
+						class="container mt-4">
+						<!-- Titre principal avec logo QR Code -->
+						<h3 class="text-center mb-4">
+							<i class="fa-solid fa-qrcode me-2"></i>
+							Génération des QR Codes
+						</h3>
 
-					
-					
-					<div class="row">
-						Pour les tables :
-
-
-						{% for i in 1.. AfficherTerrain|length %}
-							<a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{AfficherTerrain[i-1].terrain_id}}" class="btn btn-primary">
-								<i class="fa-solid fa-qrcode me-1"></i>
-								QRCODE table
-								{{AfficherTerrain[i-1].nom}}</a><br>
-
-						{% endfor %}
-					
-
-
-					</div>
-					
-					{% if infotournoi.gestionTables == 1 %}
-					<div class="row">
-					<h3>Ajouter une personne pour gérer les score à la une table d'un terrain</h3>
-						<div class="col-5">
-							
-							<form action="modifierTournoi_traitement.php">
-							<div class="mb-3">
-									<label for="Email" class="form-label">Email address</label>
-									<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
-									<input type="hidden" name="addPersonne" value="true">
-									<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
-									<div id="emailHelp" class="form-text">Email</div>
+						<div
+							class="row gy-4">
+							<!-- Card pour les coachs -->
+							<div class="col-lg-6">
+								<div class="card shadow-lg">
+									<div class="card-body text-center">
+										<h5 class="card-title">
+											<i class="fa-solid fa-qrcode me-2"></i>
+											Pour les coachs
+										</h5>
+										<a href="GenerateQrCode.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">
+											<i class="fa-solid fa-qrcode me-1"></i>
+											QR Code public
+										</a>
+									</div>
 								</div>
-								<div class="mb-3">
-									<label for="Nom" class="form-label">Nom</label>
-									<input type="text" class="form-control" id="Nom" name="nom" required>
+							</div>
+
+							<!-- Card pour les tables -->
+							<div class="col-lg-6">
+								<div class="card shadow-lg">
+									<div class="card-body text-center">
+										<h5 class="card-title">
+											<i class="fa-solid fa-qrcode me-2"></i>
+											Pour les tables
+										</h5>
+										<div class="d-grid gap-2">
+											{% for i in 1..AfficherTerrain|length %}
+												<a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{AfficherTerrain[i-1].terrain_id}}" class="btn btn-primary d-flex align-items-center justify-content-center">
+													<i class="fa-solid fa-qrcode me-2"></i>
+													QRCODE
+													{{ AfficherTerrain[i-1].nom }}
+												</a>
+											{% endfor %}
+										</div>
+									</div>
 								</div>
-								<div class="mb-3">
-									<label for="prenom" class="form-label">prenom</label>
-									<input type="text" class="form-control" id="prenom" name="prenom" required>
-								</div>
-								<button type="submit" class="btn btn-primary">Ajouter</button>
-							</form>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col">
-						{% if AfficherPersonnes |length > 0 %}
-							<table class="table" id="personneTable">
-								<thead>
-									<tr>
-									
-									<th scope="col">nom</th>
-									<th scope="col">Prenom</th>
-									<th scope="col">mail</th>
-									<th scope="col">Terrain N°</th>
-									</tr>
-								</thead>
-								<tbody>
-						{% endif %}		
-								{% for personne in AfficherPersonnes %}
-									<tr>
-									
-									<td>{{personne.Nom}}</td>
-									<td>{{personne.Prenom}}</td>
-									<td>{{personne.Mail}}</td>
-									<td>
-										{% for terrain in AfficherTerrain %}
-										
-									<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{personne.id}}&idterrain={{terrain.terrain_id}}&tournoiId={{infotournoi.id}}"><span class="badge rounded-pill bg-success"> {{terrain.nom}}</span></a>
-										{% endfor %}
-									</td>
-									</tr>
-								{% endfor %}
-								</tbody>
-								</table>
-						</div>
-
-						<div class="col">
-
-						{% if AfficherLesPersonnesCrees |length > 0 %}
-							
-						
-						<table class="table" >
-								<thead>
-									<tr>
-									
-									<th scope="col">nom</th>
-									<th scope="col">Prenom</th>
-									<th scope="col">mail</th>
-									<th scope="col">Terrain N°</th>
-									<th scope="col">Code pin</th>
-									<th scope="col">Clé sécurisée</th>
-									<th scope="col">envoyer les informations</th>
-									<th scope="col">Suppression de cette personne</th>
-									</tr>
-								</thead>
-								<tbody>
-							{% endif %}	
-								{% for personneTable in AfficherLesPersonnesCrees %}
-								<tr>
-									<td>{{personneTable.Nom}}</td>
-									<td>{{personneTable.Prenom}}</td>
-									<td>{{personneTable.Mail}}</td>
-									<td>{{personneTable.terrain_nom}}</td>
-									<td>{{personneTable.code_pin}}</td>
-									<td>{{personneTable.url_key}}</td>
-									<td class="align-middle"><a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}"><i class="fa fa-envelope-o" aria-hidden="true"></i></a></td>
-									<td><a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}&tournoiId={{idTournoi}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
-									
-								</tr>
-								{% endfor %}
-								</tbody>
-								</table>
-
-
-							
-						</div>
-
-					</div>
-					{% endif %}
-					
-					{% if infotournoi.gestionArbitres == 1 %}
-					<hr>
-					<div class="row mt-5">
-						<div class="col-5">
-							<h3>Ajouter des arbitres</h3>
-							<form action="modifierTournoi_traitement.php">
-							<div class="mb-3">
-									<input type="hidden" name="addArbitre" value="true">
-									<label for="nomArbitre" class="form-label">Nom (optionnel)</label>
-									<input type="text" class="form-control" id="NomArbitre" aria-describedby="emailHelp" name="NomArbitre">
-								    <input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
-									<label for="nomArbitre" class="form-label">Club</label>
-									<select class="form-select" name="clubID">
-									
-									
-									{% for club in AfficherLesClubsPourArbitres  %}
-									<option value="{{club.id}}">{{club.nom}}</option>
-									{% endfor %}
-									</select>
-								<input type="submit">
 							</div>
 						</div>
+					</div>
 
-						<div class="col">
-						
-						<table class="table">
-						{% for arbitre in AfficherLesArbitres %}
-						
-						 <tr>
-     					 	<td>{{arbitre.nom}}</td>
-      						<td>{{arbitre.club_nom}}</td>
-							<td><a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{arbitre.arbitre_id}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
-						 </tr>
-						 {% endfor %}
-						</table>
-						
+
+					{% if infotournoi.gestionTables == 1 %}
+						<div class="row mt-4">
+							<h3>Ajouter une personne pour gérer les score à la une table d'un terrain</h3>
+							<div class="col-5">
+
+								<form action="modifierTournoi_traitement.php">
+									<div class="mb-3">
+										<label for="Email" class="form-label">Email address</label>
+										<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
+										<input type="hidden" name="addPersonne" value="true">
+										<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+										<div id="emailHelp" class="form-text">Email</div>
+									</div>
+									<div class="mb-3">
+										<label for="Nom" class="form-label">Nom</label>
+										<input type="text" class="form-control" id="Nom" name="nom" required>
+									</div>
+									<div class="mb-3">
+										<label for="prenom" class="form-label">prenom</label>
+										<input type="text" class="form-control" id="prenom" name="prenom" required>
+									</div>
+									<button type="submit" class="btn btn-primary">Ajouter</button>
+								</form>
+							</div>
 						</div>
-					</div>			
-
-
-					{% endif %}
-
-					{% if infotournoi.isArchived == 1 %}
 						<div class="row">
+							<div class="col">
+								{% if AfficherPersonnes |length > 0 %}
+									<table class="table" id="personneTable">
+										<thead>
+											<tr>
 
-							<a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\'action est irréversible');">
-								<i class="fa-solid fa-trash-can me-1"></i>Suppression du tournoi</a>
+												<th scope="col">nom</th>
+												<th scope="col">Prenom</th>
+												<th scope="col">mail</th>
+												<th scope="col">Terrain N°</th>
+											</tr>
+										</thead>
+										<tbody>
+										{% endif %}
+										{% for personne in AfficherPersonnes %}
+											<tr>
+
+												<td>{{personne.Nom}}</td>
+												<td>{{personne.Prenom}}</td>
+												<td>{{personne.Mail}}</td>
+												<td>
+													{% for terrain in AfficherTerrain %}
+
+														<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{personne.id}}&idterrain={{terrain.terrain_id}}&tournoiId={{infotournoi.id}}">
+															<span class="badge rounded-pill bg-success">
+																{{terrain.nom}}</span>
+														</a>
+													{% endfor %}
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+
+							<div class="col">
+
+								{% if AfficherLesPersonnesCrees |length > 0 %}
+
+
+									<table class="table">
+										<thead>
+											<tr>
+
+												<th scope="col">nom</th>
+												<th scope="col">Prenom</th>
+												<th scope="col">mail</th>
+												<th scope="col">Terrain N°</th>
+												<th scope="col">Code pin</th>
+												<th scope="col">Clé sécurisée</th>
+												<th scope="col">envoyer les informations</th>
+												<th scope="col">Suppression de cette personne</th>
+											</tr>
+										</thead>
+										<tbody>
+										{% endif %}
+										{% for personneTable in AfficherLesPersonnesCrees %}
+											<tr>
+												<td>{{personneTable.Nom}}</td>
+												<td>{{personneTable.Prenom}}</td>
+												<td>{{personneTable.Mail}}</td>
+												<td>{{personneTable.terrain_nom}}</td>
+												<td>{{personneTable.code_pin}}</td>
+												<td>{{personneTable.url_key}}</td>
+												<td class="align-middle">
+													<a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{personneTable.personne_rencontre_id}}">
+														<i class="fa fa-envelope-o" aria-hidden="true"></i>
+													</a>
+												</td>
+												<td>
+													<a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{personneTable.personne_rencontre_id}}&tournoiId={{idTournoi}}">
+														<i class="fa fa-trash-o" aria-hidden="true"></i>
+													</a>
+												</td>
+
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+
+
+							</div>
 
 						</div>
 					{% endif %}
 
+					{% if infotournoi.gestionArbitres == 1 %}
+						<hr>
+						<div class="row mt-5">
+							<div class="col-5">
+								<h3>Ajouter des arbitres</h3>
+								<form action="modifierTournoi_traitement.php">
+									<div class="mb-3">
+										<input type="hidden" name="addArbitre" value="true">
+										<label for="nomArbitre" class="form-label">Nom (optionnel)</label>
+										<input type="text" class="form-control" id="NomArbitre" aria-describedby="emailHelp" name="NomArbitre">
+										<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+										<label for="nomArbitre" class="form-label">Club</label>
+										<select class="form-select" name="clubID">
 
+
+											{% for club in AfficherLesClubsPourArbitres  %}
+												<option value="{{club.id}}">{{club.nom}}</option>
+											{% endfor %}
+										</select>
+										<input type="submit">
+									</div>
+								</div>
+
+								<div class="col">
+
+									<table class="table">
+										{% for arbitre in AfficherLesArbitres %}
+
+											<tr>
+												<td>{{arbitre.nom}}</td>
+												<td>{{arbitre.club_nom}}</td>
+												<td>
+													<a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{arbitre.arbitre_id}}">
+														<i class="fa fa-trash-o" aria-hidden="true"></i>
+													</a>
+												</td>
+											</tr>
+										{% endfor %}
+									</table>
+
+								</div>
+							</div>
+
+
+						{% endif %}
+
+						{% if infotournoi.isArchived == 1 %}
+							<div class="row">
+
+								<a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\'action est irréversible');">
+									<i class="fa-solid fa-trash-can me-1"></i>Suppression du tournoi</a>
+
+							</div>
+						{% endif %}
+
+
+					</div>
+
+
+				{% endif %}
+
+
+				<div class="toast-container position-fixed bottom-50 end-0 p-3">
+					<div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+						<div class="d-flex">
+							<div class="toast-body">
+								Email envoyé avec succès !
+							</div>
+							<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+						</div>
+					</div>
+					<div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+						<div class="d-flex">
+							<div class="toast-body">
+								Échec de l'envoi de l'email.
+							</div>
+							<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+						</div>
+					</div>
 				</div>
 
-				
-			{% endif %}
 
+				<script>
 
+					document.addEventListener('DOMContentLoaded', function () {
+const params = new URLSearchParams(window.location.search);
+const status = params.get('status');
 
-
-<div class="toast-container position-fixed bottom-50 end-0 p-3">
-    <div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Email envoyé avec succès !
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Échec de l'envoi de l'email.
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-
-
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const params = new URLSearchParams(window.location.search);
-        const status = params.get('status');
-
-        if (status === 'success') {
-            const successToast = new bootstrap.Toast(document.getElementById('mailToast'));
-            successToast.show();
-        } else if (status === 'error') {
-            const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-            errorToast.show();
-        }
-    });
-</script>
+if (status === 'success') {
+const successToast = new bootstrap.Toast(document.getElementById('mailToast'));
+successToast.show();
+} else if (status === 'error') {
+const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+errorToast.show();
+}
+});
+				</script>
