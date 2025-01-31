@@ -142,12 +142,14 @@ gtag('config', 'G-3NFVPTP2MY');
 								{% endif %}
 							{% endif %}
 							<ul class="list-group">
-							{% for equipes in listeDesEquipesByClubs %}
-									
-								
-									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{equipes.id}}" class="list-group-item list-group-item-action">{{ equipes.nom |upper }} - {{equipes.Nom_categorie}}</a>
-								
-							{% endfor %}
+							
+								{% for equipe in equipesAvecPoule %}
+									<a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}" 
+									class="list-group-item list-group-item-action">
+										{{ equipe.nom | upper }} - {{ equipe.Nom_categorie }}
+									</a>
+								{% endfor %}
+
 							</ul>
 						{% endif %}
 					</div>
@@ -169,14 +171,18 @@ gtag('config', 'G-3NFVPTP2MY');
 							<ul class="list-group">
 
 								{% for poule in afficherLesPoules %}
-						
-												
-												
-								<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action" >
-								{{ poule.nom | upper }}
-								</a>
-					
-									
+
+										{% if IdPoules == poule.id  %}
+									<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action active">
+										{{ poule.nom | upper }}
+									</a>
+									{% else %}
+									<a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action">
+										{{ poule.nom | upper }}
+									</a>
+									{% endif %}
+
+
 								{% endfor %}
 								</ul>
 							{% endif %}
