@@ -77,12 +77,18 @@ if (isset($_GET['categorie'])) {
                 
                }    
                
-        echo "<div class=\" alert alert-success alert-dismissible fade show d-flex \" role=\"alert\" style=\"z-index: 1050;\">
-        <button type=\"button\" class=\"btn-close\" data-dismiss=\"alert\" aria-label=\"Close\"></button>
-        <div>
-          La poule et les rencontres sont créés :), il reste à les planifier  <a href=\"PlacementDesRencontres.php?id_tournoi=" . htmlspecialchars($_GET['id_tournoi']) . "\">ici</a>
-        </div>
-      </div>";
+               echo "
+               <div class=\"alert alert-success alert-dismissible fade show d-flex\" role=\"alert\" style=\"z-index: 1050;\">
+                   <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>
+                   <div>
+                       <strong>La poule et les rencontres ont été créées avec succès ! 😊</strong><br>
+                       Il reste à les planifier. Vous pouvez commencer à planifier <a href=\"PlacementDesRencontres.php?id_tournoi=" . htmlspecialchars($_GET['id_tournoi']) . "\" class=\"btn btn-link\">
+                           <i class=\"fa-solid fa-calendar-check me-2\"></i>Planifier les rencontres</a>, 
+                       ou retoucher cette poule <a href=\"modifierPoules.php?id_tournoi=" . htmlspecialchars($_GET['id_tournoi']) . "\" class=\"btn btn-link\">
+                           <i class=\"fa-solid fa-pencil-alt me-2\"></i>Modifier la poule</a>.
+                   </div>
+               </div>";
+               
 
 
 
