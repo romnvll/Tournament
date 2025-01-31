@@ -475,6 +475,24 @@ public function pouleHasRencontreProgrammee(int $pouleId, int $idTournoi): bool 
 }
 
 
+public function getDernierePouleIdParEquipe(int $equipeId): ?int {
+    $query = "
+        SELECT ep.poule_id
+        FROM EquipePoule ep
+        WHERE ep.equipe_id = :equipeId
+        ORDER BY ep.poule_id DESC
+        LIMIT 1
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':equipeId', $equipeId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchColumn() ?: null;
+}
+
+
+
 
 public function compterEquipesParPoule($poule_id) {
     

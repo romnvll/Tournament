@@ -45,19 +45,46 @@ if (isset ($_GET['affichageByTerrain'])) {
 
 if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
+
+
+
+
 }
 
 else {
 
   $listePoulesParEquipe = null;
+ 
 }
 
 
 if (isset ($_GET['id_club'])) {
+  
+
   $idclub = $_GET['id_club'];
 
   $listeDesRencontreByClubs = $rencontre->afficherRencontreByTournoiByClub($_GET['id_tournoi'],$_GET['id_club']);
   $listeDesEquipesByClubs = $equipeDao->getAllEquipeByIdTournoiAndClub($_GET['id_tournoi'],$_GET['id_club']);
+
+//derniere poules des équipes :
+
+$equipesAvecPoule = [];
+
+foreach ($listeDesEquipesByClubs as $equipe) {
+    $equipesAvecPoule[] = [
+        'id' => $equipe['id'],
+        'nom' => $equipe['nom'],
+        'Nom_categorie' => $equipe['Nom_categorie'],
+        'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id'])
+    ];
+}
+
+
+//
+
+
+
+
 }
 
 else {
@@ -100,6 +127,7 @@ else {
 
 if (isset ($_GET['idPoule'])) {
   //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
+  
  
   if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
     
@@ -145,6 +173,7 @@ echo $template->render([
     'getNomClubCourant' => $clubdao->getClubById($_GET['id_club'])['nom'],
     'getNomEquipeCourant' => $equipeDao->getEquipeById($_GET['id_equipe'])['nom'],
     'labels' => $Labels,
+    'equipesAvecPoule' => $equipesAvecPoule
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

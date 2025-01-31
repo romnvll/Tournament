@@ -53,7 +53,7 @@
 
                           {% if poule.nbrEquipeParPoule == 0 %}
                         <a href="modifierPoules.php?id_poule={{ poule.idPoule }}&id_tournoi={{idTournoi}}" class="btn btn-success {% if RencontresExistesDansPoules %} disabled {% endif %}" role="button" aria-disabled="true">{{poule.nomPoule}} ({{ poule.nbrEquipeParPoule }})<a href="modifierPoules_traitement.php?idPoule={{poule.idPoule}}"><span class="badge bg-danger"> <i class="fa-solid fa-trash"></i></span></a> </a><br>
-
+                            
                           {% else %}
                            <a href="modifierPoules.php?id_poule={{ poule.idPoule }}&id_tournoi={{idTournoi}}" class="btn btn-success {% if RencontresExistesDansPoules %} disabled {% endif %}" role="button" aria-disabled="true">{{poule.nomPoule}} ({{ poule.nbrEquipeParPoule }}) </a><br>
 
