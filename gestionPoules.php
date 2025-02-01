@@ -49,7 +49,6 @@ if (isset($_GET['categorie'])) {
              // $rencontreDejaPlanifiee = $rencontre->rencontresCategorieDejaPlanifiees($idCategorie,$_GET['id_tournoi']);
 
 
-             $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
               
              //on efface les rencontres existantes
                foreach ($poule as $key => $value) {
@@ -67,7 +66,8 @@ if (isset($_GET['categorie'])) {
                       exit(1);
                       }
                       else {
-                        
+                        $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
+
                         $rencontres->supprimerRencontresParPoule($value);
                         $rencontres->createRencontreByPoule($value,$_GET['id_tournoi'],0,false);
 
