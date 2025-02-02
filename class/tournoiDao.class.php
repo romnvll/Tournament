@@ -485,7 +485,8 @@ public function modifierTournoi(
     ?int $isArchived = null, 
     ?int $IsRankingView = null, 
     ?int $gestionTable = null, 
-    ?int $gestionArbitres = null
+    ?int $gestionArbitres = null,
+    ?int $refreshClientTime = null
 ): void {
     $fields = [];
     $params = [':idTournoi' => $idTournoi];
@@ -503,8 +504,6 @@ public function modifierTournoi(
         $fields[] = "isClassement = :isClassement";
         $params[':isClassement'] = $isClassement;
     }
-   
-   
     if ($pasHoraire !== null) {
         $fields[] = "pasHoraire = :pasHoraire";
         $params[':pasHoraire'] = $pasHoraire;
@@ -534,6 +533,13 @@ public function modifierTournoi(
         $params[':gestionArbitres'] = $gestionArbitres;
     }
 
+    // Gestion de refreshClientTime : si null, on le met à 30000
+    if ($refreshClientTime === null) {
+        $refreshClientTime = 30000;
+    }
+    $fields[] = "refreshClientTime = :refreshClientTime";
+    $params[':refreshClientTime'] = $refreshClientTime;
+
     if (empty($fields)) {
         throw new Exception("Aucun champ à mettre à jour.");
     }
@@ -551,6 +557,7 @@ public function modifierTournoi(
 
     $stmt->execute();
 }
+
 
 
 public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
