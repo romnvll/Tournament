@@ -120,6 +120,7 @@ else {
 
 if (isset ($_GET['id_tournoi'])) {
   $_SESSION['idTournoi'] = $_GET['id_tournoi'];
+  $idTournoi= $_GET['id_tournoi'];
   $listeClubsParticipants = $clubdao->clubsParticipatingInTournoi($_GET['id_tournoi']);
   $Labels = $Labels->getLabelsWithCreneauxByTournoiId($_GET['id_tournoi']);
 
@@ -128,6 +129,7 @@ if (isset ($_GET['id_tournoi'])) {
 else {
   $listeClubsParticipants=null;
   $Labels = $Labels->getLabelsWithCreneauxByTournoiId(0);
+  $idTournoi=0;
 }
 
 if (isset ($_GET['idPoule'])) {
@@ -165,7 +167,7 @@ if (isset ($_GET['idPoule'])) {
 
 
 echo $template->render([
-    'infoTournoiEnCours'=> $tournoiDao->getTournoiById($_GET['id_tournoi']),
+    'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
     'ListeDesTournois' => $listeDesTournois,
     'afficherLesPoules' => $listePoulesParEquipe ,
     'idTournoi'=> $_SESSION['idTournoi'],
