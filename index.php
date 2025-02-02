@@ -165,6 +165,7 @@ if (isset ($_GET['idPoule'])) {
 
 
 echo $template->render([
+    'infoTournoiEnCours'=> $tournoiDao->getTournoiById($_GET['id_tournoi']),
     'ListeDesTournois' => $listeDesTournois,
     'afficherLesPoules' => $listePoulesParEquipe ,
     'idTournoi'=> $_SESSION['idTournoi'],
