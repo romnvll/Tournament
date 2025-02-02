@@ -86,6 +86,10 @@
                                         <input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="1" {% if infotournoi.isArchived == 1 %} checked {% endif %} onchange="this.form.submit()">
                                         <label class="form-check-label" for="isArchived">Archiver le tournoi</label>
                                     </div>
+									<div class="mb-3 ">
+                                    <label for="refreshClientTime" class="form-label">Taux raffraichissement (s)</label>
+                                    <input type="number" class="form-control" id="refreshClientTime" name="refreshClientTime" value="{{ infotournoi.refreshClientTime /1000 }}" onchange="this.form.submit()" min="1" max="200">
+                                </div>
                                 </div>
                             </form>
                         </div>

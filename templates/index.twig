@@ -46,6 +46,7 @@
             font-size: 16px;
         }
     </style>
+
 </head>
 <body>
     {% set countVisibleTournois = 0 %}
@@ -397,24 +398,28 @@
         </div>
     </div>
 </body>
+
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <script>
-    // Rafraîchir les sections toutes les 10 secondes
-    setInterval(function () {
-        // Rafraîchir le div 'score'
-        $('#score').load(location.href + ' #score > *');
-        // Rafraîchir la table avec l'ID 'classementTableau'
-        $('#classementTableau').load(location.href + ' #classementTableau > *');
-        // Rafraîchir le div contenant les labels
-        $('#labels').load(location.href + ' #labels > *', function () {
-            // Vérifier si le div est vide après le rafraîchissement
-            if ($.trim($('#labels').text()) === '') {
-                $('#labels').hide(); // Masquer le div s'il est vide
-            } else {
-                $('#labels').show(); // Afficher le div s'il contient des informations
-            }
-        });
-    }, 10000);
+   // Récupérer la valeur de refreshClientTime depuis Twig
+var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] }};
+
+// Rafraîchir les sections selon refreshClientTime
+setInterval(function () {
+    // Rafraîchir le div 'score'
+    $('#score').load(location.href + ' #score > *');
+    // Rafraîchir la table avec l'ID 'classementTableau'
+    $('#classementTableau').load(location.href + ' #classementTableau > *');
+    // Rafraîchir le div contenant les labels
+    $('#labels').load(location.href + ' #labels > *', function () {
+        // Vérifier si le div est vide après le rafraîchissement
+        if ($.trim($('#labels').text()) === '') {
+            $('#labels').hide(); // Masquer le div s'il est vide
+        } else {
+            $('#labels').show(); // Afficher le div s'il contient des informations
+        }
+    });
+}, refreshInterval);
 
     document.addEventListener("DOMContentLoaded", function () {
         // Fonction pour obtenir les paramètres de l'URL

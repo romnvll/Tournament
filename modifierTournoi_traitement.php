@@ -152,12 +152,12 @@ else {
 
 
 
-
+$tempRefresh = $_POST['refreshClientTime'] * 1000;
 
 
 
 $tournoidao = new tournoiDao();
-$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres);
+$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh);
 
 header("Location: " . $_SERVER['HTTP_REFERER']);
 ?>
