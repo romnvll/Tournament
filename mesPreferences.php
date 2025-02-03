@@ -19,8 +19,7 @@ $label = new LabelDao();
 
 $idClub = $club->afficherClubsDetailByMail($_COOKIE['email'])[0]['id'];
 
-$label = $label->getLabelByClubs($idClub);
-var_dump($label);
+
 echo $template->render([
   'email' => $_COOKIE['email'],
   'pageEnCours' =>  'Users',
