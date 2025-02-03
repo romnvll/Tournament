@@ -8,6 +8,7 @@ require 'class/equipeDao.class.php';
 require 'class/clubDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
+require 'security.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
