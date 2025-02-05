@@ -43,6 +43,8 @@ $qrcode = (new QRCode($options))->render($url);
   <title>Tournoi Handball</title>
   <link rel="stylesheet" href="/css/styles.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
       @media print {
       body {
@@ -81,7 +83,10 @@ $qrcode = (new QRCode($options))->render($url);
 <div class="row justify-content-md-center">
 
 
-<h4 class="text-center">Scanner pour savoir quand et où votre équipe doit jouer</h4>
+<h4 class="text-center">
+    <i class="fas fa-qrcode"></i> Scannez le QR code pour voir les horaires et lieux de vos rencontres !
+</h4>
+
 </div>
 <div class="row justify-content-md-center">
 
@@ -103,7 +108,11 @@ $formatter = new IntlDateFormatter(
 
 $dateFormatted = $formatter->format($date);
 
-echo "<p class=\"text-primary text-center fs-1\">" . $tournoiDao->getTournoiById($_GET['idTournoi'])['nom'] . " le " . $dateFormatted . "</p>";
+echo "<p class=\"text-center text-primary fw-bold fs-1\">
+        <i class=\"fas fa-trophy me-2\"></i>" 
+        . htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['nom']) . 
+        " <br><span class=\"fs-3 text-secondary\">📅 " . $dateFormatted . "</span>
+      </p>";
 
 
 ?>
