@@ -35,6 +35,7 @@ if (isset ($_GET['affichageByClubs'])) {
 }
 
 if (isset ($_GET['affichageByTeam'])) {
+  
   $affichageByTeam = true;
   $listeDesRencontresByTeam = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
 }

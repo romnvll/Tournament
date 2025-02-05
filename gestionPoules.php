@@ -43,12 +43,13 @@ if (isset($_GET['categorie'])) {
     
       if (isset($_GET['creation'])) {
        
+        
 
 
         if ($_GET['creation'] == "ok") {
              // $rencontreDejaPlanifiee = $rencontre->rencontresCategorieDejaPlanifiees($idCategorie,$_GET['id_tournoi']);
 
-
+            
               
              //on efface les rencontres existantes
                foreach ($poule as $key => $value) {
@@ -62,21 +63,30 @@ if (isset($_GET['categorie'])) {
                             <a href=\"PlacementDesRencontres.php?id_tournoi=" . htmlspecialchars($_GET['id_tournoi']) . "\">ici</a>.
                           </div>
                         </div>";
+                        
 
                       exit(1);
                       }
+
                       else {
+                        
                         $poule = $poules->creerPoulesPourCategorie($_GET['id_tournoi'],$idCategorie,$nbrEquipeEnCours);
+                       
+                       foreach ($poule as $idpoule) {
+                        $rencontres->supprimerRencontresParPoule($idpoule);
+                        $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],0,false);
+                        
+                        }
+                                       
 
-                        $rencontres->supprimerRencontresParPoule($value);
-                        $rencontres->createRencontreByPoule($value,$_GET['id_tournoi'],0,false);
-
+                        
+                        
                       }
+                      
 
 
                 
                }    
-               
                echo "
                <div class=\"alert alert-success alert-dismissible fade show d-flex\" role=\"alert\" style=\"z-index: 1050;\">
                    <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>
@@ -90,12 +100,14 @@ if (isset($_GET['categorie'])) {
                </div>";
                
 
-
+               
 
         exit();
-
+             
         }
+        
       }
+
 
   }
 }
