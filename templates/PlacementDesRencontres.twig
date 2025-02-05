@@ -23,6 +23,8 @@
             width: 150px;
             font-size: 12px;
         }
+
+        
     </style>
 </head>
 <body>
@@ -171,7 +173,9 @@
                     </td>
                     {% set Displayed = false %}
                     {% for j in 0..terrains|length - 1 %}
-                    <td>
+                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}">
+
+                    
                         {% set planificationFound = false %}
                         {% set creneauOqp = false %}
                         {% for planification in afficherPlanification %}
@@ -180,7 +184,7 @@
                                 {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
                                     {% if planification.arbitre_id is not null %}
                                         <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}" >
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
                                             <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                         </a>
                                     {% else %}
@@ -201,7 +205,7 @@
                                         {% elseif planification.isClassement == 1 %}
                                             <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.equipe2_poule_noms|split(',')[0] }} </p>
                                         {% endif %}
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}" >
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
                                             <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                         </a>
                                     {% endif %}
@@ -216,7 +220,7 @@
                                         var backgroundColor = '{{ planification.label_couleur }}';
                                         tdElement.style.backgroundColor = backgroundColor;
                                     </script>
-                                    <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}">
+                                    <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}">
                                         <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                     </a>
                                     <p class="text-light">{{ planification.label_description }}</p>
