@@ -15,15 +15,20 @@ class arbitreDao {
         }
     }
 
-    public function ajouterArbitre(string $nom, int $tournoi_id, int $club_id): void {
+    public function ajouterArbitre(?string $nom, int $tournoi_id, int $club_id): void {
         $stmt = $this->connexion->prepare("
             INSERT INTO Arbitres (nom, tournoi_id, club_id)
-            VALUES (:nom, :tournoi_id, :club_id)");
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->bindParam(':club_id', $club_id);
+            VALUES (:nom, :tournoi_id, :club_id)
+        ");
+        
+        // Si le nom est null, on utilise NULL dans la requête
+        $stmt->bindValue(':nom', $nom, $nom !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->bindValue(':club_id', $club_id, PDO::PARAM_INT);
+        
         $stmt->execute();
     }
+    
 
     public function modifierArbitre(int $arbitre_id, string $nom = null, int $tournoi_id = null, int $club_id = null): void {
         $sql = "UPDATE Arbitres SET ";
