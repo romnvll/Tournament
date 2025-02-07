@@ -33,11 +33,18 @@ $listeDesRencontresByTerrain = null;
 if (isset ($_GET['affichageByClubs'])) {
   $affichageByClubs = true;
 }
+else {
+  $affichageByClubs = null;
+}
 
 if (isset ($_GET['affichageByTeam'])) {
   
   $affichageByTeam = true;
   $listeDesRencontresByTeam = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
+}
+else {
+  $affichageByTeam=null;
+  $listeDesRencontresByTeam = null;
 }
 
 if (isset ($_GET['affichageByTerrain'])) {
