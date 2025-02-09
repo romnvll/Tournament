@@ -1,7 +1,7 @@
 Fonctionnalités du logiciel Tournament
 --------------------------------------
 
-Le logiciel **Tournament** est une application de gestion de tournois qui offre une gamme complète de fonctionnalités pour organiser et gérer efficacement des compétitions. Basé sur le code source, voici une liste détaillée des fonctionnalités disponibles :
+Le logiciel **Tournament** est une application de gestion de tournois qui offre une gamme complète de fonctionnalités pour organiser et gérer efficacement des compétitions. Voici une liste détaillée des fonctionnalités disponibles :
 
 Gestion des Tournois
 --------------------
@@ -9,7 +9,7 @@ Gestion des Tournois
 -   **Création de tournois** : Permet de créer de nouveaux tournois en spécifiant les détails tels que le nom, la date, le lieu et le type de compétition.
 -   **Modification des tournois** : Possibilité de modifier les informations des tournois existants.
 -   **Suppression des tournois** : Option pour supprimer des tournois de la base de données.
--   **Types de tournois supportés** : Gestion de différents formats de tournois (*élimination directe, rondes suisses, ligues*, etc.).
+-   **Types de tournois supportés** : Toute ronde simple ou aller/retour.
 
 Gestion des Participants
 ------------------------
@@ -18,14 +18,14 @@ Gestion des Participants
 -   **Modification des participants** : Mise à jour des données des participants inscrits.
 -   **Suppression des participants** : Retrait de participants d'un tournoi si nécessaire.
 -   **Gestion des équipes** : Création et gestion d'équipes pour les tournois en équipe.
--   **Importation de participants** : Importation en masse des participants à partir de fichiers externes.
+
 
 Gestion des Matchs
 ------------------
 
 -   **Génération automatique des matchs** : Création des rencontres en fonction du format du tournoi.
 -   **Planification des matchs** : Programmation des dates, heures et lieux des rencontres.
--   **Saisie des résultats** : Enregistrement des scores et des résultats de chaque match.
+-   **Saisie des résultats** : Enregistrement des scores et des résultats de chaque match. La saisie peut se faire soit par la table centrale, soit par le gestionnaire du score à la table du terrain. La personne reçoit un e-mail et se connecte pour saisir uniquement les scores de son terrain..
 -   **Mise à jour en temps réel** : Actualisation automatique du tableau du tournoi après chaque match.
 
 Système de Classement
@@ -42,57 +42,15 @@ Interface Utilisateur
 -   **Visualisation graphique** : Affichage des tableaux, arbres et rondes du tournoi de manière graphique.
 -   **Personnalisation de l'interface** : Options pour personnaliser les thèmes et les dispositions.
 
-Gestion des Utilisateurs
-------------------------
 
--   **Authentification sécurisée** : Système de connexion pour protéger l'accès aux fonctionnalités sensibles.
--   **Gestion des rôles** : Attribution de rôles (*administrateur, organisateur, arbitre*) avec des permissions spécifiques.
--   **Multi-utilisateurs** : Support de plusieurs utilisateurs travaillant simultanément.
 
 Notifications et Communications
 -------------------------------
 
--   **Envoi d'e-mails automatisés** : Notifications aux participants pour les inscriptions, horaires des matchs et résultats.
--   **Alertes et rappels** : Rappels automatiques pour les matchs à venir ou les actions requises.
--   **Messagerie interne** : Communication directe entre les organisateurs et les participants.
+-   **Generation de QR code** : Génération automtique d'un qr code pour notifier les coachs zet le public des horaires des matchs et résultats.
 
-Statistiques et Rapports
-------------------------
 
--   **Génération de rapports** : Création de rapports détaillés sur le déroulement du tournoi, les résultats et les statistiques.
--   **Exportation des données** : Exportation des informations au format *PDF, Excel ou CSV*.
--   **Analyse des données** : Outils pour analyser les performances et les tendances.
 
-Support Multilingue
--------------------
-
--   **Langues disponibles** : Interface disponible en plusieurs langues pour une utilisation internationale.
--   **Facilité de traduction** : Possibilité d'ajouter de nouvelles langues via des fichiers de langue.
-
-Paramètres et Personnalisation
-------------------------------
-
--   **Configuration flexible** : Ajustement des paramètres du tournoi selon les besoins spécifiques.
--   **Règles personnalisées** : Définition de règles propres au tournoi ou au sport concerné.
--   **Thèmes et logos** : Personnalisation avec les logos et les couleurs de l'organisateur ou du sponsor.
-
-Sauvegarde et Restauration
---------------------------
-
--   **Sauvegarde des données** : Enregistrement régulier des données pour éviter les pertes.
--   **Restauration** : Possibilité de restaurer les informations à partir d'une sauvegarde précédente.
-
-Sécurité et Confidentialité
----------------------------
-
--   **Protection des données** : Chiffrement des informations sensibles des participants.
--   **Conformité RGPD** : Respect des réglementations sur la protection des données personnelles.
-
-Intégrations et Extensions
---------------------------
-
--   **API ouverte** : Interface de programmation pour intégrer le logiciel avec d'autres systèmes.
--   **Plugins et modules** : Support pour ajouter des fonctionnalités supplémentaires via des extensions.
 
 Support et Documentation
 ------------------------
@@ -100,11 +58,6 @@ Support et Documentation
 -   **Aide intégrée** : Documentation pour guider les utilisateurs à travers les fonctionnalités.
 -   **Support technique** : Assistance pour résoudre les problèmes ou répondre aux questions des utilisateurs.
 
-Mise à Jour
------------
-
--   **Mises à jour automatiques** : Téléchargement et installation des dernières améliorations et correctifs.
--   **Historique des versions** : Suivi des changements apportés dans chaque version du logiciel.
 
 * * * * *
 
