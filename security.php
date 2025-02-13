@@ -9,7 +9,7 @@ if (!isset($_COOKIE['auth'])) {
 }
 else {
  
-  $secret = "ma_clé_ultra_sécurisée"; 
+  $secret = "ma_clé_ultra_sécurisée!"; 
 
 if (isset($_COOKIE['auth'])) {
     // Décoder le cookie
