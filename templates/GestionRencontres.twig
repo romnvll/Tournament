@@ -67,37 +67,45 @@
 <div class="row">
   <div class="col-12 col-lg-7">
     <!-- Table des rencontres -->
-    <table class="table table-striped table-hover align-middle">
-      <thead>
+  <table class="table table-striped table-hover align-middle">
+    <thead>
         <tr>
-          <th scope="col" class="text-center">Tour <i class="fas fa-calendar-day"></i></th>
-          <th scope="col" class="text-center">Heure <i class="fas fa-clock"></i></th>
-          <th scope="col" class="text-center">Équipe 1 <i class="fas fa-users"></i></th>
-          <th scope="col" class="text-center">Score <i class="fas fa-trophy"></i></th>
-          <th scope="col" class="text-center">Équipe 2 <i class="fas fa-users"></i></th>
-          <th scope="col" class="text-center">Terrain <i class="fas fa-map-marker-alt"></i></th>
+            <th scope="col" class="text-center">Tour <i class="fas fa-calendar-day"></i></th>
+            <th scope="col" class="text-center">Heure <i class="fas fa-clock"></i></th>
+            <th scope="col" class="text-center">Équipe 1 <i class="fas fa-users"></i></th>
+            <th scope="col" class="text-center">Score <i class="fas fa-trophy"></i></th>
+            <th scope="col" class="text-center">Équipe 2 <i class="fas fa-users"></i></th>
+            <th scope="col" class="text-center">Terrain <i class="fas fa-map-marker-alt"></i></th>
         </tr>
-      </thead>
-      <tbody>
+    </thead>
+    <tbody>
         {% for equipe in RencontreByPoule %}
-          <form action="gestionRencontres_traitement.php" method="POST" id="rencontre_{{equipe.rencontre_id}}">
+        <form action="gestionRencontres_traitement.php" method="POST" id="rencontre_{{equipe.rencontre_id}}">
             <input type="hidden" value="{{idTournoi}}" name="idTournoi">
             <input type="hidden" value="{{idPoule}}" name="idPoule">
             <input type="hidden" value="{{equipe.rencontre_id}}" name="IdRencontre" id="IdRencontre">
             <tr>
-              <td class="text-center">
-                <span class="badge {% if equipe.tour is even %}bg-success{% else %}bg-primary{% endif %}">Tour N°{{ equipe.tour }}</span>
-              </td>
-              <td>{{equipe.creneau_nom}}</td>
-              <td class="text-center">{{ equipe.equipe1_nom }}</td>
-              <td class="text-center">{{equipe.score1}} - {{equipe.score2}}</td>
-              <td class="text-center">{{ equipe.equipe2_nom }}</td>
-              <td>{{equipe.terrain_nom}}</td>
+                <td class="text-center">
+                    <span class="badge {% if equipe.tour is even %}bg-success{% else %}bg-primary{% endif %}">Tour N°{{ equipe.tour }}</span>
+                </td>
+                <td class="text-center">{{equipe.creneau_nom}}</td>
+                <td class="text-center">
+                    <img src="{{ equipe.club1_logo }}" alt="{{ equipe.equipe1_nom }} Logo" style="width: 30px; height: 30px;">
+                    {{ equipe.equipe1_nom }}
+                </td>
+                <td class="text-center">{{equipe.score1}} - {{equipe.score2}}</td>
+                <td class="text-center">
+                    {{ equipe.equipe2_nom }}
+                    <img src="{{ equipe.club2_logo }}" alt="{{ equipe.equipe2_nom }} Logo" style="width: 30px; height: 30px;">
+                    
+                </td>
+                <td class="text-center">{{equipe.terrain_nom}}</td>
             </tr>
-          </form>
+        </form>
         {% endfor %}
-      </tbody>
-    </table>
+    </tbody>
+</table>
+
   </div>
 
   <div class="col-12 col-lg-5">
