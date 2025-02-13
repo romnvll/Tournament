@@ -17,11 +17,12 @@ $club = new ClubDAO();
 $label = new LabelDao();
 
 
-$idClub = $club->afficherClubsDetailByMail($_COOKIE['email'])[0]['id'];
+
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+  'email' => $userData['email'],
+  'logo' => $userData['logo'],
   'pageEnCours' =>  'Users',
  
    

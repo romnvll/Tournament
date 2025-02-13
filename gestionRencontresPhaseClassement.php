@@ -76,6 +76,7 @@ foreach ($poulesFinales as &$poule) {
 
 
 echo $template->render([
+  'logo' => $_COOKIE['logo'],
   'email' => $_COOKIE['email'],
   'pageEnCours' => 'GestionDesRencontres',
   //'categorieEnCours' => $_GET['categorie'],

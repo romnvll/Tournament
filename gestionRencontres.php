@@ -48,10 +48,11 @@ if (isset ($_GET['idPoule'])) {
 
 $template = $twig->load('GestionRencontres.twig');
 echo $template->render([
-  'email' => $_COOKIE['email'],
+  'email' => $userData['email'],
+  'logo' => $userData['logo'],
   'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
   'pageEnCours' => 'GestionDesRencontres',
-  'afficherLesTournois' => $tournoi->afficherLesTournois(),
+  'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_SESSION['idTournoi']),
   'idTournoi'=> $_SESSION['idTournoi'],
   'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule'],),

@@ -18,13 +18,13 @@ public function __construct() {
 }
 
 
-public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0): int {
+public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0, int $idUser): int {
     try {
         $this->connexion->beginTransaction(); // Début de la transaction
 
         $stmt = $this->connexion->prepare("
-            INSERT INTO Tournois (nom, dateDebut, nb_terrains, heure_debut, pasHoraire, isClassement) 
-            VALUES (:nom, :dateDebut, :nb_terrains, :heure_debut, :pasHoraire, :isClassement)
+            INSERT INTO Tournois (nom, dateDebut, nb_terrains, heure_debut, pasHoraire, isClassement,club_id) 
+            VALUES (:nom, :dateDebut, :nb_terrains, :heure_debut, :pasHoraire, :isClassement, :idUser)
         ");
         
         $stmt->bindParam(':nom', $nom);
@@ -33,6 +33,7 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
         $stmt->bindParam(':heure_debut', $heure_debut);
         $stmt->bindParam(':pasHoraire', $pasHoraire, PDO::PARAM_INT);
         $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
+        $stmt->bindParam(':idUser', $idUser, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -58,24 +59,43 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
         $stmt->execute();
     }
 
-    public function afficherLesTournois() : array {
-       
+    public function afficherLesTournois(int $club_id) : array {
         $stmt = $this->connexion->prepare("
-        SELECT
-            t.*,
-            COUNT(e.id) AS nombre_equipes
-        FROM
-            Tournois t
-        LEFT JOIN
-            Equipes e ON t.id = e.tournoi_id
-        GROUP BY
-            t.id
-    ");
+            SELECT
+                t.*,
+                COUNT(e.id) AS nombre_equipes
+            FROM
+                Tournois t
+            LEFT JOIN
+                Equipes e ON t.id = e.tournoi_id
+            WHERE
+                t.club_id = :club_id
+            GROUP BY
+                t.id
+        ");
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
-       $tounois=$stmt->fetchAll();
-       return $tounois;
+        return $stmt->fetchAll();
+    }
+
+    public function afficherTousLesTournois() : array {
+        $stmt = $this->connexion->prepare("
+            SELECT
+                t.*,
+                COUNT(e.id) AS nombre_equipes
+            FROM
+                Tournois t
+            LEFT JOIN
+                Equipes e ON t.id = e.tournoi_id
+            
+            GROUP BY
+                t.id
+        ");
         
-   }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
 
    public function afficherLesTournoisDeClassement() : array {
        

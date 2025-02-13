@@ -116,14 +116,15 @@ if (isset($_GET['categorie'])) {
 
 $template = $twig->load('GestionPoules.twig');
 echo $template->render([
-  'email' => $_COOKIE['email'],
+  'email' => $userData['email'],
+  'logo' => $userData['logo'],
   'pageEnCours' => 'GestionDesPoules',
 
   'nbrEquipeEnCours' => $nbrEquipeEnCours,
 
   'nomDuTournoi' => $nomTournoi,
 
-  'ListeDesTournois' => $tournois->afficherLesTournois(),
+  'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
   'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
   'idTournoi' => $_GET['id_tournoi'],
   'nombreEquipeParPoule' => $PouleAuto,

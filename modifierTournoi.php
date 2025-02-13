@@ -3,7 +3,6 @@ require 'security.php';
 require 'vendor/autoload.php';
 
 
-
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
@@ -47,12 +46,14 @@ $template = $twig->load('modifierTournoi.twig');
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+ 'email' => $userData['email'],
+  'logo' => $userData['logo'],
+  'idUser' => $_COOKIE['user'],
   'pageEnCours' => 'GestionTournois',
   'infotournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
   'tournoiEnCours' => $idtournoi,
   'idTournoi' => $idtournoi,
-'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
+'ListeDesTournois' => $tournoiDao->afficherLesTournois($userData['id']),
 'AfficherClub' => $listeClub->afficherClubs(),
 'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),

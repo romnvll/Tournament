@@ -1,5 +1,6 @@
 <?php
 require 'security.php';
+
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
 $tournoiDao = new tournoiDao();
@@ -13,7 +14,7 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 $template = $twig->load('ajoutTournoi.twig');
 
 
-$tousLesTournois = $tournoiDao->afficherLesTournois();
+$tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 $dernierId = null;
 
@@ -25,9 +26,11 @@ foreach ($tousLesTournois as $tournoi) {
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+ 'email' => $userData['email'],
+  'logo' => $userData['logo'],
 'pageEnCours' => 'GestionTournois',
 'idTournoi' => $dernierId,
+
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),
 //'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),

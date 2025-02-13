@@ -29,11 +29,12 @@ if (isset ($_GET['idPoule'])) {
 }
 
 echo $template->render([
-    'email' => $_COOKIE['email'],
+  'email' => $userData['email'],
+  'logo' => $userData['logo'],
     'pageEnCours' => 'GestionDesRencontres',
     //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
     //'afficherLesTournois' => $tournoi->getAllTournoi(),
-    'ListeDesTournois' => $tournois->afficherLesTournois(),
+    'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
     'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_GET['id_tournoi'],true),
     'idTournoi' => $idtournoi,
     'tournoiEnCours' => $idtournoi,

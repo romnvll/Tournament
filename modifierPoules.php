@@ -84,12 +84,13 @@ if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
 
 $template = $twig->load('modifierPoules.twig');
 echo $template->render([
-    'email' => $_COOKIE['email'],
+    'email' => $userData['email'],
+  'logo' => $userData['logo'],
     'pageEnCours' => 'GestionDesPoules',
     'tournoiEnCours' => $idtournoi,
     'poules' => $poulesEtNombreEquipe,
    
-    'ListeDesTournois' => $tournois->afficherLesTournois(),
+    'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
     //'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
     'idTournoi' => $_GET['id_tournoi'],
     'idPoule' => $_GET['id_poule'],

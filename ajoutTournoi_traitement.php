@@ -17,13 +17,13 @@ $tournoiDao = new tournoiDao();
 
 //echo $_POST['dateTournoi'];
 
-$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire']);
+$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire'],$_COOKIE['user']);
 
 
 
 
 $tournoiDao = new tournoiDao();
-$tousLesTournois = $tournoiDao->afficherLesTournois();
+$tousLesTournois = $tournoiDao->afficherLesTournois($_COOKIE['user']);
 
 $dernierId = null;
 

@@ -27,7 +27,7 @@ $arbitre = new arbitreDao();
 $labels = new labelDao();
 
 if (!isset($_GET['id_tournoi'])) {
-    $listedestournois = $tournois->afficherLesTournois();
+    $listedestournois = $tournois->afficherLesTournois($userData['id']);
     $nbrterrain = null;
     $table = null;
     $listdecreneau = null;
@@ -42,7 +42,7 @@ if (!isset($_GET['id_tournoi'])) {
     $nombreDeLabel=null;
     
 } else {
-   $listedestournois = $tournois->afficherLesTournois();
+   $listedestournois = $tournois->afficherLesTournois($userData['id']);
    $nbrterrain = $terrain->AfficherTerrains($_GET['id_tournoi']);
    $listdecreneaux = $creneaux->afficherCreneaux($_GET['id_tournoi']);
    $ToutesPlanification = $planification->afficherPlanifications($_GET['id_tournoi']);
@@ -83,7 +83,8 @@ if (!isset($_GET['id_tournoi'])) {
 
 
 echo $template->render([
-    'email' => $_COOKIE['email'],
+    'email' => $userData['email'],
+  'logo' => $userData['logo'],
     'pageEnCours' => 'GestionDesRencontres',
     'idTournoi' => $_GET['id_tournoi'],
     'afficherPlanification' =>  $ToutesPlanification,
