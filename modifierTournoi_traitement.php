@@ -9,11 +9,11 @@ if ($_GET['action'] == "ajoutUserSurTable") {
     
     try {
     $personneTable->genererUrlEtCodePin($_GET['idPersonne'],$_GET['idterrain'],$_GET['tournoiId']);
-    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
+    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#placementPersonneSurTerrain");
 
     }
     catch (Exception $e) {
-        header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
+        header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#placementPersonneSurTerrain");
 
         echo 'Exception reçue : ',  $e->getMessage(), "\n";
     }
@@ -26,7 +26,7 @@ if ($_GET['action'] == "delPersonneTable") {
     $personneTable = new PersonneTableDao();
     $personneTable->supprimerPersonneTable($_GET['personneTableId']);
     
-    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#personneTable");
+    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."#placementPersonneSurTerrain");
     exit(0);
 }
 
@@ -35,7 +35,7 @@ if ($_GET['action'] == "sendMail") {
     $personneTable = new PersonneTableDao();
     $status = $personneTable->envoyerMail($_GET['personneTableId']);
     $statusParam = $status ? 'success' : 'error';
-    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#personneTable");
+    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#placementPersonneSurTerrain");
     exit(0);
 }
 
@@ -58,7 +58,7 @@ if ($_GET['addArbitre'] == true) {
     require 'class/arbitreDao.class.php';
     $arbitre=new arbitreDao();
     $arbitre->ajouterArbitre($_GET['NomArbitre'],$_GET['tournoiId'],$_GET['clubID']);
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location: " . $_SERVER['HTTP_REFERER']."#tableDesArbitres");
    exit();
 }
 
@@ -68,7 +68,7 @@ if ($_GET['delArbitre'] == true) {
     try {
         $arbitre->supprimerArbitre($_GET['arbitre_id']);
         echo "Arbitre supprimé avec succès.";
-        echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "'; }, 0);</script>";
+        echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "#tableDesArbitres'; }, 0);</script>";
 
     } catch (PDOException $e) {
         // Vérifie si l'exception est une violation de contrainte d'intégrité

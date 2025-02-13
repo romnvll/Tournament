@@ -44,6 +44,7 @@ $arbitre = new arbitreDao();
 $template = $twig->load('gestionToutesLesRencontres.twig');
 
 if (!isset($_GET['id_tournoi'])) {
+  
   $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
   $nbrterrain = null;
   $table = null;
@@ -75,7 +76,8 @@ if (!isset($_GET['id_tournoi'])) {
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+  'logo' => $userData['logo'],
+  'email' => $userData['email'],
   'pageEnCours' => 'GestionDesRencontres',
 
   //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),

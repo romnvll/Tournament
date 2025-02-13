@@ -16,7 +16,7 @@ $template = $twig->load('creerClub.twig');
 
 $club = new ClubDAO();
 $tournoiDao = new tournoiDao();
-$tousLesTournois = $tournoiDao->afficherLesTournois();
+$tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 $dernierId = null;
 
@@ -30,7 +30,8 @@ foreach ($tousLesTournois as $tournoi) {
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+ 'email' => $userData['email'],
+  'logo' => $userData['logo'],
   'pageEnCours' =>  'GestionClub',
     'ListeDesClubs' => $club->afficherClubs(),
     'idTournoi' => $dernierId,

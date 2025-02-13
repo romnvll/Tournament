@@ -17,6 +17,7 @@ $club = new ClubDAO();
 
 
 echo $template->render([
+  'logo' => $_COOKIE['logo'],
   'email' => $_COOKIE['email'],
   'pageEnCours' =>  'GestionClub',
     'ListeDesClubs' => $club->afficherClubs(),

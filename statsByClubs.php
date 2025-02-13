@@ -49,11 +49,12 @@ if ($dateTime === false) {
 
 
 echo $template->render([
-  'email' => $_COOKIE['email'],
+ 'email' => $userData['email'],
+  'logo' => $userData['logo'],
   'pageEnCours' => 'Stats',
     //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
     //'afficherLesTournois' => $tournoi->getAllTournoi(),
-    'ListeDesTournois' => $tournois->afficherLesTournois(),
+    'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
     'idTournoi' => $_GET['id_tournoi'],
     'statTournoi' => $tournois->statsTournoi($_GET['id_tournoi']),
     'infoTournoiEnCours' => $tournois->getTournoiById($_GET['id_tournoi']),

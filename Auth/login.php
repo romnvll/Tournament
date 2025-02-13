@@ -18,7 +18,7 @@ if (isset($_POST['btn-login'])) {
 
     $password = hash('sha256', $upass); // password hashing using SHA256
     
-    $stmt = $conn->prepare("SELECT id, nom, email, password FROM Clubs WHERE email= ?");
+    $stmt = $conn->prepare("SELECT id, nom, email,logo, password FROM Clubs WHERE email= ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -27,11 +27,40 @@ if (isset($_POST['btn-login'])) {
     $row = mysqli_fetch_array($res, MYSQLI_ASSOC);
 
     $count = $res->num_rows;
+    
     if ($count == 1 && $row['password'] == $password) {
-        // Définir les cookies
-        setcookie('user', $row['id'], time() + (48 * 60 * 60), "/");
-        setcookie('email', $row['email'], time() + (48 * 60 * 60), "/");
+       
+        $secret = "ma_clé_ultra_sécurisée"; 
 
+        // Données utilisateur
+        $data = [
+            'id' => $row['id'],
+            'email' => $row['email'],
+            'logo' => $row['logo'],
+            'exp' => time() + (48 * 60 * 60) // Expiration dans 48h
+        ];
+        
+        // Encodage JSON sécurisé
+        $payload = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        
+        // Génération de la signature sécurisée
+        $signature = hash_hmac('sha256', $payload, $secret);
+        
+        // Créer un tableau avec les deux parties
+        $tokenData = [
+            'payload' => $payload,
+            'signature' => $signature
+        ];
+        
+        // Encodage en Base64
+        $token = base64_encode(json_encode($tokenData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        
+        // Stockage du cookie
+        setcookie('auth', $token, time() + (48 * 60 * 60), "/", "", false, true);
+        
+
+        
+        
         // Vérifier si tous les tournois sont archivés
         $stmtTournois = $conn->prepare("SELECT COUNT(*) AS total, SUM(isArchived) AS archived FROM Tournois");
         $stmtTournois->execute();
@@ -49,6 +78,7 @@ if (isset($_POST['btn-login'])) {
         exit;
     } elseif ($count == 1) {
         $errMSG = "Mauvais mot de passe";
+       
     } else {
         $errMSG = "Club non trouvé";
     }
