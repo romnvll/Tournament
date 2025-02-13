@@ -208,6 +208,7 @@
                                         <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
                                             <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                         </a>
+                                        {% set creneauOqp = true %}
                                     {% endif %}
                                     <script>
                                         var tdElement = document.currentScript.parentElement;
