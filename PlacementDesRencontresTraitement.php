@@ -12,7 +12,7 @@ if (isset ($_POST['Addevent'])) {
     
     
     $dataArray = json_decode($_POST['Addevent'], true);
-    var_dump($dataArray);
+    
     if (json_last_error() === JSON_ERROR_NONE) {
         // Récupération de chaque champ
         $rencontre = $dataArray['rencontre'];
@@ -26,7 +26,7 @@ if (isset ($_POST['Addevent'])) {
         $idtournoi = $dataArray['idtournoi'];
         
         require 'class/planificationDao.class.php';
-        var_dump($dataArray);
+        
         $planification = new planificationDao();
 
         if (!empty($idrencontre)) {
@@ -36,8 +36,8 @@ if (isset ($_POST['Addevent'])) {
             
         } elseif (!empty($idarbitre)) {
             $planification->ajouterOuModifierPlanification($idterrain, $idcreneau, null, $idtournoi, $idarbitre, null);
-            
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+           
+           // header("Location: " . $_SERVER['HTTP_REFERER']);
         } elseif (!empty($idlabel)) {
             $planification->ajouterOuModifierPlanification($idterrain, $idcreneau, null, $idtournoi, null, $idlabel);
             echo "<script>history.back</script>";

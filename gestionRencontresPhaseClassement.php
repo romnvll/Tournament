@@ -22,6 +22,17 @@ $equipeDao = new EquipeDAO();
 $categorie = new CategorieDao();
 
 
+if (!isset ($_GET['idTournoiBase']) || $_GET['idTournoiBase'] == 0) {
+  echo "Aucun tournoi actif en cours.";
+  header("Refresh:3; url=ajoutTournoi.php");
+  exit();
+}
+
+if ($tournoiDao->droitTournoiClub($_GET['idTournoiBase'], $userData['id']) == null) {
+    
+  exit;
+}
+
 //afficher les phase de classement uniquement:
 
 
@@ -76,8 +87,9 @@ foreach ($poulesFinales as &$poule) {
 
 
 echo $template->render([
-  'logo' => $_COOKIE['logo'],
-  'email' => $_COOKIE['email'],
+ 'email' => $userData['email'],
+  'logo' => $userData['logo'],
+  
   'pageEnCours' => 'GestionDesRencontres',
   //'categorieEnCours' => $_GET['categorie'],
   'categories' => $tournoiDao->getCategoriesPourTournoi($tournoiId),
@@ -95,7 +107,7 @@ echo $template->render([
   'idCategorieEnCours' => $_GET['idCategorie'],
   //'PoulesClassement' =>$tournoiDao->afficherPoulesDeClassement($tournoiId),
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
-  'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement(),
+  'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
   
 ]);
 ?>

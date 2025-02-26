@@ -167,7 +167,7 @@
                                    hx-target="this"
                                    hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
                                    pattern="^([01]\d|2[0-3]):[0-5]\d$"
-                                   title="Please enter a time in HH:MM format (e.g., 09:12 or 14:30)."
+                                   title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
                             >
                         </div>
                     </td>
@@ -188,15 +188,15 @@
                                             <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                         </a>
                                     {% else %}
-                                        <form action="PlacementDesRencontresTraitement.php" method="post" >
-                                            {% if tournoiInfo.gestionArbitres == 1 %}
-                                                <select class="form-select"  name="Addevent" onchange="this.form.submit()" id="listeArbitre">
-                                                    <option value="">Choisir arbitre</option>
-                                                    {% for arbitre in listeDesArbitres  %}
-                                                    <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>Arbitre: {{arbitre.nom}} Club: {{arbitre.club_nom}}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            {% endif %}
+                                       <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
+                                            <select class="form-select" name="Addevent" id="listeArbitre">
+                                                <option value="">Choisir arbitre</option>
+                                                {% for arbitre in listeDesArbitres %}
+                                                <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
+                                                    Arbitre: {{arbitre.nom}} Club: {{arbitre.club_nom}}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
                                         </form>
                                     {% endif %}
                                     {% if planification.rencontre_id is not null %}
@@ -308,6 +308,20 @@
                 });
             });
         });
+
+
+
+           $(document).ready(function() {
+        $('.arbitreForm .form-select').on('change', function() {
+            var $form = $(this).closest('form');
+            var formAction = $form.attr('action');
+            var formData = $form.serialize();
+
+            $.post(formAction, formData, function() {
+                location.reload();
+            });
+        });
+    });
     </script>
 
     <script>

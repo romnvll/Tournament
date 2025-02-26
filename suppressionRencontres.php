@@ -7,6 +7,21 @@ require 'class/pouleManagerDao.class.php';
 $tournois = new tournoiDao();
 $poulemanager = new PouleManager();
 
+
+
+if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
+  echo "Aucun tournoi actif en cours.";
+  header("Refresh:3; url=ajoutTournoi.php");
+  exit();
+}
+
+if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
+    
+  exit;
+}
+
+
+
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
