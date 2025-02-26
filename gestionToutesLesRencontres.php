@@ -18,6 +18,13 @@ session_start();
 $_SESSION['id_tournoi'] = $_GET['id_tournoi'];
 
 
+if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
+  echo "Aucun tournoi actif en cours.";
+  header("Refresh:3; url=ajoutTournoi.php");
+  exit();
+}
+
+
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
@@ -37,7 +44,10 @@ $planification = new planificationDao();
 $arbitre = new arbitreDao();
 
 
-//
+if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
+    
+  exit;
+}
 
 
 

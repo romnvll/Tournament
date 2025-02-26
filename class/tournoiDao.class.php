@@ -95,11 +95,38 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function droitTournoiClub(int $tournoiId, int $clubId) : ?array {
+        $stmt = $this->connexion->prepare("
+            SELECT 
+                t.*, 
+                COUNT(e.id) AS nombre_equipes
+            FROM 
+                Tournois t
+            LEFT JOIN 
+                Equipes e ON t.id = e.tournoi_id
+            WHERE 
+                t.id = :tournoiId 
+                AND t.club_id = :clubId
+            GROUP BY 
+                t.id
+        ");
+        
+        $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
+        $stmt->bindParam(':clubId', $clubId, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $tournoi = $stmt->fetch();
+        
+        return $tournoi ?: null; // Retourne null si aucun tournoi trouvé
+    }
+    
     
 
    public function afficherLesTournoisDeClassement() : array {
        
-    $stmt = $this->connexion->prepare("select * FROM Tournois where isClassement = 1 ");
+    $stmt = $this->connexion->prepare("select * FROM Tournois where isClassement = 1  ");
+    
     $stmt->execute();
    $tounois=$stmt->fetchAll();
    return $tounois;
@@ -107,9 +134,10 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
 }
 
 
-public function afficherLesTournoisQuiNeSontPasClassement() : array {
+public function afficherLesTournoisQuiNeSontPasClassement(int $tournoiId) : array {
        
-    $stmt = $this->connexion->prepare("select * FROM Tournois where isClassement = 0 ");
+    $stmt = $this->connexion->prepare("select * FROM Tournois where isClassement = 0 and id = :tournoiId ");
+    $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
     $stmt->execute();
    $tounois=$stmt->fetchAll();
    return $tounois;

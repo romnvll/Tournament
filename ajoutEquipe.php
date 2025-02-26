@@ -13,14 +13,38 @@ $twig = new \Twig\Environment($loader, [
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
 
-require 'class/clubDao.class.php';
-require 'class/databaseInformations.php';
-require 'class/tournoiDao.class.php';
-require 'class/pouleManagerDao.class.php';
-require 'class/equipeDao.class.php';
-require 'class/categorie.class.php';
+require_once 'class/clubDao.class.php';
+require_once 'class/databaseInformations.php';
+require_once 'class/tournoiDao.class.php';
+require_once 'class/pouleManagerDao.class.php';
+require_once 'class/equipeDao.class.php';
+require_once 'class/categorie.class.php';
 $tournoiDao = new tournoiDao();
-//$tournoiDao->getAllTournoi();
+
+$tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
+
+
+//si l'id du tournoi est égal à 0 alors on redirige vers la page ajoutEquipe avec l'id du dernier tournoi
+
+foreach ($tousLesTournois as $tournoi) {
+      // $dernierId = $tournoi['id'];
+      }
+
+//if ($_GET['idTournoi'] == "0") {
+ // header("Location: ajoutEquipe.php?idTournoi=" . $dernierId);
+  //  exit();
+//}
+//sinon on continue
+
+
+
+
+
+if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+    
+  exit;
+}
+
 
 $poules = new PouleManager();
 
@@ -31,7 +55,7 @@ $listeDesCategorie = new CategorieDao();
 
 $template = $twig->load('ajoutEquipe.twig');
 
-$tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
+
 
 $dernierId = null;
 
@@ -39,7 +63,10 @@ foreach ($tousLesTournois as $tournoi) {
 
     if (isset($tournoi['isArchived']) && $tournoi['isArchived'] == 0) {
         $dernierId = $tournoi['id'];
-         }
+
+        
+}
+
 }
 
 

@@ -7,6 +7,22 @@ require 'class/equipeDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/planificationDao.class.php';
 
+$tournois = new tournoiDao();
+
+if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
+  echo "Aucun tournoi actif en cours.";
+  header("Refresh:3; url=ajoutTournoi.php");
+  exit();
+}
+
+if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
+    
+  exit;
+}
+
+
+
+
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
@@ -18,13 +34,17 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 $idCategorie = null;
 
 
-$tournois = new tournoiDao();
+
 $equipesByCategorie = new EquipeDAO();
 $afficheCategorie = new EquipeDAO();
 $poules = new PouleManager();
 $rencontres = new RencontreDAO();
 $planification = new planificationDao();
 
+if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
+    
+  exit;
+}
 
 
 

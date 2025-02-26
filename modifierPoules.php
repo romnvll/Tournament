@@ -15,6 +15,22 @@ $twig = new \Twig\Environment($loader, [
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
+
+if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
+    echo "Aucun tournoi actif en cours.";
+    header("Refresh:3; url=ajoutTournoi.php");
+    exit();
+  }
+  
+  if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
+      
+    exit;
+  }
+  
+
+
+
+
 $equipe = new EquipeDAO();
 
 

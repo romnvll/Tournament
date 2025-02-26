@@ -28,6 +28,20 @@ $equipeDao = new EquipeDAO();
 
 
 
+if (!isset ($_GET['idTournoi']) || $_GET['idTournoi'] == 0) {
+ 
+  echo "Aucun tournoi actif en cours.";
+  header("Refresh:3; url=ajoutTournoi.php");
+  exit();
+}
+
+if ($tournoi->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) {
+    
+  exit;
+}
+
+
+
 if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
   $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],0,true);
   

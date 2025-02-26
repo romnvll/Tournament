@@ -4,7 +4,7 @@
 
 if (!isset($_COOKIE['auth'])) {
   header("Location: index.php");
-  //var_dump($_COOKIE);
+  
   exit;
 }
 else {
@@ -45,10 +45,11 @@ if (isset($_COOKIE['auth'])) {
     echo "⚠️ Aucun cookie trouvé.";
 }
 
-  
-
 
 }
+
+
+
 
 
 
