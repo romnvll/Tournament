@@ -18,7 +18,7 @@ public function __construct() {
 }
 
 
-public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $pasHoraire = 0, int $idUser): int {
+public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $idUser, int $pasHoraire = 0): int {
     try {
         $this->connexion->beginTransaction(); // Début de la transaction
 

@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+
 require ('security.php');
 require 'class/equipeDao.class.php';
 //require 'class/equipe.class.php';
