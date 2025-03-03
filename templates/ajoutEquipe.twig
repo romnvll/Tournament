@@ -37,10 +37,12 @@
         <div class="card shadow-sm p-4">
             <h5 class="text-center mb-3">Ajouter une équipe</h5>
 
-            <div class="form-group mb-3">
-                <label for="nomEquipe" class="form-label">Nom de l'équipe</label>
-                <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Ex: HBCAT2" required />
-            </div>
+           <div class="form-group mb-3">
+              <label for="nomEquipe" class="form-label">Noms des équipes (séparés par une virgule ou un saut de ligne)</label>
+              <input type="text" class="form-control" name="nomEquipes" id="nomEquipes" placeholder="Ex: HBCAT2, HBCAT3, HBCAT4" required />
+          </div>
+
+
             
             <div class="form-group mb-3">
                 <label for="Categorie" class="form-label">Choisir la catégorie</label>
@@ -246,6 +248,15 @@ $(document).ready(function() {
 
 
 
+</script>
+
+<script>
+document.getElementById("nomEquipes").addEventListener("paste", function(event) {
+    event.preventDefault();  // Empêcher le comportement par défaut
+    let text = (event.clipboardData || window.clipboardData).getData("text"); 
+    text = text.replace(/\n/g, ', '); // Remplacer les sauts de ligne par des virgules
+    this.value = text;
+});
 </script>
 
 
