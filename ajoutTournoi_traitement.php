@@ -17,7 +17,7 @@ $tournoiDao = new tournoiDao();
 
 //echo $_POST['dateTournoi'];
 
-$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$_POST['pasHoraire'],$userData['id']);
+$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$userData['id'],$_POST['pasHoraire']);
 
 
 
