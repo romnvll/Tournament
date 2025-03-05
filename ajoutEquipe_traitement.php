@@ -1,13 +1,11 @@
 <?php
 require 'security.php';
-
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
-
 require('class/equipeDao.class.php');
 require ('class/rencontreDao.class.php');
 
-print_r($_POST);
+
+
+
 
 // Vérifier si des rencontres existent déjà pour cette catégorie et ce tournoi
 $rencontreDao = new RencontreDAO();
