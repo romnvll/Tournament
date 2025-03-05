@@ -74,7 +74,7 @@ if (isset ($_GET['id_club'])) {
 
   $listeDesRencontreByClubs = $rencontre->afficherRencontreByTournoiByClub($_GET['id_tournoi'],$_GET['id_club']);
   $listeDesEquipesByClubs = $equipeDao->getAllEquipeByIdTournoiAndClub($_GET['id_tournoi'],$_GET['id_club']);
-
+  $nomClub = $clubdao->getClubById($_GET['id_club'])['nom'];
 //derniere poules des équipes :
 
 $equipesAvecPoule = [];
@@ -97,6 +97,8 @@ foreach ($listeDesEquipesByClubs as $equipe) {
 }
 
 else {
+  $nomClub = null;
+  $equipesAvecPoule = null;
   $listeDesRencontreByClubs = null;
   $listeDesEquipesByClubs = null;
   $idclub = null;
@@ -106,11 +108,15 @@ if (isset ($_GET['id_equipe'])) {
 
   $listeDesRenbcontreByEquipe = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
 $idequipe = $_GET['id_equipe'];
+
+
+$equipeNom = $equipeDao->getEquipeById($_GET['id_equipe'])['nom'];
 }
 
 
 
 else {
+  $equipeNom = null;
   $idequipe = null;
   $listeDesRenbcontreByEquipe = null;
 }
@@ -182,8 +188,8 @@ echo $template->render([
     'listeDesRencontreByTeam' =>$listeDesRencontresByTeam,
     'affichageByTerrain' => $listeDesRencontresByTerrain,
     'resultatRencontres'=> $GetResultatDesPoules,
-    'getNomClubCourant' => $clubdao->getClubById($_GET['id_club'])['nom'],
-    'getNomEquipeCourant' => $equipeDao->getEquipeById($_GET['id_equipe'])['nom'],
+    'getNomClubCourant' => $nomClub,
+    'getNomEquipeCourant' => $equipeNom,
     'labels' => $Labels,
     'equipesAvecPoule' => $equipesAvecPoule
   
