@@ -50,7 +50,7 @@ if ($_GET['addPersonne'] == "true") {
    require 'class/personneDao.class.php';
    $personne=new PersonneDao;
    $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
-   header("Location: " . $_SERVER['HTTP_REFERER']);
+   header("Location: " . $_SERVER['HTTP_REFERER']. "#placementPersonneSurTerrain");
 
 }
 

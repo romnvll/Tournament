@@ -833,10 +833,8 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             r.score2,
             r.isTerminated,
     
-            l.label_id AS label_id,
-            l.description AS label_description,
-            l.couleur AS label_couleur,
-    
+            
+                
             a.nom AS arbitre_nom,
             clubArbitre.nom AS arbitre_club_nom
     
@@ -860,8 +858,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN 
             Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN 
-            Labels l ON l.tournoi_id = :idTournoi
+        
         LEFT JOIN 
             Arbitres a ON p.arbitre_id = a.arbitre_id
         LEFT JOIN 
