@@ -31,15 +31,34 @@ class PersonneDao {
         return $this->connexion->lastInsertId();
     }
 
-    // Supprimer une personne par ID
-    public function supprimerPersonne($id) {
+    public function supprimerPersonne($id, $id_tournoi, $id_club) {
+        // Vérifier si le tournoi appartient bien au club de l'utilisateur
         $stmt = $this->connexion->prepare("
-            DELETE FROM Personne 
-            WHERE id = :id
+            SELECT t.id 
+            FROM Tournois t
+            JOIN Personne p ON t.id = p.tournoi_id
+            WHERE p.id = :id AND t.id = :tournoi_id AND t.club_id = :club_id
         ");
+        
         $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':tournoi_id', $id_tournoi);
+        $stmt->bindValue(':club_id', $id_club);
+        $stmt->execute();
+    
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Suppression refusée : la personne n'appartient pas à un tournoi que vous avez créé.");
+        }
+    
+        // Suppression de la personne
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Personne WHERE id = :id AND tournoi_id = :tournoi_id
+        ");
+        
+        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':tournoi_id', $id_tournoi);
         $stmt->execute();
     }
+    
 
 
     public function supprimerPersonneParTournoi($id_tournoi) {

@@ -50,14 +50,27 @@ if ($_GET['addPersonne'] == "true") {
    require 'class/personneDao.class.php';
    $personne=new PersonneDao;
    $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
-   header("Location: " . $_SERVER['HTTP_REFERER']. "#placementPersonneSurTerrain");
+  header("Location: " . $_SERVER['HTTP_REFERER']. "#placementPersonneSurTerrain");
 
 }
+
+if ($_GET['action'] == "delPersonne") {
+
+    $idPersonne=$_GET['idPersonne'];
+    (int)$idTournoi = $_GET['tournoiId'];
+    require 'class/personneDao.class.php';
+    $personne=new PersonneDao;
+    $personne->supprimerPersonne($idPersonne,$idTournoi,$userData['id']);
+    header("Location: " . $_SERVER['HTTP_REFERER']. "#placementPersonneSurTerrain");
+    exit();
+ }
+ 
 
 if ($_GET['addArbitre'] == true) {
     require 'class/arbitreDao.class.php';
     $arbitre=new arbitreDao();
-    $arbitre->ajouterArbitre($_GET['NomArbitre'],$_GET['tournoiId'],$_GET['clubID']);
+    var_dump($_GET);
+    $arbitre->ajouterArbitre($_GET['nomArbitre'],$_GET['tournoiId'],$_GET['clubID']);
     header("Location: " . $_SERVER['HTTP_REFERER']."#tableDesArbitres");
    exit();
 }
@@ -159,5 +172,5 @@ $tempRefresh = $_POST['refreshClientTime'] * 1000;
 $tournoidao = new tournoiDao();
 $var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh);
 
-header("Location: " . $_SERVER['HTTP_REFERER']);
+header("Location: " . $_SERVER['HTTP_REFERER'] ."#option");
 ?>

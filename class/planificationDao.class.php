@@ -246,6 +246,40 @@ GROUP BY
     }
     
 
+    public function afficherCreneauxArbitres(int $tournoi_id): array {
+        $stmt = $this->connexion->prepare("
+            SELECT 
+            p.planification_id,
+            p.terrain_id,
+            t.nom AS terrain_nom,
+            p.creneau_id,
+            c.nom AS creneau_nom,
+            p.arbitre_id,
+            a.nom AS arbitre_nom,
+            a.club_id AS arbitre_club_id,
+            cl.nom AS club_nom,
+            cl.logo AS club_logo
+        FROM 
+            Planification p
+        LEFT JOIN 
+            Terrains t ON p.terrain_id = t.terrain_id
+        LEFT JOIN 
+            Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN 
+            Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN 
+            Clubs cl ON a.club_id = cl.id
+        WHERE 
+            p.tournoi_id = :tournoi_id
+            AND p.arbitre_id IS NOT NULL
+        ORDER BY 
+            c.nom, t.nom
+        ");
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function afficherRencontresSansPlanification(int $tournoi_id): array {
         
         $stmt = $this->connexion->prepare("
