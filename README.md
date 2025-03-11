@@ -1,3 +1,9 @@
+Description
+-----------
+
+Ce projet a été réalisé dans le but d'aider le club de handball local à gérer efficacement ses rencontres lors des tournois. En tant que passionné de handball et de développement informatique, j'ai conçu cette application en **PHP** pour simplifier et optimiser le processus de gestion des tournois, offrant ainsi une solution pratique et centralisée pour le club.
+
+
 Fonctionnalités du logiciel Tournament
 --------------------------------------
 
@@ -14,19 +20,18 @@ Gestion des Tournois
 Gestion des Participants
 ------------------------
 
--   **Inscription des participants** : Ajout de nouveaux participants avec leurs informations personnelles.
--   **Modification des participants** : Mise à jour des données des participants inscrits.
--   **Suppression des participants** : Retrait de participants d'un tournoi si nécessaire.
--   **Gestion des équipes** : Création et gestion d'équipes pour les tournois en équipe.
+-   **Inscription des participants** : Ajout de nouveaux clubs participants .
+-   **Gestion des équipes** : Création et gestion d'équipes pour les tournois .
 
 
-Gestion des Matchs
+Gestion des rencontres
 ------------------
 
--   **Génération automatique des matchs** : Création des rencontres en fonction du format du tournoi.
--   **Planification des matchs** : Programmation des dates, heures et lieux des rencontres.
--   **Saisie des résultats** : Enregistrement des scores et des résultats de chaque match. La saisie peut se faire soit par la table centrale, soit par le gestionnaire du score à la table du terrain. La personne reçoit un e-mail et se connecte pour saisir uniquement les scores de son terrain..
--   **Mise à jour en temps réel** : Actualisation automatique du tableau du tournoi après chaque match.
+-   **Génération automatique des rencontres** : Création des rencontres en fonction du format du tournoi.
+-   **Planification des rencontres** : Programmation des dates, heures et lieux des rencontres.
+-   **Saisie des résultats** : Enregistrement des scores et des résultats de chaque match. La saisie peut se faire soit par la table centrale, soit par le **gestionnaire du score** à la table du terrain. 
+La personne reçoit un e-mail📧 et se connecte pour saisir uniquement les scores de son terrain.
+-   **Mise à jour en temps réel** : Actualisation automatique du tableau du tournoi .
 
 Système de Classement
 ---------------------
@@ -47,8 +52,8 @@ Interface Utilisateur
 Notifications et Communications
 -------------------------------
 
--   **Generation de QR code** : Génération automtique d'un qr code pour notifier les coachs zet le public des horaires des matchs et résultats.
-
+-   **Generation de QR code coach/publique** : Génération automtique d'un qr code pour notifier les coachs et le public des horaires des matchs et résultats.
+-   **Generation de QR code arbitre** : Génération automtique d'un qr code pour informer les arbitres sur leurs prochaines rencontres.
 
 
 
@@ -61,17 +66,7 @@ Support et Documentation
 
 * * * * *
 
-Description
------------
 
-Ce projet a été réalisé dans le but d'aider le club de handball local à gérer efficacement ses rencontres lors des tournois. En tant que passionné de handball et de développement informatique, j'ai conçu cette application en **PHP** pour simplifier et optimiser le processus de gestion des tournois, offrant ainsi une solution pratique et centralisée pour le club.
-
-### Fonctionnalités spécifiques
-
--   **Gestion des Rencontres** : Organisez les matchs et suivez les résultats en temps réel.
--   **Tableaux de Classement** : Visualisez facilement la progression des équipes tout au long du tournoi.
--   **Système de Points** : Les points sont calculés en temps réel en fonction des scores.
--   **Convivialité** : Interface utilisateur conviviale pour une utilisation intuitive.
 
 Comment utiliser
 ----------------
