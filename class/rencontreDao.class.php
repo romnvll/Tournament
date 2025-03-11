@@ -302,6 +302,12 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             club2.email AS club2_email,
             club2.contact AS club2_contact,
             club2.logo AS club2_logo,
+
+            cat2.Nom_categorie AS equipe2_categorie_nom,
+            cat2.Couleur AS equipe2_categorie_couleur,
+
+
+            
             
             r.score1,
             r.score2,
@@ -334,6 +340,8 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             Arbitres a ON p.arbitre_id = a.arbitre_id
         LEFT JOIN 
             Clubs clubArbitre ON a.club_id = clubArbitre.id
+        LEFT JOIN 
+            Categorie cat2 ON equipe2.categorie = cat2.id_categorie
         WHERE 
             r.isClassement = :isClassement
             $additionalCondition

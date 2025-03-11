@@ -11,11 +11,11 @@
         gtag('js', new Date());
         gtag('config', 'G-3NFVPTP2MY');
     </script>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
     {% if ListeDesTournois[0]['gestionArbitres'] == 1 %}
-    <meta name="viewport" content="width=device-width, initial-scale=0.5"/>
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
     {% else %}
-    <meta name="viewport" content="width=device-width, initial-scale=0.7"/>
+    <meta name="viewport" content="width=device-width, initial-scale=0.7">
     {% endif %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -60,6 +60,9 @@
         .content {
             margin-bottom: 60px; /* Ajustez cette valeur selon la hauteur de votre footer */
         }
+        .no-bullet {
+    list-style-type: none; /* Supprime les puces */
+}
     </style>
 </head>
 <body>
@@ -135,12 +138,15 @@
                                     <div class="alert alert-success mt-2">
                                         <h4><i class="fas fa-users"></i> Choisir un club ...</h4>
                                     </div>
-                                    <ul class="list-group">
+                                    <ul class="list-group no-bullet">
+                                    <li class="">
                                         {% for club in listeDesCLubs %}
+                                    <li>
                                             <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="list-group-item list-group-item-action">
                                                 <img class="img-thumbnail" src="{{club.logo}}" alt="Card image cap" style="max-width: 50px; max-height: 50px;">
                                                 {{ club.nom|upper }}
                                             </a>
+                                     </li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -155,11 +161,13 @@
                                         </div>
                                     {% endif %}
                                 {% endif %}
-                                <ul class="list-group">
+                                <ul class="list-group no-bullet">
                                     {% for equipe in equipesAvecPoule %}
+                                    <li>
                                         <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}" class="list-group-item list-group-item-action">
                                             {{ equipe.nom|upper }} - {{ equipe.Nom_categorie }}
                                         </a>
+                                    </li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
@@ -171,16 +179,20 @@
                                         <h4><i class="fas fa-check-circle"></i> Dernière étape: Choisir la poule</h4>
                                     </div>
                                 {% endif %}
-                                <ul class="list-group">
+                                <ul class="list-group no-bullet">
                                     {% for poule in afficherLesPoules %}
                                         {% if IdPoules == poule.id %}
+                                        <li>
                                             <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action active">
                                                 {{ poule.nom|upper }}
                                             </a>
+                                        </li>
                                         {% else %}
+                                         <li>
                                             <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action">
                                                 {{ poule.nom|upper }}
                                             </a>
+                                        </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
@@ -305,7 +317,7 @@
                                     {% if equipe.terrain_nom != 0 %}
                                         <td class="align-middle text-center position-relative">
                                             <a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true">
-                                                <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50">
+                                                <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50" alt="terrain">
                                                 <h6 class="position-absolute top-50 start-50 translate-middle">
                                                     <span class="badge rounded-pill bg-danger">{{ equipe.terrain_nom }}</span>
                                                 </h6>
@@ -336,8 +348,9 @@
                                             {% endif %}
                                         </div>
                                         <div class="d-flex justify-content-center flex-nowrap mb-2">
+                                            
                                             <span class="badge" style="background-color: {{ equipe.equipe2_categorie_couleur }}; color: #000;">
-                                                {{ equipe.equipe2_categorie_nom }}
+                                                {{ equipe.equipe2_categorie_nom }} 
                                             </span>
                                         </div>
                                         <div class="d-flex justify-content-center flex-nowrap">
@@ -405,7 +418,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 {{ classement }}
-                                                <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                                                <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;" alt="logo">
                                                 <span>{{ resultat.nom|upper }}</span>
                                             </div>
                                         </td>
