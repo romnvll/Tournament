@@ -52,13 +52,13 @@
         footer {
             background-color: #343a40;
             color: white;
-            padding: 10px 0;
+            
             position: fixed;
             bottom: 0;
             width: 100%;
         }
         .content {
-            margin-bottom: 60px; /* Ajustez cette valeur selon la hauteur de votre footer */
+           margin-bottom: 100px; /* Ajustez cette valeur selon la hauteur de votre footer */
         }
         .no-bullet {
     list-style-type: none; /* Supprime les puces */
@@ -400,7 +400,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 col-12">
                     {% if IsRankingView == 1 and IdPoules != null %}
-                        <table class="table" id="classementTableau">
+                        <table class="table mb-3" id="classementTableau" >
                             <thead>
                                 <tr>
                                     <th scope="col" class="text-center"><i class="fas fa-users"></i> Equipe</th>
@@ -434,9 +434,11 @@
                 </div>
             </div>
         {% endif %}
+        
+        {% include "footer.twig" %}
     </div>
 
-   {% include "footer.twig" %}
+   
 
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script>
