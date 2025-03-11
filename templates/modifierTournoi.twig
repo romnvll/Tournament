@@ -60,7 +60,7 @@
                                     <label for="pasHoraire" class="form-label">Pas Horaire (en minutes)</label>
                                     <input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()">
                                 </div>
-                                <h5 class="mt-4">Options</h5>
+                                <h5 class="mt-4" id="option">Options</h5>
                                 <div class="form-group">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="1" {% if infotournoi.gestionTables == 1 %} checked {% endif %} onchange="this.form.submit()">
@@ -121,17 +121,16 @@
                                     <div class="card-body text-center">
                                         <h5 class="card-title">
                                             <i class="fa-solid fa-qrcode me-2"></i>
-                                            Pour les tables
+                                            Pour les arbitres
                                         </h5>
-                                        <div class="d-grid gap-2">
-                                            {% for i in 1..AfficherTerrain|length %}
-                                                <a href="GenerateQrCodeTable.php?idTournoi={{infotournoi.id}}&terrain={{AfficherTerrain[i-1].terrain_id}}" class="btn btn-primary d-flex align-items-center justify-content-center">
-                                                    <i class="fa-solid fa-qrcode me-2"></i>
-                                                    QRCODE
-                                                    {{ AfficherTerrain[i-1].nom }}
-                                                </a>
-                                            {% endfor %}
-                                        </div>
+                                        <a href="GenerateQrCodeArbitre.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">
+                                       
+                                        <i class="fa-solid fa-qrcode me-1"></i>
+                                           QR Code Arbitre
+                                        
+                                        </a>
+                                        
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -177,6 +176,7 @@
 													<th scope="col">Prénom</th>
 													<th scope="col">Mail</th>
 													<th scope="col">Positionner cette personne sur le terrain N°</th>
+                                                    <th scope="col">Actions</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -192,6 +192,10 @@
 																</a>
 															{% endfor %}
 														</td>
+                                                        <td>
+                                                            <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}" class="btn btn-danger btn-sm">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i> Supprimer
+                                                            </a>
 													</tr>
 												{% endfor %}
 											</tbody>
@@ -250,7 +254,7 @@
                             </div>
                             <div class="card-body p-4">
                                 <div class="col-5 mt-3">
-                                    <form action="modifierTournoi_traitement.php" class="bg-light p-4 rounded shadow">
+                                    <form action="modifierTournoi_traitement.php" class="bg-light p-4 rounded shadow" method="GET">
 										<div class="mb-3">
 											<input type="hidden" name="addArbitre" value="true">
 											<label for="nomArbitre" class="form-label">Nom (optionnel)</label>
@@ -345,4 +349,8 @@
         </script>
     </div>
 </body>
+
+
+
+
 </html>

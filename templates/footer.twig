@@ -1,3 +1,5 @@
+
+
 <footer class="bg-dark text-light py-2">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
         <!-- Logo -->
@@ -14,6 +16,13 @@
         <a href="https://github.com/romnvll/Tournament" class="text-light text-decoration-none small" target="_blank">
             <i class="fab fa-github"></i> GitHub
         </a>
+       <pre>
+        {% if gestionArbitres == 1 %}
+       </pre>
+        <a href="affichagePlanningArbitre.php?idTournoi={{idTournoi}}" class="text-light text-decoration-none small" target="_blank">
+            <i class="fab fa-github"></i> Arbitrage
+        </a>
+        {% endif %}
     </div>
 </footer>
 

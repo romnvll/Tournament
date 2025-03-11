@@ -1,13 +1,14 @@
 <?php
 require 'security.php';
 require 'class/tournoiDao.class.php';
+
 use chillerlan\QRCode\{QRCode, QROptions};
 
 require_once('vendor/autoload.php');
 
 $options = new QROptions([
     'eccLevel'   => QRCode::ECC_L,
-    'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+    'outputType' => QRCode::OUTPUT_IMAGE_PNG,
     'version'    => 5,
 ]);
 
@@ -18,28 +19,19 @@ $tournoiDao->getTournoiById($_GET['idTournoi']);
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $domainName = $_SERVER['HTTP_HOST'];
 $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
-$url = $protocol . $domainName . $basePath . "index.php?id_tournoi=" . urlencode($_GET['idTournoi']);
+$url = $protocol . $domainName . $basePath . "affichagePlanningArbitre.php?idTournoi=" . urlencode($_GET['idTournoi']);
 
 $qrcode = (new QRCode($options))->render($url);
-
-// Formatage de la date en français
-$dateDebut = $tournoiDao->getTournoiById($_GET['idTournoi'])['dateDebut'];
-$date = new DateTime($dateDebut);
-$formatter = new IntlDateFormatter(
-    'fr_FR', IntlDateFormatter::LONG, IntlDateFormatter::NONE, null, IntlDateFormatter::GREGORIAN, 'dd MMMM yyyy'
-);
-$dateFormatted = $formatter->format($date);
-
-$tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['nom']);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $tournoiNom ?> - QR Code</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Accès aux Rencontres</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -57,11 +49,6 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .qr-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-        }
         @media print {
             .no-print {
                 display: none !important;
@@ -76,25 +63,20 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
             <i class="fas fa-print"></i> Imprimer
         </button>
 
-        <h2 class="mt-1">
-            <i class="fas fa-qrcode"></i> Scannez pour voir les horaires et lieux de vos rencontres !
-        </h2>
-
-        <p class="text-primary fw-bold fs-4">
-            <i class="fas fa-trophy me-2"></i> <?= $tournoiNom ?>
-            <br><span class="fs-5 text-secondary">📅 <?= $dateFormatted ?></span>
-        </p>
+        <h1 class="mt-4">
+            <i class="fas fa-qrcode"></i> Scannez pour accéder à vos rencontres à arbitrer
+        </h1>
 
         <div class="row mt-4 align-items-center">
             <div class="col-md-6">
                 <div class="card p-3">
-                    <img src="<?= $qrcode ?>" alt="QR Code" class="qr-image">
+                    <img src="<?= $qrcode ?>" alt="QR Code" class="img-fluid rounded">
                     <p class="mt-2"><i class="fas fa-mobile-alt"></i> Scannez avec votre smartphone</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card p-3">
-                    <img src="Qr.png" alt="QR Code" class="qr-image">
+                    <img src="logos/matcheventPro.webp" alt="Logo" class="img-fluid rounded">
                     <p class="mt-2"><i class="fas fa-handshake"></i> Matchevent Pro - Votre gestionnaire de tournois</p>
                 </div>
             </div>
