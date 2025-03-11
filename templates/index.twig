@@ -46,7 +46,7 @@
             font-size: 16px;
         }
         footer {
-    position: fixed;
+    
     bottom: 0;
     left: 0;
     width: 100%;
@@ -415,6 +415,8 @@
             </div>
         </div>
     {% endif %}
+
+     {{ include('footer.twig') }}
 </body>
 
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
@@ -479,4 +481,3 @@ setInterval(function () {
     });
 </script>
 </html>
- {{ include('footer.twig') }}
