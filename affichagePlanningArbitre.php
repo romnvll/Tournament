@@ -16,6 +16,8 @@ require 'class/tournoiDao.class.php';
 
 $tournoi = new tournoiDao();
 $infoTournoi = $tournoi->getTournoiById($_GET['idTournoi']);
+$infoTournoiRefresh = $tournoi->getTournoiById($_GET['idTournoi']);
+
 
 $planificationDao = new PlanificationDao();
 $creneauxArbitres = $planificationDao->afficherCreneauxArbitres($_GET['idTournoi']);
@@ -28,5 +30,6 @@ echo $template->render([
     'creneauxArbitres' => $creneauxArbitres,
     'idTournoi' => $_GET['idTournoi'],
     'infoTournoi' => $infoTournoi['nom'],
+    'infoTournoiRefresh'=> $infoTournoiRefresh
 
 ]);
