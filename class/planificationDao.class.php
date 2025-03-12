@@ -248,32 +248,63 @@ GROUP BY
 
     public function afficherCreneauxArbitres(int $tournoi_id): array {
         $stmt = $this->connexion->prepare("
-            SELECT 
-            p.planification_id,
-            p.terrain_id,
-            t.nom AS terrain_nom,
-            p.creneau_id,
-            c.nom AS creneau_nom,
-            p.arbitre_id,
-            a.nom AS arbitre_nom,
-            a.club_id AS arbitre_club_id,
-            cl.nom AS club_nom,
-            cl.logo AS club_logo
-        FROM 
-            Planification p
-        LEFT JOIN 
-            Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN 
-            Creneaux c ON p.creneau_id = c.creneau_id
-        LEFT JOIN 
-            Arbitres a ON p.arbitre_id = a.arbitre_id
-        LEFT JOIN 
-            Clubs cl ON a.club_id = cl.id
-        WHERE 
-            p.tournoi_id = :tournoi_id
-            AND p.arbitre_id IS NOT NULL
-        ORDER BY 
-            c.nom, t.nom
+           SELECT
+    p.planification_id,
+    p.terrain_id,
+    t.nom AS terrain_nom,
+    p.creneau_id,
+    c.nom AS creneau_nom,
+    p.arbitre_id,
+    a.nom AS arbitre_nom,
+    a.club_id AS arbitre_club_id,
+    cl.nom AS arbitre_club_nom,
+    cl.logo AS arbitre_club_logo,
+    r.id AS rencontre_id,
+    r.equipe1_id,
+    eq1.nom AS equipe1_nom,
+    eq1.club_id AS equipe1_club_id,
+    cl1.nom AS equipe1_club_nom,
+    cl1.logo AS equipe1_club_logo,
+    r.equipe2_id,
+    eq2.nom AS equipe2_nom,
+    eq2.club_id AS equipe2_club_id,
+    cl2.nom AS equipe2_club_nom,
+    cl2.logo AS equipe2_club_logo,
+    r.score1,
+    r.score2,
+    r.isTerminated,
+    cat.id_categorie AS categorie_id,
+    cat.Nom_categorie AS categorie_nom,
+    cat.Couleur AS categorie_couleur
+FROM
+    Planification p
+LEFT JOIN
+    Terrains t ON p.terrain_id = t.terrain_id
+LEFT JOIN
+    Creneaux c ON p.creneau_id = c.creneau_id
+LEFT JOIN
+    Arbitres a ON p.arbitre_id = a.arbitre_id
+LEFT JOIN
+    Clubs cl ON a.club_id = cl.id
+LEFT JOIN
+    Rencontres r ON p.rencontre_id = r.id
+LEFT JOIN
+    Equipes eq1 ON r.equipe1_id = eq1.id
+LEFT JOIN
+    Clubs cl1 ON eq1.club_id = cl1.id
+LEFT JOIN
+    Equipes eq2 ON r.equipe2_id = eq2.id
+LEFT JOIN
+    Clubs cl2 ON eq2.club_id = cl2.id
+LEFT JOIN
+    Categorie cat ON eq1.categorie = cat.id_categorie
+WHERE
+    p.tournoi_id = :tournoi_id
+    AND p.arbitre_id IS NOT NULL
+ORDER BY
+    c.nom, t.nom;
+
+
         ");
         $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $stmt->execute();
