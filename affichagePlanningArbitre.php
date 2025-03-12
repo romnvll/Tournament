@@ -20,6 +20,8 @@ $infoTournoiRefresh = $tournoi->getTournoiById($_GET['idTournoi']);
 
 
 $planificationDao = new PlanificationDao();
+
+//marquer les rencontres à arbitrer terminées
 $creneauxArbitres = $planificationDao->afficherCreneauxArbitres($_GET['idTournoi']);
 
 
