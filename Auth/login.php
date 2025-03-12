@@ -30,7 +30,8 @@ if (isset($_POST['btn-login'])) {
     
     if ($count == 1 && $row['password'] == $password) {
        
-        $secret = "ma_clé_ultra_sécurisée"; 
+        require_once '../secureCookies.php';
+        
 
         // Données utilisateur
         $data = [
