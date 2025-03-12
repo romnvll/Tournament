@@ -2,3 +2,4 @@ class/databaseInformations.php
 config.php
 updateDB.txt
 security.php
+secureCookies.php
