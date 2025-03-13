@@ -6,7 +6,7 @@ require 'class/rencontreDao.class.php';
 
 
 $tournoiDao = new tournoiDao();
-if (($tournoiDao->droitTournoiClub($_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+if (($tournoiDao->droitTournoiClub((int)$_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
     
     exit;
   }
