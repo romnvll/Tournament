@@ -303,7 +303,7 @@
                                         {% if not equipe.creneau_nom is empty %}
                                             <td class="align-middle text-center">
                                                 <p class="fw-bold">
-                                                    {{ equipe.creneau_nom }}
+                                                    {{ equipe.creneau_nom|slice(0, -3) }}
                                                 </p>
                                             </td>
                                         {% else %}

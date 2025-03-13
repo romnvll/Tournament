@@ -15,99 +15,115 @@ class creneauxDao {
     }
 
     public function ajouterCreneau(string $nom, int $tournoi_id): void {
+        var_dump($nom);
+        // Vérifier si le format de l'heure est valide (HH:MM)
+        if (preg_match("/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/", $nom)) {
+            // Ajouter les secondes ":00" pour respecter le format TIME (HH:MM:SS)
+            $nom .= ":00";
+        } else {
+            throw new Exception("Le format de l'heure est invalide. Utilisez le format HH:MM.");
+        }
+    
         $stmt = $this->connexion->prepare("
             INSERT INTO Creneaux (nom, tournoi_id)
-            VALUES (:nom, :tournoi_id)");
+            VALUES (:nom, :tournoi_id)
+        ");
         $stmt->bindParam(':nom', $nom);
         $stmt->bindParam(':tournoi_id', $tournoi_id);
         $stmt->execute();
     }
+    
+    
 
-    public function mettreAJourHoraireDebut($tournoi_id, $nouvelle_heure_debut, $intervalle) {
+    public function mettreAJourIntervalle($tournoi_id, $intervalle) {
         try {
-            // Commencer une transaction
             $this->connexion->beginTransaction();
-
-            // Récupérer tous les créneaux pour le tournoi spécifié
-            $stmt = $this->connexion->prepare("SELECT * FROM Creneaux WHERE tournoi_id = :tournoi_id ORDER BY nom ASC");
-            $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-            $stmt->execute();
-            $creneaux = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            if (empty($creneaux)) {
-                throw new Exception("Aucun créneau trouvé pour ce tournoi.");
+    
+            // Récupérer l'heure du premier créneau
+            $sqlFirst = "
+                SELECT nom
+                FROM Creneaux
+                WHERE tournoi_id = :tournoi_id
+                ORDER BY creneau_id ASC
+                LIMIT 1
+            ";
+    
+            $stmtFirst = $this->connexion->prepare($sqlFirst);
+            $stmtFirst->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+            $stmtFirst->execute();
+    
+            $firstCreneau = $stmtFirst->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$firstCreneau) {
+                throw new Exception("Aucun créneau trouvé pour le tournoi $tournoi_id");
             }
-
-            // Mettre à jour le premier créneau avec la nouvelle heure de début
-            $premier_creneau_id = $creneaux[0]['creneau_id'];
-            $stmt = $this->connexion->prepare("UPDATE Creneaux SET nom = :nouvelle_heure_debut WHERE creneau_id = :creneau_id");
-            $stmt->bindParam(':nouvelle_heure_debut', $nouvelle_heure_debut);
-            $stmt->bindParam(':creneau_id', $premier_creneau_id, PDO::PARAM_INT);
-            $stmt->execute();
-
-            // Mettre à jour les autres créneaux en les décalant selon l'intervalle spécifié
-            $current_time = new DateTime($nouvelle_heure_debut);
-            for ($i = 1; $i < count($creneaux); $i++) {
-                $current_time->add(new DateInterval('PT' . $intervalle . 'M'));
-                $nouvelle_heure = $current_time->format('H:i');
-
-                $stmt = $this->connexion->prepare("UPDATE Creneaux SET nom = :nouvelle_heure WHERE creneau_id = :creneau_id");
-                $stmt->bindParam(':nouvelle_heure', $nouvelle_heure);
-                $stmt->bindParam(':creneau_id', $creneaux[$i]['creneau_id'], PDO::PARAM_INT);
-                $stmt->execute();
-            }
-
-            // Commit la transaction
+    
+            $firstHoraire = $firstCreneau['nom']; // Déjà sous format `HH:MM:SS`
+    
+            // Mise à jour des créneaux avec correction du dépassement de 24h
+            $sqlUpdate = "
+                UPDATE Creneaux
+                JOIN (
+                    SELECT creneau_id, ROW_NUMBER() OVER (ORDER BY creneau_id ASC) AS rownum
+                    FROM Creneaux
+                    WHERE tournoi_id = :tournoi_id
+                ) AS ordered_creneaux
+                ON Creneaux.creneau_id = ordered_creneaux.creneau_id
+                SET Creneaux.nom = SEC_TO_TIME(
+                    MOD(
+                        TIME_TO_SEC(:firstHoraire) + ((ordered_creneaux.rownum - 1) * :intervalle * 60),
+                        86400
+                    )
+                )
+                WHERE Creneaux.tournoi_id = :tournoi_id;
+            ";
+    
+            $stmtUpdate = $this->connexion->prepare($sqlUpdate);
+            $stmtUpdate->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+            $stmtUpdate->bindParam(':firstHoraire', $firstHoraire);
+            $stmtUpdate->bindParam(':intervalle', $intervalle, PDO::PARAM_INT);
+    
+            $stmtUpdate->execute();
+    
             $this->connexion->commit();
+    
+            return $stmtUpdate->rowCount();
         } catch (Exception $e) {
-            // Rollback la transaction en cas d'erreur
             $this->connexion->rollBack();
             throw $e;
         }
     }
+    
+    
+    
+    
+    
+    
+    
 
     
 
     public function mettreAJourCreneauxAvecMinutesAjoutees($tournoiId, $minutes) {
-        // Initialiser la variable @time avec le premier créneau
         $sql = "
-            SET @time = (SELECT nom FROM Creneaux WHERE tournoi_id = :tournoiId ORDER BY nom LIMIT 1);
-            SET @rownum := 0;  -- Initialisation de la variable de ligne
-        ";
-    
-        // Préparer la requête
-        $stmt = $this->connexion->prepare($sql);
-        $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
-    
-        // Exécuter les commandes pour initialiser les variables
-        $stmt->execute();
-    
-        // Requête pour mettre à jour les créneaux en ajoutant les minutes
-        $sqlUpdate = "
             UPDATE Creneaux
-            SET nom = (
-                SELECT DATE_FORMAT(DATE_ADD(STR_TO_DATE(@time, '%H:%i'), INTERVAL (@rownum := @rownum + 1) * :minutes MINUTE), '%H:%i')
-                FROM (SELECT @rownum := 0) AS init
-                WHERE tournoi_id = :tournoiId
-                ORDER BY nom
+            SET nom = DATE_FORMAT( 
+                ADDTIME(nom, SEC_TO_TIME(:minutes * 60)), '%H:%i'
             )
             WHERE tournoi_id = :tournoiId
-            ORDER BY nom;
         ";
     
-        // Préparer la requête de mise à jour
-        $stmtUpdate = $this->connexion->prepare($sqlUpdate);
-        $stmtUpdate->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
-        $stmtUpdate->bindParam(':minutes', $minutes, PDO::PARAM_INT);
+        $stmt = $this->connexion->prepare($sql);
+        $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
+        $stmt->bindParam(':minutes', $minutes, PDO::PARAM_INT);
     
-        // Exécuter la mise à jour
-        if ($stmtUpdate->execute()) {
-            return $stmtUpdate->rowCount(); // Retourne le nombre de lignes mises à jour
+        if ($stmt->execute()) {
+            return $stmt->rowCount(); // Retourne le nombre de lignes mises à jour
         } else {
             return false; // En cas d'échec
         }
     }
     
+
     
     
     

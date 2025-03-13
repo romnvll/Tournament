@@ -273,7 +273,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
     public function getRencontreByPoule($pouleid, $tournoiId, $isClassement = 0, $from = 'index')
 {
-    $orderBy = ($from === 'tour') ? "r.tour, c.nom, r.id" : "c.nom, r.id";
+    $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
 
     // Construire la condition supplémentaire selon la valeur de $from
     $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';

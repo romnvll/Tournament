@@ -182,7 +182,7 @@
                                 </a>
                             </span>
                             <input type="text" name="creneau" class="form-control"
-                                   value="{{ creneau.nom }}" size="5"
+                                   value="{{ creneau.nom|slice(0, -3) }}" size="5"
                                    hx-post="PlacementDesRencontresTraitement.php"
                                    hx-trigger="change"
                                    hx-target="this"
@@ -276,7 +276,7 @@
             <tfoot>
                 <td>
                     <a id="add-creneau-link"
-                       href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']}}&newTime={{timeNextCreneau}}"
+                       href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}"
                     >
                         <h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2>
                     </a>
