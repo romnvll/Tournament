@@ -84,6 +84,7 @@ if (!isset($_GET['id_tournoi'])) {
     
     $timeDebut = DateTime::createFromFormat('H:i', $lastCreneau['nom']);
     $pasHoraire = $tournoiInfo['pasHoraire']; // Valeur des minutes à ajouter
+    
     $timeNextCreneau = $timeDebut->add(new DateInterval('PT' . $pasHoraire . 'M'));
     $timeNextCreneau = $timeNextCreneau->format('H:i');
 
