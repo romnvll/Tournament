@@ -81,12 +81,34 @@ if (!isset($_GET['id_tournoi'])) {
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
     $lastCreneau = $creneaux->getLastCreneau($_GET['id_tournoi']);
-    
-    $timeDebut = DateTime::createFromFormat('H:i', $lastCreneau['nom']);
-    $pasHoraire = $tournoiInfo['pasHoraire']; // Valeur des minutes à ajouter
-    
-    $timeNextCreneau = $timeDebut->add(new DateInterval('PT' . $pasHoraire . 'M'));
-    $timeNextCreneau = $timeNextCreneau->format('H:i');
+
+if (!$lastCreneau || !isset($lastCreneau['nom'])) {
+    // Gérer l'erreur si la dernière valeur du créneau est manquante
+    throw new Exception("Créneau non trouvé pour le tournoi");
+}
+
+$timeDebut = DateTime::createFromFormat('H:i:s', $lastCreneau['nom']);
+
+if (!$timeDebut) {
+    // Gérer l'erreur si la création de l'objet DateTime échoue
+    throw new Exception("Le format de l'heure est invalide : " . $lastCreneau['nom']);
+}
+
+$pasHoraire = $tournoiInfo['pasHoraire']; // Valeur des minutes à ajouter
+
+// Ajouter le pas horaire
+$timeNextCreneau = $timeDebut->add(new DateInterval('PT' . $pasHoraire . 'M'));
+
+// Vérifie si $timeNextCreneau est un objet DateTime valide
+if (!$timeNextCreneau instanceof DateTime) {
+    throw new Exception("Erreur lors de l'ajout de l'intervalle au créneau.");
+}
+
+// Formater le prochain créneau
+$timeNextCreneauFormatted = $timeNextCreneau->format('H:i');
+
+
+
 
 }
 
@@ -113,7 +135,7 @@ echo $template->render([
     'listeDesArbitres' => $listeDesArbitres,
     'tournoiInfo'   => $tournoiInfo,
     'lastCreneau' => $lastCreneau,
-    'timeNextCreneau' => $timeNextCreneau,
+    'timeNextCreneau' => $timeNextCreneauFormatted,
     'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier,
     'nombreDeLabel' => $nombreDeLabel
     

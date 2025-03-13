@@ -77,11 +77,11 @@ if (isset ($_POST['modifHeureDebut'])) {
     $creneau=new creneauxDao();
     $tournoi = new tournoiDao();
     
-    
-    $creneau->mettreAJourHoraireDebut($_POST['idTournoi'],$_POST['modifHeureDebut'],$_POST['modifPasHoraire']);
-    
     $tournoi->modifierTournoi($_POST['idTournoi'],null,$_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,null,null,null,null,null);
 
+    $creneau->mettreAJourIntervalle($_POST['idTournoi'],$_POST['modifPasHoraire']);
+    
+    
     header("Location: " . $_SERVER['HTTP_REFERER']);
    
     
