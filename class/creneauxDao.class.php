@@ -69,23 +69,45 @@ class creneauxDao {
     
 
     public function mettreAJourCreneauxAvecMinutesAjoutees($tournoiId, $minutes) {
+        // Initialiser la variable @time avec le premier créneau
         $sql = "
-            UPDATE Creneaux
-            SET nom = DATE_FORMAT(DATE_ADD(STR_TO_DATE(nom, '%H:%i'), INTERVAL :minutes MINUTE), '%H:%i')
-            WHERE tournoi_id = :tournoiId
+            SET @time = (SELECT nom FROM Creneaux WHERE tournoi_id = :tournoiId ORDER BY nom LIMIT 1);
+            SET @rownum := 0;  -- Initialisation de la variable de ligne
         ";
-        
+    
+        // Préparer la requête
         $stmt = $this->connexion->prepare($sql);
         $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
-        $stmt->bindParam(':minutes', $minutes, PDO::PARAM_INT);
-        
-        if ($stmt->execute()) {
-            return $stmt->rowCount(); // Retourne le nombre de lignes mises à jour
+    
+        // Exécuter les commandes pour initialiser les variables
+        $stmt->execute();
+    
+        // Requête pour mettre à jour les créneaux en ajoutant les minutes
+        $sqlUpdate = "
+            UPDATE Creneaux
+            SET nom = (
+                SELECT DATE_FORMAT(DATE_ADD(STR_TO_DATE(@time, '%H:%i'), INTERVAL (@rownum := @rownum + 1) * :minutes MINUTE), '%H:%i')
+                FROM (SELECT @rownum := 0) AS init
+                WHERE tournoi_id = :tournoiId
+                ORDER BY nom
+            )
+            WHERE tournoi_id = :tournoiId
+            ORDER BY nom;
+        ";
+    
+        // Préparer la requête de mise à jour
+        $stmtUpdate = $this->connexion->prepare($sqlUpdate);
+        $stmtUpdate->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
+        $stmtUpdate->bindParam(':minutes', $minutes, PDO::PARAM_INT);
+    
+        // Exécuter la mise à jour
+        if ($stmtUpdate->execute()) {
+            return $stmtUpdate->rowCount(); // Retourne le nombre de lignes mises à jour
         } else {
             return false; // En cas d'échec
         }
     }
-
+    
     
     
     

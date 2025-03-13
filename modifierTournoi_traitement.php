@@ -16,10 +16,6 @@ if (isset($_POST['idTournoi']) && is_numeric($_POST['idTournoi'])) {
     exit;
 }
 
-// Vérifier les droits d'accès au tournoi
-if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) === null && $tournoiId !== 0) {
-    exit;
-}
 
 
 
@@ -98,10 +94,11 @@ if ($_GET['addArbitre'] == true) {
 if ($_GET['delArbitre'] == true) {
     require 'class/arbitreDao.class.php';
     $arbitre=new arbitreDao();
+    
     try {
         $arbitre->supprimerArbitre($_GET['arbitre_id']);
         echo "Arbitre supprimé avec succès.";
-        echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "#tableDesArbitres'; }, 0);</script>";
+       echo "<script>setTimeout(function(){ window.location.href = '" . $_SERVER['HTTP_REFERER'] . "#tableDesArbitres'; }, 0);</script>";
 
     } catch (PDOException $e) {
         // Vérifie si l'exception est une violation de contrainte d'intégrité

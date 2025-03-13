@@ -228,7 +228,7 @@
 														<td>{{ personneTable.code_pin }}</td>
 														<td>{{ personneTable.url_key }}</td>
 														<td class="align-middle">
-															<a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}" class="btn btn-primary btn-sm">
+															<a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{idTournoi}}" class="btn btn-primary btn-sm">
 																<i class="fa fa-envelope" aria-hidden="true"></i> Envoyer
 															</a>
 														</td>
@@ -288,7 +288,7 @@
 													<td>{{ arbitre.nom }}</td>
 													<td>{{ arbitre.club_nom }}</td>
 													<td>
-														<a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}" class="btn btn-danger btn-sm">
+														<a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{infotournoi.id}}" class="btn btn-danger btn-sm">
 															<i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer
 														</a>
 													</td>

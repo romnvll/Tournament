@@ -69,6 +69,7 @@
                                 <label for="modifMinutes" class="form-label mb-0 me-2">Retarder les rencontres :</label>
                                 <input
                                     type="number"
+                                    
                                     id="modifMinutes"
                                     class="form-control"
                                     name="modifMinutes"
@@ -82,6 +83,7 @@
                                 <label for="modifPasHoraire" class="form-label mb-0 me-2">Durée des rencontres :</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     id="modifPasHoraire"
                                     name="modifPasHoraire"
                                     value="{{tournoiInfo['pasHoraire']}}"
@@ -169,6 +171,7 @@
                 {% for creneau in listCreneaux %}
                 <tr>
                     <td class="col-md-1">
+                    
                         <div class="input-group flex-nowrap">
                             <span class="input-group-text" id="addon-wrapping">
                                 <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}"
