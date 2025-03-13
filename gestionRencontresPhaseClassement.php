@@ -46,9 +46,7 @@ $tournoiId = $_GET['idTournoiBase']; // Remplacez cela par l'ID du tournoi pour 
 
 $poules = $poulemanager->getAllPoulesByTournoi($tournoiId);
 
-//TO DO 
-// recuperer les categorie pour creer uniquement les rencontres
-// de phase de classement qui sont terminées
+
 
 
 if (isset($_GET['categorie'])) {
@@ -83,7 +81,12 @@ usort($poulesFinales, function($a, $b) {
 });
 foreach ($poulesFinales as &$poule) {
   $poule['contenu'] = $poulemanager->getEquipesInPoule($poule['id']);
+  $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],1);
 }
+
+
+//Savoir si une poule contient des rencontre
+$pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);
 
 
 echo $template->render([
@@ -95,7 +98,7 @@ echo $template->render([
   'categories' => $tournoiDao->getCategoriesPourTournoi($tournoiId),
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($tournoiId),
   'afficherLespoulesFinales' => $poulesFinales,
-  'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
+  //'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
   'PouleDuTournoi' => $poulemanager->getAllPoulesByTournoi($tournoiId),
   'pouleEnCours' => $_GET['idPoule'],
  
@@ -108,6 +111,7 @@ echo $template->render([
   //'PoulesClassement' =>$tournoiDao->afficherPoulesDeClassement($tournoiId),
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
   'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
+  'pouleHasRencontres' => $pouleHasRencontres,
   
 ]);
 ?>

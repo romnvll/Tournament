@@ -5,6 +5,12 @@ require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
 
 
+$tournoiDao = new tournoiDao();
+if (($tournoiDao->droitTournoiClub($_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+    
+    exit;
+  }
+
 
 $rencontres = new RencontreDAO();
 $poulemanager = new PouleManager();
