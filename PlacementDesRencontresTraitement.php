@@ -1,5 +1,11 @@
 <?php
 require 'security.php';
+require ('class/tournoiDao.class.php');
+
+
+
+
+
 
 if (isset ($_POST['nomTerrain'])) {
     require ('class/terrainDao.class.php');

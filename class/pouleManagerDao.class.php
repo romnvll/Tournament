@@ -45,16 +45,18 @@ class PouleManager {
     }
 
 
-    public function checkRencontresInPoule($idPoule) {
+    public function checkRencontresInPoule($idPoule, $isClassement = 0) {
         $query = "SELECT COUNT(*) as count FROM Rencontres r
                   JOIN EquipePoule ep ON r.equipe1_id = ep.equipe_id OR r.equipe2_id = ep.equipe_id
-                  WHERE ep.poule_id = :id and r.isClassement = 0";
+                  WHERE ep.poule_id = :id AND r.isClassement = :isClassement";
         $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':id', $idPoule);
+        $stmt->bindValue(':id', $idPoule, PDO::PARAM_INT);
+        $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['count'] / 2 > 0;
     }
+    
     
 
 

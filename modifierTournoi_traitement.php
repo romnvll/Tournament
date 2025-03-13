@@ -2,6 +2,12 @@
 require 'security.php';
 require ('class/tournoiDao.class.php');
 
+$tournoiDao = new tournoiDao();
+if (($tournoiDao->droitTournoiClub($_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+    
+    exit;
+  }
+
 
 if ($_GET['action'] == "ajoutUserSurTable") {
     require 'class/PersonneTableDao.class.php';
