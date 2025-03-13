@@ -2,11 +2,25 @@
 require 'security.php';
 require ('class/tournoiDao.class.php');
 
+// Vérification de l'existence et de la validité des paramètres $_GET ou $_POST
+
 $tournoiDao = new tournoiDao();
-if (($tournoiDao->droitTournoiClub($_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-    
+
+// Prioriser $_POST['idTournoi'], sinon utiliser $_GET['tournoiId']
+if (isset($_POST['idTournoi']) && is_numeric($_POST['idTournoi'])) {
+    $tournoiId = (int)$_POST['idTournoi'];
+} elseif (isset($_GET['tournoiId']) && is_numeric($_GET['tournoiId'])) {
+    $tournoiId = (int)$_GET['tournoiId'];
+} else {
+    // Si aucune valeur valide n'est trouvée, terminer le script
     exit;
-  }
+}
+
+// Vérifier les droits d'accès au tournoi
+if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) === null && $tournoiId !== 0) {
+    exit;
+}
+
 
 
 if ($_GET['action'] == "ajoutUserSurTable") {

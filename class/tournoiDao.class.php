@@ -97,6 +97,7 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
     }
 
     public function droitTournoiClub(int $tournoiId, int $clubId) : ?array {
+     
         $stmt = $this->connexion->prepare("
             SELECT 
                 t.*, 

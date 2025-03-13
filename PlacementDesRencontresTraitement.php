@@ -70,10 +70,10 @@ if ($_POST['modifMinutes'] != "" ) {
 
 //permet de modifier dans la bdd les info du tournoi et de mettre à jour les horaires
 if (isset ($_POST['modifHeureDebut'])) {
-var_dump($_POST);
+
     
     require 'class/creneauxDao.class.php';
-    require 'class/tournoiDao.class.php';
+    require_once 'class/tournoiDao.class.php';
     $creneau=new creneauxDao();
     $tournoi = new tournoiDao();
     
