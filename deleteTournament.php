@@ -11,6 +11,12 @@ require ('class/terrainDao.class.php');
 require ('class/planificationDao.class.php');
 require ('class/PersonneTableDao.class.php');
 require ('class/personneDao.class.php');
+$tournoiDao = new tournoiDao();
+if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+   
+    exit;
+  }
+
 
 if ($_GET['action'] == "delete") {
     $tournoi = $_GET['idTournoi'];
@@ -96,7 +102,7 @@ if ($_GET['action'] == "delete") {
  
 
 
-header("Location: " . $_SERVER['HTTP_REFERER']);
+header("Location: ajoutTournoi.php" );
 
 
 

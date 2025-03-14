@@ -88,7 +88,7 @@
                 <td class="text-center">
                     <span class="badge {% if equipe.tour is even %}bg-success{% else %}bg-primary{% endif %}">Tour N°{{ equipe.tour }}</span>
                 </td>
-                <td class="text-center">{{equipe.creneau_nom}}</td>
+                <td class="text-center">{{equipe.creneau_nom| slice (0, -3)}}</td>
                 <td class="text-center">
                     <img src="{{ equipe.club1_logo }}" alt="{{ equipe.equipe1_nom }} Logo" style="width: 30px; height: 30px;">
                     {{ equipe.equipe1_nom }}

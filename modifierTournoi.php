@@ -24,7 +24,7 @@ require 'class/PersonneTableDao.class.php';
 $tournoiDao = new tournoiDao();
 
 if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-    
+   
   exit;
 }
 
