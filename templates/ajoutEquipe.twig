@@ -60,24 +60,17 @@
                             </a>
                         {% endif %}
                     {% endfor %}
-                    <table class="table mt-2" id="example">
+                    <table class="table mt-2" id="tableEquipes">
                         <thead>
                             <tr>
                                 <th scope="col" class="text-center" style="display:none">Id</th>
                                 <th scope="col" class="text-center">Club</th>
                                 <th scope="col" class="text-center">Nom de l'équipe</th>
                                 <th scope="col">Categorie</th>
-                                <th scope="col">Changer de</th>
+                                <th scope="col">Changer vers categorie</th>
                                 <th scope="col">Action</th>
                             </tr>
-                            <tr>
-                                <th style="display:none"></th>
-                                <th><input type="text" class="form-control" placeholder="Rechercher Club"></th>
-                                <th></th>
-                                <th><input type="text" class="form-control" placeholder="Rechercher Catégorie"></th>
-                                <th></th>
-                                <th></th>
-                            </tr>
+                          
                         </thead>
                         <tbody>
                             {% for equipe in AfficherLesEquipes %}
@@ -171,26 +164,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
+new DataTable('#tableEquipes', {
+    searchable: true,
+    ordering: false,
+    paging: false,
+     dom: '<"top"f<i>rt<"bottom"flp>',
+     language: {
+        search: "Rechercher :",  // Texte pour le champ de recherche
+        lengthMenu: "Afficher _MENU_ résultats",  // Texte pour le menu de pagination
+       // info: "Affichage de _START_ à _END_ sur _TOTAL_ résultats",  // Texte pour l'information de nombre de résultats
+        info: "_TOTAL_ résultats",
+        infoEmpty: "Affichage de 0 à 0 sur 0 résultats",  // Texte quand il n'y a pas de données
+        infoFiltered: "(filtré à partir de _MAX_ résultats)",  // Texte pour indiquer que les résultats sont filtrés
+        paginate: {
+            first: "Premier",  // Texte pour le bouton "Premier"
+            previous: "Précédent",  // Texte pour le bouton "Précédent"
+            next: "Suivant",  // Texte pour le bouton "Suivant"
+            last: "Dernier"  // Texte pour le bouton "Dernier"
+        },
+      },
+    columns: [
+        { searchable: true }, // Colonne 1
+        { searchable: true }, // Colonne 2
+        { searchable: true }, // Colonne 3
+        { searchable: true }, // Colonne 3
+        { searchable: false },
+        { searchable: false },
+        
+        // Ajoutez d'autres colonnes si nécessaire
+    ]
+});
+
+
 //
-    document.addEventListener("DOMContentLoaded", function() {
-        let table = document.getElementById("example");
-        let filters = table.querySelectorAll("thead tr:nth-child(2) input");
-
-        filters.forEach((input, columnIndex) => {
-            input.addEventListener("keyup", function() {
-                let filterValue = this.value.toLowerCase();
-                let rows = table.querySelectorAll("tbody tr");
-
-                rows.forEach(row => {
-                    let cell = row.cells[columnIndex + 1]; // Décalage car la première colonne (Id) est cachée
-                    if (cell) {
-                        let cellText = cell.textContent.toLowerCase();
-                        row.style.display = cellText.includes(filterValue) ? "" : "none";
-                    }
-                });
-            });
-        });
-    });
+  
 </script>
 
 </html>
