@@ -3,10 +3,6 @@ require 'security.php';
 require('class/equipeDao.class.php');
 require ('class/rencontreDao.class.php');
 
-
-
-
-
 // Vérifier si des rencontres existent déjà pour cette catégorie et ce tournoi
 $rencontreDao = new RencontreDAO();
 $RencontreExist = $rencontreDao->rencontresExistByCategorieAndTournoi($_POST['Categorie'], $_POST['IdTournoi']);

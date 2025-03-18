@@ -1,19 +1,28 @@
-
-<footer class="bg-dark text-light py-2">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <img src="logos/matcheventPro.webp" alt="MatchEventPro" style="max-height: 40px;">
+<footer class="bg-dark text-light mt-2">
+    <div class="container d-flex justify-content-between align-items-center w-100 py-2">
+        
+        <!-- Liens à gauche -->
         <ul class="list-unstyled d-flex mb-0">
-            <li class="mx-2"><a href="https://github.com/romnvll/Tournament/wiki" class="btn btn-primary btn-sm">Fonctionnalités</a></li>
-            <li class="mx-2"><a href="#" class="text-light text-decoration-none small">Tarifs (nous contacter)</a></li>
-            <li class="mx-2"><a href="#" class="text-light text-decoration-none small">Vallée Romain</a></li>
+            <li class="mx-2">
+                <a href="https://github.com/romnvll/Tournament/wiki" class="btn btn-primary btn-sm">Fonctionnalités</a>
+            </li>
+            <li class="mx-2">
+                <a href="#" class="text-light text-decoration-none small">Vallée Romain</a>
+            </li>
         </ul>
-        <a href="https://github.com/romnvll/Tournament" class="text-light text-decoration-none small" target="_blank">
-            <i class="fab fa-github"></i> GitHub
-        </a>
-        {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
-        <a href="affichagePlanningArbitre.php?idTournoi={{infoTournoiEnCours['id']}}" class="btn btn-primary btn-sm">
-            <i class="fa fa-user"></i> Arbitrage
-        </a>
-        {% endif %}
+
+        <!-- GitHub et Arbitrage à droite -->
+        <div class="d-flex align-items-center">
+            <a href="https://github.com/romnvll/Tournament" class="text-light text-decoration-none small me-2" target="_blank">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+            
+            {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
+            <a href="affichagePlanningArbitre.php?idTournoi={{infoTournoiEnCours['id']}}" class="btn btn-primary btn-sm">
+                <i class="fa fa-user"></i> Arbitrage
+            </a>
+            {% endif %}
+        </div>
+
     </div>
 </footer>
