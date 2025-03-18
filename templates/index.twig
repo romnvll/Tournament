@@ -328,10 +328,10 @@
                                     {% endif %}
                                     <td class="align-middle text-center">
                                         <div class="d-flex flex-column align-items-center">
-                                            <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true">
-                                                <h5>
-                                                    <span class="badge text-bg-dark">{{ equipe.equipe1_nom|upper }}</span>
-                                                </h5>
+                                            <h4><a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true">
+                                                
+                                                    <span class="badge text-bg-dark fs-6 p-1">{{ equipe.equipe1_nom|upper }}</span>
+                                                </h4>
                                             </a>
                                             <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true">
                                                 <img src="{{ equipe.club1_logo }}" class="w-100 img-fluid w-md-50 w-lg-50" alt="{{ equipe.equipe1_nom|upper }}">
@@ -385,7 +385,7 @@
                                         <div class="d-flex flex-column align-items-center">
                                             <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByTeam=true">
                                                 <h5>
-                                                    <span class="badge text-bg-dark">{{ equipe.equipe2_nom|upper }}</span>
+                                                    <span class="badge text-bg-dark fs-6 p-1">{{ equipe.equipe2_nom|upper }}</span>
                                                 </h5>
                                             </a>
                                             <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true">
@@ -432,10 +432,12 @@
                         </table>
                     {% endif %}
                 </div>
-            </div>
+                
+            </div >
+            
         {% endif %}
-        
         {% include "footer.twig" %}
+        
     </div>
 
    

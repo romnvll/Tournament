@@ -257,7 +257,7 @@ class EquipeDAO {
             INNER JOIN Clubs c ON e.club_id = c.id
             INNER JOIN Categorie cat ON e.categorie = cat.id_categorie
             WHERE e.tournoi_id = :tournoi_id
-            ORDER BY e.categorie
+            ORDER BY e.id desc
         ";
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':tournoi_id', $idTournoi, PDO::PARAM_INT);
