@@ -203,15 +203,16 @@
                             {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
                                 {% set planificationFound = true %}
                                 {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
-                                    {% if planification.arbitre_id is not null %}
+                                    {% if planification.arbitre_id is not null and  tournoiInfo.gestionArbitres == 1 %}
                                        <i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}
                                         <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
                                             <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                         </a>
                                     {% else %}
+                                   {% if tournoiInfo.gestionArbitres == 1 %}
                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
                                             <select class="form-select" name="Addevent" id="listeArbitre">
-                                                <option value="">Choisir arbitre</option>
+                                             <option value="">Choisir arbitre</option>
                                                 {% for arbitre in listeDesArbitres %}
                                                 <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
                                                     Arbitre: {{arbitre.nom}} Club: {{arbitre.club_nom}}
@@ -219,6 +220,7 @@
                                                 {% endfor %}
                                             </select>
                                         </form>
+                                     {% endif %}
                                     {% endif %}
                                     {% if planification.rencontre_id is not null %}
                                         {% if planification.isClassement == 0 %}
