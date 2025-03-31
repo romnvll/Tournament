@@ -148,21 +148,21 @@
             <thead>
                 <tr>
                     <th scope="col">Heure des rencontres</th>
-                    {% for i in 0..terrains|length - 1 %}
-                    <th scope="col">
+                                        {% for i in 0..terrains|length - 1 %}
+                     <th scope="col" class="sticky-top bg-white" style="z-index: 1;">
                         <form id="terrain{{i}}">
                             <input type="hidden" name="terrain_id" value="{{terrains[i]['terrain_id']}}">
                             <input type="text" class="form-control form-control-sm" value="{{terrains[i]['nom']}}" name="nomTerrain" size="2"
-                                   hx-post="PlacementDesRencontresTraitement.php"
-                                   hx-trigger="change"
-                                   hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']"
-                            {{terrains[i]['nom']}}
-                            </input>
+                                hx-post="PlacementDesRencontresTraitement.php"
+                                hx-trigger="change"
+                                hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']"
+                            >
                             <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}">
                                 <p class="text-danger"><i class="fa fa-minus-circle" aria-hidden="true"></i></p>
                             </a>
                         </form>
                     </th>
+
                     {% endfor %}
                     <th scope="col"><a href="PlacementDesRencontresTraitement.php?action=addTerrain&idTournoi={{idTournoi}}"><h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2></a></th>
                 </tr>
