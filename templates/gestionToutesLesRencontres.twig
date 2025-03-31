@@ -1,300 +1,303 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-   <link href="style/fixHeaderTable.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@2.0.1"
-        integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Gestion rencontre</title>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<link href="style/fixHeaderTable.css" rel="stylesheet">
+		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<title>Gestion rencontre</title>
 
-<style>
-      @media print {
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: white; /* Fond blanc pour éviter les problèmes */
-      }
-      .container {
-        width: 100%;
-        max-width: 100%;
-      }
-      h1 {
-        font-size: 1.5rem;
-        text-align: center;
-      }
-      /* Masquer le bouton lors de l'impression */
-      .no-print {
-        display: none !important;
-      }
-    
-      }
-  </style>
+		<style>
+			@media print {
+				body {
+					margin: 0;
+					padding: 0;
+					background-color: white; /* Fond blanc pour éviter les problèmes */
+				}
+				.container {
+					width: 100%;
+					max-width: 100%;
+				}
+				h1 {
+					font-size: 1.5rem;
+					text-align: center;
+				}
+				/* Masquer le bouton lors de l'impression */
+				.no-print {
+					display: none !important;
+				}
 
-</head>
+                 
 
-<body>
-    <div class="no-print">
-    {{ include('header.twig') }}
-    </div>
-    <div class="row ml-n4">
-        <div class="col-lg-3">
-            {% for tournoi in ListeDesTournois %}
-            {% if tournoi.isArchived == 0 %}
-            {% if tournoi.id == idTournoi %}
-            <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}"
-                class="btn btn-success btn-sm no-print">{{ tournoi.nom }}</a>
-            {% else %}
-            <a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}"
-                class="btn btn-secondary no-print">{{ tournoi.nom }}</a>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-        </div>
-        <div class="col-lg-6">
-            <div class="progress no-print">
-                <div class="progress-bar progress-bar-striped progress-bar-animated no-print" role="progressbar"
-                    aria-valuenow="{{pourcentage}}" aria-valuemin="0" aria-valuemax="100"
-                    style="width: {{pourcentage}}%"> {{pourcentage}}%</div>
-            </div>
-
-        </div>
-        <div class="col">
-                 <button id="toggle-button" class="btn btn-success btn-lg no-print" >Pause</button>
-                 <button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
-
-        </div>
-        <div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
-        
-            <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
-                <div data-mdb-input-init class="form-outline me-2">
-                    <label class="form-label mb-0 no-print">Retarder les rencontres:</label>
-                     
-                    <input type="number" size="2" class="form-control no-print" name="modifMinutes"
-                        onfocusout="this.form.submit()">
-                </div>
-                <input type="hidden" name="idTournoi" value="{{idTournoi}}">
-            </form>
-        </div>
+			}
 
 
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="table table-responsive table-striped table-bordered">
-                    <table class="table" id="planification-table">
-                        <thead class= "table-header">
-                            <tr class="text-center" >
-                                <th scope="col"></th>
-
-                                {% for i in 0..terrains|length - 1 %}
-                                <th scope="col ">Terrain {{terrains[i]["nom"]}}</th>
-                                {% endfor %}
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for creneau in listCreneaux %}
-                            <tr>
-                                <td>
-
-                                    <div class="input-group flex-nowrap">
-                                        {{ creneau.nom|slice(0, -3) }}
-                                    </div>
-
-                                </td>
-                                {% set Displayed = false %}
-                                {% for j in 0..terrains|length - 1 %}
-                                <td>
-                                    {% set planificationFound = false %}
-                                    {# Variable pour suivre si une planification a été trouvée #}
-                                    {% set creneauOqp = false %}
-                                    {# Variable pour suivre si un creneau est OQP #}
-                                    {% for planification in afficherPlanification %}
-
-                                    {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
-                                    {% set planificationFound = true %}
-                                    {# Variable pour suivre si une planification a été trouvée #}
-                                    {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
-                                    {% if planification.arbitre_id is not null %}
-                                    <!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
-                                     <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}
-
-                                    {% endif %}
-                                    {% if planification.rencontre_id is not null %}
-                                    <div class="mb-3">
-                                        <!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
-                                        <p class="fw-bold text-center">{{planification.equipe1_categorie_nom}} - tour
-                                            {{planification.tour}} - {{ planification.equipe2_poule_nom|split(' - ')[1] }} </p>
-                                        {% if planification.isTerminated == 1 %}
-                                        <p class="fw-bold text-center text-success bg-dark" id="Label{{planification.rencontre_id}}">Rencontre terminée  </p> 
-                                        {% endif %}
-                                        {% if planification.isTerminated == 0  %}
-                                         <p class="fw-bold text-center text-danger bg-dark" id="Label{{planification.rencontre_id}}" >Rencontre à venir</p>
-
-                                        {% endif %}
-                                        {% if planification.isTerminated == 2 %}
-                                        <p class="fw-bold text-center text-warning bg-dark" id="Label{{planification.rencontre_id}}">Rencontre en cours</p>
-                                        {% endif %}
-
-                                        <div class="d-flex justify-content-center">
-                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à : 'à venir' " data-bs-placement="bottom" style="background-color: red;" name="etat"
-                                                hx-post="gestionRencontres_traitement.php"
-                                                hx-trigger="click"
-                                                hx-target="#Label{{planification.rencontre_id}}"
-                                                hx-include="#idRencontre{{ planification.rencontre_id}}"
-                                                hx-swap="innerHTML"
-                                                hx-vals='{"etat": "Avenir"}'>
-                                                
-                                                </span>
-                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à 'en cours' " data-bs-placement="bottom"  style="background-color: orange;"
-                                                 hx-post="gestionRencontres_traitement.php"
-                                                hx-trigger="click"
-                                                hx-swap="innerHTML"
-                                                hx-target="#Label{{planification.rencontre_id}}"
-                                                hx-include="#idRencontre{{ planification.rencontre_id }}"
-                                                 hx-vals='{"etat": "enCours"}'>
-                                                </span>
-                                                <span class="point no-print" data-bs-toggle="tooltip" title="passer la rencontre à 'terminer' " data-bs-placement="bottom"  style="background-color: green;"
-                                                 hx-post="gestionRencontres_traitement.php"
-                                                hx-trigger="click"
-                                                hx-swap="innerHTML"
-                                                hx-target="#Label{{planification.rencontre_id}}"
-                                                hx-include="#idRencontre{{ planification.rencontre_id }}"
-                                                 hx-vals='{"etat": "terminee"}'>
-                                                </span>
-                                            </div>
-
-                                        <!-- Ligne 2: Noms des équipes et scores, centrée -->
-                                        <p class="text-center">terrain <b>{{planification.terrain_nom}}</b></p>
-                                        <div class="d-flex flex-column align-items-center justify-content-center">
-                                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                                <p class="mb-0">{{ planification.equipe1_nom }}</p>
-                                                <span class="mx-2">vs</span>
-                                                <p class="mb-0">{{ planification.equipe2_nom }}</p>
-                                            </div>
-                                            
-
-                                            <div class="d-flex">
-                                                <input type="hidden" name="idRencontre"
-                                                    value="{{ planification.rencontre_id }}"
-                                                    id="idRencontre{{ planification.rencontre_id }}">
-
-                                                <input type="number" name="scoreEquipe1"
-                                                    value="{{ planification.score1 }}" class="form-control me-2" min="0"
-                                                    hx-post="gestionRencontres_traitement.php"
-                                                    hx-trigger="change"
-                                                    hx-include="#idRencontre{{ planification.rencontre_id }}">
-
-                                                <input type="number" name="scoreEquipe2"
-                                                    value="{{ planification.score2 }}" class="form-control ms-2" min="0"
-                                                    hx-post="gestionRencontres_traitement.php"
-                                                    hx-trigger="change"
-                                                    hx-include="#idRencontre{{ planification.rencontre_id }}">
-                                            </div>
-                                        </div>
-
-
-                                    {% set creneauOqp = true %}
-                                    {% endif %}
-                                    <script>
-                                        var tdElement = document.currentScript.parentElement;
-                                        // Appliquer la couleur de fond au <td> parent
-                                        tdElement.style.backgroundColor = '{{planification.equipe1_categorie_couleur}}';
-                                    </script>
-
-                                    {% elseif planification.label_id is not null %}
-                                    {{ planification.label_description }}
-                                    <script>
-                                        var tdElement = document.currentScript.parentElement;
-                                        // Appliquer la couleur de fond au <td> parent
-                                        tdElement.style.backgroundColor = 'grey';
-                                    </script>
-                                    {% endif %}
-
-
-                                    {% endif %}
-
-                                    {% endfor %}
-
-
-                                </td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-
-
-        <script>
-            $(document).ready(function () {
-                $('.rencontreLabel .form-select').on('change', function () {
-                    var $form = $(this).closest('form');
-                    var formAction = $form.attr('action');
-                    var formData = $form.serialize();
-
-                    $.post(formAction, formData, function () {
-                        location.reload();
-                    });
-                });
-            });
-        </script>
-
-
-        <script>
-        $(document).ready(function () {
-            let isPaused = false;
-            let reloadInterval;
-
-
- 
-
-            function startReloading() {
-                reloadInterval = setInterval(function () {
-                    if (!isPaused) {
-                        location.reload(true);
-                    }
-                }, 5000);
-            }
-
-            // Démarrer le rechargement
-            startReloading();
-
-            // Gérer le clic sur le bouton pour mettre en pause ou reprendre
-            $('#toggle-button').click(function () {
-                isPaused = !isPaused;
-                $(this).text(isPaused ? 'Lecture' : 'Pause');
-
-                if (isPaused) {
-                    clearInterval(reloadInterval);
-                } else {
-                    startReloading();
+            .touch-friendly {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 5px;
+                    touch-action: manipulation;
                 }
-            });
-        });
-    </script>
+		</style>
+
+	</head>
+
+	<body>
+		<div class="no-print">
+			{{ include('header.twig') }}
+		</div>
+		<div class="row ml-n4">
+			<div class="col-lg-3">
+				{% for tournoi in ListeDesTournois %}
+					{% if tournoi.isArchived == 0 %}
+						{% if tournoi.id == idTournoi %}
+							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-sm no-print">{{ tournoi.nom }}</a>
+						{% else %}
+							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary no-print">{{ tournoi.nom }}</a>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</div>
+			<div class="col-lg-6">
+				<div class="progress no-print">
+					<div class="progress-bar progress-bar-striped progress-bar-animated no-print" role="progressbar" aria-valuenow="{{pourcentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{pourcentage}}%">
+						{{pourcentage}}%</div>
+				</div>
+
+			</div>
+			<div class="col">
+				<button id="toggle-button" class="btn btn-success btn-lg no-print">Pause</button>
+				<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
+
+			</div>
+			<div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
+
+				<form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
+					<div data-mdb-input-init class="form-outline me-2">
+						<label class="form-label mb-0 no-print">Retarder les rencontres:</label>
+
+						<input type="number" size="2" class="form-control no-print" name="modifMinutes" onfocusout="this.form.submit()">
+					</div>
+					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
+				</form>
+			</div>
 
 
-    
-      <script>
-        // Initialiser tous les tooltips sur la page
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    </script>
-    </script>
+			<div class="col-lg-12">
+				<div class="row">
+					<div class="table table-responsive table-striped table-bordered">
+						<table class="table" id="planification-table">
+							<thead class="table-header">
+								<tr class="text-center">
+									<th scope="col"></th>
 
-</body>
+									{% for i in 0..terrains|length - 1 %}
+										<th scope="col ">Terrain
+											{{terrains[i]["nom"]}}</th>
+									{% endfor %}
+
+								</tr>
+							</thead>
+							<tbody>
+								{% for creneau in listCreneaux %}
+									<tr>
+										<td>
+
+											<div class="input-group flex-nowrap">
+												{{ creneau.nom|slice(0, -3) }}
+											</div>
+
+										</td>
+										{% set Displayed = false %}
+										{% for j in 0..terrains|length - 1 %}
+											<td>
+												{% set planificationFound = false %}
+												{# Variable pour suivre si une planification a été trouvée #}
+												{% set creneauOqp = false %}
+												{# Variable pour suivre si un creneau est OQP #}
+												{% for planification in afficherPlanification %}
+
+													{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
+														{% set planificationFound = true %}
+														{# Variable pour suivre si une planification a été trouvée #}
+
+                                                       
+														{% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
+                                                        {% if tournoiInfo.gestionArbitres == 1 %}
+															{% if planification.arbitre_id is not null  %}
+																<!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
+																<i class="fas fa-user-tie"></i><i class="material-icons me-2" style="font-size: 20px;">sports</i>
+																{{planification.arbitre_nom}}
+																{{planification.club_nom_arbitre}}
+															{% else %}
+																<i class="material-icons me-2" style="font-size: 20px;">sports</i>
+																<i class="fas fa-user-tie"></i>Aucun arbitre
+
+															{% endif %}
+                                                        {% endif %}
+															{% if planification.rencontre_id is not null %}
+																<div
+																	class="mb-3">
+																	<!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
+																	<p class="fw-bold text-center">{{planification.equipe1_categorie_nom}}
+																		- tour
+																		{{planification.tour}}
+																		-
+																		{{ planification.equipe2_poule_nom|split(' - ')[1] }}
+																	</p>
+																	{% if planification.isTerminated == 1 %}
+																		<p class="fw-bold text-center text-success bg-dark" id="Label{{planification.rencontre_id}}">Rencontre terminée
+																		</p>
+																	{% endif %}
+																	{% if planification.isTerminated == 0  %}
+																		<p class="fw-bold text-center text-danger bg-dark" id="Label{{planification.rencontre_id}}">Rencontre à venir</p>
+
+																	{% endif %}
+																	{% if planification.isTerminated == 2 %}
+																		<p class="fw-bold text-center text-warning bg-dark" id="Label{{planification.rencontre_id}}">Rencontre en cours</p>
+																	{% endif %}
+
+																	<div class="d-flex justify-content-center">
+                                                                        <div class="point no-print touch-friendly" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Passer la rencontre à 'à venir'" 
+                                                                            style="background-color: red;" hx-post="gestionRencontres_traitement.php"
+                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
+                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
+                                                                            hx-swap="innerHTML" hx-vals='{"etat": "Avenir"}'></div>
+
+                                                                        <div class="point no-print touch-friendly"  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Passer la rencontre à 'en cours'" 
+                                                                            style="background-color: orange;" hx-post="gestionRencontres_traitement.php"
+                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
+                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
+                                                                            hx-swap="innerHTML" hx-vals='{"etat": "enCours"}'></div>
+
+                                                                        <div class="point no-print touch-friendly" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Passer la rencontre à 'terminée'" 
+                                                                            style="background-color: green;" hx-post="gestionRencontres_traitement.php"
+                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
+                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
+                                                                            hx-swap="innerHTML" hx-vals='{"etat": "terminee"}'></div>
+                                                                    </div>
+
+																	<!-- Ligne 2: Noms des équipes et scores, centrée -->
+																	<p class="text-center">terrain
+																		<b>{{planification.terrain_nom}}</b>
+																	</p>
+																	<div class="d-flex flex-column align-items-center justify-content-center">
+																		<div class="d-flex align-items-center justify-content-center mb-2">
+																			<p class="mb-0">{{ planification.equipe1_nom }}</p>
+																			<span class="mx-2">vs</span>
+																			<p class="mb-0">{{ planification.equipe2_nom }}</p>
+																		</div>
+
+
+																		<div class="d-flex">
+																			<input type="hidden" name="idRencontre" value="{{ planification.rencontre_id }}" id="idRencontre{{ planification.rencontre_id }}">
+
+																			<input type="number" name="scoreEquipe1" value="{{ planification.score1 }}" class="form-control me-2" min="0" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="#idRencontre{{ planification.rencontre_id }}">
+
+																			<input type="number" name="scoreEquipe2" value="{{ planification.score2 }}" class="form-control ms-2" min="0" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="#idRencontre{{ planification.rencontre_id }}">
+																		</div>
+																	</div>
+
+
+																	{% set creneauOqp = true %}
+																{% endif %}
+																<script>
+																	var tdElement = document.currentScript.parentElement;
+                                                                        // Appliquer la couleur de fond au <td> parent
+                                                                        tdElement.style.backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
+																</script>
+
+															{% elseif planification.label_id is not null %}
+																{{ planification.label_description }}
+																<script>
+																	var tdElement = document.currentScript.parentElement;
+// Appliquer la couleur de fond au <td> parent
+tdElement.style.backgroundColor = 'grey';
+																</script>
+															{% endif %}
+
+
+														{% endif %}
+
+													{% endfor %}
+
+
+												</td>
+											{% endfor %}
+										</tr>
+									{% endfor %}
+								</tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+
+			<script>
+				$(document).ready(function () {
+$('.rencontreLabel .form-select').on('change', function () {
+var $form = $(this).closest('form');
+var formAction = $form.attr('action');
+var formData = $form.serialize();
+
+$.post(formAction, formData, function () {
+location.reload();
+});
+});
+});
+			</script>
+
+
+			<script>
+				$(document).ready(function () {
+let isPaused = false;
+let reloadInterval;
+
+
+function startReloading() {
+reloadInterval = setInterval(function () {
+if (! isPaused) {
+location.reload(true);
+}
+}, 5000);
+}
+
+// Démarrer le rechargement
+startReloading();
+
+// Gérer le clic sur le bouton pour mettre en pause ou reprendre
+$('#toggle-button').click(function () {
+isPaused = ! isPaused;
+$(this).text(isPaused ? 'Lecture' : 'Pause');
+
+if (isPaused) {
+clearInterval(reloadInterval);
+} else {
+startReloading();
+}
+});
+});
+			</script>
+
+
+			<script>
+				// Initialiser tous les tooltips sur la page
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+new bootstrap.Tooltip(tooltipTriggerEl);
+});
+			</script>
+		</script>
+
+	</body>
 
 </html>
