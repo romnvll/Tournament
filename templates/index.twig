@@ -67,13 +67,15 @@
 </head>
 <body>
     <div class="content">
-        {% if infoTournoiEnCours.isArchived == 1 %}
+    
+        {% if infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0  %}
             <div class="container-fluid">
                 <div class="alert alert-warning text-center mt-5">
                     <h2><i class="fas fa-exclamation-triangle"></i> Ce tournoi n'est plus disponible</h2>
                     <p>Il n'y a actuellement aucun tournoi en cours ou à venir.</p>
                 </div>
             </div>
+            
         {% else %}
             {% set countVisibleTournois = 0 %}
             {% for tournoi in ListeDesTournois %}
