@@ -99,6 +99,12 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
                 </div>
             </div>
         </div>
+        <div class="row mt-4 align-items-center no-print">
+            <p class="display-6 text-center text-danger">
+                Pour un meilleur résultat, imprimer cette affiche en paysage.
+            </p>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
