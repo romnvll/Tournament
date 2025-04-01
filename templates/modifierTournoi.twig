@@ -71,15 +71,18 @@
                                         <label class="form-check-label" for="gestionArbitres">Gestion des arbitres</label>
                                     </div>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="1" {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
+                                        <input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="1"
+                                            {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="toggleDependencies()">
                                         <label class="form-check-label" for="isVisible">Tournoi visible du public ?</label>
                                     </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="heureIsVisible" name="heureIsVisible" value="1" {% if infotournoi.heureIsVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
+                                    <div class="form-check form-switch" id="heureIsVisibleContainer" style="margin-left: 20px;">
+                                        <input class="form-check-input" type="checkbox" id="heureIsVisible" name="heureIsVisible" value="1"
+                                            {% if infotournoi.heureIsVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
                                         <label class="form-check-label" for="heureIsVisible">Horaires visibles du public</label>
                                     </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="1" {% if infotournoi.IsRankingView == 1 %} checked {% endif %} onchange="this.form.submit()">
+                                    <div class="form-check form-switch" id="IsRankingViewContainer" style="margin-left: 20px;">
+                                        <input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="1"
+                                            {% if infotournoi.IsRankingView == 1 %} checked {% endif %} onchange="this.form.submit()">
                                         <label class="form-check-label" for="IsRankingView">Classement visible du public</label>
                                     </div>
                                     <div class="form-check form-switch">
@@ -334,6 +337,18 @@
                 </div>
             </div>
         </div>
+<script>
+    function toggleDependencies() {
+        const isVisible = document.getElementById('isVisible').checked;
+        document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
+        document.getElementById('IsRankingViewContainer').style.display = isVisible ? 'block' : 'none';
+    }
+
+    // Appel initial pour s'assurer que les dépendances sont correctement affichées au chargement de la page
+    toggleDependencies();
+</script>
+
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const params = new URLSearchParams(window.location.search);
