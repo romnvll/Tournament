@@ -42,7 +42,7 @@
             <div class="row mt-4">
                 <div class="col-lg-6">
                     <div class="card shadow-lg">
-                        <div class="card-header bg-primary text-white text-center id="option">
+                        <div class="card-header bg-primary text-white text-center" id="option">
                             <h4>Modifier Tournoi</h4>
                         </div>
                         <div class="card-body p-4">
@@ -60,7 +60,7 @@
                                     <label for="pasHoraire" class="form-label">Pas Horaire (en minutes)</label>
                                     <input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()">
                                 </div>
-                                <h5 class="mt-4" >Options</h5>
+                                <h5 class="mt-4">Options</h5>
                                 <div class="form-group">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="1" {% if infotournoi.gestionTables == 1 %} checked {% endif %} onchange="this.form.submit()">
@@ -72,7 +72,7 @@
                                     </div>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="1"
-                                            {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="toggleDependencies()">
+                                            {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="toggleDependencies(),this.form.submit()">
                                         <label class="form-check-label" for="isVisible">Tournoi visible du public ?</label>
                                     </div>
                                     <div class="form-check form-switch" id="heureIsVisibleContainer" style="margin-left: 20px;">
@@ -89,10 +89,10 @@
                                         <input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="1" {% if infotournoi.isArchived == 1 %} checked {% endif %} onchange="this.form.submit()">
                                         <label class="form-check-label" for="isArchived">Archiver le tournoi</label>
                                     </div>
-									<div class="mb-3 ">
-                                    <label for="refreshClientTime" class="form-label">Taux raffraichissement (s)</label>
-                                    <input type="number" class="form-control" id="refreshClientTime" name="refreshClientTime" value="{{ infotournoi.refreshClientTime /1000 }}" onchange="this.form.submit()" min="1" max="200">
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="refreshClientTime" class="form-label">Taux raffraichissement (s)</label>
+                                        <input type="number" class="form-control" id="refreshClientTime" name="refreshClientTime" value="{{ infotournoi.refreshClientTime /1000 }}" onchange="this.form.submit()" min="1" max="200">
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -119,7 +119,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {% if infotournoi.gestionArbitres == 1 %}
                             <div class="col-lg-6">
                                 <div class="card shadow-lg">
@@ -129,17 +129,13 @@
                                             Pour les arbitres
                                         </h5>
                                         <a href="GenerateQrCodeArbitre.php?idTournoi={{infotournoi.id}}" class="btn btn-primary">
-                                       
-                                        <i class="fa-solid fa-qrcode me-1"></i>
-                                           QR Code Arbitre
-                                        
+                                            <i class="fa-solid fa-qrcode me-1"></i>
+                                            QR Code Arbitre
                                         </a>
-                                        
-                                        
                                     </div>
                                 </div>
-                            {% endif %}
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -151,105 +147,105 @@
                             <div class="card-header bg-primary text-white text-center">
                                 <h4>Ajouter une personne pour gérer les scores à une table d'un terrain</h4>
                             </div>
-                            <di	v class="card-body p-4">
-                              <div class="col-md-6 mt-3">
-									<form action="modifierTournoi_traitement.php" class="bg-light p-4 rounded shadow">
-										<div class="mb-3">
-											<label for="Email" class="form-label">Adresse email</label>
-											<input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
-											<input type="hidden" name="addPersonne" value="true">
-											<input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
-											<div id="emailHelp" class="form-text">Veuillez entrer une adresse email valide.</div>
-										</div>
-										<div class="mb-3">
-											<label for="Nom" class="form-label">Nom</label>
-											<input type="text" class="form-control" id="Nom" name="nom" required>
-										</div>
-										<div class="mb-3">
-											<label for="prenom" class="form-label">Prénom</label>
-											<input type="text" class="form-control" id="prenom" name="prenom" required>
-										</div>
-										<button type="submit" class="btn btn-primary">Ajouter</button>
-									</form>
-								</div>
+                            <div class="card-body p-4">
+                                <div class="col-md-6 mt-3">
+                                    <form action="modifierTournoi_traitement.php" class="bg-light p-4 rounded shadow">
+                                        <div class="mb-3">
+                                            <label for="Email" class="form-label">Adresse email</label>
+                                            <input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name="mail" required>
+                                            <input type="hidden" name="addPersonne" value="true">
+                                            <input type="hidden" name="tournoiId" value="{{infotournoi.id}}">
+                                            <div id="emailHelp" class="form-text">Veuillez entrer une adresse email valide.</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="Nom" class="form-label">Nom</label>
+                                            <input type="text" class="form-control" id="Nom" name="nom" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="prenom" class="form-label">Prénom</label>
+                                            <input type="text" class="form-control" id="prenom" name="prenom" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                                    </form>
+                                </div>
 
                                 <div class="col mt-3">
-									{% if AfficherPersonnes |length > 0 %}
-										<table class="table table-striped table-hover" id="placementPersonneSurTerrain">
-											<thead class="table-dark">
-												<tr>
-													<th scope="col">Nom</th>
-													<th scope="col">Prénom</th>
-													<th scope="col">Mail</th>
-													<th scope="col">Positionner cette personne sur le terrain N°</th>
+                                    {% if AfficherPersonnes |length > 0 %}
+                                        <table class="table table-striped table-hover" id="placementPersonneSurTerrain">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Prénom</th>
+                                                    <th scope="col">Mail</th>
+                                                    <th scope="col">Positionner cette personne sur le terrain N°</th>
                                                     <th scope="col">Actions</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for personne in AfficherPersonnes %}
-													<tr>
-														<td>{{ personne.Nom }}</td>
-														<td>{{ personne.Prenom }}</td>
-														<td>{{ personne.Mail }}</td>
-														<td>
-															{% for terrain in AfficherTerrain %}
-																<a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{ personne.id }}&idterrain={{ terrain.terrain_id }}&tournoiId={{ infotournoi.id }}" class="btn btn-success btn-sm">
-																	{{ terrain.nom }}
-																</a>
-															{% endfor %}
-														</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for personne in AfficherPersonnes %}
+                                                    <tr>
+                                                        <td>{{ personne.Nom }}</td>
+                                                        <td>{{ personne.Prenom }}</td>
+                                                        <td>{{ personne.Mail }}</td>
+                                                        <td>
+                                                            {% for terrain in AfficherTerrain %}
+                                                                <a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{ personne.id }}&idterrain={{ terrain.terrain_id }}&tournoiId={{ infotournoi.id }}" class="btn btn-success btn-sm">
+                                                                    {{ terrain.nom }}
+                                                                </a>
+                                                            {% endfor %}
+                                                        </td>
                                                         <td>
                                                             <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}" class="btn btn-danger btn-sm">
                                                                 <i class="fa fa-trash" aria-hidden="true"></i> Supprimer
                                                             </a>
-													</tr>
-												{% endfor %}
-											</tbody>
-										</table>
-									{% endif %}
-								</div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
+                                </div>
 
                                 <div class="col mt-3">
-									{% if AfficherLesPersonnesCrees |length > 0 %}
-										<table class="table table-striped table-hover">
-											<thead class="table-dark">
-												<tr>
-													<th scope="col">Nom</th>
-													<th scope="col">Prénom</th>
-													<th scope="col">Mail</th>
-													<th scope="col">Terrain N°</th>
-													<th scope="col">Code PIN</th>
-													<th scope="col">Clé sécurisée</th>
-													<th scope="col">Envoyer les informations</th>
-													<th scope="col">Suppression de cette personne</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for personneTable in AfficherLesPersonnesCrees %}
-													<tr>
-														<td>{{ personneTable.Nom }}</td>
-														<td>{{ personneTable.Prenom }}</td>
-														<td>{{ personneTable.Mail }}</td>
-														<td>{{ personneTable.terrain_nom }}</td>
-														<td>{{ personneTable.code_pin }}</td>
-														<td>{{ personneTable.url_key }}</td>
-														<td class="align-middle">
-															<a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{idTournoi}}" class="btn btn-primary btn-sm">
-																<i class="fa fa-envelope" aria-hidden="true"></i> Envoyer
-															</a>
-														</td>
-														<td>
-															<a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}" class="btn btn-danger btn-sm">
-																<i class="fa fa-trash" aria-hidden="true"></i> Supprimer
-															</a>
-														</td>
-													</tr>
-												{% endfor %}
-											</tbody>
-										</table>
-									{% endif %}
-								</div>
-
+                                    {% if AfficherLesPersonnesCrees |length > 0 %}
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Prénom</th>
+                                                    <th scope="col">Mail</th>
+                                                    <th scope="col">Terrain N°</th>
+                                                    <th scope="col">Code PIN</th>
+                                                    <th scope="col">Clé sécurisée</th>
+                                                    <th scope="col">Envoyer les informations</th>
+                                                    <th scope="col">Suppression de cette personne</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for personneTable in AfficherLesPersonnesCrees %}
+                                                    <tr>
+                                                        <td>{{ personneTable.Nom }}</td>
+                                                        <td>{{ personneTable.Prenom }}</td>
+                                                        <td>{{ personneTable.Mail }}</td>
+                                                        <td>{{ personneTable.terrain_nom }}</td>
+                                                        <td>{{ personneTable.code_pin }}</td>
+                                                        <td>{{ personneTable.url_key }}</td>
+                                                        <td class="align-middle">
+                                                            <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{idTournoi}}" class="btn btn-primary btn-sm">
+                                                                <i class="fa fa-envelope" aria-hidden="true"></i> Envoyer
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}" class="btn btn-danger btn-sm">
+                                                                <i class="fa fa-trash" aria-hidden="true"></i> Supprimer
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     {% endif %}
@@ -261,60 +257,53 @@
                             <div class="card-body p-4">
                                 <div class="col-5 mt-3">
                                     <form action="modifierTournoi_traitement.php" class="bg-light p-4 rounded shadow" method="GET">
-										<div class="mb-3">
-											<input type="hidden" name="addArbitre" value="true">
-											<label for="nomArbitre" class="form-label">Nom (optionnel)</label>
-											<input type="text" class="form-control" id="nomArbitre" aria-describedby="emailHelp" name="nomArbitre">
-										</div>
-										<div class="mb-3">
-											<input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
-											<label for="club" class="form-label">Club</label>
-											<select class="form-select" id="club" name="clubID">
-												{% for club in AfficherLesClubsPourArbitres %}
-													<option value="{{ club.id }}">{{ club.nom }}</option>
-												{% endfor %}
-											</select>
-										</div>
-										<button type="submit" class="btn btn-primary">Ajouter</button>
-									</form>
-
+                                        <div class="mb-3">
+                                            <input type="hidden" name="addArbitre" value="true">
+                                            <label for="nomArbitre" class="form-label">Nom (optionnel)</label>
+                                            <input type="text" class="form-control" id="nomArbitre" aria-describedby="emailHelp" name="nomArbitre">
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
+                                            <label for="club" class="form-label">Club</label>
+                                            <select class="form-select" id="club" name="clubID">
+                                                {% for club in AfficherLesClubsPourArbitres %}
+                                                    <option value="{{ club.id }}">{{ club.nom }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                                    </form>
                                 </div>
-								<div class="col mt-3">
-									<table class="table table-striped table-hover" id="tableDesArbitres">
-										<thead class="table-dark">
-											<tr>
-												<th scope="col">Nom</th>
-												<th scope="col">Club</th>
-												<th scope="col">Actions</th>
-											</tr>
-										</thead>
-										<tbody>
-											{% for arbitre in AfficherLesArbitres %}
-												<tr>
-													<td>{{ arbitre.nom }}</td>
-													<td>{{ arbitre.club_nom }}</td>
-													<td>
-														<a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{infotournoi.id}}" class="btn btn-danger btn-sm">
-															<i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer
-														</a>
-													</td>
-												</tr>
-											{% endfor %}
-										</tbody>
-									</table>
-								</div>
-
-
-
-
-
-
+                                <div class="col mt-3">
+                                    <table class="table table-striped table-hover" id="tableDesArbitres">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th scope="col">Nom</th>
+                                                <th scope="col">Club</th>
+                                                <th scope="col">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for arbitre in AfficherLesArbitres %}
+                                                <tr>
+                                                    <td>{{ arbitre.nom }}</td>
+                                                    <td>{{ arbitre.club_nom }}</td>
+                                                    <td>
+                                                        <a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{infotournoi.id}}" class="btn btn-danger btn-sm">
+                                                            <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
                     {% if infotournoi.isArchived == 1 %}
                         <div class="row">
-                            <a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\'action est irréversible');">
+                            <a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\action est irréversible');">
                                 <i class="fa-solid fa-trash-can me-1"></i>Suppression du tournoi
                             </a>
                         </div>
@@ -340,17 +329,17 @@
                 </div>
             </div>
         </div>
-<script>
-    function toggleDependencies() {
-        const isVisible = document.getElementById('isVisible').checked;
-        document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
-        document.getElementById('IsRankingViewContainer').style.display = isVisible ? 'block' : 'none';
-    }
 
-    // Appel initial pour s'assurer que les dépendances sont correctement affichées au chargement de la page
-    toggleDependencies();
-</script>
-
+        <script>
+            function toggleDependencies() {
+                const isVisible = document.getElementById('isVisible').checked;
+                document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
+                document.getElementById('IsRankingViewContainer').style.display = isVisible ? 'block' : 'none';
+            }
+            //document.querySelector('form').submit();
+            // Appel initial pour s'assurer que les dépendances sont correctement affichées au chargement de la page
+            toggleDependencies();
+        </script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -367,8 +356,4 @@
         </script>
     </div>
 </body>
-
-
-
-
 </html>
