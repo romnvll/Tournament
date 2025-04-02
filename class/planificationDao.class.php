@@ -248,7 +248,7 @@ GROUP BY
 
     public function afficherCreneauxArbitres(int $tournoi_id): array {
         $stmt = $this->connexion->prepare("
-           SELECT
+       SELECT
     p.planification_id,
     p.terrain_id,
     t.nom AS terrain_nom,
@@ -275,7 +275,9 @@ GROUP BY
     r.isTerminated,
     cat.id_categorie AS categorie_id,
     cat.Nom_categorie AS categorie_nom,
-    cat.Couleur AS categorie_couleur
+    cat.Couleur AS categorie_couleur,
+    COUNT(p.rencontre_id) OVER (PARTITION BY p.arbitre_id) AS nombre_matchs_arbitre,
+    COUNT(p.rencontre_id) OVER (PARTITION BY a.club_id) AS nombre_matchs_club
 FROM
     Planification p
 LEFT JOIN
@@ -301,8 +303,12 @@ LEFT JOIN
 WHERE
     p.tournoi_id = :tournoi_id
     AND p.arbitre_id IS NOT NULL
-ORDER BY
-    c.nom, t.nom;
+ORDER BY 
+    (TIME(c.nom) < '06:00:00') ASC,  -- Met les horaires après minuit à la fin
+    TIME(c.nom) ASC, 
+    t.nom;
+
+
 
 
         ");
