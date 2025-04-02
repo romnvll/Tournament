@@ -68,7 +68,8 @@
 <body>
     <div class="content">
     
-        {% if infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0  %}
+        {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
+
             <div class="container-fluid">
                 <div class="alert alert-warning text-center mt-5">
                     <h2><i class="fas fa-exclamation-triangle"></i> Ce tournoi n'est plus disponible</h2>
@@ -345,7 +346,7 @@
                                             {% if gestionArbitres == 1 and equipe.arbitre_nom or equipe.arbitre_club_nom %}
                                                 <div class="d-flex align-items-center">
                                                     <i class="fas fa-user-tie"></i><i class="material-icons me-2" style="color: black; font-size: 20px;">sports</i>
-                                                    <span>{{ equipe.arbitre_nom }} {{ equipe.arbitre_club_nom }}</span>
+                                                    <span>{{ equipe.arbitre_nom|capitalize  }} {{ equipe.arbitre_club_nom|upper }}</span>
                                                 </div>
                                             {% endif %}
                                         </div>
