@@ -42,18 +42,19 @@
             <tbody id="arbitreTableBody">
            
                 {% for arbitre in creneauxArbitres %}
+                
                 <tr>
                     <td>
                         {% if arbitre.arbitre_nom|length == 0 %}
                             <span class="text-primary">un arbitre du club</span>
                         {% else %}
-                            {{ arbitre.arbitre_nom|upper }}
+                            {{ arbitre.arbitre_nom|upper }} ( {{arbitre.nombre_matchs_arbitre}} rencontre(s) arbitrée(s) )
                         {% endif %}
                     </td>
                     <td>
                         <div class="d-flex align-items-center">
                             <img src="{{ arbitre.arbitre_club_logo }}" alt="Logo {{ arbitre.club_nom  }}" class="me-2" style="width: 40px; height: 40px; object-fit: contain;">
-                            {{ arbitre.arbitre_club_nom  }}
+                            {{ arbitre.arbitre_club_nom  }} ({{arbitre.nombre_matchs_club}} rencontre(s) arbitrée(s))
                             
                         </div>
                     </td>
