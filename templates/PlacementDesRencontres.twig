@@ -215,7 +215,7 @@
                                              <option value="">Choisir arbitre</option>
                                                 {% for arbitre in listeDesArbitres %}
                                                 <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
-                                                    Arbitre: {{arbitre.nom}} Club: {{arbitre.club_nom}}
+                                                   {% if arbitre.nom is not empty %} Arbitre: {{arbitre.nom}} ({{arbitre.nombre_matchs}}) {% endif %}  Club: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
                                                 </option>
                                                 {% endfor %}
                                             </select>
