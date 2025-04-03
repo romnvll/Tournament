@@ -121,7 +121,7 @@ private function genererCodePin() {
     if ($result) {
         try {
             include('./config.php');
-            $mail->setFrom('noreply@hbcat.fr', 'HBCAT');
+            $mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
             $mail->isHTML(true);
             $mail->addAddress($result['Mail'], "{$result['Prenom']} {$result['Nom']}");
             $mail->Subject = "Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";
