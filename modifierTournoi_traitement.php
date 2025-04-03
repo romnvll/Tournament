@@ -16,6 +16,11 @@ if (isset($_POST['idTournoi']) && is_numeric($_POST['idTournoi'])) {
     exit;
 }
 
+if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) == null) {
+      
+    exit;
+  }
+
 
 
 
