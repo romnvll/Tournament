@@ -134,15 +134,26 @@
     </div>
 
     <script>
-        function updateStatus(idRencontre) {
-            if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
-                htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
-                    target: `#State${idRencontre}`,
-                    swap: 'outerHTML'
-                });
+       function updateStatus(idRencontre) {
+    if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
+        const target = `#State${idRencontre}`;
+
+        const handler = function(evt) {
+            if (evt.target.id === `State${idRencontre}`) {
+                document.body.removeEventListener('htmx:afterSwap', handler);
+                location.reload();
             }
-            location.reload(true);
-        }
+        };
+
+        document.body.addEventListener('htmx:afterSwap', handler);
+
+        htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
+            target: target,
+            swap: 'outerHTML'
+        });
+    }
+}
+
 
         function vibrate(temps) {
             if (navigator.vibrate) {
