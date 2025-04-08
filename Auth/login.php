@@ -74,7 +74,7 @@ if (isset($_POST['btn-login'])) {
             header("Location: ../ajoutTournoi.php");
         } else {
             // Il y a au moins un tournoi non archivé
-            header("Location: ../ajoutEquipe.php?idTournoi=0");
+            header("Location: ../tableauDeBord.php");
         }
         exit;
     } elseif ($count == 1) {
