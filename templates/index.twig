@@ -57,16 +57,14 @@
             bottom: 0;
             width: 100%;
         }
-        .content {
-           margin-bottom: 100px; /* Ajustez cette valeur selon la hauteur de votre footer */
-        }
+       
         .no-bullet {
     list-style-type: none; /* Supprime les puces */
 }
     </style>
 </head>
 <body>
-    <div class="content">
+    <div class="container-fluid">
    
         {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
 
