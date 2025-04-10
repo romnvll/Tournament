@@ -83,58 +83,69 @@
                                 </div>
                             </td>
 
-								<td
-									class="text-center">
-									<!-- Bloc équipes -->
-									<div
-										class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
-										<!-- Équipe 1 -->
-										<div class="d-flex align-items-center justify-content-center mb-2 mb-md-0">
-											<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2 logo-club" style="width: 36px; height: 36px;">
-											<strong class="d-block text-truncate">{{ arbitre.equipe1_nom }}</strong>
-										</div>
+								<td class="text-center">
+                                
+	<!-- Affichage mobile (vertical) -->
+	<div class="d-flex flex-column align-items-center mb-2 d-md-none">
+		<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="mb-1" style="width: 36px; height: 36px;">
+		<strong class="mb-1 text-center">{{ arbitre.equipe1_nom }}</strong>
+		<span class="fw-bold">{{arbitre.score1}}</span>
+        <span class="fw-bold">-</span>
+        <span class="fw-bold">{{arbitre.score2}}</span>
+		<strong class="mt-1 text-center">{{ arbitre.equipe2_nom }}</strong>
+		<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="mt-1" style="width: 36px; height: 36px;">
+	</div>
 
-										<!-- Équipe 2 -->
-										<div class="d-flex align-items-center justify-content-center">
-											<strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
-											<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2 logo-club" style="width: 36px; height: 36px;">
-										</div>
-									</div>
+	<!-- Affichage desktop (horizontal) -->
+	<div class="d-none d-md-flex flex-row justify-content-between align-items-center mb-2">
+		<div class="d-flex align-items-center justify-content-center">
+			<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2" style="width: 36px; height: 36px;">
+			<strong class="d-block text-truncate">{{ arbitre.equipe1_nom }}</strong>
+		</div>
+        <span class="fw-bold">{{arbitre.score1}}</span>
+        <span class="fw-bold">-</span>
+        <span class="fw-bold">{{arbitre.score2}}</span>
+		<div class="d-flex align-items-center justify-content-center">
+			<strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
+			<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2" style="width: 36px; height: 36px;">
+		</div>
+	</div>
 
-									<!-- Badge catégorie -->
-									<span class="badge text-white px-3 py-2 mb-2" style="background-color: {{ arbitre.categorie_couleur }};">
-										{{ arbitre.categorie_nom }}
-									</span>
+	<!-- Badge catégorie -->
+	<span class="badge text-white px-3 py-2 mb-2" style="background-color: {{ arbitre.categorie_couleur }};">
+		{{ arbitre.categorie_nom }}
+	</span>
 
-									<!-- Terrain -->
-									<div class="mt-2">
-										<strong class="d-flex align-items-center justify-content-center gap-1">
-											<svg width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-												<rect x="2" y="2" width="20" height="20" stroke="green" stroke-width="2" fill="none"/>
-												<line x1="12" y1="2" x2="12" y2="22" stroke="green" stroke-width="2"/>
-												<circle cx="12" cy="12" r="2" stroke="green" stroke-width="2" fill="none"/>
-											</svg>
-											{{ arbitre.terrain_nom }}
-										</strong>
-									</div>
+	<!-- Terrain -->
+	<div class="mt-2">
+		<strong class="d-flex align-items-center justify-content-center gap-1">
+			<svg width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect x="2" y="2" width="20" height="20" stroke="green" stroke-width="2" fill="none"/>
+				<line x1="12" y1="2" x2="12" y2="22" stroke="green" stroke-width="2"/>
+				<circle cx="12" cy="12" r="2" stroke="green" stroke-width="2" fill="none"/>
+			</svg>
+			{{ arbitre.terrain_nom }}
+		</strong>
+	</div>
 
-									<!-- Créneau -->
-									<em class="text-muted d-block mt-1">{{ arbitre.creneau_nom|slice(0, -3) }}</em>
+	<!-- Créneau -->
+	<em class="text-muted d-block mt-1">{{ arbitre.creneau_nom|slice(0, -3) }}</em>
 
-									<!-- Statut de la rencontre -->
-									<div class="mt-2">
-										{% if arbitre.isTerminated == 0 %}
-											<span class="badge bg-warning text-dark">À venir</span>
-										{% elseif arbitre.isTerminated == 1 %}
-											<span class="badge bg-danger">Rencontre terminée</span>
-										{% elseif arbitre.isTerminated == 2 %}
-											<span class="badge bg-info text-dark d-inline-flex align-items-center">
-												<span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-												Rencontre en cours
-											</span>
-										{% endif %}
-									</div>
-								</td>
+	<!-- Statut de la rencontre -->
+	<div class="mt-2">
+		{% if arbitre.isTerminated == 0 %}
+			<span class="badge bg-warning text-dark">À venir</span>
+		{% elseif arbitre.isTerminated == 1 %}
+			<span class="badge bg-danger">Rencontre terminée</span>
+		{% elseif arbitre.isTerminated == 2 %}
+			<span class="badge bg-info text-dark d-inline-flex align-items-center">
+				<span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+				Rencontre en cours
+			</span>
+		{% endif %}
+	</div>
+</td>
+
 
 
 							</tr>

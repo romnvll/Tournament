@@ -67,7 +67,7 @@
 </head>
 <body>
     <div class="content">
-    
+   
         {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
 
             <div class="container-fluid">
@@ -135,13 +135,13 @@
 
                             {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
 
-                    <h2 class="mb-4 ml-2">
-                        <i class="fas fa-exclamation-circle"></i> Les tournois en cours
-                    </h2>
-                            {% else %}
-                      <h2 class="mb-4 ml-2">
-                        <i class="fas fa-exclamation-circle"></i> aucun tournoi en cours
-                    </h2>
+                                    <h2 class="mb-4 ml-2">
+                                        <i class="fas fa-exclamation-circle"></i> Les tournois en cours
+                                    </h2>
+                                            {% else %}
+                                    <h2 class="mb-4 ml-2">
+                                        <i class="fas fa-exclamation-circle"></i> aucun tournoi en cours
+                                    </h2>
 
                             {% endif %}
                     <p class="mb-4">
@@ -311,7 +311,7 @@
                 </div>
             {% endif %}
             {# fin Gestion des labels #}
-
+           
             <div class="row mt-3">
                 <div class="col-lg-12 col-md-6 col-sm-12 col-12" id="score">
                     <div class="table-responsive">
@@ -322,7 +322,9 @@
                                         {% if heureIsVisible == 1 %}
                                             <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-clock"></i> Heure</th>
                                         {% endif %}
-                                        <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-map-marker-alt"></i> Terrain</th>
+                                        {% if nbrTerrains > 1 %}
+                                            <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-map-marker-alt"></i> Terrain</th>
+                                        {% endif %}
                                         <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-futbol"></i> Equipe1</th>
                                         <th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center"><i class="fas fa-info-circle"></i> Informations</th>
                                         <th scope="col" class="col-lg-2 col-md-3 col-sm-4"><i class="fas fa-futbol"></i> Equipe2</th>
@@ -363,6 +365,7 @@
                                             </td>
                                         {% endif %}
                                     {% endif %}
+                                     {% if nbrTerrains > 1 %} 
                                     {% if equipe.terrain_nom != 0 %}
                                         <td class="align-middle text-center position-relative">
                                             <a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true">
@@ -374,6 +377,7 @@
                                         </td>
                                     {% else %}
                                         <td class="align-middle text-center"></td>
+                                    {% endif %}
                                     {% endif %}
                                     <td class="align-middle text-center">
                                         <div class="d-flex flex-column align-items-center">
