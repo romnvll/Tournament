@@ -31,6 +31,9 @@ $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
 $terrain = new TerrainDao();
 
+if (isset ($_GET['id_tournoi'])) {
+  $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
+}
 
 
 if (isset ($_GET['affichageByClubs'])) {
@@ -195,7 +198,7 @@ echo $template->render([
     'getNomEquipeCourant' => $equipeNom,
     'labels' => $Labels,
     'equipesAvecPoule' => $equipesAvecPoule,
-    'nbrTerrains' => $terrain->compterTerrains($_GET['id_tournoi']),
+    'nbrTerrains' => $nbrterrain,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
