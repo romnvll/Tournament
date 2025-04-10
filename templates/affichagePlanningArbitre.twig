@@ -1,194 +1,228 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Planning des Arbitres</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
-    <style>
-        .filter-input {
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body class="bg-light">
-
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Planning des Arbitres: {{infoTournoi}}</h2>
-
-    <div class="row">
-        <div class="col-md-6">
-            <input type="text" id="filterArbitre" class="form-control filter-input" placeholder="Filtrer par nom de l'arbitre...">
-        </div>
-        <div class="col-md-6">
-            <input type="text" id="filterClub" class="form-control filter-input" placeholder="Filtrer par nom du club...">
-        </div>
-    </div>
-
-    <div class="table-responsive" id="arbitreTable">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr class="text-center">
-                    <th>Arbitre <i class="fas fa-user"></i></th>
-                    <th>Club <i class="fas fa-futbol"></i></th>
-                    <th>Informations <i class="fas fa-map-marker-alt"></i></th>
-                    
-                </tr>
-            </thead>
-            
-            <tbody id="arbitreTableBody">
-           
-                {% for arbitre in creneauxArbitres %}
-                
-                <tr>
-                    <td>
-                        {% if arbitre.arbitre_nom|length == 0 %}
-                            <span class="text-primary">un arbitre du club</span>
-                        {% else %}
-                            {{ arbitre.arbitre_nom|upper }} ( {{arbitre.nombre_matchs_arbitre}} rencontre(s) arbitrée(s) )
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{{ arbitre.arbitre_club_logo }}" alt="Logo {{ arbitre.club_nom  }}" class="me-2" style="width: 40px; height: 40px; object-fit: contain;">
-                            {{ arbitre.arbitre_club_nom  }} ({{arbitre.nombre_matchs_club}} rencontre(s) arbitrée(s))
-                            
-                        </div>
-                    </td>
-                 <td class="text-center">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <div class="d-flex align-items-center">
-            <img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2" style="width: 48px; height: 48px;">
-            <strong class="text-start">{{ arbitre.equipe1_nom }}</strong>
-        </div>
-        <div class="d-flex align-items-center">
-            <strong class="text-end">{{ arbitre.equipe2_nom }}</strong>
-            <img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2" style="width: 48px; height: 48px;">
-        </div>
-    </div>
-
-    <!-- Badge pour la catégorie -->
-    <span class="badge text-white px-3 py-2" style="background-color: {{ arbitre.categorie_couleur }};">
-        {{ arbitre.categorie_nom }}
-    </span>
-    <br>
-
-    <!-- Terrain avec icône -->
-    <strong class="d-block mt-2">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="20" height="20" stroke="green" stroke-width="2" fill="none"/>
-            <line x1="12" y1="2" x2="12" y2="22" stroke="green" stroke-width="2"/>
-            <circle cx="12" cy="12" r="2" stroke="green" stroke-width="2" fill="none"/>
-        </svg>
-        {{ arbitre.terrain_nom }}
-    </strong>
-
-    <!-- Créneau en texte adouci -->
-    <em class="text-muted">{{ arbitre.creneau_nom }}</em>
-    <br>
-
-    <!-- Statut de la rencontre -->
-    {% if arbitre.isTerminated == 0 %}
-        <span class="badge bg-warning text-dark mt-2">À venir</span>
-    {% elseif arbitre.isTerminated == 1 %}
-        <span class="badge bg-danger mt-2">Rencontre terminée</span>
-    {% elseif arbitre.isTerminated == 2 %}
-        <span class="badge bg-info text-dark d-inline-flex align-items-center mt-2">
-            <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-            Rencontre en cours
-        </span>
-    {% endif %}
-</td>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Planning des Arbitres</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center">Aucune planification trouvée</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
- 
-    <!--<div class="text-center mt-3">
-        <a href="index.php?id_tournoi={{idTournoi}}" class="btn btn-primary">Retour au tournoi {{infoTournoi}}</a>
-    </div>-->
-</div>
+	</head>
+<style>
+@media (max-width: 576px) {
+	img.logo-club {
+		width: 30px !important;
+		height: 30px !important;
+	}
+}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-<script>
-    $(document).ready(function() {
-        // Définir l'intervalle de rafraîchissement en millisecondes (par exemple, 10 secondes)
-        const refreshInterval = {{infoTournoiRefresh["refreshClientTime"]}};
+</style>
+    
+	<body class="bg-light">
 
-        // Fonction pour rafraîchir le contenu du tableau
-        setInterval(function() {
-            $('#arbitreTable').load(location.href + ' #arbitreTable', function() {
-                // Réappliquer les filtres après le rafraîchissement
-                const filterArbitre = document.getElementById('filterArbitre');
-                const filterClub = document.getElementById('filterClub');
-                filterTable();
-            });
-        }, refreshInterval);
+		<div class="container mt-4">
+			<h2 class="text-center mb-4">Planning des Arbitres:
+				{{infoTournoi}}</h2>
 
-        // Fonction pour filtrer le tableau
-        function filterTable() {
-            const filterValueArbitre = filterArbitre.value.toLowerCase();
-            const filterValueClub = filterClub.value.toLowerCase();
-            const rows = document.getElementById('arbitreTableBody').getElementsByTagName('tr');
+			<div class="row">
+				<div class="col-md-6">
+					<input type="text" id="filterArbitre" class="form-control filter-input mb-10" placeholder="Filtrer par nom de l'arbitre...">
+				</div>
+				<div class="col-md-6">
+					<input type="text" id="filterClub" class="form-control filter-input mb-10" placeholder="Filtrer par nom du club...">
+				</div>
+			</div>
 
-            for (let row of rows) {
-                const cells = row.getElementsByTagName('td');
-                if (cells.length < 2) continue; // Éviter de filtrer la ligne "Aucune planification trouvée"
+			<div class="table-responsive" id="arbitreTable">
+				<table class="table table-striped table-bordered align-middle">
+					<thead class="table-dark">
+						<tr class="text-center">
+							<th>Arbitre
+								<i class="fas fa-user"></i>
+							</th>
+							<th>Club
+								<i class="fas fa-futbol"></i>
+							</th>
+							<th>Informations
+								<i class="fas fa-map-marker-alt"></i>
+							</th>
 
-                const arbitreNom = cells[0].textContent.toLowerCase();
-                const clubNom = cells[1].textContent.toLowerCase();
+						</tr>
+					</thead>
 
-                const matchArbitre = arbitreNom.includes(filterValueArbitre);
-                const matchClub = clubNom.includes(filterValueClub);
+					<tbody id="arbitreTableBody">
 
-                if (matchArbitre && matchClub) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
+						{% for arbitre in creneauxArbitres %}
 
-        // Ajouter les événements de filtrage
-        const filterArbitre = document.getElementById('filterArbitre');
-        const filterClub = document.getElementById('filterClub');
+							<tr>
+								<td class="text-center">
+                                    <div class="d-flex flex-column align-items-center">
+                                        {% if arbitre.arbitre_nom|length == 0 %}
+                                            <span class="text-primary">Un arbitre du club</span>
+                                        {% else %}
+                                            <p class="mb-0 fw-bold">{{ arbitre.arbitre_nom|upper }}</p>
+                                            <p class="mb-0 text-muted">
+                                                ({{ arbitre.nombre_matchs_arbitre }} rencontre(s) arbitrée(s))
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </td>
 
-        filterArbitre.addEventListener('input', () => {
-            localStorage.setItem('arbitreFilter', filterArbitre.value.toLowerCase());
-            filterTable();
-        });
+								<td class="text-center">
+                                <div class="d-flex flex-column align-items-center">
+                                    <!-- Logo en haut -->
+                                    <img src="{{ arbitre.arbitre_club_logo }}" alt="Logo {{ arbitre.club_nom }}" class="mb-2 logo-club" style="width: 48px; height: 48px;">
 
-        filterClub.addEventListener('input', () => {
-            localStorage.setItem('clubFilter', filterClub.value.toLowerCase());
-            filterTable();
-        });
+                                    <!-- Nom du club -->
+                                    <p class="mb-0"><strong>{{ arbitre.arbitre_club_nom }}</strong></p>
 
-        // Récupérer les filtres stockés dans le localStorage
-        const savedArbitreFilter = localStorage.getItem('arbitreFilter');
-        const savedClubFilter = localStorage.getItem('clubFilter');
+                                    <!-- Nombre de matchs -->
+                                    <p class="mb-0 text-muted">({{ arbitre.nombre_matchs_club }} rencontre(s) arbitrée(s))</p>
+                                </div>
+                            </td>
 
-        if (savedArbitreFilter) {
-            filterArbitre.value = savedArbitreFilter;
-        }
-        if (savedClubFilter) {
-            filterClub.value = savedClubFilter;
-        }
+								<td
+									class="text-center">
+									<!-- Bloc équipes -->
+									<div
+										class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+										<!-- Équipe 1 -->
+										<div class="d-flex align-items-center justify-content-center mb-2 mb-md-0">
+											<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2 logo-club" style="width: 36px; height: 36px;">
+											<strong class="d-block text-truncate">{{ arbitre.equipe1_nom }}</strong>
+										</div>
 
-        // Appliquer les filtres au chargement initial
-        filterTable();
-    });
-</script>
+										<!-- Équipe 2 -->
+										<div class="d-flex align-items-center justify-content-center">
+											<strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
+											<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2 logo-club" style="width: 36px; height: 36px;">
+										</div>
+									</div>
 
-</body>
+									<!-- Badge catégorie -->
+									<span class="badge text-white px-3 py-2 mb-2" style="background-color: {{ arbitre.categorie_couleur }};">
+										{{ arbitre.categorie_nom }}
+									</span>
+
+									<!-- Terrain -->
+									<div class="mt-2">
+										<strong class="d-flex align-items-center justify-content-center gap-1">
+											<svg width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<rect x="2" y="2" width="20" height="20" stroke="green" stroke-width="2" fill="none"/>
+												<line x1="12" y1="2" x2="12" y2="22" stroke="green" stroke-width="2"/>
+												<circle cx="12" cy="12" r="2" stroke="green" stroke-width="2" fill="none"/>
+											</svg>
+											{{ arbitre.terrain_nom }}
+										</strong>
+									</div>
+
+									<!-- Créneau -->
+									<em class="text-muted d-block mt-1">{{ arbitre.creneau_nom|slice(0, -3) }}</em>
+
+									<!-- Statut de la rencontre -->
+									<div class="mt-2">
+										{% if arbitre.isTerminated == 0 %}
+											<span class="badge bg-warning text-dark">À venir</span>
+										{% elseif arbitre.isTerminated == 1 %}
+											<span class="badge bg-danger">Rencontre terminée</span>
+										{% elseif arbitre.isTerminated == 2 %}
+											<span class="badge bg-info text-dark d-inline-flex align-items-center">
+												<span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+												Rencontre en cours
+											</span>
+										{% endif %}
+									</div>
+								</td>
+
+
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="4" class="text-center">Aucune planification trouvée</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+			<!--<div class="text-center mt-3">
+						        <a href="index.php?id_tournoi={{idTournoi}}" class="btn btn-primary">Retour au tournoi {{infoTournoi}}</a>
+						    </div>-->
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+		<script>
+			$(document).ready(function () { // Définir l'intervalle de rafraîchissement en millisecondes (par exemple, 10 secondes)
+const refreshInterval = {{ infoTournoiRefresh["refreshClientTime"] }};
+
+// Fonction pour rafraîchir le contenu du tableau
+setInterval(function () {
+$('#arbitreTable').load(location.href + ' #arbitreTable', function () { // Réappliquer les filtres après le rafraîchissement
+const filterArbitre = document.getElementById('filterArbitre');
+const filterClub = document.getElementById('filterClub');
+filterTable();
+});
+}, refreshInterval);
+
+// Fonction pour filtrer le tableau
+function filterTable() {
+const filterValueArbitre = filterArbitre.value.toLowerCase();
+const filterValueClub = filterClub.value.toLowerCase();
+const rows = document.getElementById('arbitreTableBody').getElementsByTagName('tr');
+
+for (let row of rows) {
+const cells = row.getElementsByTagName('td');
+if (cells.length < 2) 
+continue;
+
+// Éviter de filtrer la ligne "Aucune planification trouvée"
+
+const arbitreNom = cells[0].textContent.toLowerCase();
+const clubNom = cells[1].textContent.toLowerCase();
+
+const matchArbitre = arbitreNom.includes(filterValueArbitre);
+const matchClub = clubNom.includes(filterValueClub);
+
+if (matchArbitre && matchClub) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+}
+}
+
+// Ajouter les événements de filtrage
+const filterArbitre = document.getElementById('filterArbitre');
+const filterClub = document.getElementById('filterClub');
+
+filterArbitre.addEventListener('input', () => {
+localStorage.setItem('arbitreFilter', filterArbitre.value.toLowerCase());
+filterTable();
+});
+
+filterClub.addEventListener('input', () => {
+localStorage.setItem('clubFilter', filterClub.value.toLowerCase());
+filterTable();
+});
+
+// Récupérer les filtres stockés dans le localStorage
+const savedArbitreFilter = localStorage.getItem('arbitreFilter');
+const savedClubFilter = localStorage.getItem('clubFilter');
+
+if (savedArbitreFilter) {
+filterArbitre.value = savedArbitreFilter;
+}
+if (savedClubFilter) {
+filterClub.value = savedClubFilter;
+}
+
+// Appliquer les filtres au chargement initial
+filterTable();
+});
+		</script>
+
+	</body>
 </html>
