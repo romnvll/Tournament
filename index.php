@@ -8,6 +8,7 @@ require 'class/equipeDao.class.php';
 require 'class/clubDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
+require 'class/terrainDao.class.php';
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
@@ -28,6 +29,8 @@ $listeDesTournois = $tournoiDao->afficherTousLesTournois();
 $RencontreByPoule=null;
 $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
+$terrain = new TerrainDao();
+
 
 
 if (isset ($_GET['affichageByClubs'])) {
@@ -191,7 +194,8 @@ echo $template->render([
     'getNomClubCourant' => $nomClub,
     'getNomEquipeCourant' => $equipeNom,
     'labels' => $Labels,
-    'equipesAvecPoule' => $equipesAvecPoule
+    'equipesAvecPoule' => $equipesAvecPoule,
+    'nbrTerrains' => $terrain->compterTerrains($_GET['id_tournoi']),
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
