@@ -12,11 +12,7 @@
   
 
   
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link rel="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" /> 
-
-   
+  
 
     <style>
         .hidden {
@@ -32,7 +28,21 @@
             font-size: 12px;
         }
 
-        
+   select {
+  /* Style du bouton select */
+}
+select::picker-icon {
+  /* Pseudo élément représentant la flêche */
+}
+select::picker(select) {
+   opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.4s allow-discrete;
+}
+option::checkmark {
+  /* Coche à gauche des options */
+}
+
     </style>
 
 
@@ -211,10 +221,10 @@
                                     {% else %}
                                    {% if tournoiInfo.gestionArbitres == 1 %}
                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
-                                            <select class="form-select" name="Addevent" id="listeArbitre">
+                                            <select class="form-select"  name="Addevent" id="listeArbitre">
                                              <option value="">Choisir arbitre</option>
                                                 {% for arbitre in listeDesArbitres %}
-                                                <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
+                                                <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}' >
                                                    {% if arbitre.nom is not empty %} Arbitre: {{arbitre.nom}} ({{arbitre.nombre_matchs}}) {% endif %}  Club: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
                                                 </option>
                                                 {% endfor %}
