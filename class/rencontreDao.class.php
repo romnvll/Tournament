@@ -304,10 +304,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             club2.logo AS club2_logo,
 
             cat2.Nom_categorie AS equipe2_categorie_nom,
-            cat2.Couleur AS equipe2_categorie_couleur,
-
-
-            
+            cat2.Couleur AS equipe2_categorie_couleur,            
             
             r.score1,
             r.score2,

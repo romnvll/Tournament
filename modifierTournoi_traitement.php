@@ -179,6 +179,7 @@ if ($_POST['gestionArbitres'] == "") {
 
 else {
     $gestionArbitres = 1;
+    
 }
 
 

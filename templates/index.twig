@@ -69,9 +69,12 @@
 }
     </style>
 </head>
+{{ include('headerIndex.twig') }}
 <body>
-    <div class="container-fluid">
-   
+    <div class="container-fluid mt-1">
+
+    
+ 
         {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
 
             <div class="container-fluid">
@@ -137,17 +140,26 @@
 </script>
 
 
-                            {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
+ {% set hasNonArchived = false %}
 
-                                    <h2 class="mb-4 ml-2">
-                                        <i class="fas fa-exclamation-circle"></i> Les tournois en cours
-                                    </h2>
-                                            {% else %}
-                                    <h2 class="mb-4 ml-2">
-                                        <i class="fas fa-exclamation-circle"></i> aucun tournoi en cours
-                                    </h2>
+{% for tournoi in ListeDesTournois %}
 
-                            {% endif %}
+    {% if tournoi.isArchived == 0 %}
+        {% set hasNonArchived = true %}
+        
+    {% endif %}
+{% endfor %}
+
+ {% if  hasNonArchived %}
+     <h2 class="mb-4 ml-2">
+     <i class="fas fa-exclamation-circle"></i> Les tournois en cours
+     </h2>
+      {% else %}
+     <h2 class="mb-4 ml-2">
+        <i class="fas fa-exclamation-circle"></i> aucun tournoi en cours
+       </h2>
+
+      {% endif %}
                     <p class="mb-4">
                     {% for tournoi in ListeDesTournois %}
                     {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
@@ -217,9 +229,12 @@
                                 <ul class="list-group no-bullet">
                                     {% for equipe in equipesAvecPoule %}
                                     <li>
+                                        {% if equipe.idPoule != null %}
                                         <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}" class="list-group-item list-group-item-action">
                                             {{ equipe.nom|upper }} - {{ equipe.Nom_categorie }}
                                         </a>
+                                        {% endif %}
+                                        
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -474,7 +489,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                {{ classement }}
+                                                <span class="me-2">{{ classement }}</span>
                                                 <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;" alt="logo">
                                                 <span>{{ resultat.nom|upper }}</span>
                                             </div>

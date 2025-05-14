@@ -57,8 +57,8 @@
                                     <input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{ infotournoi.heure_debut }}" onchange="this.form.submit()">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="pasHoraire" class="form-label">Pas Horaire (en minutes)</label>
-                                    <input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()">
+                                    <label for="pasHoraire" class="form-label">Pas horaire (pour modifier ce pas, rendez vous dans le placement des rencontres)</label>
+                                    <input type="number" class="form-control" id="pasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()" readonly>
                                 </div>
                                 <h5 class="mt-4">Options</h5>
                                 <div class="form-group">
@@ -144,7 +144,7 @@
                 <div class="col">
                     {% if infotournoi.gestionTables == 1 %}
                         <div class="card shadow-lg mt-5">
-                            <div class="card-header bg-primary text-white text-center">
+                            <div class="card-header bg-primary text-white text-center" id="ajouterDesPersonnesSurTerrain">
                                 <h4>Ajouter une personne pour gérer les scores à une table d'un terrain</h4>
                             </div>
                             <div class="card-body p-4">
@@ -251,7 +251,7 @@
                     {% endif %}
                     {% if infotournoi.gestionArbitres == 1 %}
                         <div class="card shadow-lg mt-5">
-                            <div class="card-header bg-primary text-white text-center">
+                            <div class="card-header bg-primary text-white text-center" id="ajouterDesArbitres">
                                 <h4>Ajouter des arbitres</h4>
                             </div>
                             <div class="card-body p-4">
@@ -354,6 +354,11 @@
                 }
             });
         </script>
+
+
+
+
+
     </div>
 </body>
 </html>
