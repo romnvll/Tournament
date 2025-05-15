@@ -2,6 +2,7 @@
 require 'security.php';
 require ('class/tournoiDao.class.php');
 
+
 // Vérification de l'existence et de la validité des paramètres $_GET ou $_POST
 
 $tournoiDao = new tournoiDao();
@@ -182,7 +183,14 @@ else {
     
 }
 
+if (isset($_POST['idArbitre'])) {
+   require ('class/arbitreDao.class.php');
+$arbitreDao = new arbitreDao();
+$arbitreDao->modifierArbitre($_POST['idArbitre'],$_POST['nomArbitre']);
+  echo "✔️ Nom mis à jour" . $_POST['nomArbitre'];
 
+exit;
+}
 
 
 
