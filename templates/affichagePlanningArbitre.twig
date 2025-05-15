@@ -95,16 +95,16 @@
     <div class="d-flex align-items-center me-2">
       <img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" style="width: 24px; height: 24px;" class="me-1">
       <strong class="text-nowrap">{{ arbitre.equipe1_nom }}</strong>
-	  {% if arbitre.score1 != ""  %} <span class="ms-2 fw-bold">({{arbitre.score1}}</span>{% endif %}
+	  {% if arbitre.score1 is not empty  %} <span class="ms-2 fw-bold">({{arbitre.score1}}</span>{% endif %}
     </div>
 	
     <!-- Séparateur -->
-	{% if arbitre.score1 is not empty or arbitre.score2 is not empty %}
+	
     <span class="fw-bold mx-1">-</span>
-	{% endif %}
+	
     <!-- Équipe 2 -->
     <div class="d-flex align-items-center ms-2">
-	<span class="me-2 fw-bold">{{arbitre.score2}})</span>
+	 {% if arbitre.score2 is not empty  %}<span class="me-2 fw-bold">{{arbitre.score2}})</span>{% endif %}
       <strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
       <img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" style="width: 24px; height: 24px;" class="ms-1">
     </div>
@@ -118,14 +118,20 @@
 	<div class="d-none d-md-flex flex-row justify-content-between align-items-center mb-2">
 		<div class="d-flex align-items-center justify-content-center">
 			<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2" style="width: 36px; height: 36px;">
+			
 			<strong class="d-block text-truncate">{{ arbitre.equipe1_nom }}</strong>
 		</div>
-        <span class="fw-bold">{{arbitre.score1}}</span>
+			 {% if arbitre.score1 is not empty  %}<span class="fw-bold">({{arbitre.score1}}</span>{% endif %}
+
+        
 			{% if arbitre.score1 is not empty or arbitre.score2 is not empty %}
 
         <span class="fw-bold">-</span>
 		{% endif %}
-        <span class="fw-bold">{{arbitre.score2}}</span>
+       	
+		{% if arbitre.score2 is not empty  %}<span class="fw-bold">{{arbitre.score2}})</span>{% endif %}
+
+	    
 		<div class="d-flex align-items-center justify-content-center">
 			<strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
 			<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2" style="width: 36px; height: 36px;">
