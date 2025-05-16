@@ -232,7 +232,7 @@ class EquipeDAO {
         $query = "SELECT COUNT(*) AS nombre_equipes 
                   FROM EquipePoule 
                   JOIN Equipes e ON EquipePoule.equipe_id = e.id
-                  WHERE EquipePoule.poule_id = :poule_id AND e.IsPresent = 1";
+                  WHERE EquipePoule.poule_id = :poule_id ";
     
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':poule_id', $pouleId, PDO::PARAM_INT);

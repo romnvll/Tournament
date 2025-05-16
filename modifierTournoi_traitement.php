@@ -174,6 +174,7 @@ else {
     $gestionTables = 1;
 }
 
+
 if ($_POST['gestionArbitres'] == "") {
     $gestionArbitres = 0;
 }
@@ -187,7 +188,7 @@ if (isset($_POST['idArbitre'])) {
    require ('class/arbitreDao.class.php');
 $arbitreDao = new arbitreDao();
 $arbitreDao->modifierArbitre($_POST['idArbitre'],$_POST['nomArbitre']);
-  echo "✔️ Nom mis à jour" . $_POST['nomArbitre'];
+  echo "✅ Ok!";
 
 exit;
 }

@@ -227,8 +227,7 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
         $query = "SELECT
                     e.id,
                     e.nom,
-                    e.categorie,
-                    e.IsPresent,
+                    e.categorie,                    
                     e.tournoi_id,
                     ep.poule_id,
                     e.club_id,

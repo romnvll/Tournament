@@ -108,7 +108,6 @@ echo $template->render([
   'idTournoi' => $tournoiId,
   //'RencontresByPoulephase1' => $rencontreDao->GetEquipesClasseesParPoule($tournoiId),
   'idCategorieEnCours' => $_GET['idCategorie'],
-  //'PoulesClassement' =>$tournoiDao->afficherPoulesDeClassement($tournoiId),
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
   'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
   'pouleHasRencontres' => $pouleHasRencontres,

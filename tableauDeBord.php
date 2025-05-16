@@ -21,14 +21,16 @@ $template = $twig->load('tableauDeBord.twig');
 
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
-$dernierId = null;
+$dernierId = 0;
 
 foreach ($tousLesTournois as $tournoi) {
     if (isset($tournoi['isArchived']) && $tournoi['isArchived'] == 0) {
         $dernierId = $tournoi['id'];
+       
     }
 }
-
+ //var_dump($dernierId);
+        
 $nbrequipe = $equipeDao->getAllEquipeByIdTournoi($dernierId);
 $nbrequipe = count($nbrequipe);
 

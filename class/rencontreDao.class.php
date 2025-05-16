@@ -141,7 +141,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
 
     public function getEquipesPresentesByPoule($pouleId)
     {
-        // Effectuez une requête SQL pour récupérer les équipes présentes pour la poule donnée en utilisant une jointure
+        // Effectuez une requête SQL pour récupérer les équipes donnée en utilisant une jointure
         $query = "SELECT e.id, e.nom 
                   FROM Equipes e 
                   INNER JOIN EquipePoule ep ON e.id = ep.equipe_id 
@@ -537,7 +537,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             e.id,
             e.nom,
             e.categorie,
-            e.IsPresent,
+            
             e.tournoi_id,
             ep.poule_id,
             e.club_id,
@@ -601,7 +601,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
                             e.id,
                             e.nom,
                             e.categorie,
-                            e.IsPresent,
+                            
                             e.tournoi_id,
                             ep.poule_id,
                             e.club_id,
@@ -621,7 +621,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
                         JOIN EquipePoule ep ON e.id = ep.equipe_id
                         WHERE
                             ep.poule_id = :pouleId AND
-                            e.isPresent = 1 AND
+                            
                             e.tournoi_id = :idTournoi
                         ORDER BY
                             TotalDesPoints DESC,
@@ -1109,7 +1109,7 @@ WHERE
         FROM Rencontres r
         JOIN Equipes equipe1 ON r.equipe1_id = equipe1.id
         JOIN Equipes equipe2 ON r.equipe2_id = equipe2.id
-        WHERE equipe1.IsPresent = 1 AND equipe2.IsPresent = 1 AND r.tournoi_id = :tournoiId
+        WHERE r.tournoi_id = :tournoiId
         ORDER BY CASE WHEN r.heure IS NULL THEN 1 ELSE 0 END, r.heure, equipe1.categorie
         
         ";
