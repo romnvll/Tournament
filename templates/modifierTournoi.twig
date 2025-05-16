@@ -292,7 +292,7 @@
     <form 
         id="form-arbitre-{{ arbitre.arbitre_id }}"
         hx-post="modifierTournoi_traitement.php" 
-        hx-trigger="change delay:200ms" 
+        hx-trigger="keyup" 
         hx-target="#message-arbitre-{{ arbitre.arbitre_id }}" 
         hx-swap="innerHTML">
         
@@ -318,7 +318,7 @@
 
 
                                                        {% endfor %}
-                                            <input type="submit">
+                                            
                                         </form>
                                         </tbody>
                                     </table>
