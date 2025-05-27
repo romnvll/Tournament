@@ -3,6 +3,7 @@ require 'security.php';
 require ('class/tournoiDao.class.php');
 
 
+var_dump($_POST);
 
 
 

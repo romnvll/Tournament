@@ -23,6 +23,21 @@ class CategorieDao {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function obtenirCategoriesDuTournoi(int $idTournoi): array {
+    $stmt = $this->connexion->prepare("
+        SELECT DISTINCT c.*
+        FROM Equipes e
+        INNER JOIN Categorie c ON e.categorie = c.id_categorie
+        WHERE e.tournoi_id = :idTournoi AND e.IsPresent = 1
+    ");
+    $stmt->bindParam(':idTournoi', $idTournoi);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+    
+
     public function obtenirToutesLesCategories(): array {
         $stmt = $this->connexion->prepare("
             SELECT * FROM Categorie ORDER BY Nom_categorie ASC

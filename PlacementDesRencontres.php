@@ -8,6 +8,7 @@ require 'class/creneauxDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
 require 'class/labelsDao.class.php';
+require 'class/categorie.class.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -25,6 +26,7 @@ $terrain = new TerrainDao();
 $planification = new planificationDao();
 $arbitre = new arbitreDao();
 $labels = new labelDao();
+$categories = new CategorieDao();
 
 if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
     echo "Aucun tournoi actif en cours.";
@@ -137,7 +139,8 @@ echo $template->render([
     'lastCreneau' => $lastCreneau,
     'timeNextCreneau' => $timeNextCreneauFormatted,
     'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier,
-    'nombreDeLabel' => $nombreDeLabel
+    'nombreDeLabel' => $nombreDeLabel,
+    'listeCategorie' => $categories->obtenirCategoriesDuTournoi($_GET['id_tournoi'])
     
 
 

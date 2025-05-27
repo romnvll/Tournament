@@ -31,7 +31,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card text-bg-primary">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Tournois en cours</h5>
+                        <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Tournoi(s) en cours</h5>
                         <p class="card-text display-6"><a href="modifierTournoi.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" >{{ tournoisActifs|length }}</a></p>
                      </div>
                 </div>
@@ -39,7 +39,9 @@
             <div class="col-md-4 mb-3">
                 <div class="card text-bg-success">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-users me-2"> </i>Équipes inscrites</h5>
+                        <h5 class="card-title"><i class="fas fa-users me-2"> </i>Équipes inscrites au tournoi {{tournoisActifs[0].nom}} 
+                           
+                       </h5>
                         <p class="card-text display-6">  <a href="ajoutEquipe.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" > {{nbrequipe}} </a></p>
                     </div>
                 </div>
@@ -47,7 +49,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card text-bg-warning">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fa-solid fa-building-user"></i>Nombre de clubs</h5>
+                        <h5 class="card-title"><i class="fa-solid fa-building-user"></i>Nombre de clubs au tournoi {{tournoisActifs[0].nom}}</h5>
                         <p class="card-text display-6">{{nbClub}}</p>
                     </div>
                 </div>

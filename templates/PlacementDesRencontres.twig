@@ -154,7 +154,7 @@ option::checkmark {
             </div>
         </div>
 
-        <table class="table" id="planification-table">
+        <table class="table ms-1" id="planification-table">
             <thead>
                 <tr>
                     <th scope="col">Heure des rencontres</th>
@@ -180,7 +180,7 @@ option::checkmark {
             <tbody>
                 {% for creneau in listCreneaux %}
                 <tr>
-                    <td class="col-md-1">
+                    <td class="col-md-1 ">
                     
                         <div class="input-group flex-nowrap">
                             <span class="input-group-text" id="addon-wrapping">
@@ -201,6 +201,20 @@ option::checkmark {
                                    title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
                             >
                         </div>
+                        <!--<form action="PlacementDesRencontresTraitement.php" method="post" name="VerticalPlacement">
+                         
+                        <select name="idCategorie" class="form-select form-select-sm">
+
+                        {% for Categorie in listeCategorie %}
+                        <option value="{{ Categorie.id_categorie }}">{{ Categorie.Nom_categorie }}</option>
+                            
+                        {% endfor %}
+                        </select>
+                        <input type="hidden" name="idCreneau" value="{{ creneau.creneau_id }}">
+                        <input type="submit" class="btn btn-primary btn-sm" value="VerticalPlacement">
+                        
+                        </form>
+                        -->
                     </td>
                     {% set Displayed = false %}
                     {% for j in 0..terrains|length - 1 %}

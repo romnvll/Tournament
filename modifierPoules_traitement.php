@@ -3,11 +3,23 @@ require ('security.php');
 require 'class/equipeDao.class.php';
 require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
-
+require 'class/tournoiDao.class.php';
 
 $tournoiDao = new tournoiDao();
-if (($tournoiDao->droitTournoiClub((int)$_GET['tournoiId'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-    
+var_dump($_POST);
+
+// Prioriser $_POST['idTournoi'], sinon utiliser $_GET['tournoiId']
+if (isset($_POST['id_tournoi']) && is_numeric($_POST['id_tournoi'])) {
+    $tournoiId = (int)$_POST['id_tournoi'];
+} elseif (isset($_GET['tournoiId']) && is_numeric($_GET['tournoiId'])) {
+    $tournoiId = (int)$_GET['tournoiId'];
+} else {
+    // Si aucune valeur valide n'est trouvée, terminer le script
+    exit;
+}
+
+if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) == null) {
+      
     exit;
   }
 
@@ -42,7 +54,7 @@ else {
     $equipe->modifierEquipeIdPoule($_POST['dstpoule'],$_POST['equipe']);
 
 
-  // var_dump($_POST['id_poule']);
+   //var_dump($_POST['id_poule']);
     
     $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi']);
    
