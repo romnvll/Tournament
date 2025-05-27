@@ -63,10 +63,12 @@ if ($RencontreExist) {
 
 $equipeDao = new EquipeDAO();
 
-$listeEquipes = preg_split('/[\n,]+/', $_POST['nomEquipes']); // Séparation par virgule et retour à la ligne
+$valeurs = str_replace(["\r", "\n"], ',', $_POST['nomEquipes']); // Remplace les retours invisibles par des virgules
+$listeEquipes = array_filter(array_map('trim', explode(',', $valeurs)));
+
 
 foreach ($listeEquipes as $nomEquipe) {
-    var_dump($_POST['idClubs']);
+   
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
     if (!empty($nomEquipe)) {
         $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);
