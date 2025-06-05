@@ -62,13 +62,17 @@
 								<i class="fa-solid fa-table me-2 text-primary"></i>
 								Liste des Poules</h3>
 							<div class="row">
+							{% set NbrPoule = 0 %}
 								{% for poule in listeDesPoules %}
+									{% set NbrPoule = NbrPoule + 1 %}
+									
 									<div class="col-12 mb-4">
 										<div class="card shadow-sm rounded-3">
 											<div class="card-header bg-primary text-white">
 												<h4 class="mb-0">
 													<i class="fa-solid fa-circle-nodes me-2"></i>
-													{{ poule.nom }}</h4>
+													{% set NbrEquipe = poule.equipes|length %}
+													{{ poule.nom }} ({{NbrEquipe}} équipes)</h4>
 											</div>
 											<div class="card-body">
 												<table class="table table-bordered text-center">
@@ -86,7 +90,9 @@
 														<tr>
 															<td>
 																<ul class="list-group list-group-flush">
+																
 																	{% for equipe in poule.equipes %}
+																	{% set NbrEquipe = NbrEquipe +1 %}
 																		<li class="list-group-item">{{ equipe.nom }}</li>
 																	{% endfor %}
 																</ul>
@@ -108,12 +114,20 @@
 					{% endif %}
 
 					{% if nbrEquipe is not null %}
-						<div class="text-center mt-4">
-							<a hx-get="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok" hx-target="#divResult" hx-swap="innerHTML" class="btn btn-lg btn-success shadow">
+						<div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3 text-center">
+							<a hx-get="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok"
+							hx-target="#divResult"
+							hx-swap="innerHTML"
+							class="btn btn-lg btn-success shadow">
 								<i class="fa-solid fa-check-circle me-2"></i>
-								Créer cette poule ?
+								{% if NbrPoule < 2 %}
+									Créer cette poule ?
+								{% else %}
+									créer ces {{NbrPoule}} poules ?
+								{% endif %}
 							</a>
 						</div>
+
 					{% endif %}
 				</div>
 			</div>
