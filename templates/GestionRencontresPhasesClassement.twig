@@ -155,6 +155,10 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                    {% set nbEquipes = poule.contenu|length %}
+                                        {% set nbRencontres = (nbEquipes * (nbEquipes - 1)) // 2 %}
+                                         {{ nbRencontres }} rencontres à planifier
+
                                         {% for equipe in poule.contenu %}
                                             <tr>
                                                 <td>{{ equipe.nom }}</td>
