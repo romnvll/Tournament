@@ -201,6 +201,19 @@ option::checkmark {
                                    title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
                             >
                         </div>
+                        <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+                       <a 
+                        href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Insérer un créneau"
+                        class="text-success">
+                        <i class="fa fa-plus-circle fa-sm" aria-hidden="true"></i>
+                    </a>
+
+                        
+
+                        
                         <!--<form action="PlacementDesRencontresTraitement.php" method="post" name="VerticalPlacement">
                          
                         <select name="idCategorie" class="form-select form-select-sm">
@@ -302,8 +315,7 @@ option::checkmark {
             <tfoot>
                 <td>
                     <a id="add-creneau-link"
-                       href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}"
-                    >
+                       href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}">
                         <h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2>
                     </a>
                     <span id="bottom"></span>

@@ -3,7 +3,6 @@ require 'security.php';
 require ('class/tournoiDao.class.php');
 
 
-var_dump($_POST);
 
 
 
@@ -135,6 +134,15 @@ if (isset($_GET['action'])) {
         }
 
     }
+
+     if  (($_GET['action']=="ajouterCreneauEntre")) {
+        require 'class/creneauxDao.class.php';
+         $creneau = new creneauxDao();
+            $creneau->ajouterCreneauEntre($_GET['idTournoi'],$_GET['CreneauOrdre'],$_GET['pas']);
+             header("Location: " . $_SERVER['HTTP_REFERER']."#bottom");
+
+
+     }
 
       
 

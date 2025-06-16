@@ -74,7 +74,6 @@
 
 			</div>
 			<div class="col">
-				<button id="toggle-button" class="btn btn-success btn-lg no-print">Pause</button>
 				<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
 
 			</div>
@@ -145,7 +144,7 @@
                                                         {% endif %}
 															{% if planification.rencontre_id is not null %}
 																<div
-																	class="mb-3">
+																	class="mb-3" style="background-color: {{ planification.equipe1_categorie_couleur }};">
 																	<!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
 																	<p class="fw-bold text-center">{{planification.equipe1_categorie_nom}}
 																		- tour
@@ -197,20 +196,13 @@
 																		</div>
 
 																		<div class="d-flex align-items-center justify-content-center mb-2">
-																			<span class="mx-2"><i class="fas fa-user-tie"></i></span>
-																			
-																			{% if planification.arbitre_nom == "" %}
-																				<p class="mb-0">Aucun arbitre </p>
-																			{% else %}
-																				<p class="mb-0 me-1">{{ planification.arbitre_nom }} </p>
-																			{% endif %}
+																		{% if planification.isClassement == 1 %}
+																			  <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PhaseFinale-tour{{planification.tour}}-{{ planification.equipe2_poule_noms|split(',')[0] }} </p>
+																		{% else %}
+	
+																	 <p class="card-text">tour{{planification.tour}}-{{ planification.equipe1_poule_noms|split(',')[0] }} </p>
 
-																			{% if planification.club_nom_arbitre == "" %}
-																				<p class="mb-0"> </p>
-																			{% else %}
-																				<p class="mb-0">  {{ planification.club_nom_arbitre }}</p>
-																			{% endif %}
-
+																		 		{% endif %}
 																			
 
 																			
@@ -233,7 +225,7 @@
 																<script>
 																	var tdElement = document.currentScript.parentElement;
                                                                         // Appliquer la couleur de fond au <td> parent
-                                                                        tdElement.style.backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
+                                                                       // tdElement.style.backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
 																</script>
 
 															{% elseif planification.label_id is not null %}
@@ -278,36 +270,7 @@ location.reload();
 			</script>
 
 
-			<script>
-				$(document).ready(function () {
-let isPaused = false;
-let reloadInterval;
-
-
-function startReloading() {
-reloadInterval = setInterval(function () {
-if (! isPaused) {
-location.reload(true);
-}
-}, 5000);
-}
-
-// Démarrer le rechargement
-startReloading();
-
-// Gérer le clic sur le bouton pour mettre en pause ou reprendre
-$('#toggle-button').click(function () {
-isPaused = ! isPaused;
-$(this).text(isPaused ? 'Lecture' : 'Pause');
-
-if (isPaused) {
-clearInterval(reloadInterval);
-} else {
-startReloading();
-}
-});
-});
-			</script>
+			
 
 
 			<script>
