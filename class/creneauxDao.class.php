@@ -14,24 +14,111 @@ class creneauxDao {
         }
     }
 
-    public function ajouterCreneau(string $nom, int $tournoi_id): void {
-        var_dump($nom);
-        // Vérifier si le format de l'heure est valide (HH:MM)
-        if (preg_match("/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/", $nom)) {
-            // Ajouter les secondes ":00" pour respecter le format TIME (HH:MM:SS)
-            $nom .= ":00";
-        } else {
-            throw new Exception("Le format de l'heure est invalide. Utilisez le format HH:MM.");
-        }
-    
-        $stmt = $this->connexion->prepare("
-            INSERT INTO Creneaux (nom, tournoi_id)
-            VALUES (:nom, :tournoi_id)
-        ");
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->execute();
+   public function ajouterCreneau(string $nom, int $tournoi_id): void {
+    // Vérifier si le format de l'heure est valide (HH:MM)
+    if (preg_match("/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/", $nom)) {
+        // Ajouter les secondes ":00" pour respecter le format TIME (HH:MM:SS)
+        $nom .= ":00";
+    } else {
+        throw new Exception("Le format de l'heure est invalide. Utilisez le format HH:MM.");
     }
+
+    // Récupérer le nombre actuel de créneaux pour ce tournoi
+    $stmtCount = $this->connexion->prepare("
+        SELECT COUNT(*) FROM Creneaux WHERE tournoi_id = :tournoi_id order by ordre
+    ");
+    $stmtCount->bindParam(':tournoi_id', $tournoi_id);
+    $stmtCount->execute();
+    $ordre = (int)$stmtCount->fetchColumn() + 1;
+
+    // Insérer le nouveau créneau avec ordre
+    $stmtInsert = $this->connexion->prepare("
+        INSERT INTO Creneaux (nom, tournoi_id, ordre)
+        VALUES (:nom, :tournoi_id, :ordre)
+    ");
+    $stmtInsert->bindParam(':nom', $nom);
+    $stmtInsert->bindParam(':tournoi_id', $tournoi_id);
+    $stmtInsert->bindParam(':ordre', $ordre);
+    $stmtInsert->execute();
+}
+
+public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMinutes): void
+{
+    // Récupérer l'heure du créneau précédent
+    $stmtPrev = $this->connexion->prepare("
+        SELECT nom
+        FROM Creneaux
+        WHERE tournoi_id = :tournoi_id AND ordre = :ordreAvant
+    ");
+    $stmtPrev->execute([
+        ':tournoi_id' => $tournoi_id,
+        ':ordreAvant' => $ordreAvant
+    ]);
+
+    $result = $stmtPrev->fetch(PDO::FETCH_ASSOC);
+
+    if (!$result) {
+        throw new Exception("Aucun créneau trouvé à l'ordre spécifié.");
+    }
+
+    $heurePrecedente = $result['nom'];
+
+    // Ajouter X minutes (pas horaire) pour obtenir la nouvelle heure
+    $interval = new DateInterval('PT' . $pasMinutes . 'M');
+    $nouvelleHeure = (new DateTime($heurePrecedente))->add($interval)->format('H:i:s');
+
+    // Commencer la transaction
+    $this->connexion->beginTransaction();
+
+    try {
+        // Récupérer les créneaux suivants
+        $stmtSuivants = $this->connexion->prepare("
+            SELECT creneau_id, nom
+            FROM Creneaux
+            WHERE tournoi_id = :tournoi_id AND ordre > :ordreAvant
+            ORDER BY ordre ASC
+        ");
+        $stmtSuivants->execute([
+            ':tournoi_id' => $tournoi_id,
+            ':ordreAvant' => $ordreAvant
+        ]);
+
+        $creneauxSuivants = $stmtSuivants->fetchAll(PDO::FETCH_ASSOC);
+
+        // Décaler les heures et les ordres
+        foreach ($creneauxSuivants as $index => $creneau) {
+            $newTime = (new DateTime($creneau['nom']))->add($interval)->format('H:i:s');
+
+            $stmtUpdate = $this->connexion->prepare("
+                UPDATE Creneaux
+                SET nom = :new_nom, ordre = ordre + 1
+                WHERE creneau_id = :id
+            ");
+            $stmtUpdate->execute([
+                ':new_nom' => $newTime,
+                ':id' => $creneau['creneau_id']
+            ]);
+        }
+
+        // Insérer le nouveau créneau à l'ordre suivant
+        $stmtInsert = $this->connexion->prepare("
+            INSERT INTO Creneaux (nom, tournoi_id, ordre)
+            VALUES (:nom, :tournoi_id, :ordre)
+        ");
+        $stmtInsert->execute([
+            ':nom' => $nouvelleHeure,
+            ':tournoi_id' => $tournoi_id,
+            ':ordre' => $ordreAvant + 1
+        ]);
+
+        $this->connexion->commit();
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
+    }
+}
+
+
     
     
 
@@ -205,7 +292,7 @@ class creneauxDao {
 
 
     public function afficherCreneaux(int $tournoi_id): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM Creneaux WHERE tournoi_id = :tournoi_id");
+        $stmt = $this->connexion->prepare("SELECT * FROM Creneaux WHERE tournoi_id = :tournoi_id order by ordre");
         $stmt->bindParam(':tournoi_id', $tournoi_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
