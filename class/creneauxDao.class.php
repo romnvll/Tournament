@@ -288,6 +288,104 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
         $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $stmt->execute();
     }
+
+
+    public function supprimerCreneauEtRecaler(int $creneau_id, int $tournoi_id, int $pas): void
+{
+    try {
+        // Vérifier les utilisations du créneau
+        $stmt = $this->connexion->prepare("
+            SELECT * FROM Planification 
+            WHERE creneau_id = :creneau_id AND tournoi_id = :tournoi_id
+        ");
+        $stmt->execute([
+            ':creneau_id' => $creneau_id,
+            ':tournoi_id' => $tournoi_id,
+        ]);
+        $planifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($planifications as $planif) {
+            if (!is_null($planif['label_id']) || !is_null($planif['rencontre_id'])) {
+                throw new Exception("Créneau déjà utilisé, suppression impossible.");
+            }
+        }
+
+        // Supprimer les planifications vides
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Planification 
+            WHERE creneau_id = :creneau_id AND tournoi_id = :tournoi_id
+        ");
+        $stmt->execute([
+            ':creneau_id' => $creneau_id,
+            ':tournoi_id' => $tournoi_id,
+        ]);
+
+        // Récupérer les infos du créneau à supprimer
+        $stmt = $this->connexion->prepare("
+            SELECT ordre 
+            FROM Creneaux 
+            WHERE creneau_id = :id AND tournoi_id = :tournoi_id
+        ");
+        $stmt->bindParam(':id', $creneau_id, PDO::PARAM_INT);
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $creneau = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$creneau) {
+            throw new Exception("Créneau non trouvé.");
+        }
+
+        $ordreSupprime = $creneau['ordre'];
+
+        // Supprimer le créneau
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Creneaux 
+            WHERE creneau_id = :id AND tournoi_id = :tournoi_id
+        ");
+        $stmt->bindParam(':id', $creneau_id, PDO::PARAM_INT);
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Récupérer les créneaux suivants
+        $stmt = $this->connexion->prepare("
+            SELECT creneau_id, nom 
+            FROM Creneaux 
+            WHERE tournoi_id = :tournoi_id AND ordre > :ordre 
+            ORDER BY ordre ASC
+        ");
+        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->bindParam(':ordre', $ordreSupprime, PDO::PARAM_INT);
+        $stmt->execute();
+        $creneaux = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Recaler les créneaux suivants
+        $ordreActuel = $ordreSupprime;
+        foreach ($creneaux as $creneau) {
+            $nouvelleHeure = (new DateTime($creneau['nom']))
+                ->sub(new DateInterval("PT{$pas}M"))
+                ->format("H:i:s");
+
+            $stmtUpdate = $this->connexion->prepare("
+                UPDATE Creneaux 
+                SET nom = :nom, ordre = :ordre 
+                WHERE creneau_id = :id
+            ");
+            $stmtUpdate->bindParam(':nom', $nouvelleHeure);
+            $stmtUpdate->bindParam(':ordre', $ordreActuel, PDO::PARAM_INT);
+            $stmtUpdate->bindParam(':id', $creneau['creneau_id'], PDO::PARAM_INT);
+            $stmtUpdate->execute();
+
+            $ordreActuel++;
+        }
+    } catch (Exception $e) {
+        echo "<div class='alert alert-danger'>".$e->getMessage()."</div>";
+        exit();
+    }
+}
+
+
+
+
     
 
 
