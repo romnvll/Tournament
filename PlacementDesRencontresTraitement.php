@@ -120,7 +120,7 @@ if (isset($_GET['action'])) {
             require 'class/creneauxDao.class.php';
             try {
             $creneau = new creneauxDao();
-            $creneau->supprimerCreneau($_GET['creneauId']);
+            $creneau->supprimerCreneauEtRecaler($_GET['creneauId'],$_GET['tournoiId'], $_GET['pas']);
             header("Location: " . $_SERVER['HTTP_REFERER']."#bottom");
             }catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
@@ -139,7 +139,7 @@ if (isset($_GET['action'])) {
         require 'class/creneauxDao.class.php';
          $creneau = new creneauxDao();
             $creneau->ajouterCreneauEntre($_GET['idTournoi'],$_GET['CreneauOrdre'],$_GET['pas']);
-             header("Location: " . $_SERVER['HTTP_REFERER']."#bottom");
+             header("Location: " . $_SERVER['HTTP_REFERER']);
 
 
      }

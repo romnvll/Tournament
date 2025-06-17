@@ -168,7 +168,7 @@ option::checkmark {
                                 hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']"
                             >
                             <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}">
-                                <p class="text-danger"><i class="fa fa-minus-circle" aria-hidden="true"></i></p>
+                                <p class="text-danger"><i class="fa fa-minus-circle fa-sm" aria-hidden="true"></i></p>
                             </a>
                         </form>
                     </th>
@@ -180,70 +180,75 @@ option::checkmark {
             <tbody>
                 {% for creneau in listCreneaux %}
                 <tr>
-                    <td class="col-md-1 ">
-                    
-                        <div class="input-group flex-nowrap">
-                            <span class="input-group-text" id="addon-wrapping">
-                                <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}"
-                                   data-bs-toggle="tooltip"
-                                   data-bs-placement="top"
-                                   title="Supprimer ce créneau (il doit être vide)">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </a>
-                            </span>
-                            <input type="text" name="creneau" class="form-control"
-                                   value="{{ creneau.nom|slice(0, -3) }}" size="5"
-                                   hx-post="PlacementDesRencontresTraitement.php"
-                                   hx-trigger="change"
-                                   hx-target="this"
-                                   hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
-                                   pattern="^([01]\d|2[0-3]):[0-5]\d$"
-                                   title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
+                    <td class="col-md-1 align-middle text-center">
+                        <div class="d-flex flex-column align-items-center gap-1">
+
+                            <!-- Bouton supprimer (en haut) -->
+                            <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}&tournoiId={{idTournoi}}&pas={{tournoiInfo.pasHoraire}}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Supprimer ce créneau (il doit être vide)"
+                            class="text-danger">
+                                <i class="fa fa-minus-circle fa-lg" aria-hidden="true"></i>
+                            </a>
+
+                            <!-- Champ modifiable de l'heure -->
+                            <input type="text" name="creneau" class="form-control text-center p-1"
+                                value="{{ creneau.nom|slice(0, -3) }}" size="4"
+                                hx-post="PlacementDesRencontresTraitement.php"
+                                hx-trigger="change"
+                                hx-target="this"
+                                hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
+                                pattern="^([01]\d|2[0-3]):[0-5]\d$"
+                                title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
                             >
+
+                            <!-- Champ caché -->
+                            <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+
+                            <!-- Bouton ajouter (en bas) -->
+                            <a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Insérer un créneau"
+                            class="text-success">
+                                <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i>
+                            </a>
                         </div>
-                        <input type="hidden" name="idTournoi" value="{{idTournoi}}">
-                       <a 
-                        href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Insérer un créneau"
-                        class="text-success">
-                        <i class="fa fa-plus-circle fa-sm" aria-hidden="true"></i>
-                    </a>
-
-                        
-
-                        
-                        <!--<form action="PlacementDesRencontresTraitement.php" method="post" name="VerticalPlacement">
-                         
-                        <select name="idCategorie" class="form-select form-select-sm">
-
-                        {% for Categorie in listeCategorie %}
-                        <option value="{{ Categorie.id_categorie }}">{{ Categorie.Nom_categorie }}</option>
-                            
-                        {% endfor %}
-                        </select>
-                        <input type="hidden" name="idCreneau" value="{{ creneau.creneau_id }}">
-                        <input type="submit" class="btn btn-primary btn-sm" value="VerticalPlacement">
-                        
-                        </form>
-                        -->
                     </td>
+
                     {% set Displayed = false %}
                     {% for j in 0..terrains|length - 1 %}
-                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}">
+
+
+                    {# Trouver la planification correspondante #}
+                       {% set couleurDeFond = '#ffffff' %} {# Valeur par défaut #}
+                            {% for planification in afficherPlanification %}
+                                {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+                                    {% if planification.label_couleur is not empty %}
+                                        {% set couleurDeFond = planification.label_couleur %}
+                                    {% else %}
+                                        {% set couleurDeFond = planification.equipe1_categorie_couleur %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+
+
+                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"  style="background-color: {{ couleurDeFond }}">
 
                     
                         {% set planificationFound = false %}
                         {% set creneauOqp = false %}
+                        {% set maCouleurDeFond = planification.equipe1_categorie_couleur %}
                         {% for planification in afficherPlanification %}
                             {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
                                 {% set planificationFound = true %}
                                 {% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
                                     {% if planification.arbitre_id is not null and  tournoiInfo.gestionArbitres == 1 %}
-                                       <i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
-                                            <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
+                                       <i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}<br>
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger" >
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </a>
                                     {% else %}
                                    {% if tournoiInfo.gestionArbitres == 1 %}
@@ -265,26 +270,18 @@ option::checkmark {
                                         {% elseif planification.isClassement == 1 %}
                                             <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.equipe2_poule_noms|split(',')[0] }} </p>
                                         {% endif %}
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" >
-                                            <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger" >
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </a>
                                         {% set creneauOqp = true %}
                                     {% endif %}
-                                    <script>
-                                        var tdElement = document.currentScript.parentElement;
-                                        var backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
-                                        tdElement.style.backgroundColor = backgroundColor;
-                                    </script>
+                                    
                                 {% elseif planification.label_id is not null %}
-                                    <script>
-                                        var tdElement = document.currentScript.parentElement;
-                                        var backgroundColor = '{{ planification.label_couleur }}';
-                                        tdElement.style.backgroundColor = backgroundColor;
-                                    </script>
+                                   
                                     <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}">
                                         <p class="text-danger"><i class="fa fa-calendar" aria-hidden="true"></i></p>
                                     </a>
-                                    <p class="text-light">{{ planification.label_description }}</p>
+                                    <p class="text-warning bg-dark">{{ planification.label_description }}</p>
                                     {% set creneauOqp = true %}
                                 {% endif %}
                             {% endif %}
@@ -414,6 +411,23 @@ option::checkmark {
     </script>
 
 
+<script>
+  // Stocker la position de défilement avant de quitter la page
+  window.onload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      var scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition !== null) {
+        window.scrollTo(0, scrollPosition);
+      }
+    }
+  };
+
+  window.onbeforeunload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+  };
+</script>
 
 
 
