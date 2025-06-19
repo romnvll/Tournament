@@ -456,7 +456,9 @@ public function modifierTournoi(
     ?int $IsRankingView = null, 
     ?int $gestionTable = null, 
     ?int $gestionArbitres = null,
-    ?int $refreshClientTime = null
+    ?int $refreshClientTime = null,
+    ?int $gestionRepas = null,
+    ?int $gestionPartenaires = null
 ): void {
     $fields = [];
     $params = [':idTournoi' => $idTournoi];
@@ -465,7 +467,7 @@ public function modifierTournoi(
         $fields[] = "nom = :nom";
         $params[':nom'] = $nom;
     }
-    
+
     if ($heure_debut !== null) {
         $fields[] = "heure_debut = :heure_debut";
         $params[':heure_debut'] = $heure_debut;
@@ -501,6 +503,16 @@ public function modifierTournoi(
     if ($gestionArbitres !== null) {
         $fields[] = "gestionArbitres = :gestionArbitres";
         $params[':gestionArbitres'] = $gestionArbitres;
+    }
+
+    // Champs ajoutés : gestionRepas et gestionPartenaires
+    if ($gestionRepas !== null) {
+        $fields[] = "gestionRepas = :gestionRepas";
+        $params[':gestionRepas'] = $gestionRepas;
+    }
+    if ($gestionPartenaires !== null) {
+        $fields[] = "gestionPartenaires = :gestionPartenaires";
+        $params[':gestionPartenaires'] = $gestionPartenaires;
     }
 
     // Gestion de refreshClientTime : si null, on le met à 30000

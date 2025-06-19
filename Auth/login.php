@@ -6,9 +6,9 @@ require_once '../class/databaseInformations.php';
 
 
 // if session is set direct to index
-if (isset($_COOKIE['user'])) {
-    phpinfo();
-    header("Location: ../creerClub.php");
+if (isset($_COOKIE['auth'])) {
+    
+    header("Location: ../tableauDeBord.php");
     exit;
 }
 

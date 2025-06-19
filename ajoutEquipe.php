@@ -24,20 +24,6 @@ $tournoiDao = new tournoiDao();
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 
-//si l'id du tournoi est égal à 0 alors on redirige vers la page ajoutEquipe avec l'id du dernier tournoi
-
-foreach ($tousLesTournois as $tournoi) {
-      // $dernierId = $tournoi['id'];
-      }
-
-//if ($_GET['idTournoi'] == "0") {
- // header("Location: ajoutEquipe.php?idTournoi=" . $dernierId);
-  //  exit();
-//}
-//sinon on continue
-
-
-
 
 
 if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
@@ -57,16 +43,23 @@ $template = $twig->load('ajoutEquipe.twig');
 
 
 
-$dernierId = null;
+$dernierId = $_GET['idTournoi'];
 
 foreach ($tousLesTournois as $tournoi) {
 
     if (isset($tournoi['isArchived']) && $tournoi['isArchived'] == 0) {
-        $dernierId = $tournoi['id'];
+       $dernierId = $tournoi['id'];
 
         
 }
 
+}
+
+if (isset($_GET['query'])) {
+    $query = $_GET['query'];
+}
+else {
+    $query = '';
 }
 
 
@@ -75,13 +68,15 @@ echo $template->render([
   'logo' => $userData['logo'],
   'pageEncours' => 'ajoutEquipe',
   'tournoiEnCours' => $_GET['idTournoi'],
-  'idTournoi' => $dernierId,
+  'idTournoi' => $_GET['idTournoi'],
   'dernierTournoi' => $dernierId,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois($userData['id']),
 'AfficherClub' => $listeClub->afficherClubs(),
-'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
+'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories(),
+'query' => $query,
+
 
 ]);
 
