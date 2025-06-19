@@ -36,6 +36,7 @@ select::picker(select):popover-open {
             {% if tournoiEnCours != 0 %}
                 <div class="col-md-4">
                     <form action="ajoutEquipe_traitement.php" method="POST">
+                    <input type="hidden" name="query" value="{{query}}">
                         <div class="card shadow-sm p-4">
                             <h5 class="text-center mb-3">Ajouter une équipe</h5>
                             <div class="form-group mb-3">
