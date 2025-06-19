@@ -76,6 +76,6 @@ foreach ($listeEquipes as $nomEquipe) {
 }
 
 // Redirection
-header("Location: ajoutEquipe.php?idTournoi=".$_POST['IdTournoi']);
+header("Location: ajoutEquipe.php?idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);
 exit;
 ?>
