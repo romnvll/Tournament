@@ -17,19 +17,36 @@ class PersonneDao {
 
     // Ajouter une nouvelle personne
     public function ajouterPersonne($nom, $prenom, $mail, $tournoi_id) {
-        $stmt = $this->connexion->prepare("
-            INSERT INTO Personne ( Nom, Prenom, Mail, tournoi_id) 
-            VALUES (:nom, :prenom, :mail, :tournoi_id)
-        ");
-        
-        $stmt->bindValue(':nom', $nom);
-        $stmt->bindValue(':prenom', $prenom);
-        $stmt->bindValue(':mail', $mail);
-        $stmt->bindValue(':tournoi_id', $tournoi_id);
-        $stmt->execute();
+    // Vérifier si une personne avec le même mail existe déjà pour ce tournoi
+    $verifStmt = $this->connexion->prepare("
+        SELECT COUNT(*) FROM Personne 
+        WHERE Mail = :mail AND tournoi_id = :tournoi_id
+    ");
+    $verifStmt->bindValue(':mail', $mail);
+    $verifStmt->bindValue(':tournoi_id', $tournoi_id);
+    $verifStmt->execute();
+    $existeDeja = $verifStmt->fetchColumn();
 
-        return $this->connexion->lastInsertId();
+    if ($existeDeja > 0) {
+        // Mail déjà utilisé pour ce tournoi, on ne fait rien (ou tu peux renvoyer false ou un code spécial)
+        return false;
     }
+
+    // Sinon on insère
+    $stmt = $this->connexion->prepare("
+        INSERT INTO Personne (Nom, Prenom, Mail, tournoi_id) 
+        VALUES (:nom, :prenom, :mail, :tournoi_id)
+    ");
+
+    $stmt->bindValue(':nom', $nom);
+    $stmt->bindValue(':prenom', $prenom);
+    $stmt->bindValue(':mail', $mail);
+    $stmt->bindValue(':tournoi_id', $tournoi_id);
+    $stmt->execute();
+
+    return $this->connexion->lastInsertId();
+}
+
 
     public function supprimerPersonne($id, $id_tournoi, $id_club) {
         // Vérifier si le tournoi appartient bien au club de l'utilisateur

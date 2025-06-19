@@ -50,6 +50,14 @@ class EquipeDAO {
             $stmtPoule->execute();
         }
     }
+
+    public function changerClubEquipe(int $idEquipe, int $nouveauClubId): void {
+    $stmt = $this->connexion->prepare("UPDATE Equipes SET club_id = :club_id WHERE id = :id");
+    $stmt->bindParam(':club_id', $nouveauClubId, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $idEquipe, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
     
 
     public function modifierEquipe(int $id, string $nom, int $categorie): void {
@@ -59,6 +67,19 @@ class EquipeDAO {
         $stmt->bindParam(':categorie', $categorie);
         $stmt->execute();
     }
+
+    public function changerCategorieEquipe(int $idEquipe, int $nouvelleCategorieId): void
+{
+    $stmt = $this->connexion->prepare("
+        UPDATE Equipes 
+        SET categorie = :categorie 
+        WHERE id = :id
+    ");
+    $stmt->bindParam(':categorie', $nouvelleCategorieId, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $idEquipe, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
 
     
     
@@ -225,6 +246,23 @@ class EquipeDAO {
     
         return $result;
     }
+
+
+    public function equipeAUneRencontrePlanifiee(int $idEquipe): bool
+{
+    $stmt = $this->connexion->prepare("
+        SELECT 1
+        FROM Rencontres r
+        JOIN Planification p ON p.rencontre_id = r.id
+        WHERE r.equipe1_id = :idEquipe OR r.equipe2_id = :idEquipe
+        LIMIT 1
+    ");
+    $stmt->bindValue(':idEquipe', $idEquipe, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return (bool) $stmt->fetchColumn();
+}
+
     
 
     public function countEquipesPresentesInPoule($pouleId) {
@@ -266,6 +304,53 @@ class EquipeDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    public function rechercherEquipesDansTournoi(int $idTournoi, ?string $termeRecherche = null): array
+{
+    $query = "
+        SELECT e.*, 
+               c.nom AS nom_club,
+               c.logo AS logo,
+               cat.Nom_categorie AS nom_categorie,
+               cat.Couleur AS cat_couleur
+        FROM Equipes e
+        INNER JOIN Clubs c ON e.club_id = c.id
+        INNER JOIN Categorie cat ON e.categorie = cat.id_categorie
+        WHERE e.tournoi_id = :tournoi_id
+    ";
+
+    if (!empty($termeRecherche)) {
+        $query .= "
+            AND (
+                LOWER(e.nom) LIKE :terme
+                OR LOWER(c.nom) LIKE :terme
+                OR LOWER(cat.Nom_categorie) LIKE :terme
+            )
+        ";
+    }
+
+    $query .= " ORDER BY e.id DESC";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':tournoi_id', $idTournoi, PDO::PARAM_INT);
+
+    if (!empty($termeRecherche)) {
+        $termeRecherche = '%' . strtolower($termeRecherche) . '%';
+        $stmt->bindValue(':terme', $termeRecherche, PDO::PARAM_STR);
+    }
+
+    $stmt->execute();
+    $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $nombre = count($resultats);
+
+    return [
+        'nombre' => $nombre,
+        'resultats' => $resultats
+    ];
+}
+
+
+
     
 
     public function getAllEquipeByIdTournoiAndClub (int $idTournoi, int $clubId) {
