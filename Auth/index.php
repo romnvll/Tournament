@@ -1,7 +1,7 @@
 <?php
 if (isset($_COOKIE['auth'])) {
     
-    header("Location: ../creerClub.php");
+    header("Location: ../tableauDeBord.php");
     exit;
 }
 header("Location: login.php");
