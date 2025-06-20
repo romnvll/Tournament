@@ -282,12 +282,9 @@ option::checkmark {
                                    
                                            <p class="text-warning bg-dark">{{ planification.label_description }}</p>
 
-                                        
-                                            
-
-    <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger">
-        <i class="fa fa-calendar" aria-hidden="true"></i>
-    </a>
+                            <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger">
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                            </a>
 {% set creneauOqp = true %}
 
                                 {% endif %}

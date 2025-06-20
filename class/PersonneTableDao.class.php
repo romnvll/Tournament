@@ -108,11 +108,23 @@ private function genererCodePin() {
  
  public function envoyerMail($PersonneTableId) {
     $stmt = $this->connexion->prepare("
-        SELECT pr.id AS personne_rencontre_id, p.Mail, p.Prenom, p.Nom, t.nom AS terrain_nom, pr.code_pin, pr.url_key, pr.tournoi_id
-        FROM PersonneTable pr
-        INNER JOIN Personne p ON pr.personne_id = p.id
-        INNER JOIN Terrains t ON pr.terrain_id = t.terrain_id
-        WHERE pr.id = :PersonneTableId
+        SELECT 
+    pr.id AS personne_rencontre_id, 
+    p.Mail, 
+    p.Prenom, 
+    p.Nom, 
+    t.nom AS terrain_nom, 
+    pr.code_pin, 
+    pr.url_key, 
+    pr.tournoi_id,
+    tr.nom AS tournoi_nom,
+    tr.dateDebut AS tournoi_date
+FROM PersonneTable pr
+INNER JOIN Personne p ON pr.personne_id = p.id
+INNER JOIN Terrains t ON pr.terrain_id = t.terrain_id
+INNER JOIN Tournois tr ON pr.tournoi_id = tr.id
+WHERE pr.id = :PersonneTableId;
+
     ");
     $stmt->bindValue(':PersonneTableId', $PersonneTableId);
     $stmt->execute();
@@ -124,9 +136,9 @@ private function genererCodePin() {
             $mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
             $mail->isHTML(true);
             $mail->addAddress($result['Mail'], "{$result['Prenom']} {$result['Nom']}");
-            $mail->Subject = "Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";
+            $mail->Subject = "[Tournoi" .$result['tournoi_nom']. "]Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";
             $mail->Body = "Bonjour {$result['Prenom']} {$result['Nom']},<br><br>
-                           Vous avez été assigné au terrain '{$result['terrain_nom']}' pour noter les scores.<br><br>
+                           Vous avez été assigné au terrain '{$result['terrain_nom']}' pour noter les scores <br><br>
                            Voici votre lien sécurisé : <a href='http://".$_SERVER['SERVER_NAME']. dirname($_SERVER['SCRIPT_NAME']) ."/authPersonneTable.php?key={$result['url_key']}&tournoi_id={$result['tournoi_id']}'>Lien sécurisé</a><br><br>
                            Votre code PIN est : <b>{$result['code_pin']}</b><br><br>
                            Merci de votre collaboration.";
@@ -137,6 +149,8 @@ private function genererCodePin() {
                               Merci de votre collaboration.";
             $mail->CharSet = 'UTF-8';
             $mail->send();
+            $this->marquerMailEnvoye($result['personne_rencontre_id']);
+           
             return true; // Succès
         } catch (Exception $e) {
             return false; // Échec
@@ -150,7 +164,7 @@ private function genererCodePin() {
 
 public function recupererToutesLesPersonnesParTournoi($tournoi_id) {
     $stmt = $this->connexion->prepare("
-         SELECT pr.id AS personne_rencontre_id, pr.personne_id, pr.terrain_id, pr.tournoi_id, p.*,pr.*, t.nom AS terrain_nom
+         SELECT pr.id AS personne_rencontre_id, pr.personne_id, pr.terrain_id, pr.tournoi_id, p.*,pr.*, t.nom AS terrain_nom,pr.sentMail as sentMail
         FROM PersonneTable pr
         INNER JOIN Personne p ON pr.personne_id = p.id
         INNER JOIN Terrains t ON pr.terrain_id = t.terrain_id
@@ -160,6 +174,19 @@ public function recupererToutesLesPersonnesParTournoi($tournoi_id) {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+public function marquerMailEnvoye(int $personneId): void
+{
+    
+    $sql = "UPDATE PersonneTable SET sentMail = 1 WHERE id = :personne_id";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindParam(':personne_id', $personneId, PDO::PARAM_INT);
+    $stmt->execute();
+
+}
+
+
+
 
 
 // Méthode pour supprimer une personne

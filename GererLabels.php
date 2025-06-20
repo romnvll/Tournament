@@ -18,6 +18,9 @@ if (($_SESSION['id_tournoi']) == null) {
 
 $labels = new LabelDao();
 
+if ($_POST['labelModif'] == true) {
+    $labels->updateLabel($_POST['labelId'], $_POST['description'], $_POST['couleur']);
+}
 
 
 $listeDesLabels = $labels->getLabelsByTournoiId((int)$_GET['id_tournoi']);
