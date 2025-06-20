@@ -58,7 +58,7 @@ if ($_GET['action'] == "sendMail") {
     $personneTable = new PersonneTableDao();
     $status = $personneTable->envoyerMail($_GET['personneTableId']);
     $statusParam = $status ? 'success' : 'error';
-    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#placementPersonneSurTerrain");
+    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#placementPersonneSurTerrain&tab=tableDesPersonnes");
     exit(0);
 }
 

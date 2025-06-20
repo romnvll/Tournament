@@ -68,5 +68,6 @@ echo $template->render([
 'AfficherLesPersonnesCrees' => $personneTable->recupererToutesLesPersonnesParTournoi($_GET['idTournoi']),
 'AfficherLesClubsPourArbitres' => $listeClub->clubsParticipatingInTournoi($_GET['idTournoi']),
 'AfficherLesArbitres' => $arbitre->afficherArbitres($_GET['idTournoi']),
-'tab'=>$_GET['tab'] 
+'tab'=>$_GET['tab'],
+
 ]);
