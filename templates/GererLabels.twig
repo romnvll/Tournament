@@ -92,9 +92,41 @@
             hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "couleur": "{{ label.couleur }}"}'
           >
         </td>
-          <td>
-            <span style="background-color: {{ label.couleur }}; display: inline-block; width: 20px; height: 20px; border-radius: 50%;"></span>
-          </td>
+       <td>
+           <div class="d-flex flex-wrap gap-1">
+  {% set couleurs = ['#000000', '#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF'] %}
+  {% for couleur in couleurs %}
+    {% set isSelected = couleur == label.couleur %}
+    <label>
+      <input 
+        type="radio" 
+        name="couleur_{{ label.label_id }}" 
+        value="{{ couleur }}" 
+        {% if isSelected %}checked{% endif %}
+        hx-post="GererLabels.php"
+        hx-trigger="change"
+        hx-on::after-request="location.reload()"
+        hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "description": "{{ label.description }}", "couleur": "{{ couleur }}"}'
+        style="display:none;"
+      >
+      <span 
+        class="d-inline-block rounded-circle"
+        style="
+          background-color: {{ couleur }};
+          width: 20px;
+          height: 20px;
+          border: 2px solid {% if isSelected %}#000{% else %}#ccc{% endif %};
+          box-shadow: {% if isSelected %}0 0 5px 2px rgba(0,0,0,0.3){% else %}none{% endif %};
+          cursor: pointer;
+        "
+        onclick="this.previousElementSibling.checked = true; this.previousElementSibling.dispatchEvent(new Event('change', { bubbles: true }))"
+      ></span>
+    </label>
+  {% endfor %}
+</div>
+
+      </td>
+
           <td>
             <a href="GererLabels.php?action=delLabel&labelId={{ label.label_id }}" 
                class="btn btn-danger btn-sm" 

@@ -8,6 +8,7 @@ require 'class/rencontreDao.class.php';
 require 'class/clubDao.class.php';
 
 $tournoiDao = new tournoiDao();
+
 $equipeDao = new equipeDao();
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -29,7 +30,7 @@ foreach ($tousLesTournois as $tournoi) {
        
     }
 }
- //var_dump($dernierId);
+ 
         
 $nbrequipe = $equipeDao->getAllEquipeByIdTournoi($dernierId);
 $nbrequipe = count($nbrequipe);
@@ -41,6 +42,9 @@ $statsStatusRencontres = $rencontreDao->getAllRencontresByTournoiId($dernierId);
 $clubDao = new clubDao();
 $countClub = $clubDao->clubsParticipatingInTournoi($dernierId);
 $countClub = count($countClub);
+
+$nbrTotalButs = $tournoiDao->getTotalButsTournoi($dernierId);
+
 //stats 
 $avenir = 0;
 $terminees = 0;
@@ -85,6 +89,7 @@ echo $template->render([
 'nbRencontreTerminees' => $terminees,
 'nbRencontreEncours' => $encours,
 'nbClub' => $countClub,
+'totalButs' => $nbrTotalButs,
 
 
 
