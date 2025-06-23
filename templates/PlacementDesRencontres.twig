@@ -247,7 +247,7 @@ option::checkmark {
                                 {% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null   %}
                                     {% if planification.arbitre_id is not null and  tournoiInfo.gestionArbitres == 1 %}
                                     
-                                       <i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}<br>
+                                       <p class="text-light bg-dark"><i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}</p><br>
                                         <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger" >
                                             <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </a>

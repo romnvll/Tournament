@@ -293,6 +293,25 @@ public function genererRencontresPhaseclassement(int $idTournoi, string $categor
     return $rencontres;
 }
 
+public function getTotalButsTournoi(int $idTournoi): int {
+    $query = "
+        SELECT
+            COALESCE(SUM(r.score1), 0) + COALESCE(SUM(r.score2), 0) AS total_buts
+        FROM
+            Rencontres r
+        JOIN Equipes e1 ON r.equipe1_id = e1.id
+        JOIN Equipes e2 ON r.equipe2_id = e2.id
+        WHERE
+            e1.tournoi_id = :idTournoi AND e2.tournoi_id = :idTournoi
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return (int)$result['total_buts'];
+}
 
 
 public function getClassementFinal(int $idTournoi) {

@@ -37,7 +37,17 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:/
        
 //
 
+if ($_POST['labelModif'] == true) {
+    $labelId = $_POST['labelId'];
+    $description = $_POST['description'];
+    $couleur = $_POST['couleur'];
 
+    $labelDao = new LabelDao();
+    $labelDao->updateLabel($labelId, $description, $couleur);
+
+   
+    exit;
+}
 
 
 
