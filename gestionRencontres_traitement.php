@@ -5,6 +5,26 @@ require 'class/rencontreDao.class.php';
 require 'class/equipeDao.class.php';
 
 
+if (isset ($_POST['etatTotal'])) {
+   if ($_POST['etatTotal'] == "Avenir") {
+     $rencontre = new RencontreDAO();
+     $rencontre->updateStatusByCreneau($_POST['creneau_id'],0);
+     header("Location: " . $_SERVER['HTTP_REFERER']);
+   }
+   if ($_POST['etatTotal'] == "enCours") {
+     $rencontre = new RencontreDAO();
+     $rencontre->updateStatusByCreneau($_POST['creneau_id'],2);
+     header("Location: " . $_SERVER['HTTP_REFERER']);
+   }
+   if ($_POST['etatTotal'] == "terminee") {
+     $rencontre = new RencontreDAO();
+     $rencontre->updateStatusByCreneau($_POST['creneau_id'],1);
+     header("Location: " . $_SERVER['HTTP_REFERER']);
+     
+   }
+
+}
+
 
 if (isset ($_POST['etat'])) {
   if ($_POST['etat'] == "Avenir") {

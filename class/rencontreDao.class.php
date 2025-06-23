@@ -355,7 +355,21 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-    
+    public function updateStatusByCreneau(int $idCreneau, int $status): void
+{
+    $query = "
+        UPDATE Rencontres r
+        JOIN Planification p ON r.id = p.rencontre_id
+        SET r.isTerminated = :status
+        WHERE p.creneau_id = :idCreneau
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':status', $status, PDO::PARAM_INT);
+    $stmt->bindValue(':idCreneau', $idCreneau, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
     
 
 

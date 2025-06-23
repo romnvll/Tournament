@@ -110,9 +110,43 @@
 									<tr>
 										<td>
 
-											<div class="input-group flex-nowrap">
-												{{ creneau.nom|slice(0, -3) }}
-											</div>
+											<div class="input-group flex-column align-items-start">
+  <div class="mb-1">
+    {{ creneau.nom|slice(0, -3) }} 
+  </div>
+  <div class="d-flex flex-column align-items-center gap-1">
+  
+
+				<div class="d-flex justify-content-center gap-2">
+					<form method="POST" action="gestionRencontres_traitement.php">
+					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+					<input type="hidden" name="etatTotal" value="Avenir">
+					<button type="submit" class="point no-print touch-friendly" 
+							style="background-color: red;" 
+							title="Passer les rencontres à 'à venir'">
+					</button>
+					</form>
+
+					<form method="POST" action="gestionRencontres_traitement.php">
+					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+					<input type="hidden" name="etatTotal" value="enCours">
+					<button type="submit" class="point no-print touch-friendly" 
+							style="background-color: orange;" 
+							title="Passer les rencontres à 'en cours'">
+					</button>
+					</form>
+
+					<form method="POST" action="gestionRencontres_traitement.php">
+					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+					<input type="hidden" name="etatTotal" value="terminee">
+					<button type="submit" class="point no-print touch-friendly" 
+							style="background-color: green;" 
+							title="Passer les rencontres à 'terminée'">
+					</button>
+					</form>
+				</div>
+		</div>	
+
 
 										</td>
 										{% set Displayed = false %}
@@ -269,7 +303,23 @@ location.reload();
 });
 			</script>
 
+<script>
+  // Stocker la position de défilement avant de quitter la page
+  window.onload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      var scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition !== null) {
+        window.scrollTo(0, scrollPosition);
+      }
+    }
+  };
 
+  window.onbeforeunload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+  };
+</script>
 			
 
 
