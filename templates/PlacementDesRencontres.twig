@@ -28,20 +28,7 @@
             font-size: 12px;
         }
 
-   select {
-  /* Style du bouton select */
-}
-select::picker-icon {
-  /* Pseudo élément représentant la flêche */
-}
-select::picker(select) {
-   opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.4s allow-discrete;
-}
-option::checkmark {
-  /* Coche à gauche des options */
-}
+   
 
     </style>
 
@@ -70,50 +57,87 @@ option::checkmark {
             {% endfor %}
         </div>
         <div class="col-lg-12">
-            <div class="container my-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center flex-wrap gap-3">
-                            <!-- Retarder les rencontres -->
-                            <div class="d-flex align-items-center">
-                                <label for="modifMinutes" class="form-label mb-0 me-2">Retarder les rencontres :</label>
-                                <input
-                                    type="number"
-                                    
-                                    id="modifMinutes"
-                                    class="form-control"
-                                    name="modifMinutes"
-                                    onfocusout="this.form.submit()"
-                                    placeholder="Minutes"
-                                    style="width: 100px;">
-                            </div>
+           <div class="container my-4">
 
-                            <!-- Ajuster le pas horaire -->
-                            <div class="d-flex align-items-center">
-                                <label for="modifPasHoraire" class="form-label mb-0 me-2">Durée des rencontres :</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    id="modifPasHoraire"
-                                    name="modifPasHoraire"
-                                    value="{{tournoiInfo['pasHoraire']}}"
-                                    class="form-control"
-                                    onchange="this.form.submit()"
-                                    style="width: 100px;">
-                            </div>
+  <div class="card shadow-sm">
+    <div class="card-body">
 
-                            <!-- Heure de début (lecture seule) -->
-                            <div class="d-flex align-items-center">
-                                <input type="hidden" name="modifHeureDebut" value="{{tournoiInfo['heure_debut']}}">
-                            </div>
+      <!-- Rangée flex : chaque formulaire est un "bloc" côte-à-côte -->
+      <div class="d-flex align-items-center flex-wrap gap-3">
 
-                            <!-- Bouton de soumission -->
-                            <div>
-                                <input type="hidden" name="idTournoi" value="{{idTournoi}}">
-                            </div>
+        <!-- 1) FORMULAIRE D’ACTION GROUPÉE ------------------------------- -->
+        <form id="bulkForm"
+              action="PlacementDesRencontresTraitement.php"
+              method="post"
+              class="d-inline-flex align-items-center gap-2">
 
-                            <!-- Informations sur les rencontres -->
-                            <div class="d-flex align-items-center mt-3 gap-4">
+          <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+
+          <label for="bulkAction" class="mb-0">Action&nbsp;groupée</label>
+
+          <select name="action"
+                  id="bulkAction"
+                  class="form-select form-select-sm"
+                  required>
+            <option value="" disabled selected>— choisir une action —</option>
+            <option value="deplanifier">Déplanifier ces rencontres</option>
+          </select>
+
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            Valider
+          </button>
+        </form>
+        <!-- /fin bulkForm ----------------------------------------------- -->
+
+
+        <!-- 2) FORMULAIRE MODIFICATION DES HORAIRES ---------------------- -->
+        <form action="PlacementDesRencontresTraitement.php"
+              method="post"
+              class="d-inline-flex align-items-center flex-wrap gap-3">
+
+          <!-- Retarder les rencontres -->
+          <div class="d-flex align-items-center">
+            <label for="modifMinutes" class="form-label mb-0 me-2">
+              Retarder&nbsp;les&nbsp;rencontres&nbsp;:
+            </label>
+            <input type="number"
+                   id="modifMinutes"
+                   name="modifMinutes"
+                   placeholder="Minutes"
+                   class="form-control form-control-sm"
+                   style="width: 100px;"
+                   onfocusout="this.form.submit()">
+          </div>
+
+          <!-- Ajuster le pas horaire -->
+          <div class="d-flex align-items-center">
+            <label for="modifPasHoraire" class="form-label mb-0 me-2">
+              Durée&nbsp;des&nbsp;rencontres&nbsp;:
+            </label>
+            <input type="number"
+                   id="modifPasHoraire"
+                   name="modifPasHoraire"
+                   min="0"
+                   value="{{ tournoiInfo['pasHoraire'] }}"
+                   class="form-control form-control-sm"
+                   style="width: 100px;"
+                  oninput="this.value = this.value < 0 ? 0 : this.value;"  
+
+                   onchange="this.form.submit()">
+          </div>
+
+          <!-- Champs cachés communs -->
+          <input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
+          <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+        </form>
+        <!-- /fin deuxième formulaire  -->
+ <div class="d-flex align-items-center">
+                                    <i class="bi bi-info-circle-fill me-2 text-info"></i>
+                                    <span><strong><a href="GererLabels.php?id_tournoi={{idTournoi}}">Labels :</a></strong> {{nombreDeLabel | length}}</span>
+                                </div>
+      </div><!-- /.d-flex -->
+      
+  <div class="d-flex align-items-center mt-3 gap-4">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-calendar-check me-2 text-info"></i>
                                     <span><strong>Planifiées :</strong> {{ nombreDeRencontresPlanifiee }}</span>
@@ -126,7 +150,10 @@ option::checkmark {
                                     <i class="bi bi-exclamation-circle me-2 text-warning"></i>
                                     <span><strong>Restantes :</strong> {{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
                                 </div>
+                                     <div class="d-flex align-items-center">
 
+                               
+                                    </div>
                                 <div class="d-flex align-items-center">
     <a href="#"
        data-bs-toggle="tooltip"
@@ -139,20 +166,20 @@ option::checkmark {
         {% set hours = timeInMinutes // 60 %}
         {% set minutes = timeInMinutes % 60 %}
         {{ hours }} heures {{ minutes }} minutes
-    </span>
+    </span>      
+    </div>
+  </div>
 </div>
 
 
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-info-circle-fill me-2 text-info"></i>
-                                    <span><strong><a href="GererLabels.php?id_tournoi={{idTournoi}}">Labels :</a></strong> {{nombreDeLabel | length}}</span>
-                                </div>
+                               
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+       
 
         <table class="table ms-1" id="planification-table">
             <thead>
@@ -235,7 +262,7 @@ option::checkmark {
 
 
 
-                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"  style="background-color: {{ couleurDeFond }}">
+                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"  style="background-color: {{ couleurDeFond }}" class="planif-item">
 
                     
                         {% set planificationFound = false %}
@@ -247,10 +274,21 @@ option::checkmark {
                                 {% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null   %}
                                     {% if planification.arbitre_id is not null and  tournoiInfo.gestionArbitres == 1 %}
                                     
-                                       <p class="text-light bg-dark"><i class="fas fa-user-tie"></i> <i class="material-icons me-2" style="font-size: 20px;">sports</i> {{planification.arbitre_nom}} {{planification.club_nom_arbitre}}</p><br>
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{planification.arbitre_id}}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger" >
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                     <div class="d-flex align-items-center bg-dark text-light p-2 rounded">
+                                        <!-- Icône calendrier à gauche -->
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                            class="text-danger me-3">
+                                            <i class="fas fa-calendar-times fa-lg"></i>
                                         </a>
+
+                                        <!-- Texte arbitre -->
+                                        <p class="mb-0">
+                                            <i class="fas fa-user-tie"></i>
+                                            <i class="material-icons me-2" style="font-size: 20px;">sports</i>
+                                            {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
+                                        </p>
+                                        </div>
+
                                     {% else %}
                                    {% if tournoiInfo.gestionArbitres == 1 %}
                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
@@ -271,21 +309,56 @@ option::checkmark {
                                         {% elseif planification.isClassement == 1 %}
                                             <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.equipe2_poule_noms|split(',')[0] }} </p>
                                         {% endif %}
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}&rencontreId={{planification.rencontre_id}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger" >
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </a>
+                                          <!-- Groupe case à cocher + action planification -->
+                            <div class="d-flex align-items-center gap-3">
+                          
+
+            <!-- La checkbox (cachée ou non) -->
+            <input type="checkbox"
+                class="form-check-input me-2"
+                id="rencontreCheck{{ planification.planification_id }}"
+                name="rencontreCheck[]"
+                value="{{ planification.planification_id }}"
+                form="bulkForm">
+
+            <!-- (mets ici le texte ou les icônes que tu veux) -->
+            {{ planification.label_description }}
+       
+
+  <!-- Le lien calendrier reste à droite et ne déclenche PAS le label -->
+  <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent
+           &event={{ planification.planification_id }}
+           &tournoi_id={{ idTournoi }}
+           &rencontreId={{ planification.rencontre_id }}
+           #planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+     class="text-danger"
+     data-bs-toggle="tooltip"
+     title="Supprimer uniquement cette planification">
+    <i class="fas fa-calendar-times fa-lg"></i>
+  </a>
+</div>
+
+
+
                                         {% set creneauOqp = true %}
                                     {% endif %}
                                 {% endif %}  
                                {% if planification.label_id is not null %}
                                         
-                                   
-                                           <p class="text-warning bg-dark">{{ planification.label_description }}</p>
+                                   <div class="d-flex align-items-center bg-dark text-warning p-2 rounded">
+                                        <!-- Icône calendrier à gauche -->
+                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                            class="text-danger me-3">
+                                            <i class="fas fa-calendar-times fa-lg"></i>
+                                        </a>
 
-                            <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{idTournoi}}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="text-danger">
-                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                            </a>
-{% set creneauOqp = true %}
+                                        <!-- Description du label -->
+                                        <p class="mb-0">
+                                            {{ planification.label_description }}
+                                        </p>
+                                        </div>
+
+                            {% set creneauOqp = true %}
 
                                 {% endif %}
                             {% endif %}
@@ -432,6 +505,19 @@ option::checkmark {
       sessionStorage.setItem('scrollPosition', window.scrollY);
     }
   };
+</script>
+
+<script>
+document.querySelectorAll('.planif-item').forEach(item => {
+  const checkbox = item.querySelector('input[type="checkbox"]');
+
+  item.addEventListener('click', e => {
+    // Si on clique sur le lien (ou son icône), on ne touche pas à la case
+    if (e.target.closest('a')) return;
+
+    checkbox.checked = !checkbox.checked;   // toggle
+  });
+});
 </script>
 
 

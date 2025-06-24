@@ -63,12 +63,9 @@ if ($RencontreExist) {
 
 $equipeDao = new EquipeDAO();
 
-$valeurs = str_replace(["\r", "\n"], ',', $_POST['nomEquipes']); // Remplace les retours invisibles par des virgules
-$listeEquipes = array_filter(array_map('trim', explode(',', $valeurs)));
 
-
-foreach ($listeEquipes as $nomEquipe) {
-   
+    $nomEquipe = $_POST['nomEquipe'];
+    $nomEquipe = strtoupper($nomEquipe);
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
     try {
             $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);            } catch (Exception $e) {
@@ -76,7 +73,7 @@ foreach ($listeEquipes as $nomEquipe) {
                 header("Location: ajoutEquipe.php?error=" . urlencode($e->getMessage())."&idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);
                 exit;
             }
-}
+
 
 // Redirection
 header("Location: ajoutEquipe.php?idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);

@@ -43,8 +43,8 @@ select::picker(select):popover-open {
                         <div class="card shadow-sm p-4">
                             <h5 class="text-center mb-3">Ajouter une équipe</h5>
                             <div class="form-group mb-3">
-                                <label for="nomEquipe" class="form-label">Noms des équipes (séparés par une virgule ou un saut de ligne)</label>
-                                <input type="text" class="form-control" name="nomEquipes" id="nomEquipes" placeholder="Ex: HBCAT2, HBCAT3, HBCAT4" required />
+                                <label for="nomEquipe" class="form-label">Noms de l'équipe</label>
+                                <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Ex: HBCAT2" required />
                             </div>
                             <div class="form-group mb-3">
                                 <label for="Categorie" class="form-label">Choisir la catégorie</label>
@@ -264,7 +264,7 @@ select::picker(select):popover-open {
 
 //on autocomplete le club
   document.addEventListener('DOMContentLoaded', function() {
-            const equipeInput = document.getElementById('nomEquipes');
+            const equipeInput = document.getElementById('nomEquipe');
             const clubSelect = document.getElementById('club');
 
             equipeInput.addEventListener('input', function() {
