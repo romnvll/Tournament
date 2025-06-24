@@ -70,9 +70,12 @@ $listeEquipes = array_filter(array_map('trim', explode(',', $valeurs)));
 foreach ($listeEquipes as $nomEquipe) {
    
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
-    if (!empty($nomEquipe)) {
-        $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);
-    }
+    try {
+            $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);            } catch (Exception $e) {
+                // Redirige avec message d'erreur
+                header("Location: ajoutEquipe.php?error=" . urlencode($e->getMessage())."&idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);
+                exit;
+            }
 }
 
 // Redirection

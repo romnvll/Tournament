@@ -35,6 +35,9 @@ select::picker(select):popover-open {
         <div class="row">
             {% if tournoiEnCours != 0 %}
                 <div class="col-md-4">
+                {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
                     <form action="ajoutEquipe_traitement.php" method="POST">
                     <input type="hidden" name="query" value="{{query}}">
                         <div class="card shadow-sm p-4">
