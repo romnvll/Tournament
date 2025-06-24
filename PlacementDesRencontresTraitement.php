@@ -7,12 +7,35 @@ require ('class/tournoiDao.class.php');
 
 
 
+
 if (isset ($_POST['nomTerrain'])) {
     require ('class/terrainDao.class.php');
     $terrain = new TerrainDao();
     $terrain->modifierNomTerrain($_POST['terrain_id'],$_POST['nomTerrain']);
     
 }
+
+
+if ($_POST['action'] == "deplanifier") {
+  require ('class/planificationDao.class.php');
+  $planification = new planificationDao();
+    $idTournoi = $_POST['idTournoi'];
+ foreach ($_POST['rencontreCheck'] as $idRencontre) {
+        // Sécurise chaque identifiant avant appel
+        $idRencontre = (int) $idRencontre;
+
+        // Appel DAO : un retrait par rencontre
+        $planification->retireRencontre($idTournoi, $idRencontre);
+                    header("Location: " . $_SERVER['HTTP_REFERER']);
+
+    }
+
+
+ 
+
+    
+}
+
 
 if (isset ($_POST['Addevent'])) {
     
