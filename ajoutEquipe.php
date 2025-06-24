@@ -62,6 +62,8 @@ else {
     $query = '';
 }
 
+$error = $_GET['error'] ?? null;
+$success = $_GET['success'] ?? null;
 
 echo $template->render([
   'email' => $userData['email'],
@@ -76,6 +78,7 @@ echo $template->render([
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories(),
 'query' => $query,
+'error' => $error,
 
 
 ]);

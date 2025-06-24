@@ -30,26 +30,48 @@ class EquipeDAO {
         return $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
-    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void {
-        // Insertion de l'équipe
-        $stmt = $this->connexion->prepare("INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) VALUES (:nom, :categorie, :tournoi_id, :club_id)");
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':categorie', $categorie);
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->bindParam(':club_id', $club_id);
-        $stmt->execute();
-    
-        // Récupérer l'ID de l'équipe insérée
-        $equipe_id = $this->connexion->lastInsertId();
-    
-        // Si un poule_id est fourni, ajoutez l'équipe à la poule dans la table de liaison
-        if ($poule_id !== null) {
-            $stmtPoule = $this->connexion->prepare("INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipe_id, :poule_id)");
-            $stmtPoule->bindParam(':equipe_id', $equipe_id);
-            $stmtPoule->bindParam(':poule_id', $poule_id);
-            $stmtPoule->execute();
-        }
+    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void
+{
+    // Vérifie si le nom d'équipe existe déjà dans ce tournoi (insensible à la casse)
+    $verifStmt = $this->connexion->prepare("
+        SELECT COUNT(*) FROM Equipes 
+        WHERE LOWER(nom) = LOWER(:nom) AND tournoi_id = :tournoi_id
+    ");
+    $verifStmt->bindParam(':nom', $nom);
+    $verifStmt->bindParam(':tournoi_id', $tournoi_id);
+    $verifStmt->execute();
+    $count = $verifStmt->fetchColumn();
+
+    if ($count > 0) {
+        throw new Exception("Le nom de l'équipe \"$nom\" est déjà utilisé dans ce tournoi.");
     }
+
+    // Insertion de l'équipe
+    $stmt = $this->connexion->prepare("
+        INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) 
+        VALUES (:nom, :categorie, :tournoi_id, :club_id)
+    ");
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':categorie', $categorie);
+    $stmt->bindParam(':tournoi_id', $tournoi_id);
+    $stmt->bindParam(':club_id', $club_id);
+    $stmt->execute();
+
+    // Récupérer l'ID de l'équipe insérée
+    $equipe_id = $this->connexion->lastInsertId();
+
+    // Si un poule_id est fourni, ajoutez l'équipe à la poule dans la table de liaison
+    if ($poule_id !== null) {
+        $stmtPoule = $this->connexion->prepare("
+            INSERT INTO EquipePoule (equipe_id, poule_id) 
+            VALUES (:equipe_id, :poule_id)
+        ");
+        $stmtPoule->bindParam(':equipe_id', $equipe_id);
+        $stmtPoule->bindParam(':poule_id', $poule_id);
+        $stmtPoule->execute();
+    }
+}
+
 
     public function changerClubEquipe(int $idEquipe, int $nouveauClubId): void {
     $stmt = $this->connexion->prepare("UPDATE Equipes SET club_id = :club_id WHERE id = :id");
