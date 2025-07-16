@@ -64,6 +64,33 @@ class ClubDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+public function changeClubPassword(int $clubId, string $oldPassword, string $newPassword): bool {
+    // Récupérer le mot de passe actuel du club
+    $stmt = $this->connexion->prepare("SELECT password FROM Clubs WHERE id = :clubId");
+    $stmt->bindParam(':clubId', $clubId);
+    $stmt->execute();
+    $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Vérifier si le club existe et si l'ancien mot de passe est correct
+    if ($club && hash('sha256', $oldPassword) === $club['password']) {
+        // Hacher le nouveau mot de passe en SHA-256
+        $newPasswordHash = hash('sha256', $newPassword);
+
+        // Mettre à jour le mot de passe du club
+        $updateStmt = $this->connexion->prepare("UPDATE Clubs SET password = :newPassword WHERE id = :clubId");
+        $updateStmt->bindParam(':newPassword', $newPasswordHash);
+        $updateStmt->bindParam(':clubId', $clubId);
+        $updateStmt->execute();
+
+        return true; // Le mot de passe a été changé avec succès
+    }
+
+    return false; // L'ancien mot de passe est incorrect ou le club n'existe pas
+}
+
+
+
+
     // Dans clubDao.class.php
 
     public function updateClub($id, $nom, $email = null, $password = null, $contact, $logo) {
