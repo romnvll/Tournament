@@ -76,7 +76,7 @@ echo $template->render([
 'AfficherClub' => $listeClub->afficherClubs(),
 'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
-'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories(),
+'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories($userData['id']),
 'query' => $query,
 'error' => $error,
 
