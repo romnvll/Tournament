@@ -42,6 +42,32 @@ class creneauxDao {
     $stmtInsert->execute();
 }
 
+public function getAudiosPourCreneau(int $creneau_id): array {
+    $stmt = $this->connexion->prepare("
+        SELECT 
+            T.terrain_id,
+            T.audio_path AS terrain_audio,
+            E1.audio_path AS equipe1_audio,
+            E2.audio_path AS equipe2_audio,
+            A.audio_path AS arbitre_audio
+        FROM Planification P
+        LEFT JOIN Rencontres R ON R.id = P.rencontre_id
+        LEFT JOIN Terrains T ON T.terrain_id = P.terrain_id
+        LEFT JOIN Equipes E1 ON E1.id = R.equipe1_id
+        LEFT JOIN Equipes E2 ON E2.id = R.equipe2_id
+        LEFT JOIN Arbitres A ON A.arbitre_id = P.arbitre_id
+        WHERE P.creneau_id = :creneau_id
+    ");
+    $stmt->bindParam(':creneau_id', $creneau_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+
+
 public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMinutes): void
 {
     // Récupérer l'heure du créneau précédent

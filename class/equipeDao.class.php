@@ -90,6 +90,15 @@ class EquipeDAO {
         $stmt->execute();
     }
 
+    public function mettreAJourAudioEquipe(int $idEquipe, string $audioPath): void
+{
+    $stmt = $this->connexion->prepare("UPDATE Equipes SET audio_path = :audio_path WHERE id = :id");
+    $stmt->bindParam(':audio_path', $audioPath);
+    $stmt->bindParam(':id', $idEquipe);
+    $stmt->execute();
+}
+
+
     public function changerCategorieEquipe(int $idEquipe, int $nouvelleCategorieId): void
 {
     $stmt = $this->connexion->prepare("

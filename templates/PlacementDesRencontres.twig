@@ -326,11 +326,7 @@
        
 
   <!-- Le lien calendrier reste à droite et ne déclenche PAS le label -->
-  <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent
-           &event={{ planification.planification_id }}
-           &tournoi_id={{ idTournoi }}
-           &rencontreId={{ planification.rencontre_id }}
-           #planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+  <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}&rencontreId={{ planification.rencontre_id }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
      class="text-danger"
      data-bs-toggle="tooltip"
      title="Supprimer uniquement cette planification">
