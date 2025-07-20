@@ -15,6 +15,15 @@ class arbitreDao {
         }
     }
 
+    public function updateAudioPath(int $arbitre_id, string $audio_path): void {
+    $sql = "UPDATE Arbitres SET audio_path = :audio_path WHERE arbitre_id = :arbitre_id";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindValue(':audio_path', $audio_path);
+    $stmt->bindValue(':arbitre_id', $arbitre_id);
+    $stmt->execute();
+}
+
+
     public function ajouterArbitre(?string $nom, int $tournoi_id, int $club_id): void {
         $stmt = $this->connexion->prepare("
             INSERT INTO Arbitres (nom, tournoi_id, club_id)

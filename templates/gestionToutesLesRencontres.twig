@@ -96,14 +96,26 @@
 						<table class="table" id="planification-table">
 							<thead class="table-header">
 								<tr class="text-center">
-									<th scope="col"></th>
+    <th scope="col"></th>
 
-									{% for i in 0..terrains|length - 1 %}
-										<th scope="col ">Terrain
-											{{terrains[i]["nom"]}}</th>
-									{% endfor %}
+					{% for i in 0..terrains|length - 1 %}
+						<th scope="col">
+							Terrain {{ terrains[i]["nom"] }}
+							
 
-								</tr>
+
+				<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
+					<button class="btn-record">🎙️ Enregistrer</button>
+					<button class="btn-play" >▶️ Écouter</button>
+					<audio class="audio-preview" src="Audio/{{ idTournoi }}/Terrain/{{ terrains[i]['terrain_id'] }}.wav"></audio>
+				</div>
+
+
+
+						</th>
+					{% endfor %}
+</tr>
+
 							</thead>
 							<tbody>
 								{% for creneau in listCreneaux %}
@@ -147,6 +159,9 @@
 				</div>
 		</div>	
 
+	<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" class="btn btn-primary">
+    🎧 Lancer la lecture audio
+</button>
 
 										</td>
 										{% set Displayed = false %}
@@ -330,7 +345,70 @@ tooltipTriggerList.forEach(function (tooltipTriggerEl) {
 new bootstrap.Tooltip(tooltipTriggerEl);
 });
 			</script>
-		</script>
+		
+<script>
+document.querySelectorAll('.btn-record').forEach(button => {
+    button.addEventListener('click', async function () {
+        const container = this.closest('div');
+        const idTournoi = container.dataset.tournoiId;
+        const idTerrain = container.dataset.terrainId;
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'audio.wav');
+            formData.append('idTournoi', idTournoi);
+            formData.append('idTerrain', idTerrain);
+
+            const response = await fetch('upload_audio.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const audioElement = container.querySelector('.audio-preview');
+                const playButton = container.querySelector('.btn-play');
+
+                // Forcer le rechargement du fichier
+                const timestamp = new Date().getTime();
+                audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
+                playButton.disabled = false;
+            } else {
+                alert("Erreur lors de l'enregistrement");
+            }
+        };
+
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 3000); // 3 secondes
+    });
+});
+
+// Lecture
+document.querySelectorAll('.btn-play').forEach(button => {
+    button.addEventListener('click', function () {
+        const audio = this.closest('div').querySelector('.audio-preview');
+        audio.play();
+    });
+});
+</script>
+
+
+<script>
+function ouvrirLectureAudio(idCreneau) {
+    const url = `lectureAudio.php?idCreneau=${idCreneau}`;
+    const options = 'width=400,height=200,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
+    window.open(url, '_blank', options);
+}
+</script>
+
 
 	</body>
 

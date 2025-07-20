@@ -83,7 +83,6 @@ if (!isset($_GET['id_tournoi'])) {
 
 
 
-
 echo $template->render([
   'logo' => $userData['logo'],
   'email' => $userData['email'],

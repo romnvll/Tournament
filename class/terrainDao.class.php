@@ -24,6 +24,18 @@ class TerrainDao {
         $stmt->execute();
     }
 
+    public function mettreAJourAudioTerrain(int $terrain_id, string $cheminAudio): void {
+    $stmt = $this->connexion->prepare("
+        UPDATE Terrains 
+        SET audio_path = :cheminAudio 
+        WHERE terrain_id = :terrain_id
+    ");
+    $stmt->bindParam(':cheminAudio', $cheminAudio);
+    $stmt->bindParam(':terrain_id', $terrain_id);
+    $stmt->execute();
+}
+
+
     public function ajoutTerrain(int $idTournoi, string $nomTerrain): void {
         $stmt = $this->connexion->prepare("
             INSERT INTO Terrains (fk_idTournoi, nom)
