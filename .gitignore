@@ -3,4 +3,5 @@ config.php
 updateDB.txt
 security.php
 secureCookies.php
-audio/*
+Audio/*
+!Audio/.gitignore
