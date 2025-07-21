@@ -569,7 +569,8 @@ public function modifierTournoi(
     ?int $gestionArbitres = null,
     ?int $refreshClientTime = null,
     ?int $gestionRepas = null,
-    ?int $gestionPartenaires = null
+    ?int $gestionPartenaires = null,
+    ?int $gestionVoix = null,
 ): void {
     $fields = [];
     $params = [':idTournoi' => $idTournoi];
@@ -614,6 +615,10 @@ public function modifierTournoi(
     if ($gestionArbitres !== null) {
         $fields[] = "gestionArbitres = :gestionArbitres";
         $params[':gestionArbitres'] = $gestionArbitres;
+    }
+     if ($gestionVoix !== null) {
+        $fields[] = "gestionVoix = :gestionVoix";
+        $params[':gestionVoix'] = $gestionVoix;
     }
 
     // Champs ajoutés : gestionRepas et gestionPartenaires
