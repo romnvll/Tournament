@@ -103,13 +103,14 @@
 							Terrain {{ terrains[i]["nom"] }}
 							
 
-
+				 {% if tournoiInfo.gestionVoix == 1 %}
 				<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
 					<button class="btn-record">🎙️ Enregistrer</button>
 					<button class="btn-play" >▶️ Écouter</button>
 					<audio class="audio-preview" src="Audio/{{ idTournoi }}/Terrain/{{ terrains[i]['terrain_id'] }}.wav"></audio>
+					
 				</div>
-
+				{% endif %}
 
 
 						</th>
@@ -158,10 +159,11 @@
 					</form>
 				</div>
 		</div>	
-
+ {% if tournoiInfo.gestionVoix == 1 %}
 	<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" class="btn btn-primary">
     🎧 Lancer la lecture audio
 </button>
+{% endif %}
 
 										</td>
 										{% set Displayed = false %}

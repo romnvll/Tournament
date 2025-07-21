@@ -77,6 +77,7 @@ echo $template->render([
 'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories($userData['id']),
+'infoTournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
 'query' => $query,
 'error' => $error,
 

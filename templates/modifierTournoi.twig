@@ -82,54 +82,60 @@
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="gestionTables" name="gestionTables" value="1" {% if infotournoi.gestionTables == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="gestionTables">
-                                                Gestion des tables
+                                               🧮 Gestion des tables
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="gestionVoix" name="gestionVoix" value="1" {% if infotournoi.gestionVoix == 1 %} checked {% endif %} onchange="this.form.submit()">
+                                            <label class="form-check-label" for="gestionVoix">
+                                               🎙️ Gestion des annonces vocales
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="gestionArbitres" name="gestionArbitres" value="1" {% if infotournoi.gestionArbitres == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="gestionArbitres">
-                                                Gestion des arbitres
+                                               🧑‍⚖️ Gestion des arbitres
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="gestionRepas" name="gestionRepas" value="1" {% if infotournoi.gestionRepas == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="gestionRepas">
-                                                Gestion des repas
+                                               🍽️ Gestion des repas
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="gestionPartenaires" name="gestionPartenaires" value="1" {% if infotournoi.gestionPartenaires == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="gestionPartenaires">
-                                                Gestion des partenaires
+                                              🤝 Gestion des partenaires
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="isVisible" name="isVisible" value="1" {% if infotournoi.isVisible == 1 %} checked {% endif %} onchange="toggleDependencies(),this.form.submit()">
                                             <label class="form-check-label" for="isVisible">
-                                                Tournoi visible du public ?
+                                               👁️ Tournoi visible du public ?
                                             </label>
                                         </div>
                                         <div class="form-check form-switch" id="heureIsVisibleContainer" style="margin-left: 20px;">
                                             <input class="form-check-input" type="checkbox" id="heureIsVisible" name="heureIsVisible" value="1" {% if infotournoi.heureIsVisible == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="heureIsVisible">
-                                                Horaires visibles du public
+                                               ⏰ Horaires visibles du public
                                             </label>
                                         </div>
                                         <div class="form-check form-switch" id="IsRankingViewContainer" style="margin-left: 20px;">
                                             <input class="form-check-input" type="checkbox" id="IsRankingView" name="IsRankingView" value="1" {% if infotournoi.IsRankingView == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="IsRankingView">
-                                                Classement visible du public
+                                                🏆Classement visible du public
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="isArchived" name="isArchived" value="1" {% if infotournoi.isArchived == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="isArchived">
-                                                Archiver le tournoi
+                                                🗃️ Archiver le tournoi
                                             </label>
                                         </div>
                                         <div class="mb-3">
                                             <label for="refreshClientTime" class="form-label">
-                                                Taux raffraichissement (s)
+                                                🔄Taux raffraichissement (s)
                                             </label>
                                             <input type="number" class="form-control" id="refreshClientTime" name="refreshClientTime" value="{{ infotournoi.refreshClientTime /1000 }}" onchange="this.form.submit()" min="1" max="200">
                                         </div>
@@ -299,7 +305,7 @@
             <tr id="ligne-arbitre-{{ arbitre.arbitre_id }}">
                 <td>
                     <form id="form-arbitre-{{ arbitre.arbitre_id }}" hx-post="modifierTournoi_traitement.php" hx-trigger="keyup" hx-target="#message-arbitre-{{ arbitre.arbitre_id }}" hx-swap="innerHTML">
-                        <input type="text" name="nomArbitre" value="{{ arbitre.nom }}">
+                        <input type="text" name="nomArbitre" value="{{ arbitre.nom }}" placeholder="optionnel" class="form-control" >
                         <input type="hidden" name="idArbitre" value="{{ arbitre.arbitre_id }}">
                         <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
                     </form>
@@ -310,11 +316,22 @@
                     <a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{ infotournoi.id }}" class="btn btn-danger btn-sm">
                         <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer
                     </a>
-
+                    
+                    {% if infotournoi.gestionVoix == 1 %}
                     <!-- Enregistrement audio -->
                     <button class="btn btn-primary btn-sm" onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-                        🎤 Enregistrer Voix
+                    🎤 Enregistrer Voix
                     </button>
+                    <button id="stopButton_{{ arbitre.arbitre_id }}" class="btn btn-danger btn-sm" onclick="stopRecording()" disabled>
+                        ⏹️ Stop
+                    </button>
+
+                     {% if arbitre.audio_path == null %}
+                                          <i class="fa-solid fa-volume-xmark"></i> ( annoncer: Rencontre arbitrée par ...)
+                                        {% else %}
+                                           <i class="fa-solid fa-volume-high"></i>
+                                    {% endif %}
+                     {% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -620,9 +637,10 @@
 
 
 
-        <script>
+      <script>
     let mediaRecorder;
     let audioChunks = [];
+    let currentStopButton = null;
 
     function startRecording(arbitreId, tournoiId) {
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -645,20 +663,30 @@
                     method: 'POST',
                     body: formData
                 }).then(response => response.text()).then(result => {
-                    alert('Audio enregistré avec succès !');
+                    //alert('Audio enregistré avec succès !');
                 }).catch(err => {
                     alert('Erreur lors de l\'upload : ' + err);
                 });
+
+                // Désactive le bouton stop
+                if (currentStopButton) currentStopButton.disabled = true;
             };
 
             mediaRecorder.start();
 
-            setTimeout(() => {
-                mediaRecorder.stop();
-            }, 3000); // 3 secondes d'enregistrement
+            // Active le bouton stop correspondant
+            currentStopButton = document.getElementById(`stopButton_${arbitreId}`);
+            if (currentStopButton) currentStopButton.disabled = false;
         });
     }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        }
+    }
 </script>
+
 
 
 

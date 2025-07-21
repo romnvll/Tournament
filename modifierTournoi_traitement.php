@@ -196,6 +196,14 @@ else {
     
 }
 
+if ($_POST['gestionVoix'] == "") {
+    $gestionVoix = 0;
+}
+else {
+    $gestionVoix = 1;
+    
+}
+
 if ($_POST['gestionPartenaires'] == "") {
     $gestionPartenaires = 0;
 }
@@ -224,7 +232,7 @@ $tempRefresh = $_POST['refreshClientTime'] * 1000;
 
 
 $tournoidao = new tournoiDao();
-$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh,$gestionRepas,$gestionPartenaires);
+$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh,$gestionRepas,$gestionPartenaires,$gestionVoix);
 
 header("Location: " . $_SERVER['HTTP_REFERER'] ."");
 ?>
