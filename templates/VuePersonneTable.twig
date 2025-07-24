@@ -111,7 +111,27 @@
                                                         <td><strong>Arbitre:</strong></td>
                                                         <td><i class="fas fa-user-tie"></i> {{ planification.arbitre_nom }} {{planification.arbitre_club_nom}} </td>
                                                     </tr>
+                                                      {% if partenaires is not empty %}
+                                                                {% set randIndex = random(0, partenaires|length - 1) %}
+                                                                {% set sponsor = partenaires[randIndex] %}
+                                                                <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
+                                                                            <div class="text-muted small">
+                                                                                <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
+                                                                                {% if sponsor.description %}
+                                                                                    <br><em>{{ sponsor.description }}</em>
+                                                                                {% endif %}
+                                                                            </div>
+
+                                                                            {% if sponsor.logo %}
+                                                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                                                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
+                                                                                </a>
+                                                                            {% endif %}
+                                                                        </div>
+
+                                                        {% endif %}
                                                 </tbody>
+                                              
                                             </table>
                                         </td>
                                     </form>
