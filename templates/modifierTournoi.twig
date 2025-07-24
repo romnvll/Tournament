@@ -143,7 +143,15 @@
                                 </form>
                             </div>
                         </div>
+                             {% if infotournoi.isArchived == 1 %}
+                        
+                            <a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{infotournoi.id}}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\action est irréversible');">
+                                <i class="fa-solid fa-trash-can me-1"></i>Suppression du tournoi
+                            </a>
+                        
+                    {% endif %}
                     </div>
+               
                     <div class="col-lg-6">
                         <div class="container mt-4">
                             <h3 class="text-center mb-4">
@@ -247,7 +255,7 @@
                          {% if infotournoi.gestionPartenaires == 1   %}
                         <li class="nav-item" role="Partenaires">
                             <button class="nav-link {% if tab == 'Partenaires' %} active {% endif %} " id="Partenaires-tab" data-bs-toggle="tab" data-bs-target="#Partenaires" type="button" role="tab" aria-controls="Partenaires" aria-selected="false">
-                                Partenaires
+                               Les partenaires
                             </button>
                         </li>
                         {% endif %}
@@ -572,7 +580,7 @@
                             Partenaires
                         </h2>
                         <p class="lead">
-                            This is the contact tab content.
+                            les partenaires sont gérés par club dans "Mes préferences".
                         </p>
                     <!-- fin tab partenaire -->
                     </div>

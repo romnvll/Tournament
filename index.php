@@ -11,6 +11,7 @@ require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
 
 
+
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
   'cache' => false,
@@ -18,8 +19,17 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 
+$twig->addFilter(new \Twig\TwigFilter('shuffle', function ($array) {
+    shuffle($array);
+    return $array;
+}));
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 $template = $twig->load('index.twig');
+
+
+
+
+
 $rencontre = new RencontreDAO();
 $tournoiDao = new tournoiDao();
 $poulemanager = new PouleManager();
@@ -175,6 +185,22 @@ if (isset ($_GET['idPoule'])) {
 
 
 
+ 
+//gestion des sponsor
+
+if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
+  
+  //recuperation des partenaires du club qui a organiser ce tournoi
+  require_once 'class/SponsorDAO.class.php';
+  $sponsorDao = new SponsorDAO();
+  $listeDesPartenaires = $sponsorDao->getSponsorsParClub($tournoiDao->getTournoiById($idTournoi)['club_id']);
+ 
+}
+else {
+  $listeDesPartenaires = null;
+}
+
+
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
     'ListeDesTournois' => $listeDesTournois,
@@ -199,6 +225,7 @@ echo $template->render([
     'labels' => $Labels,
     'equipesAvecPoule' => $equipesAvecPoule,
     'nbrTerrains' => $nbrterrain,
+    'partenaires' => $listeDesPartenaires,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

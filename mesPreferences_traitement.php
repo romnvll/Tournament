@@ -3,6 +3,85 @@ require 'security.php';
 require_once 'class/categorie.class.php';
 $dao = new CategorieDao($pdo);
 
+
+
+if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
+    $club_id = $_POST['club_id'];
+    require_once 'class/SponsorDAO.class.php';
+    $sponsorDao = new SponsorDAO();
+
+   
+    // Vérifier si un fichier a été téléchargé sans erreur
+    if (isset($_FILES['logo']) && $_FILES['logo']['error'] == UPLOAD_ERR_OK) {
+        $uploadDir = 'Sponsors/'; // Répertoire où vous souhaitez enregistrer les fichiers
+        $nom = $_POST['nom'];
+
+        // Créer le nouveau nom de fichier
+        $newFileName = $club_id . '-Sponsors-' . $nom;
+
+        // Obtenir l'extension du fichier
+        $fileExtension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+
+        // Déplacer le fichier téléchargé vers le répertoire souhaité avec le nouveau nom
+        $destination = $uploadDir . $newFileName . '.' . $fileExtension;
+        if (move_uploaded_file($_FILES['logo']['tmp_name'], $destination)) {
+            echo "Le fichier a été téléchargé avec succès.";
+        } else {
+            echo "Une erreur est survenue lors du téléchargement du fichier.";
+        }
+    }
+
+     $sponsorDao->ajouterSponsor(
+        $_POST['nom'],
+        $_POST['description'] ?? null,
+        $_POST['lien_web'],
+        $destination ?? null,
+        $club_id
+    ); 
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+}
+
+//modif d'un sponsor
+if (isset($_POST['modifierSponsor']) && $_POST['modifierSponsor'] == '1') {
+    require_once 'class/SponsorDAO.class.php';
+    $sponsorDao = new SponsorDAO();
+
+    // Récupérer l'ancien logo du sponsor
+    $oldSponsorData = $sponsorDao->getSponsorById((int)$_POST['id']);
+    $logo = $oldSponsorData['logo']; // Conserver l'ancien logo par défaut
+
+    // Vérifier si un nouveau fichier a été téléchargé sans erreur
+    if (isset($_FILES['logo']) && $_FILES['logo']['error'] == UPLOAD_ERR_OK) {
+        $uploadDir = 'Sponsors/';
+        $nom = $_POST['nom'];
+        $newFileName = $_POST['club_id'] . '-Sponsors-' . $nom;
+        $fileExtension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+        $destination = $uploadDir . $newFileName . '.' . $fileExtension;
+
+        // Déplacer le fichier téléchargé vers le répertoire souhaité avec le nouveau nom
+        if (move_uploaded_file($_FILES['logo']['tmp_name'], $destination)) {
+            $logo = $destination; // Mettre à jour le logo avec le nouveau fichier
+        } else {
+            echo "Une erreur est survenue lors du téléchargement du fichier.";
+        }
+    }
+
+    // Appeler la méthode modifierSponsor avec le logo approprié
+    $sponsorDao->modifierSponsor(
+        (int)$_POST['id'],
+        $_POST['nom'],
+        $_POST['description'] ?? null,
+        $_POST['lien_web'],
+        $logo,
+        (int)$_POST['club_id']
+    );
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+}
+
+
+//fin modif sponsors
+
+
 if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POST['newPassword2'])) {
     require_once 'class/clubDao.class.php';
     $clubDao = new ClubDao();
@@ -27,6 +106,28 @@ if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POS
     // Gérer l'erreur, par exemple, afficher un message d'erreur
     echo "Tous les champs de mot de passe doivent être remplis.";
 }
+
+if (isset($_GET['supprimerSponsors'])) {
+    require_once 'class/SponsorDAO.class.php';
+    $sponsorDao = new SponsorDAO();
+
+    // Récupérer les informations du sponsor, y compris le chemin du logo
+    $sponsor = $sponsorDao->getSponsorById((int)$_GET['id']);
+
+    if ($sponsor) {
+        // Supprimer le fichier du serveur si le logo existe
+        if ($sponsor['logo'] && file_exists($sponsor['logo'])) {
+            unlink($sponsor['logo']);
+        }
+
+        // Supprimer le sponsor de la base de données
+        $sponsorDao->supprimerSponsor((int)$_GET['id']);
+    }
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit(); // Assurez-vous de terminer le script après la redirection
+}
+
 
 
 if (isset($_POST['ChangeColor']) ) {

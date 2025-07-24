@@ -45,6 +45,101 @@
 <body>
     {{ include('header.twig') }}
     <div class="container my-4">
+    <div class="row">
+      <div class="col-md-6 mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Gestion des sponsors</span>
+        </div>
+        <div class="card-body">
+            <!-- Formulaire d'ajout de sponsor -->
+            <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" class="mb-4" name="sponsors">
+                <input type="hidden" name="club_id" value="{{ idClub }}">
+                <input type="hidden" name="ajoutSponsor" value="1">
+                <div class="form-group mb-2">
+                    <input type="text" name="nom" class="form-control" placeholder="Nom du sponsor" required>
+                </div>
+                <div class="form-group mb-2">
+                    <input type="url" name="lien_web" class="form-control" placeholder="Lien web (https://...)" >
+                </div>
+                <div class="form-group mb-2">
+                    <textarea name="description" class="form-control" placeholder="Description (facultative)"></textarea>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="logo">Logo</label>
+                    <input type="file" name="logo" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Ajouter le sponsor</button>
+            </form>
+
+            <!-- Tableau des sponsors existants -->
+            {% if sponsors %}
+             <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Lien</th>
+            <th>Description</th>
+            <th>Logo</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sponsor in sponsors %}
+        <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+            <tr>
+                <td>
+                    <input type="hidden" name="id" value="{{ sponsor.id }}">
+                    <input type="hidden" name="modifierSponsor" value="1">
+                    <input type="text" name="nom" class="form-control" value="{{ sponsor.nom }}" onchange="this.form.submit()">
+                </td>
+                <td>
+                    <input type="url" name="lien_web" class="form-control" value="{{ sponsor.lien_web }}" onchange="this.form.submit()">
+                </td>
+                <td>
+                    <input type="text" name="description" class="form-control" value="{{ sponsor.description }}" onchange="this.form.submit()">
+                </td>
+                <td>
+                    {% if sponsor.logo %}
+                        <img src="{{ sponsor.logo }}" alt="Logo" width="40">
+                    {% endif %}
+                    <input type="file" name="logo" class="form-control form-control-sm mt-1" onchange="this.form.submit()">
+                </td>
+                <td class="text-center">
+                                <button type="submit" class="btn btn-sm btn-success mb-1">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <input type="hidden" name="club_id" value="{{ idClub }}">
+
+                <a href="mesPreferences_traitement.php?id={{ sponsor.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce sponsor ?');">
+                    <i class="bi bi-trash"></i>
+                </a>
+
+
+                </td>
+            </tr>
+        </form>
+       
+            
+                   
+                        
+                   
+                </td>
+            </tr>
+        </form>
+        {% endfor %}
+    </tbody>
+</table>
+
+            {% else %}
+                <p class="text-muted">Aucun sponsor pour l'instant.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+    </div>
+
+    <!--fin sponsors -->
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -78,6 +173,7 @@
                     {% endif %}
                 </div>
             </div>
+            
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -141,6 +237,10 @@
                     </div>
                 </div>
             </div>
+          
+
+
+
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
