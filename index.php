@@ -193,7 +193,7 @@ if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
   //recuperation des partenaires du club qui a organiser ce tournoi
   require_once 'class/SponsorDAO.class.php';
   $sponsorDao = new SponsorDAO();
-  $listeDesPartenaires = $sponsorDao->getSponsorsParClub($tournoiDao->getTournoiById($idTournoi)['club_id']);
+  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($idTournoi)['club_id']);
  
 }
 else {
