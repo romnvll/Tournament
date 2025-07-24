@@ -221,7 +221,7 @@
             {% set sponsor = partenaires[randIndex] %}
             <div class="d-flex align-items-center">
                 <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisé par {{ sponsor.nom }}</span>
-            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 40px; max-height: 40px;"></a>
+            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></a>
             </div>
         {% endif %}
 </li>
@@ -256,7 +256,7 @@
                                     {% set sponsor = partenaires[randIndex] %}
                                     <div class="d-flex align-items-center">
                                         <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisé par {{ sponsor.nom }}</span>
-                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 40px; max-height: 40px;"></a>
+                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></a>
                                     </div>
                                          {% endif %}
                                         {% endif %}

@@ -211,7 +211,7 @@
                 {% else %}
                     {% set tabcontent_repas = '' %}
                 {% endif %}
-
+                   
                 {% if tab == 'partenaires' %}
                     {% set tabcontent_partenaires = 'show active' %}
                 {% else %}
@@ -253,8 +253,8 @@
                         </li>
                          {% endif %}
                          {% if infotournoi.gestionPartenaires == 1   %}
-                        <li class="nav-item" role="Partenaires">
-                            <button class="nav-link {% if tab == 'Partenaires' %} active {% endif %} " id="Partenaires-tab" data-bs-toggle="tab" data-bs-target="#Partenaires" type="button" role="tab" aria-controls="Partenaires" aria-selected="false">
+                        <li class="nav-item" role="partenaires">
+                            <button class="nav-link {% if tab == 'partenaires' %} active {% endif %} " id="partenaires-tab" data-bs-toggle="tab" data-bs-target="#partenaires" type="button" role="tab" aria-controls="partenaires" aria-selected="false">
                                Les partenaires
                             </button>
                         </li>
@@ -539,7 +539,7 @@
                             </div>
                         {% endif %}
                     <!-- fin tab tables -->
-
+                </div>            
  <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
@@ -564,7 +564,7 @@
                     </div>
 
                     
-                    <div class="tab-pane fade {{ tabcontent_table }}" id="repas" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="tab-pane fade {{ tabcontent_repas }}" id="repas" role="tabpanel" aria-labelledby="repas-tab">
                         <!-- debut tab repas -->
                         <h2 class="mb-3">
                             repas
@@ -574,7 +574,7 @@
                         </p>
                     <!-- fin tab repas -->
                     </div>
-                    <div class="tab-pane fade {{ tabcontent_table }}" id="Partenaires" role="tabpanel" aria-labelledby="partenaire-tab">
+                    <div class="tab-pane fade {{ tabcontent_partenaires }}" id="partenaires" role="tabpanel" aria-labelledby="partenaires-tab">
                         <!-- debut tab partenaire -->
                         <h2 class="mb-3">
                             Partenaires
