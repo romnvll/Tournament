@@ -179,10 +179,10 @@ select::picker(select):popover-open {
                                     </td>
                                     {% if infoTournoi.gestionVoix == 1 %}
                                   <td class="text-center" data-id-tournoi="{{tournoiEnCours}}" data-id-equipe="{{ equipe.id }}">
-                                    <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ Enregistrer</button>
-                                        <button onclick="stopRecording(this)" class="btn btn-sm btn-danger" disabled>⏹️ Stop</button>
-                                        <br>
-                                        <audio controls style="margin-top:5px;" preload="none"></audio>
+                                        <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ Enregistrer</button>
+                                            <button onclick="stopRecording(this)" class="btn btn-sm btn-danger" disabled>⏹️ Stop</button>
+                                            <br>
+                                            <audio controls style="margin-top:5px;" preload="none" src=Audio/{{idTournoi}}/Equipe/{{ equipe.id }}.wav></audio>
                                         {% if equipe.audio_path == null %}
                                           <i class="fa-solid fa-volume-xmark"></i>
                                         {% else %}
@@ -402,7 +402,12 @@ function startRecording(btn) {
                 body: formData
             }).then(response => {
                 if (response.ok) {
-                  //  alert('Audio envoyé avec succès');
+                    alert('Audio envoyé avec succès');
+                    const audioElement = td.querySelector('audio');
+                    // Ajout d’un cache buster avec un timestamp
+                    const baseSrc = audioElement.src.split('?')[0];
+                    audioElement.src = baseSrc + '?t=' + new Date().getTime();
+                    audioElement.load(); // recharge l’audio avec le nouveau src
                 } else {
                     alert('Erreur lors de l’envoi');
                 }
@@ -419,10 +424,13 @@ function stopRecording(btn) {
     btn.disabled = true;
     const td = btn.closest('td');
     const startBtn = td.querySelector('button.btn-primary');
-    mediaRecorder.stop();
     startBtn.disabled = false;
-    location.reload(true);
+
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+    }
 }
+
 </script>
 
 <script>

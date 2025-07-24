@@ -104,13 +104,14 @@
 							
 
 				 {% if tournoiInfo.gestionVoix == 1 %}
-				<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
-					<button class="btn-record">🎙️ Enregistrer</button>
-					<button class="btn-play" >▶️ Écouter</button>
-					<audio class="audio-preview" src="Audio/{{ idTournoi }}/Terrain/{{ terrains[i]['terrain_id'] }}.wav"></audio>
-					
-				</div>
+					<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
+						<button class="btn-record">🎙️ Enregistrer</button>
+						<button class="btn-stop" disabled>⏹️ Arrêter</button>
+						<button class="btn-play" disabled>▶️ Écouter</button>
+						<audio class="audio-preview" src="Audio/{{ idTournoi }}/Terrain/{{ terrains[i]['terrain_id'] }}.wav"></audio>
+					</div>
 				{% endif %}
+
 
 
 						</th>
@@ -349,57 +350,72 @@ new bootstrap.Tooltip(tooltipTriggerEl);
 			</script>
 		
 <script>
-document.querySelectorAll('.btn-record').forEach(button => {
-    button.addEventListener('click', async function () {
-        const container = this.closest('div');
-        const idTournoi = container.dataset.tournoiId;
-        const idTerrain = container.dataset.terrainId;
+document.querySelectorAll('div[data-terrain-id]').forEach(container => {
+    let mediaRecorder;
+    let audioChunks = [];
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream);
-        const audioChunks = [];
+    const recordBtn = container.querySelector('.btn-record');
+    const stopBtn = container.querySelector('.btn-stop');
+    const playBtn = container.querySelector('.btn-play');
+    const audioElement = container.querySelector('.audio-preview');
 
-        mediaRecorder.ondataavailable = event => {
-            audioChunks.push(event.data);
-        };
+    const idTournoi = container.dataset.tournoiId;
+    const idTerrain = container.dataset.terrainId;
 
-        mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'audio.wav');
-            formData.append('idTournoi', idTournoi);
-            formData.append('idTerrain', idTerrain);
+    recordBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
 
-            const response = await fetch('upload_audio.php', {
-                method: 'POST',
-                body: formData
-            });
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
 
-            if (response.ok) {
-                const audioElement = container.querySelector('.audio-preview');
-                const playButton = container.querySelector('.btn-play');
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'audio.wav');
+                formData.append('idTournoi', idTournoi);
+                formData.append('idTerrain', idTerrain);
 
-                // Forcer le rechargement du fichier
-                const timestamp = new Date().getTime();
-                audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
-                playButton.disabled = false;
-            } else {
-                alert("Erreur lors de l'enregistrement");
-            }
-        };
+                const response = await fetch('upload_audio.php', {
+                    method: 'POST',
+                    body: formData
+                });
 
-        mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 3000); // 3 secondes
+                if (response.ok) {
+                    // Recharge la source audio avec un timestamp pour forcer le rechargement
+                    const timestamp = new Date().getTime();
+                    audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
+                    playBtn.disabled = false;
+                } else {
+                    alert("Erreur lors de l'enregistrement");
+                }
+            };
+
+            mediaRecorder.start();
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+            playBtn.disabled = true;
+        } catch (err) {
+            alert("Impossible d'accéder au microphone : " + err.message);
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            recordBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+    });
+
+    playBtn.addEventListener('click', () => {
+        audioElement.play();
     });
 });
 
-// Lecture
-document.querySelectorAll('.btn-play').forEach(button => {
-    button.addEventListener('click', function () {
-        const audio = this.closest('div').querySelector('.audio-preview');
-        audio.play();
-    });
-});
 </script>
 
 

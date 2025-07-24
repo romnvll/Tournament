@@ -5,3 +5,6 @@ security.php
 secureCookies.php
 Audio/*
 !Audio/.gitignore
+Sponsors/*
+!Sponsors/
+

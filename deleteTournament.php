@@ -25,6 +25,8 @@ if ($_GET['action'] == "delete") {
     if ($tournoiDao->getTournoiById($tournoi)['isArchived'] == 0) {
         echo "Impossible de supprimer ce tournoi, il n'est pas archivé";
     } else {
+
+
         // Suppression des planifications avant les rencontres
         $planificationDao = new planificationDao();
         try {
@@ -98,7 +100,33 @@ if ($_GET['action'] == "delete") {
 
 
 
-        
+  // Suppression des fichiers audio associés au tournoi
+$audioPath = __DIR__ . "/Audio/" . $tournoi;
+
+if (is_dir($audioPath)) {
+    $files = scandir($audioPath);
+    foreach ($files as $file) {
+        if ($file !== "." && $file !== "..") {
+            $filePath = $audioPath . "/" . $file;
+            if (is_file($filePath)) {
+                unlink($filePath);
+            } elseif (is_dir($filePath)) {
+                // Supprime récursivement les sous-dossiers
+                $it = new RecursiveDirectoryIterator($filePath, RecursiveDirectoryIterator::SKIP_DOTS);
+                $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+                foreach ($files as $f) {
+                    $f->isDir() ? rmdir($f) : unlink($f);
+                }
+                rmdir($filePath);
+            }
+        }
+    }
+    rmdir($audioPath);
+    echo "Fichiers audio supprimés pour le tournoi $tournoi.<br>";
+} else {
+    echo "Aucun dossier audio trouvé pour le tournoi $tournoi.<br>";
+}
+      
  
 
 

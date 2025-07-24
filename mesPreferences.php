@@ -4,8 +4,9 @@ require ('class/clubDao.class.php');
 require 'vendor/autoload.php';
 require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
+require_once 'class/SponsorDAO.class.php';
 
-
+$sponsorDao = new SponsorDAO();
 $categories = new CategorieDao();
 
 $categorie = $categories->obtenirToutesLesCategories($userData['id'], 'id_categorie DESC');
@@ -36,6 +37,8 @@ echo $template->render([
   'pageEnCours' =>  'Users',
   'categories' => $categorie,
   'message' => $message,
+  'idClub' => $userData['id'],
+  'sponsors' => $sponsorDao->getSponsorsParClub($userData['id']),
  
    
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

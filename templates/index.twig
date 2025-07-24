@@ -206,12 +206,30 @@
                                     <ul class="list-group no-bullet">
                                     <li class="">
                                         {% for club in listeDesCLubs %}
-                                    <li>
-                                            <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="list-group-item list-group-item-action">
-                                                <img class="img-thumbnail" src="{{club.logo}}" alt="Card image cap" style="max-width: 50px; max-height: 50px;">
-                                                {{ club.nom|upper }}
-                                            </a>
-                                     </li>
+                         
+<li>
+    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <img class="img-thumbnail me-2" src="{{ club.logo }}" alt="Logo club" style="max-width: 50px; max-height: 50px;">
+            <strong class="me-3">{{ club.nom|upper }}</strong>
+        </div>
+
+       
+    </a>
+     {% if partenaires is not empty %}
+            {% set randIndex = random(0, partenaires|length - 1) %}
+            {% set sponsor = partenaires[randIndex] %}
+            <div class="d-flex align-items-center">
+                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisé par {{ sponsor.nom }}</span>
+            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 40px; max-height: 40px;"></a>
+            </div>
+        {% endif %}
+</li>
+
+
+
+
+
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -233,6 +251,14 @@
                                         <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}" class="list-group-item list-group-item-action">
                                             {{ equipe.nom|upper }} - {{ equipe.Nom_categorie }}
                                         </a>
+                                         {% if partenaires is not empty %}
+                                    {% set randIndex = random(0, partenaires|length - 1) %}
+                                    {% set sponsor = partenaires[randIndex] %}
+                                    <div class="d-flex align-items-center">
+                                        <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisé par {{ sponsor.nom }}</span>
+                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 40px; max-height: 40px;"></a>
+                                    </div>
+                                         {% endif %}
                                         {% endif %}
                                         
                                     </li>
@@ -452,6 +478,16 @@
                                                 </span>
                                             {% endif %}
                                         </div>
+
+                                         {% if partenaires is not empty %}
+                                            {% set randIndex = random(0, partenaires|length - 1) %}
+                                            {% set sponsor = partenaires[randIndex] %}
+                                            <div class="d-flex align-items-center">
+                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisée par {{ sponsor.nom }}</span>
+                                            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></a>
+                                            </div>
+                                        {% endif %}
+
                                     </td>
                                     <td class="align-middle text-center">
                                         <div class="d-flex flex-column align-items-center">
