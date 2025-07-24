@@ -28,12 +28,13 @@ CREATE TABLE `Arbitres` (
   `nom` varchar(100) DEFAULT NULL,
   `tournoi_id` int(11) NOT NULL,
   `club_id` int(11) NOT NULL,
+  `audio_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`arbitre_id`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   KEY `idx_club_id` (`club_id`),
   CONSTRAINT `Arbitres_ibfk_1` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`),
   CONSTRAINT `Arbitres_ibfk_2` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +52,7 @@ CREATE TABLE `Categorie` (
   PRIMARY KEY (`id_categorie`),
   KEY `idx_fk_id_club` (`fk_id_club`),
   CONSTRAINT `fk_club` FOREIGN KEY (`fk_id_club`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -87,7 +88,7 @@ CREATE TABLE `Creneaux` (
   PRIMARY KEY (`creneau_id`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   CONSTRAINT `Creneaux_ibfk_1` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=634 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=665 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,6 +123,7 @@ CREATE TABLE `Equipes` (
   `tournoi_id` int(11) NOT NULL,
   `club_id` int(11) NOT NULL,
   `categorie` int(11) NOT NULL,
+  `audio_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   KEY `idx_club_id` (`club_id`),
@@ -129,7 +131,7 @@ CREATE TABLE `Equipes` (
   KEY `idx_equipes_club_id` (`club_id`),
   KEY `idx_equipes_categorie` (`categorie`),
   CONSTRAINT `fk_categorie` FOREIGN KEY (`categorie`) REFERENCES `Categorie` (`id_categorie`)
-) ENGINE=InnoDB AUTO_INCREMENT=492 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=508 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,7 +168,7 @@ CREATE TABLE `Personne` (
   PRIMARY KEY (`id`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   CONSTRAINT `fk_tournoi_personne` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,6 +184,7 @@ CREATE TABLE `PersonneTable` (
   `terrain_id` int(11) NOT NULL,
   `code_pin` varchar(255) NOT NULL,
   `url_key` varchar(255) NOT NULL,
+  `sentMail` int(1) NOT NULL DEFAULT 0,
   `tournoi_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_personne_terrain` (`personne_id`,`terrain_id`),
@@ -190,7 +193,7 @@ CREATE TABLE `PersonneTable` (
   CONSTRAINT `PersonneTable_ibfk_1` FOREIGN KEY (`personne_id`) REFERENCES `Personne` (`id`),
   CONSTRAINT `PersonneTable_ibfk_2` FOREIGN KEY (`terrain_id`) REFERENCES `Terrains` (`terrain_id`),
   CONSTRAINT `fk_tournoi_personnerencontre` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,7 +225,7 @@ CREATE TABLE `Planification` (
   CONSTRAINT `Planification_ibfk_4` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`),
   CONSTRAINT `Planification_ibfk_5` FOREIGN KEY (`arbitre_id`) REFERENCES `Arbitres` (`arbitre_id`),
   CONSTRAINT `Planification_ibfk_6` FOREIGN KEY (`label_id`) REFERENCES `Labels` (`label_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=881 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -272,7 +275,28 @@ CREATE TABLE `Rencontres` (
   KEY `idx_Arbitre` (`Arbitre`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   KEY `idx_rencontres_order` (`tour`,`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5985 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Sponsors`
+--
+
+DROP TABLE IF EXISTS `Sponsors`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Sponsors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` text NOT NULL,
+  `description` text DEFAULT NULL,
+  `lien_web` varchar(255) NOT NULL,
+  `logo` text DEFAULT 'logos/default_sponsor.png',
+  `is_actif` int(1) NOT NULL DEFAULT 1,
+  `club_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `club_id` (`club_id`),
+  CONSTRAINT `Sponsors_ibfk_1` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,10 +310,11 @@ CREATE TABLE `Terrains` (
   `terrain_id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(10) NOT NULL,
   `fk_idTournoi` int(11) NOT NULL,
+  `audio_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`terrain_id`),
   KEY `idx_fk_idTournoi` (`fk_idTournoi`),
   CONSTRAINT `Terrains_ibfk_1` FOREIGN KEY (`fk_idTournoi`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -306,8 +331,11 @@ CREATE TABLE `Tournois` (
   `nb_terrains` int(11) NOT NULL,
   `heure_debut` text NOT NULL,
   `pasHoraire` varchar(11) DEFAULT NULL,
+  `gestionRepas` int(1) NOT NULL DEFAULT 0,
+  `gestionPartenaires` int(1) NOT NULL DEFAULT 0,
   `gestionTables` int(1) NOT NULL DEFAULT 0,
   `gestionArbitres` int(11) NOT NULL DEFAULT 0,
+  `gestionVoix` int(1) NOT NULL DEFAULT 0,
   `isClassement` int(11) DEFAULT NULL,
   `isVisible` int(1) NOT NULL DEFAULT 1,
   `heureIsVisible` int(11) NOT NULL DEFAULT 1,
@@ -330,4 +358,4 @@ CREATE TABLE `Tournois` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-17 11:38:53
+-- Dump completed on 2025-07-24 16:13:11
