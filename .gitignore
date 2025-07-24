@@ -6,5 +6,5 @@ secureCookies.php
 Audio/*
 !Audio/.gitignore
 Sponsors/*
-!Sponsors/
+!Sponsors/.gitignore
 
