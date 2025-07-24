@@ -21,7 +21,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous">
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
-    <title>MatchEvent PRO !</title>
+    <title>{% if IdPoules %}
+            Vue par poule - MatchEvent PRO ! 
+            {% elseif affichageByTeam %}
+            Vue par équipe - MatchEvent PRO ! 
+            {% elseif affichageByClubs %}
+            Vue par club - MatchEvent PRO ! 
+            {% elseif affichageByTerrain %}
+            Vue par terrain - MatchEvent PRO ! 
+            {% elseif idTournoi %}
+            Menu des clubs - équipes - poules - MatchEvent PRO ! 
+            
+            
+            {% else %}
+            MatchEvent PRO ! 
+            {% endif %} 
+            
+        </title>
     <style>
         body {
             background-color: #f8f9fa;
@@ -109,6 +125,7 @@
                     <p><i class="fas fa-trophy me-2 text-warning"></i> Suivi en temps réel des scores et classements pour les coachs et la famille</p>
                     <p><i class="fas fa-user-slash me-2 text-danger"></i> Gestion des absences d'équipes</p>
                     <p><i class="fas fa-mobile-screen-button me-2 text-info"></i> Interface mobile pour les bénévoles, arbitres et gestionnaires des tables</p>
+                    <p> 🤝 Gestion des partenaires / sponsors</p>
                     <p><i class="fas fa-layer-group me-2 text-secondary"></i> Gestion intuitive des catégories (U9, U11, etc.)</p>
                     <p><i class="fas fa-circle-info me-2 text-dark"></i> <strong>Ce logiciel est conçu uniquement pour les tournois de type poule ou poule aller/retour</strong></p>
                 </div>
