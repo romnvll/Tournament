@@ -221,7 +221,9 @@
             {% set sponsor = partenaires[randIndex] %}
             <div class="d-flex align-items-center">
                 <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none; box-shadow: none;"> <span class="me-2 text-muted small">Sponsorisé par {{ sponsor.nom }}</span>
+              {% if sponsor.logo != null %}
             <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></a>
+        {% endif %}
             </div>
         {% endif %}
 </li>
