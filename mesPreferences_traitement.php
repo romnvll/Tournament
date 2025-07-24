@@ -1,7 +1,7 @@
 <?php
 require 'security.php';
 require_once 'class/categorie.class.php';
-$dao = new CategorieDao($pdo);
+
 
 
 
@@ -75,8 +75,29 @@ if (isset($_POST['modifierSponsor']) && $_POST['modifierSponsor'] == '1') {
         $logo,
         (int)$_POST['club_id']
     );
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+
+
+if (isset($_POST['actif']) && isset($_POST['id'])) {
+    require_once 'class/SponsorDAO.class.php';
+    $sponsorDao = new SponsorDAO();
+    $sponsorDao->modifierEtatActif((int)$_POST['id'], 1);
+   
 }
+else {
+    require_once 'class/SponsorDAO.class.php';
+    $sponsorDao = new SponsorDAO();
+    $sponsorDao->modifierEtatActif((int)$_POST['id'], 0);
+
+}
+
+
+   
+    // Rediriger vers la page précédente
+       header("Location: " . $_SERVER['HTTP_REFERER']);
+}
+
+
+//modification de l'état actif du sponsor
 
 
 //fin modif sponsors
@@ -178,5 +199,4 @@ if (isset($_GET['delete'])) {
 }
 
 
-// Récupération pour l’affichage
-$categories = $dao->obtenirToutesLesCategories($userData['id']);
+

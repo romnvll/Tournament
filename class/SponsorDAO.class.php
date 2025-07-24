@@ -49,6 +49,13 @@ class SponsorDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+     public function getSponsorsActifParClub(int $club_id): array {
+        $stmt = $this->connexion->prepare("SELECT * FROM Sponsors WHERE club_id = :club_id and is_actif = '1'");
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
 public function modifierSponsor(int $id, string $nom, ?string $description, string $lien_web, ?string $logo, int $club_id): void {
     $stmt = $this->connexion->prepare("
@@ -97,6 +104,17 @@ public function getSponsorById(int $id): ?array {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+
+public function modifierEtatActif(int $id, int $actif): void {
+    $stmt = $this->connexion->prepare("UPDATE Sponsors SET is_actif = :actif WHERE id = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':actif', $actif, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
+    public function __destruct() {
+        $this->connexion = null;
+    }
 
 
 
