@@ -6,6 +6,7 @@ require 'vendor/autoload.php';
 require 'class/PersonneTableDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/rencontreDao.class.php';
+require 'class/tournoiDao.class.php';
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
@@ -29,6 +30,22 @@ $affichagePlanification=null;
 $key = null;
 
 session_start();
+
+
+$tournoiId = $_SESSION['tournoiId'];
+$tournoiDao = new TournoiDAO();
+if ( $tournoiDao->getTournoiById($tournoiId)['gestionPartenaires'] == 1) {
+  
+  //recuperation des partenaires du club qui a organiser ce tournoi
+  require_once 'class/SponsorDAO.class.php';
+  $sponsorDao = new SponsorDAO();
+  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($tournoiId)['club_id']);
+ 
+}
+else {
+  $listeDesPartenaires = null;
+}
+
 
 
 if (isset ($_SESSION['infoUser'][0]['url_key'])) {
@@ -103,6 +120,7 @@ echo $template->render([
   'tournoiId' => $tournoiId,
   'prenom' => $_SESSION['infoUser'][0]['Prenom'],
   'terrain' => $_SESSION['infoUser'][0]['terrainNom'],
+  'partenaires' => $listeDesPartenaires,
   
   
  
