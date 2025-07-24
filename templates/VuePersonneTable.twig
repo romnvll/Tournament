@@ -68,8 +68,8 @@
                                             <input type="hidden" name="scoreEquipe1" value="{{ planification.score1 }}" id="scoreEquipe1{{ planification.rencontre_id }}">
                                             <p>Score: <span id="displayScoreEquipe1{{ planification.rencontre_id }}">{{ planification.score1 }}</span></p>
                                             {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-trigger="click" hx-on="htmx:afterRequest:vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-on="htmx:afterRequest:vibrate(200)" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
+                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
+                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-on::after-request="vibrate(200)" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
                                             {% endif %}
                                         </td>
                                         <td class="text-center order-1">
@@ -78,8 +78,8 @@
                                             <input type="hidden" name="scoreEquipe2" value="{{ planification.score2 }}" id="scoreEquipe2{{ planification.rencontre_id }}">
                                             <p>Score: <span id="displayScoreEquipe2{{ planification.rencontre_id }}">{{ planification.score2 }}</span></p>
                                             {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on="htmx:afterRequest:vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on="htmx:afterRequest:vibrate(200)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
+                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
+                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(200)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
                                             {% endif %}
                                         </td>
                                         <td class="align-left">
@@ -176,8 +176,10 @@
 
 
         function vibrate(temps) {
+        
             if (navigator.vibrate) {
                 navigator.vibrate(temps);
+                
             }
         }
 
