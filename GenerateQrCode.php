@@ -131,11 +131,26 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
                 <h5 class="card-title"><?= htmlspecialchars($sponsor['nom']) ?></h5>
                 <p class="card-text"><?= htmlspecialchars($sponsor['description']) ?></p>
 
-                <?php if (!empty($sponsor['lien_web'])) : ?>
-                    <p class="mt-2 text-break small text-secondary">
-                        🌐 <?= htmlspecialchars($sponsor['lien_web']) ?>
-                    </p>
-                <?php endif; ?>
+                <div class="text-start">
+                    <?php if (!empty($sponsor['lien_web'])) : ?>
+                        <p class="mt-2 text-break small text-secondary">
+                            🌐 <?= htmlspecialchars($sponsor['lien_web']) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <?php if (!empty($sponsor['telephone'])) : ?>
+                        <p class="mt-2 text-break small text-secondary">
+                            📞 <?= htmlspecialchars($sponsor['telephone']) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <?php if (!empty($sponsor['adresse'])) : ?>
+                        <p class="mt-2 text-break small text-secondary">
+                            📍 <?= htmlspecialchars($sponsor['adresse']) ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+
             </div>
         <?php endforeach; ?>
     </div>

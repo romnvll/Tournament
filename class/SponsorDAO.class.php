@@ -14,32 +14,61 @@ class SponsorDAO {
         }
     }
 
-    public function ajouterSponsor(string $nom, ?string $description, string $lien_web, ?string $logo, int $club_id): void {
-        $stmt = $this->connexion->prepare("
-            INSERT INTO Sponsors (nom, description, lien_web, logo, club_id)
-            VALUES (:nom, :description, :lien_web, :logo, :club_id)
-        ");
+    public function ajouterSponsor(
+    string $nom,
+    ?string $description,
+    string $lien_web,
+    ?string $logo,
+    int $club_id,
+    ?string $telephone = null,
+    ?string $adresse = null
+): void {
+    // Construction dynamique des colonnes et des placeholders
+    $colonnes = ['nom', 'description', 'lien_web', 'logo', 'club_id'];
+    $placeholders = [':nom', ':description', ':lien_web', ':logo', ':club_id'];
 
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':lien_web', $lien_web);
-        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-
-        // Description
-        if ($description === null) {
-            $stmt->bindValue(':description', null, PDO::PARAM_NULL);
-        } else {
-            $stmt->bindParam(':description', $description);
-        }
-
-        // Logo
-        if ($logo === null) {
-            $stmt->bindValue(':logo', null, PDO::PARAM_NULL);
-        } else {
-            $stmt->bindParam(':logo', $logo);
-        }
-
-        $stmt->execute();
+    if ($telephone !== null) {
+        $colonnes[] = 'telephone';
+        $placeholders[] = ':telephone';
     }
+
+    if ($adresse !== null) {
+        $colonnes[] = 'adresse';
+        $placeholders[] = ':adresse';
+    }
+
+    $sql = "
+        INSERT INTO Sponsors (" . implode(', ', $colonnes) . ")
+        VALUES (" . implode(', ', $placeholders) . ")
+    ";
+
+    $stmt = $this->connexion->prepare($sql);
+
+    // Champs obligatoires
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':lien_web', $lien_web);
+    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+
+    // Champs optionnels avec gestion de NULL
+    $description === null
+        ? $stmt->bindValue(':description', null, PDO::PARAM_NULL)
+        : $stmt->bindParam(':description', $description);
+
+    $logo === null
+        ? $stmt->bindValue(':logo', null, PDO::PARAM_NULL)
+        : $stmt->bindParam(':logo', $logo);
+
+    if ($telephone !== null) {
+        $stmt->bindParam(':telephone', $telephone);
+    }
+
+    if ($adresse !== null) {
+        $stmt->bindParam(':adresse', $adresse);
+    }
+
+    $stmt->execute();
+}
+
 
     // Exemple de méthode pour récupérer les sponsors d'un club
     public function getSponsorsParClub(int $club_id): array {
@@ -57,38 +86,63 @@ class SponsorDAO {
     }
 
 
-public function modifierSponsor(int $id, string $nom, ?string $description, string $lien_web, ?string $logo, int $club_id): void {
-    $stmt = $this->connexion->prepare("
+public function modifierSponsor(
+    int $id,
+    string $nom,
+    ?string $description,
+    string $lien_web,
+    ?string $logo,
+    int $club_id,
+    ?string $telephone = null,
+    ?string $adresse = null
+): void {
+    $sql = "
         UPDATE Sponsors
         SET nom = :nom,
             description = :description,
             lien_web = :lien_web,
             logo = :logo,
-            club_id = :club_id
-        WHERE id = :id
-    ");
+            club_id = :club_id";
 
+    // Ajout dynamique des champs optionnels
+    if ($telephone !== null) {
+        $sql .= ", telephone = :telephone";
+    }
+
+    if ($adresse !== null) {
+        $sql .= ", adresse = :adresse";
+    }
+
+    $sql .= " WHERE id = :id";
+
+    $stmt = $this->connexion->prepare($sql);
+
+    // Champs obligatoires
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':lien_web', $lien_web);
     $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 
-    // Description
-    if ($description === null) {
-        $stmt->bindValue(':description', null, PDO::PARAM_NULL);
-    } else {
-        $stmt->bindParam(':description', $description);
+    // Champs optionnels avec gestion de NULL
+    $description === null
+        ? $stmt->bindValue(':description', null, PDO::PARAM_NULL)
+        : $stmt->bindParam(':description', $description);
+
+    $logo === null
+        ? $stmt->bindValue(':logo', null, PDO::PARAM_NULL)
+        : $stmt->bindParam(':logo', $logo);
+
+    if ($telephone !== null) {
+        $stmt->bindParam(':telephone', $telephone);
     }
 
-    // Logo
-    if ($logo === null) {
-        $stmt->bindValue(':logo', null, PDO::PARAM_NULL);
-    } else {
-        $stmt->bindParam(':logo', $logo);
+    if ($adresse !== null) {
+        $stmt->bindParam(':adresse', $adresse);
     }
 
     $stmt->execute();
 }
+
 
 
 public function supprimerSponsor(int $id): void {
