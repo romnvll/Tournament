@@ -1,6 +1,7 @@
 <?php
 require 'security.php';
 require 'class/tournoiDao.class.php';
+require_once 'class/SponsorDAO.class.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 
 require_once('vendor/autoload.php');
@@ -10,6 +11,10 @@ $options = new QROptions([
     'outputType' => QRCode::OUTPUT_MARKUP_SVG,
     'version'    => 5,
 ]);
+
+
+$sponsorDao = new SponsorDAO();
+$sponsors = $sponsorDao->getSponsorsActifParClub($userData['id']);
 
 $tournoiDao = new tournoiDao();
 $tournoiDao->getTournoiById($_GET['idTournoi']);
@@ -71,7 +76,7 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
 </head>
 <body>
 
-    <div class="container text-center">
+    <div class="container-fluid text-center">
         <button class="btn btn-primary btn-lg btn-print no-print" onclick="window.print()">
             <i class="fas fa-print"></i> Imprimer
         </button>
@@ -85,14 +90,14 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
             <br><span class="fs-5 text-secondary">📅 <?= $dateFormatted ?></span>
         </p>
 
-        <div class="row mt-4 align-items-center">
-            <div class="col-md-6">
+        <div class="row mt-4 align-items-center justify-content-center">
+            <div class="col-md-3 ">
                 <div class="card p-3">
                     <img src="<?= $qrcode ?>" alt="QR Code" class="qr-image">
                     <p class="mt-2"><i class="fas fa-mobile-alt"></i> Scannez avec votre smartphone</p>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <div class="card p-3">
                     <img src="Qr.png" alt="QR Code" class="qr-image">
                     <p class="mt-2"><i class="fas fa-handshake"></i> Matchevent Pro - Votre gestionnaire de tournois</p>
@@ -104,6 +109,43 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
                 Pour un meilleur résultat, imprimer cette affiche en paysage.
             </p>
         </div>
+
+<?php if (!empty($sponsors)) : ?>
+    <div class="row mt-5">
+            <h3 class="text-center mb-1">
+                <i class="fas fa-handshake me-2"></i>
+                <?= count($sponsors) === 1 ? 'Notre sponsor' : 'Nos sponsors' ?>
+            </h3>
+        
+    <div class="d-flex flex-wrap justify-content-center gap-4">
+        <?php foreach ($sponsors as $sponsor) : ?>
+            <div class="card text-center p-3" style="width: 18rem;">
+                <?php if (!empty($sponsor['logo'])) : ?>
+                    <img src="<?= htmlspecialchars($sponsor['logo']) ?>" alt="<?= htmlspecialchars($sponsor['nom']) ?>" class="img-fluid mb-3" style="max-height: 100px; object-fit: contain;">
+                <?php else : ?>
+                    <div class="mb-1 text-muted" style="font-size: 3rem;">
+                        <i class="fas fa-image-slash"></i>
+                    </div>
+                <?php endif; ?>
+
+                <h5 class="card-title"><?= htmlspecialchars($sponsor['nom']) ?></h5>
+                <p class="card-text"><?= htmlspecialchars($sponsor['description']) ?></p>
+
+                <?php if (!empty($sponsor['lien_web'])) : ?>
+                    <p class="mt-2 text-break small text-secondary">
+                        🌐 <?= htmlspecialchars($sponsor['lien_web']) ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+ 
+<?php endif; ?>
+
+
+
 
     </div>
 
