@@ -36,7 +36,9 @@ if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
         $_POST['description'] ?? null,
         $_POST['lien_web'],
         $destination ?? null,
-        $club_id
+        $club_id,
+        $_POST['telephone'] ?? null,
+        $_POST['adresse'] ?? null
     ); 
         header("Location: " . $_SERVER['HTTP_REFERER']);
 }
@@ -73,7 +75,9 @@ if (isset($_POST['modifierSponsor']) && $_POST['modifierSponsor'] == '1') {
         $_POST['description'] ?? null,
         $_POST['lien_web'],
         $logo,
-        (int)$_POST['club_id']
+        (int)$_POST['club_id'],
+        $_POST['telephone'] ?? null,
+        $_POST['adresse'] ?? null
     );
 
 

@@ -46,7 +46,7 @@
     {{ include('header.twig') }}
     <div class="container my-4">
     <div class="row">
-      <div class="col-md-6 mt-4">
+      <div class="col-md-8 mt-4">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>Gestion des sponsors</span>
@@ -66,6 +66,12 @@
                     <textarea name="description" class="form-control" placeholder="Description (facultative)"></textarea>
                 </div>
                 <div class="form-group mb-2">
+                    <input type="text" name="telephone" class="form-control" placeholder="Téléphone du sponsor (facultatif)" >
+                </div>
+                <div class="form-group mb-2">
+                    <input type="text" name="Adresse" class="form-control" placeholder="adresse du sponsor (facultative)" >
+                </div>
+                <div class="form-group mb-2">
                     <label for="logo">Logo</label>
                     <input type="file" name="logo" class="form-control">
                 </div>
@@ -80,12 +86,15 @@
             <th>Nom</th>
             <th>Lien</th>
             <th>Description</th>
+            <th>Téléphone</th>
+            <th>Adresse</th>
             <th>Logo</th>
             <th class="text-center">Actif</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
+        
         {% for sponsor in sponsors %}
         <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
             <tr>
@@ -98,7 +107,13 @@
                     <input type="url" name="lien_web" class="form-control" value="{{ sponsor.lien_web }}" onchange="this.form.submit()">
                 </td>
                 <td>
-                    <input type="text" name="description" class="form-control" value="{{ sponsor.description }}" onchange="this.form.submit()">
+                    <textarea name="description" class="form-control"  onchange="this.form.submit()">{{ sponsor.description }}</textarea>
+                </td>
+                <td>
+                    <input type="text" name="telephone" class="form-control" value="{{ sponsor.telephone }}" onchange="this.form.submit()">
+                </td>
+                <td>
+                    <input type="text" name="adresse" class="form-control" value="{{ sponsor.adresse }}" onchange="this.form.submit()">
                 </td>
                 <td>
                     {% if sponsor.logo %}
