@@ -119,7 +119,8 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
         
     <div class="d-flex flex-wrap justify-content-center gap-4">
         <?php foreach ($sponsors as $sponsor) : ?>
-            <div class="card text-center p-3" style="width: 18rem;">
+            <div class="card text-center p-3">
+
                 <?php if (!empty($sponsor['logo'])) : ?>
                     <img src="<?= htmlspecialchars($sponsor['logo']) ?>" alt="<?= htmlspecialchars($sponsor['nom']) ?>" class="img-fluid mb-3" style="max-height: 100px; object-fit: contain;">
                 <?php else : ?>
