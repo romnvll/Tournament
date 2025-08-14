@@ -9,6 +9,7 @@ $licenceDao = new LicenceDao();
 
 $typeLicence = $_POST['type_licence'] ?? null;
 $idUtilisateur = $_POST['idUtilisateur'] ?? null;
+$id_tournoi = $_POST['idTournoi'] ?? null;
 
 if (!$typeLicence || !$idUtilisateur) {
     die("Paramètres manquants");
@@ -45,7 +46,7 @@ $session = \Stripe\Checkout\Session::create([
         'quantity' => 1,
     ]],
     'mode' => 'payment',
-    'success_url' => 'https://'. $_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']) .'/checkOutSucess.php?idUtilisateur='.$users['id'].'&idLicence='.$licenceDetails['id'],
+    'success_url' => 'https://'. $_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']) .'/checkOutSucess.php?idUtilisateur='.$users['id'].'&idLicence='.$licenceDetails['id'].'&id_tournoi='. $id_tournoi,
     'cancel_url' => $_SERVER['HTTP_REFERER'] ,
 ]);
 
