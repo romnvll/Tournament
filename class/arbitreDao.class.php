@@ -1,0 +1,111 @@
+<?php
+
+class arbitreDao {
+    private $connexion;
+
+    public function __construct() {
+        require 'databaseInformations.php';
+
+        try {
+            $this->connexion = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            $this->connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Erreur de connexion à la base de données : " . $e->getMessage();
+            exit;
+        }
+    }
+
+    public function updateAudioPath(int $arbitre_id, string $audio_path): void {
+    $sql = "UPDATE Arbitres SET audio_path = :audio_path WHERE arbitre_id = :arbitre_id";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindValue(':audio_path', $audio_path);
+    $stmt->bindValue(':arbitre_id', $arbitre_id);
+    $stmt->execute();
+}
+
+
+    public function ajouterArbitre(?string $nom, int $tournoi_id, int $club_id): void {
+        $stmt = $this->connexion->prepare("
+            INSERT INTO Arbitres (nom, tournoi_id, club_id)
+            VALUES (:nom, :tournoi_id, :club_id)
+        ");
+        
+        // Si le nom est null, on utilise NULL dans la requête
+        $stmt->bindValue(':nom', $nom, $nom !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+        $stmt->bindValue(':club_id', $club_id, PDO::PARAM_INT);
+        
+        $stmt->execute();
+    }
+    
+
+    public function modifierArbitre(int $arbitre_id, string $nom = null, int $tournoi_id = null, int $club_id = null): void {
+        $sql = "UPDATE Arbitres SET ";
+        $params = [];
+        if ($nom !== null) {
+            $sql .= "nom = :nom, ";
+            $params[':nom'] = $nom;
+        }
+        if ($tournoi_id !== null) {
+            $sql .= "tournoi_id = :tournoi_id, ";
+            $params[':tournoi_id'] = $tournoi_id;
+        }
+        if ($club_id !== null) {
+            $sql .= "club_id = :club_id, ";
+            $params[':club_id'] = $club_id;
+        }
+        $sql = rtrim($sql, ", ");
+        $sql .= " WHERE arbitre_id = :arbitre_id";
+        $params[':arbitre_id'] = $arbitre_id;
+
+        $stmt = $this->connexion->prepare($sql);
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value);
+        }
+
+        $stmt->execute();
+    }
+
+    public function supprimerArbitre(int $arbitre_id): void {
+        $stmt = $this->connexion->prepare("DELETE FROM Arbitres WHERE arbitre_id = :arbitre_id");
+        $stmt->bindParam(':arbitre_id', $arbitre_id);
+        $stmt->execute();
+    }
+
+   
+    
+
+    public function afficherArbitres(int $tournoi_id): array {
+        $stmt = $this->connexion->prepare("
+            SELECT a.*, 
+                   c.nom AS club_nom, 
+                   COUNT(p.rencontre_id) AS nombre_matchs,
+                   SUM(COUNT(p.rencontre_id)) OVER (PARTITION BY c.id) AS nombre_matchs_club
+            FROM Arbitres a
+            JOIN Clubs c ON a.club_id = c.id
+            LEFT JOIN Planification p ON a.arbitre_id = p.arbitre_id AND p.tournoi_id = :tournoi_id
+            WHERE a.tournoi_id = :tournoi_id
+            GROUP BY a.arbitre_id, c.id
+        ");
+        $stmt->bindParam(':tournoi_id', $tournoi_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    
+    public function supprimerArbitresParTournoi(int $tournoi_id): void {
+        try {
+            $stmt = $this->connexion->prepare("DELETE FROM Arbitres WHERE tournoi_id = :tournoi_id");
+            $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+            $stmt->execute();
+            echo "totoSuppression des arbitres réussie pour le tournoi $tournoi_id";
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression des arbitres : " . $e->getMessage();
+        }
+    }
+    
+    
+    
+
+}

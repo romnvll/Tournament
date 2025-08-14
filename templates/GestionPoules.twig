@@ -1,0 +1,179 @@
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+		<script src="js/RemoveEquipe.js"></script>
+		<title>Gestion rencontre</title>
+	</head>
+	<body>
+		{{ include('header.twig') }}
+
+ {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+  {% set today = "now"|date('Y-m-d')|date %}
+
+
+		<div id="divResult" class="sticky-top" style="z-index: 10;"></div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					{% for tournoi in ListeDesTournois %}
+						{% if tournoi.isArchived == 0 %}
+							{% if tournoi.id == idTournoi %}
+								<a href="gestionPoules.php?id_tournoi={{ tournoi.id }}" class="btn btn-danger btn-lg">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
+							{% else %}
+								<a href="gestionPoules.php?id_tournoi={{ tournoi.id }}" class="btn btn-primary">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+
+			<div class="row mt-3">
+
+
+         
+         
+
+			
+				<div class="col-lg-12 {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} d-none  {% endif %}">
+					<h3 class="mb-3">
+						<i class="fa-solid fa-layer-group me-2 text-primary"></i>
+						Choisir la catégorie</h3>
+
+					<div class="d-flex flex-wrap gap-2">
+						{% for categorie in ListeDesCategorie %}
+							<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorie.id_categorie}}&NbrEquipeParPoule={{categorie.nombre_equipes}}" class="btn {% if categorie.id_categorie == categorieEnCours %}btn-success{% else %}btn-outline-secondary{% endif %} btn-lg">
+								{{categorie.Nom_categorie}}
+								({{categorie.nombre_equipes}})
+							</a>
+						{% endfor %}
+					</div>
+
+					{% if categorieEnCours is not null %}
+						<hr>
+						<h4 class="mt-3">
+							<i class="fa-solid fa-users-gear me-2 text-success"></i>
+							Sélectionner le nombre d'équipes par poule</h4>
+						<div class="d-flex flex-wrap gap-2">
+							{% for i in 1..15 %}
+								<a href="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{i}}" class="btn {% if i == nbrEquipe %}btn-success{% else %}btn-outline-secondary{% endif %} btn-lg">
+									{{ i }}
+								</a>
+							{% endfor %}
+						</div>
+					{% endif %}
+
+					{% if listeDesPoules|length > 0 %}
+						<div class="container mt-4">
+							<h3 class="mb-3">
+								<i class="fa-solid fa-table me-2 text-primary"></i>
+								Liste des Poules</h3>
+							<div class="row">
+							{% set NbrPoule = 0 %}
+								{% for poule in listeDesPoules %}
+									{% set NbrPoule = NbrPoule + 1 %}
+									
+									<div class="col-12 mb-4">
+										<div class="card shadow-sm rounded-3">
+											<div class="card-header bg-primary text-white">
+												<h4 class="mb-0">
+													<i class="fa-solid fa-circle-nodes me-2"></i>
+													{% set NbrEquipe = poule.equipes|length %}
+													{{ poule.nom }} ({{NbrEquipe}} équipes)</h4>
+											</div>
+											<div class="card-body">
+												<table class="table table-bordered text-center">
+													<thead class="table-light">
+														<tr>
+															<th>Liste des équipes</th>
+															<th>Rencontres</th>
+															<th>Matchs par équipe</th>
+															<th>Équipes</th>
+															<th>Nombre de tours</th>
+															<th>Rencontres par tour</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>
+																<ul class="list-group list-group-flush">
+																
+																	{% for equipe in poule.equipes %}
+																	{% set NbrEquipe = NbrEquipe +1 %}
+																		<li class="list-group-item">{{ equipe.nom }}</li>
+																	{% endfor %}
+																</ul>
+															</td>
+															<td class="text-center align-middle">{{ (poule.equipes|length * (poule.equipes|length - 1)) // 2 }}</td>
+															<td class="text-center align-middle">{{ poule.equipes|length - 1 }}</td>
+															<td class="text-center align-middle">{{ poule.equipes|length }}</td>
+															<td class="text-center align-middle">{{ poule.equipes|length - 1 }}</td>
+															<td class="text-center align-middle">{{ poule.equipes|length // 2 }}</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					{% endif %}
+
+					{% if nbrEquipe is not null %}
+						<div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3 text-center">
+							<a hx-get="gestionPoules.php?id_tournoi={{ idTournoi }}&categorie={{categorieEnCours}}&NbrEquipeParPoule={{nbrEquipe}}&creation=ok"
+							hx-target="#divResult"
+							hx-swap="innerHTML"
+							class="btn btn-lg btn-success shadow">
+								<i class="fa-solid fa-check-circle me-2"></i>
+								{% if NbrPoule < 2 %}
+									Créer cette poule ?
+								{% else %}
+									créer ces {{NbrPoule}} poules ?
+								{% endif %}
+							</a>
+						</div>
+
+					{% endif %}
+				</div>
+				 {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today >= dateFin %}  
+					<div class="col-lg-12">
+						<div class="alert alert-warning" role="alert">
+							<i class="fa-solid fa-exclamation-triangle me-2"></i>
+							Vous avez atteint la limite d'équipes autorisées pour ce tournoi.
+						</div>
+				{% endif %}
+
+			</div>
+			
+			{% if modal == 'success' %}
+				<div id="successModal" class="modal" tabindex="-1" role="dialog" style="display: block;">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Succès</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<p>La poule a été créée avec succès.</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		{% endif %}
+	</body>
+</html></div><script>
+$(document).ready(function () { // Vérifie si la modale doit être affichée
+if ($("#successModal").length) {
+$("#successModal").modal('show');
+}
+});</script></body></html>

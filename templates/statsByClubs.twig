@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css"/>
+
+    <title>Stats par clubs</title>
+
+    <!-- Custom CSS for page styling -->
+    <style>
+      .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .card-header {
+        background-color: #f8f9fa;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .table th, .table td {
+        vertical-align: middle;
+      }
+      .btn-custom {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+      .summary-text {
+        font-size: 1.2rem;
+        margin-top: 20px;
+      }
+      .summary-text span {
+        font-weight: bold;
+      }
+      .badge-custom {
+        font-size: 1rem;
+      }
+      .row-custom {
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    {{ include('header.twig') }}
+    <div class="container my-4">
+      <div class="row row-custom">
+        <div class="col">
+          <div class="d-flex flex-wrap">
+            {% for tournoi in ListeDesTournois %}
+              {% if tournoi.id == idTournoi %}
+                <a href="statsByClubs.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg btn-custom">{{ tournoi.nom }}</a>
+              {% else %}
+                <a href="statsByClubs.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary btn-lg btn-custom">{{ tournoi.nom }}</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="row row-custom">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Statistiques des clubs</h5>
+            </div>
+            <div class="card-body">
+              <table id="example" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>Rang</th>
+                    <th>Nom du Club</th>
+                    <th>Buts Marqués</th>
+                    <th>Victoires</th>
+                    <th>Buts Encaissés</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for club in statTournoi %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ club.ClubNom }}</td>
+                      <td>{{ club.ButsMarques }}</td>
+                      <td>{{ club.Victoires }}</td>
+                      <td>{{ club.ButsEncaisses }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Résumé du tournoi</h5>
+            </div>
+            <div class="card-body">
+              <div class="summary-text">
+                📅 Le <span>{{ dateformat }}</span>, s'est déroulé le <span>{{ infoTournoiEnCours.nom }}</span> ! 🎉<br>
+                Un grand merci à toutes les équipes pour leur participation et leur esprit sportif 🙏 !<br>
+                Voici un remerciement spécial à chaque club :
+              </div>
+              {% for club in statTournoi %}
+                <div class="summary-text">
+                  - <span>{{ club.ClubNom }} :</span> ⚽️✨
+                  {% if club.ButsMarques is not null %}
+                    🥅 Buts Marqués: {{ club.ButsMarques }}, 🏆 Victoires: {{ club.Victoires }}, ❌ Buts Encaissés: {{ club.ButsEncaisses }}
+                  {% else %}
+                    🚫 Pas de buts marqués, mais votre participation est ce qui compte le plus ! 💪
+                  {% endif %}
+                </div>
+              {% endfor %}
+              <div class="summary-text">
+                Merci à tous d'avoir fait de ce tournoi un moment inoubliable 🎉🙌 !<br>
+                Nous espérons vous revoir nombreux pour la prochaine édition ! 🤞⚽
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DataTables Script -->
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs4/3.2.2/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        $('#example').DataTable({
+          "language": {
+            "url": "js/fr-FR.json"
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

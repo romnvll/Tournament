@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tableau de bord - Gestion tournoi</title>
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Tableau de bord</h1>
+      {% set tournoisActifs = [] %}
+
+{% for tournoi in tournois %}
+    {% if tournoi.isArchived == 0 %}
+        {% set tournoisActifs = tournoisActifs|merge([tournoi]) %}
+    {% endif %}
+{% endfor %}
+
+
+        <!-- Cartes statistiques -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card text-bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Tournoi(s) en cours</h5>
+                        <p class="card-text display-6"><a href="modifierTournoi.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" >{{ tournoisActifs|length }}</a></p>
+                     </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users me-2"> </i>Équipes inscrites au tournoi {{tournoisActifs[0].nom}} 
+                           
+                       </h5>
+                        <p class="card-text display-6">  <a href="ajoutEquipe.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" > {{nbrequipe}} </a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fa-solid fa-building-user"></i>Nombre de clubs au tournoi {{tournoisActifs[0].nom}}</h5>
+                        <p class="card-text display-6">{{nbClub}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-bg-danger">
+                   <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-futbol me-2"></i>Total de buts marqués</h5>
+            <p class="card-text display-6">{{ totalButs }}</p>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <!-- Graphe + Prochaines rencontres -->
+        <div class="row mt-4">
+            <!-- Graphe Chart.js à gauche -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Statut des rencontres</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="matchStatusChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des prochaines rencontres à droite -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Prochaines rencontres</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Heure</th>
+                                    <th scope="col">Équipe A</th>
+                                    <th scope="col">Équipe B</th>
+                                    <th scope="col">Terrain</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- À générer dynamiquement avec Twig -->
+                                <tr>
+                                    <td>10:00</td>
+                                    <td>Les Lions</td>
+                                    <td>Les Tigres</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>11:00</td>
+                                    <td>Les Aigles</td>
+                                    <td>Les Ours</td>
+                                    <td>2</td>
+                                </tr>
+                                <!-- ... -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Chart.js -->
+    <script>
+        const ctx = document.getElementById('matchStatusChart').getContext('2d');
+        const matchStatusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['À venir', 'En cours', 'Terminé'],
+                datasets: [{
+                    label: 'Rencontres',
+                    data: [{{nbRencontreAvenir}},{{nbRencontreEncours}} , {{nbRencontreTerminees}}], // Tu peux injecter tes vraies valeurs depuis Twig ici
+                    backgroundColor: [
+                        'rgba(0, 123, 255, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(40, 167, 69, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 123, 255, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(40, 167, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

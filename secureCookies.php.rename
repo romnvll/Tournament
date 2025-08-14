@@ -1,0 +1,4 @@
+<?php
+//permet le chiffrement des cookies
+$secret = "ma_clé_ultra_sécurisée";
+?>

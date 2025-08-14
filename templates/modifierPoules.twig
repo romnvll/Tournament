@@ -1,0 +1,144 @@
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <script src="js/RemoveEquipe.js"></script>
+  <title>Gestion rencontre</title>
+</head>
+
+<body>
+  
+    
+{{ include('header.twig') }}
+
+ {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+{% set today = "now"|date('Y-m-d')|date %}
+
+
+{% if RencontresExistesDansPoules %}
+   <div class="alert alert-danger alert-dismissible fade show d-flex" role="alert">
+  <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+  <div>
+    <strong>Attention!</strong> Des rencontres sont deja créées dans cette poule, si vous devez modifier une poule, il faut supprimer les rencontres existantes <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">ici</a> .
+  </div>
+</div>
+{% endif %}
+ <div class="container">
+<div class="row">
+<div class="col">
+    {% for tournoi in ListeDesTournois %}
+       {% if tournoi.isArchived == 0 %}
+        {% if tournoi.id == idTournoi %}
+         <a href="modifierPoules.php?id_tournoi={{ tournoi.id }}" class="btn btn-danger btn-lg">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
+        {% else %}
+        <a href="modifierPoules.php?id_tournoi={{ tournoi.id }}" class="btn btn-primary">{{ tournoi.nom }} <i class="fas fa-trophy"></i> </a>
+        {% endif %}
+      {% endif %}
+      {% endfor %}
+</div>
+
+<div class="col">
+{% if message is not empty %}
+{{message}}
+{% endif %}
+</div>
+    </div>
+
+
+
+ {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}  
+					<div class="col-lg-12">
+						<div class="alert alert-warning" role="alert">
+							<i class="fa-solid fa-exclamation-triangle me-2"></i>
+							Vous avez atteint la limite d'équipes autorisées pour ce tournoi.
+						</div>
+				{% endif %}
+
+
+    <div class="row mt-5 
+     {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}  
+      d-none {% endif %}
+    ">
+        <div class="col">
+       
+                 
+                {% for poule in poules %}
+                 
+                    {% if poule.idPoule == idPoule %}
+
+                          {% if poule.nbrEquipeParPoule == 0 %}
+                        <a href="modifierPoules.php?id_poule={{ poule.idPoule }}&id_tournoi={{idTournoi}}" class="btn btn-success {% if RencontresExistesDansPoules %} disabled {% endif %}" role="button" aria-disabled="true">{{poule.nomPoule}} ({{ poule.nbrEquipeParPoule }})<a href="modifierPoules_traitement.php?idPoule={{poule.idPoule}}"><span class="badge bg-danger"> <i class="fa-solid fa-trash"></i></span></a> </a><br>
+                            
+                          {% else %}
+                           <a href="modifierPoules.php?id_poule={{ poule.idPoule }}&id_tournoi={{idTournoi}}" class="btn btn-success {% if RencontresExistesDansPoules %} disabled {% endif %}" role="button" aria-disabled="true">{{poule.nomPoule}} ({{ poule.nbrEquipeParPoule }}) </a><br>
+
+                          {% endif %}
+
+
+                    {% else %}
+                        <a href="modifierPoules.php?id_poule={{ poule.idPoule }}&id_tournoi={{idTournoi}}" class="btn btn-secondary" role="button" aria-disabled="true">{{poule.nomPoule}} ({{poule.nbrEquipeParPoule}})   </a><br>
+                    {% endif %}
+                {% endfor %}
+
+            
+        </div>
+        {% if RencontresExistesDansPoules == false %}
+        <div class="col">
+                       <table class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">Equipe</th>
+                            <th scope="col">Deplacer dans cette poule</th>
+                            <th scope="col">Action</th>
+                            
+                            </tr>
+                        </thead>
+                        <tbody>
+                        
+                         {% for equipe in afficherEquipeParPoule %}
+                         
+                                <form action="modifierPoules_traitement.php" method="post">              
+                            <tr>
+                            <th scope="row">{{ equipe.nom }}</th>
+                            <td>
+                           
+                          
+                            
+                            <select class="form-select" aria-label="Default select example" name="dstpoule">
+                              <option value="" disabled selected>Poule de destination</option>
+                              {% for poule in poules %}
+                                  {% set pouleCategorieParts = poule.nomPoule|split('-') %}
+                                  {% if poule.nomPoule starts with 'Mini' or (pouleCategorieParts|length > 1 and pouleCategorieParts[0]|trim == equipe.Nom_categorie) %}
+                                      <option value="{{ poule.idPoule }}" {% if poule.rencontresExistesDeja %}disabled{% endif %}>
+                                          {{ poule.nomPoule }} {% if poule.rencontresExistesDeja %}(Rencontres déjà planifiées){% endif %}
+                                      </option>
+                                  {% endif %}
+                              {% endfor %}
+
+                               <input type="hidden" name="equipeNom" value="{{equipe.nom}}">
+                               <input type="hidden" name="equipe" value="{{equipe.id}}">
+                               <input type="hidden" name="id_tournoi" value="{{idTournoi}}">
+                               <input type="hidden" name="id_poule" value="{{idPoule}}">
+                               
+                              </select>
+                              
+                             </td>
+                            <td> <input type="submit" class="btn btn-primary" value="Déplacer">   </td>
+                            </form>
+                             </tr>
+                            {% endfor %}
+              {% endif %}
+                        </tbody>
+                        </table>
+            
+
+           
+           
+        
+        </div>
+    </div>
+
+  </div>

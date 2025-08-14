@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+
+    <script src="js/RemoveEquipe.js"></script>
+    <title>Gestion rencontre</title>
+</head>
+<body>
+    <style>
+      select::picker(select) {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.4s allow-discrete;
+}
+
+select::picker(select):popover-open {
+  transform: translateY(0px);
+  opacity: 1;
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+        </style>
+    {{ include('header.twig') }}
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs4/3.2.2/dataTables.bootstrap4.min.js"></script>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+        
+            {% if tournoiEnCours != 0 %}
+                <div class="col-md-3">
+                {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes %}
+                    <form action="" method="POST">
+                    {% else %}                    
+                    <form action="ajoutEquipe_traitement.php" method="POST">
+                    {% endif %}
+                    <input type="hidden" name="query" value="{{query}}">
+                        <div class="card shadow-sm p-4">
+                            {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes %}
+                                <div class="alert alert-danger">
+                                    Vous avez atteint la limite de {{ licence.limite_equipes }} équipes pour ce tournoi.
+                                    Veuillez contacter l'administrateur si vous souhaitez ajouter plus d'équipes.
+                                </div>
+                            {% endif %}
+                            <h5 class="text-center mb-3">Ajouter une équipe</h5>
+                            <div class="form-group mb-3">
+                                <label for="nomEquipe" class="form-label">Noms de l'équipe</label>
+                                <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Ex: HBCAT2" required />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="Categorie" class="form-label">Choisir la catégorie</label>
+                                <select class="form-select" name="Categorie" id="Categorie" required>
+                                    <option value="" disabled selected>Choisir une catégorie...</option>
+                                    {% for categorie in AfficheLesCategories %}
+                                        <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" value="{{tournoiEnCours}}" name="IdTournoi">
+                            <div class="form-group mb-3">
+                                <label for="club" class="form-label">Choisir le club de l'équipe</label>
+                                <select class="form-select" name="idClubs" id="club" required>
+                                    {% for club in AfficherClub %}
+                                        <option value="{{ club.id }}">{{ club.nom|upper }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+                             {% set today = "now"|date('Y-m-d')|date %}
+
+                              <div class="d-grid gap-2">
+                                    {% if AfficherLesEquipes['nombre'] < licence.limite_equipes %}
+                                        <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
+                                    {% elseif AfficherLesEquipes['nombre'] >= licence.limite_equipes or today > dateFin %}
+                                        <button type="submit" class="btn btn-secondary btn-lg" disabled>
+                                            {% if today > dateFin %}
+                                                Tournoi terminé
+                                            {% else %}
+                                                Ajouter l'équipe (limite atteinte) 
+                                            {% endif %}
+                                        </button>
+                                    {% else %}
+                                        <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
+                                    {% endif %}
+                                </div>
+
+
+
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-9">
+                    
+                    {% for tournament in ListeDesTournois %}
+                        {% if tournament.isArchived == 0 %}
+                            <a href="ajoutEquipe.php?idTournoi={{tournament.id}}" class="btn {% if tournament.id == tournoiEnCours %}btn-danger{% else %}btn-primary btn-sm {% endif %} position-relative ms-2 mb-2">
+                                {{tournament.nom}} <i class="fas fa-trophy"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="z-index: 10;">
+                                    {{tournament.nombre_equipes}}/{{licence.limite_equipes}}
+                                    <span class="visually-hidden">équipes</span>
+                                </span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                   <form method="GET" action="">
+                        <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+
+                        <div class="input-group mb-3">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                name="query" 
+                                placeholder="Rechercher une équipe, un club, une catégorie..."
+                                value="{{ query|default('') }}"  
+                            >
+                            <button class="btn btn-primary" type="submit">🔍</button>
+                            <a 
+                                href="?idTournoi={{ idTournoi }}&query=" 
+                                class="btn btn-outline-secondary" 
+                                title="Effacer la recherche"
+                            >❌</a>
+                        </div>
+                            <div class="form-text text-muted">
+                                🔢  nombre : <strong>{{ AfficherLesEquipes.nombre }}</strong>
+                            </div>
+                        {% if query is defined and query != '' %}
+                            <div class="form-text text-muted">
+                                🔎 Filtre actif : <strong>{{ query }}</strong>
+                            </div>
+                        {% endif %}
+                    </form>
+
+
+
+
+
+                    <table class="table mt-2" id="tableEquipes">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center" style="display:none">Id</th>
+                                <th scope="col" class="text-center">Club</th>
+                                <th scope="col" class="text-center">Nom de l'équipe</th>
+                               {% if infotournoi.gestionVoix == 1 %} <th scope="col" class="text-center">Son de l'équipe</th> {% endif %}
+                                <th scope="col">Categorie</th>
+                                <th scope="col">Changer vers categorie</th>
+                                <th scope="col">Action</th>
+                                
+                            </tr>
+                          
+                        </thead>
+                        <tbody>
+                        
+                            {% for equipe in AfficherLesEquipes.resultats %}
+
+                                <tr style="background-color: {{ equipe.cat_couleur }} !important;">
+                               
+                                  <td style="display:none">{{ equipe.id }}</td>
+                            <td class="text-center">
+                            <form action="modifierEquipe.php" method="POST" class="d-inline">
+
+                               {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+                                            {% set today = "now"|date('Y-m-d')|date %}
+                                            
+                                              
+                                            
+
+                            <input type="hidden" name="idEquipe" value="{{ equipe.id }}">
+                            <input type="hidden" name="changeClub" value="true">
+                            
+                                <select name="club_id" class="form-select float-start" style="display:none;" onchange="this.form.submit()">
+                                    <option value="">-- Sélectionner un club --</option>
+                                   {% for club in AfficherClub %}
+                                    <option value="{{ club.id }}"
+                                        {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} disabled {% endif %}>
+                                        {{ club.nom }}
+                                    </option>
+                                {% endfor %}
+
+                                </select>
+                            
+                            </form>
+
+    <span class="badge text-bg-dark float-start"> {{ equipe.nom_club }}</span>
+    <img 
+        class="img-thumbnail float-end shadow" 
+        src="{{ equipe.logo }}" 
+        style="cursor:pointer;" 
+        ondblclick="toggleSelect(this)"
+    >
+</td>
+
+                                 <td>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            size="20" 
+                                            name="nomEquipe" 
+                                            value="{{ equipe.nom }}"
+                                            hx-post="modifierEquipe.php"
+                                            hx-vals='{
+                                                "idEquipe": "{{ equipe.id }}",
+                                                "tournoi_id": "{{ equipe.tournoi_id }}",
+                                                "categorie": "{{ equipe.categorie }}",
+                                                "changeNomEquipe": "true"
+                                            }'
+                                            hx-trigger="blur"
+                                            hx-target="#notif-{{ equipe.id }}"
+                                            hx-swap="innerHTML"
+                                             
+                                            {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+                                            {% set today = "now"|date('Y-m-d')|date %}
+                                        {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today >= dateFin %} 
+                                        disabled 
+                                        {% endif %}>
+
+                                        
+
+
+
+                                           
+   
+      
+
+
+                                       
+                                       
+                                       
+                                        <!-- si la licence est payante, on readonly le champ nomEquipe -->
+                                       
+
+
+                                        <small id="notif-{{ equipe.id }}" class="text-success ms-2"></small>
+                                    </td>
+                                    {% if infoTournoi.gestionVoix == 1 %}
+                                  <td class="text-center" data-id-tournoi="{{tournoiEnCours}}" data-id-equipe="{{ equipe.id }}">
+                                        <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ Enregistrer</button>
+                                            <button onclick="stopRecording(this)" class="btn btn-sm btn-danger" disabled>⏹️ Stop</button>
+                                            <br>
+                                            <audio controls style="margin-top:5px;" preload="none" src=Audio/{{idTournoi}}/Equipe/{{ equipe.id }}.wav></audio>
+                                        {% if equipe.audio_path == null %}
+                                          <i class="fa-solid fa-volume-xmark"></i>
+                                        {% else %}
+                                           <i class="fa-solid fa-volume-high"></i>
+                                    {% endif %}
+                                    </td>
+                                {% endif %}
+
+                                    <td class="text-center"><span class="badge text-bg-dark">{{ equipe.nom_categorie}}</span></td>
+                                    <td>
+                                        <select 
+                                            class="form-select"
+                                            name="categorie"
+                                            hx-post="modifierEquipe.php"
+                                            hx-trigger="change delay:200ms"
+                                            hx-vals='{
+                                                "idEquipe": "{{ equipe.id }}",
+                                                "tournoi_id": "{{ equipe.tournoi_id }}",
+                                                "nomEquipe": "{{ equipe.nom }}",
+                                                "changeCategorie" : "true"
+                                            }'
+                                            hx-include="this"
+                                            hx-target="#message-{{ equipe.id }}"
+                                            hx-swap="outerHTML"
+                                        >
+   
+    
+
+                                            <option selected value="{{ equipe.categorie }}">{{ equipe.nom_categorie }}</option>
+                                            {% for categorie in AfficheLesCategories %}
+                                                {% if categorie['id_categorie'] != equipe.categorie %}
+                                                    <option value="{{ categorie['id_categorie'] }}">{{ categorie['Nom_categorie'] }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+
+                                        <div id="message-{{ equipe.id }}" class="small mt-1 text-muted"></div>
+                                </td>
+ 
+
+                                   <td>
+                                    </form>
+                                    <a href="deleteEquipe.php?idEquipe={{equipe.id}}&idTournoi={{equipe.tournoi_id}}" onclick="return confirm('Voulez-vous vraiment supprimer cette équipe ?')" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash text-danger" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1Z"/>
+                                        </svg>
+                                    </a>
+                                </td>
+
+
+
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+<script>
+
+//on autocomplete le club
+  document.addEventListener('DOMContentLoaded', function() {
+            const equipeInput = document.getElementById('nomEquipe');
+            const clubSelect = document.getElementById('club');
+
+            equipeInput.addEventListener('input', function() {
+                const equipeName = equipeInput.value.toLowerCase();
+
+                // Parcourir les options du select pour trouver une correspondance
+                for (let option of clubSelect.options) {
+                    if (option.textContent.toLowerCase().includes(equipeName)) {
+                        clubSelect.value = option.value;
+                        break;
+                    }
+                }
+            });
+        });
+
+
+// on retient la categorie
+document.addEventListener('DOMContentLoaded', function() {
+    // Sélectionner les éléments du formulaire
+    const categorieSelect = document.getElementById('Categorie');
+    const clubSelect = document.getElementById('club');
+
+    // Restaurer les valeurs depuis le localStorage
+    if (localStorage.getItem('Categorie')) {
+        categorieSelect.value = localStorage.getItem('Categorie');
+    }
+    //if (localStorage.getItem('club')) {
+     //   clubSelect.value = localStorage.getItem('club');
+   // }
+ 
+
+    // Ajouter des écouteurs d'événements pour sauvegarder les valeurs dans le localStorage
+    categorieSelect.addEventListener('change', function() {
+        localStorage.setItem('Categorie', categorieSelect.value);
+    });
+
+    //clubSelect.addEventListener('change', function() {
+     //   localStorage.setItem('club', clubSelect.value);
+    //});
+
+    
+});
+
+
+
+
+
+
+  
+</script>
+
+
+<script>
+  // Stocker la position de défilement avant de quitter la page
+  window.onload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      var scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition !== null) {
+        window.scrollTo(0, scrollPosition);
+      }
+    }
+  };
+
+  window.onbeforeunload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+  };
+</script>
+
+
+
+<script>
+function toggleSelect(imgElement) {
+    // Trouver le select dans la même cellule (<td>) que l'image double-cliquée
+    const td = imgElement.closest('td');
+    const select = td.querySelector('select.form-select');
+    if (!select) return;
+
+    // Toggle affichage du select
+    if (select.style.display === 'none' || select.style.display === '') {
+        select.style.display = 'inline-block'; // ou 'block' selon style souhaité
+    } else {
+        select.style.display = 'none';
+    }
+}
+</script>
+
+
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+function startRecording(btn) {
+    const td = btn.closest('td');
+    const stopBtn = td.querySelector('button.btn-danger');
+    btn.disabled = true;
+    stopBtn.disabled = false;
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            const idTournoi = td.dataset.idTournoi;
+            const idEquipe = td.dataset.idEquipe;
+            formData.append('audio', blob, `equipe_${idEquipe}.wav`);
+            formData.append('idTournoi', idTournoi);
+            formData.append('idEquipe', idEquipe);
+
+            fetch('upload_audio.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    alert('Audio envoyé avec succès');
+                    const audioElement = td.querySelector('audio');
+                    // Ajout d’un cache buster avec un timestamp
+                    const baseSrc = audioElement.src.split('?')[0];
+                    audioElement.src = baseSrc + '?t=' + new Date().getTime();
+                    audioElement.load(); // recharge l’audio avec le nouveau src
+                } else {
+                    alert('Erreur lors de l’envoi');
+                }
+                btn.disabled = false;
+                stopBtn.disabled = true;
+            });
+        };
+
+        mediaRecorder.start();
+    });
+}
+
+function stopRecording(btn) {
+    btn.disabled = true;
+    const td = btn.closest('td');
+    const startBtn = td.querySelector('button.btn-primary');
+    startBtn.disabled = false;
+
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+    }
+}
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("td[data-id-tournoi][data-id-equipe]").forEach(td => {
+        const idTournoi = td.dataset.idTournoi;
+        const idEquipe = td.dataset.idEquipe;
+        const audioTag = td.querySelector("audio");
+
+        const url = `Audio/${idTournoi}/Equipe/${idEquipe}.wav`;
+
+        // Tester si le fichier existe sans bloquer
+        fetch(url, { method: 'HEAD' }).then(resp => {
+            if (resp.ok) {
+                audioTag.src = url;
+            }
+        }).catch(e => {
+            console.warn("Audio introuvable :", url);
+        });
+    });
+});
+</script>
+
+
+
+
+</html>

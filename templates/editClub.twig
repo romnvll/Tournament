@@ -1,0 +1,57 @@
+{# Assurez-vous d'inclure le CSS de Bootstrap en haut de la page #}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+ 
+<div class="container mt-4">
+    <form action="editClub.php" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="selectedClubId">Sélectionnez un club à modifier:</label>
+            <select class="form-control" name="selectedClubId" id="selectedClubId" onchange="this.form.submit()">
+                <option value="">-- Sélectionnez un club --</option>
+                <pre>
+                    
+                </pre>
+                {% for club in clubs %}
+                {{ dump(club.id) }}
+                    <option value="{{ club.id }}">{{ club.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+      </form>  
+        {# Si un club est sélectionné, affichez les détails du club ici pour la modification. #}
+        {% if selectedClub %}
+         <input type="hidden" name="id" value="{{ selectedClub.id }}">
+        <div class="form-group">
+            <label for="clubName">Nom du Club:</label>
+            <input type="text" class="form-control" id="clubName" name="clubName" value="{{ selectedClub.nom }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ selectedClub.email }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" value="{{ selectedClub.password }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="contact">Contact:</label>
+            <input type="text" class="form-control" id="contact" name="contact" value="{{ selectedClub.contact }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="logo">Logo:</label>
+            <input type="file" class="form-control-file" id="logo" name="logo">
+            <img src="/logos/{{ selectedClub.logo }}" alt="{{ selectedClub.nom }}" width="100">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        {% endif %}
+   
+</div>
+
+{# Assurez-vous d'inclure le JS de Bootstrap au bas de la page #}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

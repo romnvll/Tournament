@@ -1,0 +1,344 @@
+-- 1. Créer la table TypeDeSport
+CREATE TABLE IF NOT EXISTS TypeDeSport (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(64) NOT NULL UNIQUE
+);
+
+-- 2. Insérer quelques sports de base
+INSERT INTO TypeDeSport (nom) VALUES 
+    ('Handball'),
+    ('Football'),   
+    ('Rugby');
+
+-- 3. Ajouter la colonne type_sport_id à la table Clubs
+ALTER TABLE Clubs
+ADD COLUMN type_sport_id INT NOT NULL DEFAULT 1,
+ADD CONSTRAINT fk_clubs_type_sport
+    FOREIGN KEY (type_sport_id) REFERENCES TypeDeSport(id);
+
+-- 4. Ajouter la colonne type_sport_id à la table Tournois
+ALTER TABLE Tournois
+ADD COLUMN type_sport_id INT NOT NULL DEFAULT 1,
+ADD CONSTRAINT fk_tournois_type_sport
+    FOREIGN KEY (type_sport_id) REFERENCES TypeDeSport(id);
+
+-- 5. Mettre à jour tous les clubs et tournois existants pour qu'ils soient liés à 'Handball' (id = 1)
+UPDATE Clubs SET type_sport_id = 1;
+UPDATE Tournois SET type_sport_id = 1;
+
+
+
+CREATE TABLE Utilisateurs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(64) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    nom VARCHAR(64) DEFAULT NULL,
+
+email_token VARCHAR(255) DEFAULT NULL,
+	 email_confirme TINYINT(1) NOT NULL DEFAULT 0;
+
+    prenom VARCHAR(64) DEFAULT NULL,
+    role ENUM('admin', 'organisateur', 'arbitre', 'club') NOT NULL DEFAULT 'organisateur',
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- 1. Ajouter la colonne utilisateur_id
+ALTER TABLE Tournois
+ADD COLUMN utilisateur_id INT NOT NULL DEFAULT 1;
+
+-- 2. Ajouter la clé étrangère vers la table Utilisateurs
+ALTER TABLE Tournois
+ADD CONSTRAINT fk_tournois_utilisateur
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id)
+    ON DELETE CASCADE;
+
+ALTER TABLE Tournois
+DROP FOREIGN KEY fk_tournois_club;
+
+
+-- 3. Supprimer l’ancienne colonne club_id (si plus utilisée)
+ALTER TABLE Tournois
+DROP COLUMN club_id;
+
+-- 1. Ajouter la colonne utilisateur_id
+ALTER TABLE Clubs
+ADD COLUMN utilisateur_id INT NOT NULL DEFAULT 1;
+
+ALTER TABLE Clubs
+ADD CONSTRAINT fk_clubs_utilisateur
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id)
+    ON DELETE CASCADE;
+
+-- Supprimer l'index lié à la colonne club_id
+ALTER TABLE Tournois DROP INDEX idx_club_id;
+
+-- Supprimer ensuite la colonne club_id
+ALTER TABLE Tournois DROP COLUMN club_id;
+
+
+ALTER TABLE Clubs
+    DROP COLUMN email,
+    DROP COLUMN password,
+    DROP COLUMN contact;
+
+
+CREATE TABLE LicenceType (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    prix DECIMAL(8,2) NOT NULL,
+    limite_tournois INT NOT NULL,
+    limite_equipes INT NOT NULL,
+    description TEXT
+);
+
+INSERT INTO LicenceType (id, nom, prix, limite_tournois, limite_equipes, description) VALUES
+(1, 'Gratuite', 0.00, 1, 8, 'Licence gratuite limitée à 1 tournoi et 8 équipes'),
+(2, 'Basique', 49.99, 5, 64, 'Licence à 49.99€ avec 5 tournois archivables et 64 équipes max'),
+(3, 'Premium', 99.99, 9999, 128, 'Licence à 99.99€ sans limite de tournois et 128 équipes max');
+
+
+
+
+CREATE TABLE Licence (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    utilisateur_id INT NOT NULL,
+    licence_type_id INT NOT NULL DEFAULT 1,
+    
+    UNIQUE(utilisateur_id),
+    
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id),
+    FOREIGN KEY (licence_type_id) REFERENCES LicenceType(id)
+);
+
+
+ALTER TABLE Tournois
+ADD COLUMN date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+
+ALTER TABLE Categorie DROP FOREIGN KEY fk_club;
+ALTER TABLE Categorie DROP COLUMN fk_id_club;
+ALTER TABLE Categorie ADD COLUMN utilisateur_id INT NOT NULL;
+
+ALTER TABLE Licence DROP FOREIGN KEY Licence_ibfk_1;
+ALTER TABLE Licence
+ADD CONSTRAINT Licence_ibfk_1
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE;
+
+
+ALTER TABLE Categorie DROP FOREIGN KEY fk_categorie_utilisateur;
+
+ALTER TABLE Categorie
+ADD CONSTRAINT fk_categorie_utilisateur
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE;
+
+ALTER TABLE Creneaux DROP FOREIGN KEY Creneaux_ibfk_1;
+ALTER TABLE Creneaux
+ADD CONSTRAINT Creneaux_ibfk_1
+FOREIGN KEY (tournoi_id)
+REFERENCES Tournois(id)
+ON DELETE CASCADE;
+
+
+ALTER TABLE Tournois
+ADD CONSTRAINT Tournois_ibfk_1
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE;
+
+ALTER TABLE Labels DROP FOREIGN KEY Labels_ibfk_1;
+ALTER TABLE Labels
+ADD CONSTRAINT Labels_ibfk_1
+FOREIGN KEY (tournoi_id)
+REFERENCES Tournois(id)
+ON DELETE CASCADE;
+
+ALTER TABLE Terrains DROP FOREIGN KEY Terrains_ibfk_1;
+ALTER TABLE Terrains
+ADD CONSTRAINT Terrains_ibfk_1
+FOREIGN KEY (fk_idTournoi)
+REFERENCES Tournois(id)
+ON DELETE CASCADE;
+
+
+ALTER TABLE LicenceType
+ADD COLUMN duree_jours INT NULL DEFAULT null;
+
+ALTER TABLE Licence
+ADD COLUMN date_debut DATE NOT NULL DEFAULT CURRENT_DATE,
+ADD COLUMN date_fin DATE NULL;
+
+ALTER TABLE Tournois DROP FOREIGN KEY fk_utilisateur_id;
+ALTER TABLE Tournois ADD CONSTRAINT fk_utilisateur_id FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE;
+
+ALTER TABLE Planification DROP FOREIGN KEY Planification_ibfk_4;
+
+ALTER TABLE Planification
+ADD CONSTRAINT Planification_ibfk_4
+FOREIGN KEY (tournoi_id)
+REFERENCES Tournois(id)
+ON DELETE CASCADE;
+
+-- Modifier la contrainte Poules_ibfk_1 pour activer ON DELETE CASCADE
+ALTER TABLE Poules DROP FOREIGN KEY Poules_ibfk_1;
+ALTER TABLE Poules
+ADD CONSTRAINT Poules_ibfk_1
+FOREIGN KEY (fk_idcategorie)
+REFERENCES Categorie(id_categorie)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+-- Modifier la contrainte Planification_ibfk_4 pour activer ON DELETE CASCADE
+ALTER TABLE Planification DROP FOREIGN KEY Planification_ibfk_4;
+ALTER TABLE Planification
+ADD CONSTRAINT Planification_ibfk_4
+FOREIGN KEY (tournoi_id)
+REFERENCES Tournois(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+-- Si Tournois est lié à Utilisateurs
+-- (tu peux adapter le nom de la contrainte s'il est différent)
+ALTER TABLE Tournois DROP FOREIGN KEY Tournois_ibfk_1;
+ALTER TABLE Tournois
+ADD CONSTRAINT Tournois_ibfk_1
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+
+-- 1. Modifier la contrainte entre EquipePoule et Poules
+ALTER TABLE EquipePoule DROP FOREIGN KEY EquipePoule_ibfk_2;
+ALTER TABLE EquipePoule
+ADD CONSTRAINT EquipePoule_ibfk_2
+FOREIGN KEY (poule_id)
+REFERENCES Poules(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+-- 2. Modifier la contrainte entre Poules et Categorie
+ALTER TABLE Poules DROP FOREIGN KEY Poules_ibfk_1;
+ALTER TABLE Poules
+ADD CONSTRAINT Poules_ibfk_1
+FOREIGN KEY (fk_idcategorie)
+REFERENCES Categorie(id_categorie)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+-- 3. Modifier la contrainte entre Planification et Tournois
+ALTER TABLE Planification DROP FOREIGN KEY Planification_ibfk_4;
+ALTER TABLE Planification
+ADD CONSTRAINT Planification_ibfk_4
+FOREIGN KEY (tournoi_id)
+REFERENCES Tournois(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+-- 4. Modifier la contrainte entre Tournois et Utilisateurs
+ALTER TABLE Tournois DROP FOREIGN KEY Tournois_ibfk_1;
+ALTER TABLE Tournois
+ADD CONSTRAINT Tournois_ibfk_1
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+
+ALTER TABLE Equipes DROP FOREIGN KEY fk_categorie;
+
+ALTER TABLE Equipes
+ADD CONSTRAINT fk_categorie
+FOREIGN KEY (categorie)
+REFERENCES Categorie(id_categorie)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+
+ALTER TABLE Categorie DROP FOREIGN KEY fk_categorie_utilisateur;
+
+ALTER TABLE Categorie
+ADD CONSTRAINT fk_categorie_utilisateur
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE CASCADE
+ON UPDATE NO ACTION;
+
+
+
+ALTER TABLE Clubs DROP FOREIGN KEY fk_clubs_utilisateur;
+
+ALTER TABLE Clubs
+ADD CONSTRAINT fk_club_utilisateur
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE RESTRICT
+ON UPDATE NO ACTION;
+
+
+ALTER TABLE Clubs MODIFY utilisateur_id INT NULL;
+
+
+ALTER TABLE Clubs DROP FOREIGN KEY fk_club_utilisateur;
+
+ALTER TABLE Clubs
+ADD CONSTRAINT fk_club_utilisateur
+FOREIGN KEY (utilisateur_id)
+REFERENCES Utilisateurs(id)
+ON DELETE SET NULL
+ON UPDATE NO ACTION;
+
+
+ALTER TABLE Sponsors 
+DROP FOREIGN KEY IF EXISTS fk_sponsors_club; -- si une FK existe vers club_id
+
+
+
+-- 1. Supprimer la contrainte FK existante sur club_id
+ALTER TABLE Sponsors DROP FOREIGN KEY Sponsors_ibfk_1;
+
+-- 2. Supprimer la colonne club_id
+ALTER TABLE Sponsors DROP COLUMN club_id;
+
+-- 3. Ajouter la colonne utilisateur_id, nullable au départ
+ALTER TABLE Sponsors ADD COLUMN utilisateur_id INT(11) NULL;
+
+-- 4. Mettre à jour utilisateur_id pour les enregistrements existants
+-- Ici on attribue arbitrairement l'utilisateur avec id = 1 à tous les sponsors existants
+UPDATE Sponsors SET utilisateur_id = 1 WHERE utilisateur_id IS NULL;
+
+-- 5. Vérifier qu'il n'y a pas de utilisateur_id invalides
+SELECT utilisateur_id FROM Sponsors
+WHERE utilisateur_id IS NOT NULL
+AND utilisateur_id NOT IN (SELECT id FROM Utilisateurs);
+
+-- Si la requête précédente renvoie des lignes, corrige-les avant de poursuivre.
+
+-- 6. Rendre la colonne utilisateur_id NOT NULL
+ALTER TABLE Sponsors MODIFY utilisateur_id INT(11) NOT NULL;
+
+-- 7. Ajouter la contrainte FK sur utilisateur_id
+ALTER TABLE Sponsors
+ADD CONSTRAINT fk_sponsors_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- 1. Supprimer les deux contraintes existantes sur type_sport_id
+ALTER TABLE Tournois DROP FOREIGN KEY fk_tournoi_type_sport;
+ALTER TABLE Tournois DROP FOREIGN KEY fk_tournois_type_sport;
+
+-- 2. Rendre le champ type_sport_id nullable
+ALTER TABLE Tournois MODIFY type_sport_id INT NULL;
+
+-- 3. Ajouter une nouvelle contrainte avec ON DELETE SET NULL
+ALTER TABLE Tournois
+ADD CONSTRAINT fk_tournoi_type_sport
+FOREIGN KEY (type_sport_id)
+REFERENCES TypeDeSport(id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
+

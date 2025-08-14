@@ -1,0 +1,66 @@
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<!-- Inclure la bibliothèque htmx via CDN -->
+		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+
+		<title>Créer un compte</title>
+	</head>
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+    <div class="text-center mb-3">
+    <img src="logos/Logo.png" alt="Logo Brackito" style="max-height: 80px;">
+    <div style="color: grey; font-size: 0.9em; font-style: italic;">The french software bracket</div>
+</div>
+
+        <div class="col-md-6">
+            <h2 class="mb-4 text-center">Créer un compte</h2>
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+                <div class="alert alert-success">{{ success }}</div>
+            {% endif %}
+            <form method="POST" action="">
+                <div class="form-group mb-3">
+                    <label for="prenom">Prénom</label>
+                    <input type="text" name="prenom" id="prenom" class="form-control" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="nom">Nom</label>
+                    <input type="text" name="nom" id="nom" class="form-control" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Adresse email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="confirm_password">Confirmer le mot de passe</label>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="cgu" id="cgu" required>
+                    <label class="form-check-label" for="cgu">
+                        J'accepte les <a href="#">conditions générales d'utilisation</a>.
+                    </label>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="captcha">Captcha : {{ captcha_question }}</label>
+                    <input type="text" name="captcha" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Créer mon compte</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
