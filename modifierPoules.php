@@ -33,7 +33,7 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
 
 
 $equipe = new EquipeDAO();
-$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['id_tournoi'], $_GET['query']);
+$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['id_tournoi'], $_GET['query']??null);
 
 $licenceDao = new LicenceDao();
 $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
@@ -107,16 +107,16 @@ echo $template->render([
     'email' => $userData['email'],
   
     'pageEnCours' => 'GestionDesPoules',
-    'tournoiEnCours' => $idtournoi,
+    'tournoiEnCours' => $idtournoi ?? null,
     'poules' => $poulesEtNombreEquipe,
    
     'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
     //'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
     'idTournoi' => $_GET['id_tournoi'],
-    'idPoule' => $_GET['id_poule'],
-    'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']),
-    'message' => $message,
-    'afficherEquipeParPoule' => $equipes,
+    'idPoule' => $_GET['id_poule'] ?? null,
+    'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']??null),
+    'message' => $message??null,
+    'afficherEquipeParPoule' => $equipes??null,
     'RencontresExistesDansPoules'=>$pouleHasRencontre,
     'AfficherLesEquipes' => $listeDesEquipes,
     'licence' => $licence,

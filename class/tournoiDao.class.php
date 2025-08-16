@@ -101,31 +101,36 @@ GROUP BY
         return $stmt->fetchAll();
     }
 
-    public function droitTournoiClub(int $tournoiId, int $utilisateur_id) : ?array {
-     
-        $stmt = $this->connexion->prepare("
-            SELECT 
-                t.*, 
-                COUNT(e.id) AS nombre_equipes
-            FROM 
-                Tournois t
-            LEFT JOIN 
-                Equipes e ON t.id = e.tournoi_id
-            WHERE 
-                t.id = :tournoiId 
-                AND t.utilisateur_id = :utilisateur_id
-            GROUP BY 
-                t.id
-        ");
-        
-        $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
-        $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
-        
-        $stmt->execute();
-        $tournoi = $stmt->fetch();
-        
-        return $tournoi ?: null; // Retourne null si aucun tournoi trouvé
+    public function droitTournoiClub(?int $tournoiId, int $utilisateur_id) : ?array {
+    // Si aucun tournoiId n'est fourni, on retourne null directement
+    if ($tournoiId === null) {
+        return null;
     }
+
+    $stmt = $this->connexion->prepare("
+        SELECT 
+            t.*, 
+            COUNT(e.id) AS nombre_equipes
+        FROM 
+            Tournois t
+        LEFT JOIN 
+            Equipes e ON t.id = e.tournoi_id
+        WHERE 
+            t.id = :tournoiId 
+            AND t.utilisateur_id = :utilisateur_id
+        GROUP BY 
+            t.id
+    ");
+    
+    $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
+    
+    $stmt->execute();
+    $tournoi = $stmt->fetch();
+
+    return $tournoi ?: null; // Retourne null si aucun tournoi trouvé
+}
+
     
     
 

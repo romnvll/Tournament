@@ -28,10 +28,13 @@ $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 
 
-if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
+if (($tournoiDao->droitTournoiClub($_GET['idTournoi'] ?? null, $userData['id']) == null) 
+    && ($_GET['idTournoi'] == "0")) {
     
-  exit;
+    header("Location: ajoutTournoi.php");
+    exit;
 }
+
 //check licence
 
 //
@@ -70,6 +73,18 @@ $error = $_GET['error'] ?? null;
 $success = $_GET['success'] ?? null;
 
 
+if ($_GET['idTournoi'] != 0) {
+
+  $afficherClub = $listeClub->afficherClubsParTypeDeSport($tournoiDao->getTournoiById($_GET['idTournoi'])['type_sport_id']);
+
+}
+
+else {
+   $afficherClub = null;
+}
+
+
+
 
 echo $template->render([
   'email' => $userData['email'],
@@ -79,7 +94,7 @@ echo $template->render([
   'idTournoi' => $_GET['idTournoi'],
   'dernierTournoi' => $dernierId,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois($userData['id']),
-'AfficherClub' => $listeClub->afficherClubsParTypeDeSport($tournoiDao->getTournoiById($_GET['idTournoi'])['type_sport_id']),
+'AfficherClub' => $afficherClub,
 'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']??null),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories($userData['id']),
