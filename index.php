@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
 require 'class/pouleManagerDao.class.php';
@@ -44,6 +44,7 @@ $terrain = new TerrainDao();
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
 }
+
 
 
 if (isset ($_GET['affichageByClubs'])) {
@@ -138,7 +139,7 @@ else {
 }
 
 if (isset ($_GET['id_tournoi'])) {
-  $_SESSION['idTournoi'] = $_GET['id_tournoi'];
+  
   $idTournoi= $_GET['id_tournoi'];
   $listeClubsParticipants = $clubdao->clubsParticipatingInTournoi($_GET['id_tournoi']);
   $Labels = $Labels->getLabelsWithCreneauxByTournoiId($_GET['id_tournoi']);
@@ -187,7 +188,7 @@ if (isset ($_GET['idPoule'])) {
 
  
 //gestion des sponsor
-if (isset ($_GET['id_tournoi'])) {
+
     if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
       
       //recuperation des partenaires du club qui a organiser ce tournoi
@@ -199,7 +200,7 @@ if (isset ($_GET['id_tournoi'])) {
     else {
       $listeDesPartenaires = null;
     }
-}
+
 
 
 echo $template->render([
@@ -226,6 +227,7 @@ echo $template->render([
     'equipesAvecPoule' => $equipesAvecPoule,
     'nbrTerrains' => $nbrterrain ?? null,
     'partenaires' => $listeDesPartenaires ??null,
+    'idTournoi' => $idTournoi
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

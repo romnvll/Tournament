@@ -7,6 +7,11 @@ require 'class/licenceDao.class.php';
 require 'class/typeSportDao.class.php';
 
 
+
+
+
+
+
 $tournoiDao = new tournoiDao();
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -33,6 +38,8 @@ foreach ($tousLesTournois as $tournoi) {
 
 $licenceDao = new LicenceDao();
 $licence = $licenceDao->getLicencesParUtilisateur($userData['id']);
+$expiration = $licenceDao->retrograderLicencesExpirees();
+
 
 
 echo $template->render([
