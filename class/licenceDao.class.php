@@ -52,6 +52,20 @@ public function getIdUserByToken(string $token): ?int {
     return $result ? (int)$result['id'] : null;
 }
 
+public function getUserInfosByToken(string $token): ?array {
+    $stmt = $this->connexion->prepare("
+        SELECT email, nom, prenom 
+        FROM Utilisateurs 
+        WHERE email_token = :token
+    ");
+    $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $result ?: null;
+}
+
+
 
 public function getLicenceDetailsByLicenceId(int $licenceId): ?array {
     $stmt = $this->connexion->prepare("

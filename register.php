@@ -70,15 +70,43 @@ $mail->Subject = "[Brackito] - Confirmez votre adresse email";
 
 
 // Body HTML
-$mail->Body = "Clique ici pour vérifier ton adresse e-mail : 
-<a href='http://" . $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/confirm_email.php?token=$token'>Vérifier mon e-mail</a>";
+$mail->Body = "
+<div style='font-family: Arial, sans-serif; color: #333;'>
+    <div style='text-align: center; margin-bottom: 20px;'>
+        <img src='https://brackito.net/logos/Logo.png' alt='Logo Brackito' style='max-width: 150px;'>
+    </div>
+    <h2 style='text-align: center; color: #0056b3;'>Bienvenue sur Brackito !</h2>
+    <p>Bonjour $prenom $nom,</p>
+    <p>Merci de t'être inscrit(e) sur notre plateforme de gestion de tournois.<br>
+    Afin de finaliser ton inscription et de sécuriser ton compte, nous devons vérifier ton adresse e-mail.</p>
+    <p style='text-align: center; margin: 30px 0;'>
+        <a href='http://" . $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/confirm_email.php?token=$token' 
+           style='display: inline-block; padding: 12px 20px; background-color: #0056b3; color: #fff; 
+                  text-decoration: none; border-radius: 6px; font-size: 16px;'>
+            ✅ Vérifier mon e-mail
+        </a>
+    </p>
+    <p>Si le bouton ne fonctionne pas, copie et colle le lien ci-dessous dans ton navigateur :</p>
+    <p style='word-break: break-word;'>
+        http://" . $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/confirm_email.php?token=$token
+    </p>
+   
+    <hr style='margin: 30px 0;'>
+    <p style='text-align: center; font-size: 12px; color: #999;'>
+        Cet e-mail a été envoyé automatiquement par Brackito. Merci de ne pas y répondre directement.
+    </p>
+</div>
+";
 
-// Body alternatif texte brut
-$mail->AltBody = "Bonjour $prenom $nom,\n\n" .
-                 "Pour vérifier ton adresse e-mail, clique sur le lien suivant :\n" .
-                 "http://" . $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) .
-                 "/confirm_email.php?token=$token\n\n" .
-                 "Vérifier mon e-mail.";
+// Corps alternatif (texte brut)
+$mail->AltBody = "Bonjour $prenom $nom,\n\n"
+               . "Merci de t'être inscrit(e) sur Brackito.\n"
+               . "Pour vérifier ton adresse e-mail et activer ton compte, clique sur le lien suivant :\n\n"
+               . "http://" . $_SERVER['SERVER_NAME'] . dirname($_SERVER['SCRIPT_NAME']) . "/confirm_email.php?token=$token\n\n"
+               . "Ce lien est valable pendant 24 heures.\n"
+               . "Si tu n'es pas à l'origine de cette inscription, ignore simplement ce message.\n\n"
+               . "--\n"
+               . "L'équipe Brackito\n";
 
 
 $mail->CharSet = 'UTF-8';
