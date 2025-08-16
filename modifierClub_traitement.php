@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $typeSport = (int) $_POST['typeSport'];
     //var_dump($typeSport);
     // Mettre à jour le club avec les données fournies
-    $clubdao->updateClub($_POST['idclub'], $_POST['nomduclub'], null, $uploadPath,$typeSport);
+    $clubdao->updateClub($_POST['idclub'], $_POST['nomduclub'], null, $uploadPath,$typeSport,$_POST['IdUser']);
 }
 
 $referer = $_SERVER['HTTP_REFERER'];

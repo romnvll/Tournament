@@ -23,14 +23,11 @@ echo $template->render([
   'pageEnCours' =>  'GestionClub',
     'ListeDesClubs' => $club->afficherClubs(),
     'isModify' => true,
-    'afficheclub' => $club->getClubById($_GET['idclub']),
+    'afficheclub' => $club->getClubById($_GET['idclub'] ?? null),
     'idUser' => $userData['id'],
     'idTournoi' => $_GET['id_tournoi'] ?? null,
     'idClub' => $_GET['idclub'] ?? null,
     'listeSports' => $typeSportDao->getTousLesTypesDeSport(),
-//'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
-//'AfficherClub' => $listeClub->afficherClubs(),
-//'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
-//'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
+
 
 ]);

@@ -96,36 +96,38 @@ public function afficherClubsParTypeDeSport(int $typeSportId): array {
 
     // Dans clubDao.class.php
 
-    public function updateClub($id, $nom, $email = null, $logo, int $typeSport) {
+    public function updateClub($id, $nom, $email = null, $logo, int $typeSport, int $utilisateurId) {
     // Commencez la requête de mise à jour
-    $query = "UPDATE Clubs SET nom = :nom, logo = :logo, type_sport_id = :typeSport";
+    $query = "UPDATE Clubs 
+              SET nom = :nom, logo = :logo, type_sport_id = :typeSport";
 
-    // Ajoutez les champs facultatifs s'ils sont fournis
+    // Ajoutez le champ email si fourni
     if (!is_null($email)) {
         $query .= ", email = :email";
     }
 
-    // Complétez la requête avec la condition WHERE
-    $query .= " WHERE id = :id";
+    // Condition WHERE pour vérifier que l'utilisateur est bien le créateur du club
+    $query .= " WHERE id = :id AND utilisateur_id = :utilisateurId";
 
     // Préparez la requête
     $stmt = $this->connexion->prepare($query);
 
-    // Lie les paramètres requis
+    // Lie les paramètres obligatoires
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->bindParam(':nom', $nom);
-    
     $stmt->bindParam(':logo', $logo);
     $stmt->bindParam(':typeSport', $typeSport, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateurId', $utilisateurId, PDO::PARAM_INT);
 
-    // Lie les paramètres facultatifs s'ils sont fournis
+    // Lie l'email si fourni
     if (!is_null($email)) {
         $stmt->bindParam(':email', $email);
     }
 
-    // Exécutez la requête
+    // Exécute la requête
     return $stmt->execute();
 }
+
 
 
 // Dans clubDao.class.php
