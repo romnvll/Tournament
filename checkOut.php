@@ -10,7 +10,7 @@ $licenceDao = new LicenceDao();
 $typeLicence = $_POST['type_licence'] ?? null;
 $idUtilisateur = $_POST['idUtilisateur'] ?? null;
 $id_tournoi = $_POST['idTournoi'] ?? null;
-
+var_dump($typeLicence);
 if (!$typeLicence || !$idUtilisateur) {
     die("Paramètres manquants");
 }
