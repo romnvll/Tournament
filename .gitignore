@@ -7,4 +7,5 @@ Audio/*
 !Audio/.gitignore
 Sponsors/*
 !Sponsors/.gitignore
-
+uploadsAssistance/*
+!uploadsAssistance/.gitignore
