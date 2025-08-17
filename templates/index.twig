@@ -12,6 +12,8 @@
         gtag('config', 'G-3NFVPTP2MY');
     </script>
     <meta charset="UTF-8">
+    <meta name="description" content="Brackito est un logiciel français pour gérer vos tournois sportifs : création automatique des poules, planification des matchs, suivi des scores en direct.">
+
     {% if ListeDesTournois[0]['gestionArbitres'] == 1 %}
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
     {% else %}
@@ -22,19 +24,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous">
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
     <title>{% if IdPoules %}
-            Vue par poule - Brackito ! 
+            Vue par poule - Brackito Logiciel de gestion de tournois sportifs (poules et compétitions)
             {% elseif affichageByTeam %}
-            Vue par équipe - Brackito ! 
+            Vue par équipe - Brackito Logiciel de gestion de tournois sportifs (poules et compétitions)
             {% elseif affichageByClubs %}
-            Vue par club - Brackito ! 
+            Vue par club - Brackito Logiciel de gestion de tournois sportifs (poules et compétitions)
             {% elseif affichageByTerrain %}
-            Vue par terrain - Brackito ! 
+            Vue par terrain - Brackito Logiciel de gestion de tournois sportifs (poules et compétitions)
             {% elseif idTournoi %}
-            Menu des clubs - équipes - poules - Brackito ! 
+            Menu des clubs - équipes - poules - Brackito Logiciel de gestion de tournois sportifs (poules et compétitions)
             
             
             {% else %}
-            Brackito ! 
+           Brackito, Logiciel de gestion de tournois sportifs (poules et compétitions) 
             {% endif %} 
             
         </title>

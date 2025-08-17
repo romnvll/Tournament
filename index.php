@@ -188,7 +188,7 @@ if (isset ($_GET['idPoule'])) {
 
  
 //gestion des sponsor
-if (isset ($_GET['id_tournoi'])) {
+if (isset($_GET['id_tournoi']) || $_GET['id_tournoi'] != 0)  {
     if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
       
       //recuperation des partenaires du club qui a organiser ce tournoi

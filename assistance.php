@@ -2,6 +2,7 @@
 require 'security.php';
 require 'vendor/autoload.php';
 require 'class/assistanceDao.class.php';
+require 'secureCookies.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -29,5 +30,6 @@ echo $template->render([
     'email' => $userData['email'],
     'pageEnCours' => 'Assistance',
     'success' => isset($_GET['success']) ? (int)$_GET['success'] : 0,
-    'idTournoi' => $_GET['id_tournoi'] ?? 0
+    'idTournoi' => $_GET['id_tournoi'] ?? 0,
+    'apiTiny' => $apiTiny,
 ]);

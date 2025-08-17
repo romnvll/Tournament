@@ -11,7 +11,7 @@ if (isset($_FILES['file'])) {
     $file = $_FILES['file'];
 
     // Dossier spécifique au tournoi
-    $uploadDir = __DIR__ . '/uploads/' . intval($idTournoi) . '/';
+    $uploadDir = __DIR__ . '/uploadsAssistance/' . intval($idTournoi) . '/';
 
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
@@ -22,7 +22,7 @@ if (isset($_FILES['file'])) {
 
     if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
         // URL accessible depuis ton site
-        $url = 'uploads/' . intval($idTournoi) . '/' . $fileName;
+        $url = 'uploadsAssistance/' . intval($idTournoi) . '/' . $fileName;
         echo json_encode(['location' => $url]);
     } else {
         http_response_code(400);
