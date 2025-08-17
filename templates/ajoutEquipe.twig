@@ -40,14 +40,14 @@ select::picker(select):popover-open {
                         <div class="alert alert-danger">{{ error }}</div>
                     {% endif %}
                     
-                    {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes %}
+                    {% if AfficherLesEquipes['nombre'] > licence.limite_equipes %}
                     <form action="" method="POST">
                     {% else %}                    
                     <form action="ajoutEquipe_traitement.php" method="POST">
                     {% endif %}
                     <input type="hidden" name="query" value="{{query}}">
                         <div class="card shadow-sm p-4">
-                            {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes %}
+                            {% if AfficherLesEquipes['nombre'] > licence.limite_equipes  %}
                                 <div class="alert alert-danger">
                                     Vous avez atteint la limite de {{ licence.limite_equipes }} équipes pour ce tournoi.
                                     Veuillez contacter l'administrateur si vous souhaitez ajouter plus d'équipes.
@@ -82,7 +82,7 @@ select::picker(select):popover-open {
                               <div class="d-grid gap-2">
                                     {% if AfficherLesEquipes['nombre'] < licence.limite_equipes %}
                                         <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
-                                    {% elseif AfficherLesEquipes['nombre'] >= licence.limite_equipes or today > dateFin %}
+                                    {% elseif AfficherLesEquipes['nombre'] > licence.limite_equipes or today > dateFin %}
                                         <button type="submit" class="btn btn-secondary btn-lg" disabled>
                                             {% if today > dateFin %}
                                                 Tournoi terminé
@@ -182,7 +182,7 @@ select::picker(select):popover-open {
                                     <option value="">-- Sélectionner un club --</option>
                                    {% for club in AfficherClub %}
                                     <option value="{{ club.id }}"
-                                        {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} disabled {% endif %}>
+                                        {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today > dateFin %} disabled {% endif %}>
                                         {{ club.nom }}
                                     </option>
                                 {% endfor %}
@@ -220,7 +220,7 @@ select::picker(select):popover-open {
                                              
                                             {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
                                             {% set today = "now"|date('Y-m-d')|date %}
-                                        {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today >= dateFin %} 
+                                        {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
                                         disabled 
                                         {% endif %}>
 

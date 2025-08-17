@@ -113,16 +113,17 @@ public function creerCategorie(string $nom, string $couleur, int $fk_id_user): i
 }
 
 
-   public function supprimerCategorie(int $id, int $fk_id_club): void
+   public function supprimerCategorie(int $id, int $utilisateur_id): void
 {
     $stmt = $this->connexion->prepare("
         DELETE FROM Categorie
-        WHERE id_categorie = :id AND fk_id_club = :fk_id_club
+        WHERE id_categorie = :id AND utilisateur_id = :utilisateur_id
     ");
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-    $stmt->bindParam(':fk_id_club', $fk_id_club, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
     $stmt->execute();
 }
+
 
 }
 ?>
