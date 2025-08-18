@@ -86,7 +86,7 @@ $listedestournois = $tournois->afficherLesTournois($userData['id']);
 
 
 echo $template->render([
-  'logo' => $userData['logo'],
+  
   'email' => $userData['email'],
   'pageEnCours' => 'GestionDesRencontres',
 
