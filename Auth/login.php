@@ -8,6 +8,7 @@ if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === "off") {
 ob_start();
 session_start();
 require_once '../class/databaseInformations.php';
+require_once '../class/utilisateurDao.class.php';
 
 // Générer une question captcha si non définie
 if (!isset($_SESSION['captcha_question'])) {
@@ -87,12 +88,14 @@ $stmt->close();
             $resultTournois = $stmtTournois->get_result();
             $dataTournois = $resultTournois->fetch_assoc();
             $stmtTournois->close();
+            $user = new UtilisateurDAO();
 
             if ($dataTournois['total'] > 0 && $dataTournois['total'] == $dataTournois['archived']) {
                 header("Location: ../ajoutTournoi.php");
+                $user->mettreAJourDerniereConnexion($row['id']);
             } else {
                 header("Location: ../ajoutTournoi.php");
-                
+                $user->mettreAJourDerniereConnexion($row['id']);
             }
             exit;
         } elseif ($count == 1) {

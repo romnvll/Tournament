@@ -82,6 +82,18 @@ class UtilisateurDAO {
         $stmt->execute();
     }
 
+    public function mettreAJourDerniereConnexion(int $id): void
+            {
+                $stmt = $this->connexion->prepare("
+                    UPDATE Utilisateurs 
+                    SET dernier_login = NOW()
+                    WHERE id = :id
+                ");
+                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                $stmt->execute();
+            }
+
+
     public function getTousLesUtilisateurs(): array {
         $stmt = $this->connexion->prepare("SELECT id, nom, email FROM Utilisateurs ORDER BY nom ASC");
         $stmt->execute();
