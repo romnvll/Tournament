@@ -52,10 +52,35 @@
 
             </div>
         </div>
-        <div class="col-lg-6 d-flex align-items-center justify-content-center">
-            <img src="logos/Logo.png" class="rounded img-fluid fade-in" alt="Brackito - logiciel de gestion de tournois sportifs">
-        </div>
+                <div class="col-lg-6 d-flex align-items-center justify-content-center position-relative overflow-hidden">
+                        <!-- Vidéo en arrière-plan -->
+                        <video autoplay muted loop playsinline 
+                            class="position-absolute w-100 h-100 object-fit-cover" 
+                            style="z-index:0;">
+                            <source src="videos/HBCAT_Tournoi_herbe.mp4" type="video/mp4">
+                            Ton navigateur ne supporte pas la vidéo.
+                        </video>
+
+                        <!-- Logo en haut à droite -->
+                        <img src="logos/Logo.png" 
+                            class="position-absolute rounded img-fluid fade-in" 
+                            alt="Brackito - logiciel de gestion de tournois sportifs"
+                            style="z-index:1; top:10px; right:10px; width:120px; height:auto;">
+
+                        <!-- Texte explicatif -->
+                        <div class="position-absolute text-end p-3 rounded" 
+                            style="bottom:20px; right:10px; max-width:320px; background:rgba(255,255,255,0.8); z-index:1;">
+                            <small>
+                                Le club <strong>HBCAT</strong> fait confiance à <strong>Brackito</strong> pour organiser son 
+                                tournoi sur herbe, qui rassemble <strong>près de 100 équipes</strong> sur un week-end <br>(Merci à Gontran pour la vidéo).
+                            </small>
+                        </div>
+                    </div>
+
+
+
     </div>
+    
 </div>
 
 
