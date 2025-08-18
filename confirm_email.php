@@ -29,6 +29,17 @@ if (isset($_GET['token'])) {
     $prenom = $userinfo['prenom'];
     $nom = $userinfo['nom'];
     
+
+
+
+    $licenceDao->creerLicenceParDefautFromToken($token);
+    $stmt = $conn->prepare("UPDATE Utilisateurs SET email_confirme = 1 WHERE email_token = ?");
+    $stmt->execute([$token]);
+
+    if ($stmt->rowCount() > 0) {
+        
+
+$categorie->creerCategorie('MiniDebutants',     '#FFC300', $userId);
 $categorie->creerCategorie('MiniDebrouillards', '#DAF7A6', $userId);
 $categorie->creerCategorie('MiniConfirmés',     '#FFC300', $userId);
 $categorie->creerCategorie('U11Mixte',          '#FF6F61', $userId);
@@ -44,17 +55,8 @@ $categorie->creerCategorie('U17M',              '#E67E22', $userId);
 $categorie->creerCategorie('Seniors M',         '#F5B041', $userId);
 $categorie->creerCategorie('Seniors F',         '#E57373', $userId);
 $categorie->creerCategorie('Loisirs',           '#FF7F7F', $userId);
-$categorie->creerCategorie('MiniDebutants',     '#FFC300', $userId);
 
 
-
-    $licenceDao->creerLicenceParDefautFromToken($token);
-    $stmt = $conn->prepare("UPDATE Utilisateurs SET email_confirme = 1 WHERE email_token = ?");
-    $stmt->execute([$token]);
-
-    if ($stmt->rowCount() > 0) {
-        echo "Adresse email confirmée avec succès !";
-        // Rediriger vers la page de connexion ou une autre page
         
 
         //Envoie de mail pour donner les liens
@@ -110,6 +112,9 @@ $mail->AltBody = "Bonjour $prenom $nom,\n\n"
 
 $mail->CharSet = 'UTF-8';
 $mail->send();
+echo "Adresse email confirmée avec succès !";
+sleep(2);
+
 header("Location: Auth/");
         //Fin envoie de mail
 

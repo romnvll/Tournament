@@ -106,15 +106,29 @@
 						<th scope="col">
 							Terrain {{ terrains[i]["nom"] }}
 							
+							
 
-				 {% if tournoiInfo.gestionVoix == 1 %}
-					<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
-						<button class="btn-record">🎙️ Enregistrer</button>
-						<button class="btn-stop" disabled>⏹️ Arrêter</button>
-						<button class="btn-play" disabled>▶️ Écouter</button>
-						<audio class="audio-preview" src="Audio/{{ idTournoi }}/Terrain/{{ terrains[i]['terrain_id'] }}.wav"></audio>
-					</div>
-				{% endif %}
+				{% if tournoiInfo.gestionVoix == 1 %}
+						<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
+							
+							{% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}
+								<!-- Pas encore d’audio -->
+								<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
+								<button class="btn-record">🎙️ Enregistrer</button>
+								<button class="btn-stop" disabled>⏹️ Arrêter</button>
+								<button class="btn-play" disabled>▶️ Écouter</button>
+							{% else %}
+								<!-- Audio disponible -->
+								<i class="fas fa-microphone text-success" title="Audio disponible"></i>
+								<button class="btn-record">🎙️ Réenregistrer</button>
+								<button class="btn-stop" disabled>⏹️ Arrêter</button>
+								<button class="btn-play">▶️ Écouter</button>
+								<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
+							{% endif %}
+							
+						</div>
+					{% endif %}
+
 
 
 
@@ -247,8 +261,28 @@
 																	<div class="d-flex flex-column align-items-center justify-content-center">
 																		<div class="d-flex align-items-center justify-content-center mb-2">
 																			<p class="mb-0">{{ planification.equipe1_nom }}</p>
+																				{% if tournoiInfo.gestionVoix == 1 %}
+																					{% if planification.audio1 is null %}
+																						<!-- Icône micro barré (pas d'audio) -->
+																						<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
+																					{% else %}
+																						<!-- Icône micro normal (audio présent) -->
+																						<i class="fas fa-microphone text-success" title="Audio disponible"></i>
+																					{% endif %}
+																				{% endif %}
+
+																			
 																			<span class="mx-2">vs</span>
 																			<p class="mb-0">{{ planification.equipe2_nom }}</p>
+																				{% if tournoiInfo.gestionVoix == 1 %}
+																					{% if planification.audio2 is null %}
+																						<!-- Icône micro barré (pas d'audio) -->
+																						<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
+																					{% else %}
+																						<!-- Icône micro normal (audio présent) -->
+																						<i class="fas fa-microphone text-success" title="Audio disponible"></i>
+																					{% endif %}
+																				{% endif %}
 																		</div>
 
 																		<div class="d-flex align-items-center justify-content-center mb-2">
