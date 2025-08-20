@@ -188,20 +188,21 @@ if (isset ($_GET['idPoule'])) {
 
  
 //gestion des sponsor
-if (isset($_GET['id_tournoi']) || $_GET['id_tournoi'] != 0)  {
-    if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
-      
-      //recuperation des partenaires du club qui a organiser ce tournoi
-      require_once 'class/SponsorDAO.class.php';
-      $sponsorDao = new SponsorDAO();
-      $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($idTournoi)['utilisateur_id']);
-    
-    }
-    else {
-      $listeDesPartenaires = null;
-    }
+if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
+    $idTournoi = (int) $_GET['id_tournoi'];
 
-  }
+    if ($tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
+        // Récupération des partenaires du club qui a organisé ce tournoi
+        require_once 'class/SponsorDAO.class.php';
+        $sponsorDao = new SponsorDAO();
+        $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub(
+            $tournoiDao->getTournoiById($idTournoi)['utilisateur_id']
+        );
+    } else {
+        $listeDesPartenaires = null;
+    }
+}
+
 
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
