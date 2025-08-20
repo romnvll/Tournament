@@ -15,7 +15,7 @@ if ($idUtilisateur !== null && $idLicence !== null && $idTournoi !== null) {
     
     // Redirection
     header("Location: maLicence.php?id_tournoi=" . urlencode($idTournoi));
-    exit; // Toujours mettre exit après un header Location
+    exit; 
 } else {
     echo "Erreur : paramètres manquants"; var_dump($idTournoi);
 }
