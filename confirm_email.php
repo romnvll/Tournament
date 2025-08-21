@@ -2,12 +2,20 @@
 require_once 'class/databaseInformations.php';
 require_once 'vendor/autoload.php';
 try {
-            $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            echo "Erreur de connexion à la base de données : " . $e->getMessage();
-            exit;
-        }
+    $conn = new PDO(
+        "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
+        $username,
+        $password,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_FOUND_ROWS => true
+        ]
+    );
+} catch (PDOException $e) {
+    echo "Erreur de connexion à la base de données : " . $e->getMessage();
+    exit;
+}
+
 
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
@@ -33,8 +41,9 @@ if (isset($_GET['token'])) {
 
 
     $licenceDao->creerLicenceParDefautFromToken($token);
-    $stmt = $conn->prepare("UPDATE Utilisateurs SET email_confirme = 1 WHERE email_token = ?");
-    $stmt->execute([$token]);
+   $stmt = $conn->prepare("UPDATE Utilisateurs SET email_confirme = 1 WHERE email_token = :token");
+    $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
         
@@ -115,7 +124,7 @@ $mail->send();
 echo "Adresse email confirmée avec succès !";
 sleep(2);
 
-header("Location: Auth/");
+header("Location: Auth/login.php?confirmation=success");
         //Fin envoie de mail
 
         exit();

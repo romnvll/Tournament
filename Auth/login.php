@@ -144,6 +144,12 @@ $stmt->close();
 </head>
 <body>
 <div class="login-card">
+    <h2 class="text-center mb-4">Connexion</h2>
+    <?php if (isset($_GET['confirmation']) && $_GET['confirmation'] == 'success') : ?>
+        <div class="alert alert-success">
+            Votre adresse email a été confirmée avec succès ! Vous pouvez maintenant vous connecter.
+        </div>
+    <?php endif; ?> 
     <form method="post" autocomplete="on">
         <div class="text-center">
             <img src="../logos/Logo.png" class="logo-img img-fluid" alt="Logo">
