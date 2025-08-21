@@ -24,7 +24,7 @@
                     <div class="card-header bg-primary text-white text-center">
                  
                     
-                      <h4>Créer un Tournoi</h4>
+                      <h4>{{ t('CreateTournament')}}</h4>
                     </div>
                     <div class="card-body">
                     
@@ -33,49 +33,79 @@
                     {% else %}
                         <form action="ajoutTournoi_traitement.php" method="post">
                     {% endif %}
-                    <div class="mb-3">
-                        <label for="typeDeSport" class="form-label">Type de sport</label>
-                        <select class="form-select" name="typeDeSport" id="typeDeSport" required>
-                            <option value="" required>-- Sélectionnez un sport --</option>
+                  <div class="form-floating mb-3 position-relative">
+                        <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                            <i class="fa-solid fa-basketball-ball mt-4"></i> {# tu peux changer l'icône selon le sport #}
+                        </span>
+                        <select class="form-select ps-5" name="typeDeSport" id="typeDeSport" required>
+                            <option value="" disabled selected> </option>
                             {% for sport in typeDeSport %}
                                 <option value="{{ sport.id }}">{{ sport.nom }}</option>
                             {% endfor %}
                         </select>
+                         <label for="typeDeSport">{{ t('typeDeSport') }}</label>
+                        
                     </div>
 
 
-                            <div class="mb-3">
-                                <label for="nomTournoi" class="form-label">Nom du tournoi</label>
-                                <input type="text" class="form-control" name="nomTournoi" id="nomTournoi" placeholder="Ex: Tournoi d'été">
+
+                            <div class="mb-3 position-relative">
+                                <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </span>
+                                <input type="text" class="form-control ps-5" name="nomTournoi" id="nomTournoi" placeholder="{{ t('nameOfTournament') }}">
                             </div>
 
-                            <div class="mb-3">
-                                <label for="heuredebut" class="form-label">Heure de lancement</label>
-                                <input type="time" class="form-control" name="heuredebut" id="heuredebut">
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="nbrterrain" class="form-label">Nombre de terrains</label>
-                                <input type="number" class="form-control" name="nbrterrain" id="nbrterrain" min="1" max="20" value="1">
-                            </div>
+                            <div class="form-floating mb-3 position-relative">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted ">
+                                <i class="fa-regular fa-clock mt-4"></i>
+                            </span>
+                            <input type="time" class="form-control ps-5" name="heuredebut" id="heuredebut" placeholder="{{ t('hourStart') }}">
+                            <label for="heuredebut">{{ t('hourStart') }}</label>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="PasHoraire" class="form-label">Durée d'une rencontre (en minutes)</label>
-                                <input type="number" class="form-control" id="PasHoraire" name="pasHoraire" value="{{ infotournoi.pasHoraire }}" required>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="dateTournoi" class="form-label">Date du tournoi</label>
-                                <input type="date" class="form-control" id="dateTournoi" name="dateTournoi">
-                            </div>
+                         <div class="form-floating mb-3 position-relative">
+                        <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                            <img src="img/football.png" alt="terrain" style="width:1.2em; height:1.2em;filter: grayscale(100%);" class="mt-4">
+                        </span>
+                        <input type="number" class="form-control ps-5" name="nbrterrain" id="nbrterrain" min="1" max="20" value="1" placeholder="{{ t('numberOfFields') }}">
+                        <label for="nbrterrain">{{ t('numberOfFields') }}</label>
+                    </div>
+
+
+
+                            <div class="form-floating mb-3 position-relative">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                                <i class="fa-regular fa-clock mt-4"></i> {# icône horloge pour la durée #}
+                            </span>
+                            <input type="number" class="form-control ps-5" 
+                                id="PasHoraire" name="pasHoraire" 
+                                value="{{ infotournoi.pasHoraire }}" 
+                                
+                                required>
+                            <label for="PasHoraire">{{ t('dureeRencontre') }}</label>
+                        </div>
+
+
+                            <div class="form-floating mb-3 position-relative">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+                                <i class="fa-regular fa-calendar mt-3"></i>
+                            </span>
+                            <input type="date" class="form-control ps-5" 
+                                id="dateTournoi" name="dateTournoi">
+                            <label for="dateTournoi">{{ t('dateDuTournoi') }}</label>
+                        </div>
+
                             
                              {% if tousLesTournois|length >= licence['0'].limite_tournois %}
                             <div class="alert alert-warning">
-                                Vous ne pouvez pas créer de nouveau tournoi car vous avez atteint la limite de {{ licence['0'].limite_tournois }} tournoi(s) pour cette licence.
+                                {{ t('limit_tournament_warning', {'%limit%': licence['0'].limite_tournois}) }}
                             </div>
                             {% else %}
                             <button type="submit" class="btn btn-primary w-100 btn-lg">
-                                <i class="fa-solid fa-check-circle"></i> Créer le tournoi
+                                <i class="fa-solid fa-check-circle"></i> {{ t('createTournament') }}
                             </button>
                             {% endif %}
                         </form>

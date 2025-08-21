@@ -10,6 +10,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 require 'class/clubDao.class.php';
@@ -21,6 +22,8 @@ require 'class/equipeDao.class.php';
 require 'class/personneDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/PersonneTableDao.class.php';
+require 'Lang/lang.php';
+
 $tournoiDao = new tournoiDao();
 
 if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {

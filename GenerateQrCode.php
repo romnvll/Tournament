@@ -2,6 +2,8 @@
 require 'security.php';
 require 'class/tournoiDao.class.php';
 require_once 'class/SponsorDAO.class.php';
+require_once 'Lang/lang.php';
+
 use chillerlan\QRCode\{QRCode, QROptions};
 
 require_once('vendor/autoload.php');
@@ -42,7 +44,7 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $tournoiNom ?> - QR Code</title>
+    <title><?= $tournoiNom ?> - <?= t('qrCode') ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -78,11 +80,11 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
 
     <div class="container-fluid text-center">
         <button class="btn btn-primary btn-lg btn-print no-print" onclick="window.print()">
-            <i class="fas fa-print"></i> Imprimer
+            <i class="fas fa-print"></i> <?= t('imprimer') ?>
         </button>
 
         <h2 class="mt-1">
-            <i class="fas fa-qrcode"></i> Scannez pour voir les horaires et lieux de vos rencontres !
+            <i class="fas fa-qrcode"></i> <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
         </h2>
 
         <p class="text-primary fw-bold fs-4">
@@ -94,19 +96,19 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
             <div class="col-md-3 ">
                 <div class="card p-3">
                     <img src="<?= $qrcode ?>" alt="QR Code" class="qr-image">
-                    <p class="mt-2"><i class="fas fa-mobile-alt"></i> Scannez avec votre smartphone</p>
+                    <p class="mt-2"><i class="fas fa-mobile-alt"></i> <?= t('ScannezAvecVotreSmartphone') ?></p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card p-3">
                     <img src="Qr.png" alt="QR Code" class="qr-image">
-                    <p class="mt-2"><i class="fas fa-handshake"></i> Matchevent Pro - Votre gestionnaire de tournois</p>
+                    <p class="mt-2"><i class="fas fa-handshake"></i><?= t('BrackitoVotreGestionnaireDeTournois') ?></p>
                 </div>
             </div>
         </div>
         <div class="row mt-4 align-items-center no-print">
             <p class="display-6 text-center text-danger">
-                Pour un meilleur résultat, imprimer cette affiche en paysage.
+                <?= t('impressionPaysage') ?>
             </p>
         </div>
 

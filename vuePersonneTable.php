@@ -33,13 +33,15 @@ session_start();
 
 
 $tournoiId = $_SESSION['tournoiId'];
+
 $tournoiDao = new TournoiDAO();
+
 if ( $tournoiDao->getTournoiById($tournoiId)['gestionPartenaires'] == 1) {
   
   //recuperation des partenaires du club qui a organiser ce tournoi
   require_once 'class/SponsorDAO.class.php';
   $sponsorDao = new SponsorDAO();
-  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($tournoiId)['club_id']);
+  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($tournoiId)['utilisateur_id']);
  
 }
 else {
