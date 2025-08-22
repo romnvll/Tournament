@@ -60,15 +60,16 @@ class LabelDao {
     public function getLabelsWithCreneauxByTournoiId(int $tournoi_id)
 {
     $sql = "
-        SELECT 
-    c.nom AS creneau_horaire, 
-    GROUP_CONCAT(l.description ORDER BY l.description SEPARATOR ' + ') AS labels
+      SELECT
+    c.nom AS creneau_horaire,
+    GROUP_CONCAT(DISTINCT l.description ORDER BY l.description SEPARATOR ' + ') AS labels
 FROM Planification p
 JOIN Creneaux c ON p.creneau_id = c.creneau_id
 JOIN Labels l ON p.label_id = l.label_id
 WHERE p.label_id IS NOT NULL AND p.tournoi_id = :tournoi_id
 GROUP BY c.nom
 ORDER BY c.nom
+
 
 
     ";
