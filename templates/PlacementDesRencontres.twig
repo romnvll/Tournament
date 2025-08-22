@@ -194,7 +194,8 @@
                      <th scope="col" class="sticky-top bg-white" style="z-index: 1;">
                         <form id="terrain{{i}}">
                             <input type="hidden" name="terrain_id" value="{{terrains[i]['terrain_id']}}">
-                            <input type="text" class="form-control form-control-sm" value="{{terrains[i]['nom']}}" name="nomTerrain" size="2"
+                            <input type="text" class="form-control form-control-sm" value="{{terrains[i]['nom']}}" name="nomTerrain"
+                                maxlength="10"
                                 hx-post="PlacementDesRencontresTraitement.php"
                                 hx-trigger="change"
                                 hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']"

@@ -2,6 +2,7 @@
 require 'security.php';
 require 'vendor/autoload.php';
 require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 $licenceDao = new LicenceDao();
 $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
@@ -13,6 +14,8 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
+
 
 
 require_once 'class/clubDao.class.php';

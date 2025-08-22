@@ -23,17 +23,17 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if pageEnCours == 'GestionClub' %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-users me-1"></i> Gestion des clubs
+                        <i class="fa-solid fa-users me-1"></i>{{t('gestionDesClubs')}}
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="creerClub.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-building-user"></i> 1 - Créer un club
+                                <i class="fa-solid fa-building-user"></i> 1 - {{t('creerClub')}} 
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="modifierClub.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-user-gear"></i> 2 - Modifier un club
+                                <i class="fa-solid fa-user-gear"></i> 2 - {{t('modifierClub')}} 
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"/></li>
@@ -42,17 +42,17 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if pageEnCours == 'GestionTournois' %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-trophy me-1"></i> Gestion des tournois
+                        <i class="fa-solid fa-trophy me-1"></i> {{t('gestionDesTournois')}} 
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="ajoutTournoi.php">
-                                <i class="fa-solid fa-folder-plus"></i> 1 - Créer un tournoi
+                                <i class="fa-solid fa-folder-plus"></i> 1 - {{t('creerTournoi')}} 
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="modifierTournoi.php?idTournoi={{idTournoi}}">
-                                <i class="fa-solid fa-sliders"></i> 2 - Paramétrer un tournoi
+                                <i class="fa-solid fa-sliders"></i> 2 - {{t('parametresTournoi')}} 
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"/></li>
@@ -62,23 +62,23 @@
                 <li class="nav-item">
                 
                     <a class="nav-link d-flex align-items-center {% if pageEncours == 'ajoutEquipe' %} active {% endif %}" href="ajoutEquipe.php?idTournoi={{idTournoi}}" title="Gestion des équipes">
-                        <i class="fa-solid fa-users-line me-1"></i> Équipes
+                        <i class="fa-solid fa-users-line me-1"></i> {{t('equipes')}} 
                     </a>
                 </li>
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if pageEnCours == 'GestionDesPoules' %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-border-all me-1"></i> Gestion des poules
+                        <i class="fa-solid fa-border-all me-1"></i> {{t('gestionDesPoules')}} 
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="gestionPoules.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-arrows-rotate"></i> 1 - Générer automatiquement
+                                <i class="fa-solid fa-arrows-rotate"></i> 1 - {{t('genererAutomatiquementLesPoules')}}  
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="modifierPoules.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-pencil"></i> 2 - Retoucher les poules
+                                <i class="fa-solid fa-pencil"></i> 2 - {{t('retoucherPoules')}}   
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"/></li>
@@ -87,40 +87,40 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if pageEnCours == 'GestionDesRencontres' %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-handshake"></i> Gestion des rencontres
+                        <i class="fa-solid fa-handshake"></i> {{t('gestionDesRencontres')}} 
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-calendar-days"></i> 1 - Placer les rencontres
+                                <i class="fa-solid fa-calendar-days"></i> 1 - {{t('placerLesRencontres')}}  
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="gestionToutesLesRencontres.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-book-open"></i> 2 - Insérer les scores par terrain
+                                <i class="fa-solid fa-book-open"></i> 2 - {{t('insererScoresParTerrain')}} 
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="gestionRencontres.php?idTournoi={{idTournoi}}&idPoule=0">
-                                <i class="fa-solid fa-list-ol"></i> 3 - Résultats par poules
+                                <i class="fa-solid fa-list-ol"></i> 3 - {{t('ResultatsParPoules')}}  
                             </a>
                         </li>
 
                          <li>
                             <a class="dropdown-item" href="resultatsParCategorie.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-ranking-star"></i> 4 - Résultats par catégorie
+                                <i class="fa-solid fa-ranking-star"></i> 4 - {{t('resultatParCategorie')}}  
 
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}">
-                                <i class="fa-solid fa-flag-checkered"></i> 5 - Phases finales
+                                <i class="fa-solid fa-flag-checkered"></i> 5 - {{t('phasesFinales')}} 
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"/></li>
                         <li>
                             <a class="dropdown-item" href="suppressionRencontres.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-trash-can"></i> Suppression des rencontres
+                                <i class="fa-solid fa-trash-can"></i> {{t('supressionDesRencontres')}}  
                             </a>
                         </li>
                     </ul>
@@ -128,15 +128,15 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if pageEnCours == 'Stats' %} active {% endif %}" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
-                        <i class="fa-solid fa-chart-column"></i> Statistiques
+                        <i class="fa-solid fa-chart-column"></i> {{t('statistiques')}}  
                     </a>
                     <ul class="dropdown-menu">
                         <li>
                             <a class="dropdown-item" href="statsByClubs.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-house-signal"></i> Par club
+                                <i class="fa-solid fa-house-signal"></i> {{t('parClub')}}  
                             </a>
                             <a class="dropdown-item" href="tableauDeBord.php">
-                                <i class="fa-solid fa-gear"></i> Tableau de bord
+                                <i class="fa-solid fa-gear"></i> {{t('tableauDeBord')}}  
                             </a>
                         </li>
                     </ul>
@@ -148,25 +148,25 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="Auth/logout.php?logout">
-                                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                            <a class="dropdown-item" href="Auth/logout.php?logout"> 
+                                <i class="fa-solid fa-right-from-bracket"></i> {{t('deconnexion')}} 
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="mesPreferences.php?id_tournoi={{idTournoi}}">
-                                <i class="fa-solid fa-gear"></i> Mes préférences
+                                <i class="fa-solid fa-gear"></i> {{t('mesPreferences')}}  
                             </a>
                             
                         </li>
                         <li>
                                 <a class="dropdown-item" href="maLicence.php?id_tournoi={{idTournoi}}">
-                                    <i class="fa-solid fa-id-card"></i> Ma licence
+                                    <i class="fa-solid fa-id-card"></i> {{t('maLicence')}}
                                 </a>
                             </li>
 
                             <li>
                                 <a class="dropdown-item" href="assistance.php?id_tournoi={{idTournoi}}">
-                                    <i class="fa-solid fa-circle-question"></i> Assistance
+                                    <i class="fa-solid fa-circle-question"></i> {{t('assistance')}} 
                                 </a>
                             </li>
 

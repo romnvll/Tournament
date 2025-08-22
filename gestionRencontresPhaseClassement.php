@@ -7,6 +7,7 @@ require  'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/categorie.class.php';
 require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
@@ -16,6 +17,7 @@ $twig = new \Twig\Environment($loader, [
 ]);
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('GestionRencontresPhasesClassement.twig');
 $poulemanager = new PouleManager();
 $rencontreDao = new RencontreDAO();

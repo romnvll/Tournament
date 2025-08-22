@@ -3,6 +3,7 @@
 require ('security.php');
 require 'vendor/autoload.php';
 require_once 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 
 
@@ -24,6 +25,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('maLicence.twig');
 
 

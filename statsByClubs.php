@@ -2,6 +2,7 @@
 require 'security.php';
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
+require 'Lang/lang.php';
 
 $tournois = new tournoiDao();
 
@@ -29,6 +30,7 @@ $twig = new \Twig\Environment($loader, [
 
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('statsByClubs.twig');
 
 
@@ -64,7 +66,7 @@ if ($dateTime === false) {
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEnCours' => 'Stats',
     //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
     //'afficherLesTournois' => $tournoi->getAllTournoi(),

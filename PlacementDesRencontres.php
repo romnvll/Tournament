@@ -11,6 +11,7 @@ require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
 require 'class/licenceDao.class.php';
 require 'class/equipeDao.class.php';
+require 'Lang/lang.php';
 
 
 $licenceDao = new LicenceDao();
@@ -24,7 +25,9 @@ $twig = new \Twig\Environment($loader, [
 ]);
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('PlacementDesRencontres.twig');
+
 
 $tournois = new tournoiDao();
 $creneaux = new creneauxDao();

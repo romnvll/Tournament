@@ -3,6 +3,7 @@ require 'security.php';
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
 require 'class/pouleManagerDao.class.php';
+require 'Lang/lang.php';
 
 $tournois = new tournoiDao();
 $poulemanager = new PouleManager();
@@ -32,6 +33,7 @@ $twig = new \Twig\Environment($loader, [
 
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('suppressionRencontres.twig');
 
 if (isset ($_GET['id_tournoi'])) {
@@ -45,7 +47,7 @@ if (isset ($_GET['idPoule'])) {
 
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
     'pageEnCours' => 'GestionDesRencontres',
     //'afficherRencontreByIdTournoi' =>  $recontreDao->afficherRencontreByIdTournoi($_GET['idTournoi']),
     //'afficherLesTournois' => $tournoi->getAllTournoi(),

@@ -6,6 +6,7 @@ require 'class/tournoiDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/clubDao.class.php';
+require 'Lang/lang.php';
 
 $tournoiDao = new tournoiDao();
 
@@ -17,6 +18,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('tableauDeBord.twig');
 
 

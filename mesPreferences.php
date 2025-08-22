@@ -5,6 +5,7 @@ require 'vendor/autoload.php';
 require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
 require_once 'class/SponsorDAO.class.php';
+require 'Lang/lang.php';
 
 $sponsorDao = new SponsorDAO();
 $categories = new CategorieDao();
@@ -18,7 +19,9 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('mesPreferences.twig');
+
 
 $club = new ClubDAO();
 $label = new LabelDao();

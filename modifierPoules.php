@@ -5,6 +5,7 @@ require 'class/pouleManagerDao.class.php';
 require 'class/tournoiDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 $tournois = new tournoiDao();
 $poules = new PouleManager();
@@ -15,6 +16,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {

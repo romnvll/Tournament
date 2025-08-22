@@ -3,6 +3,7 @@ require ('security.php');
 require ('class/clubDao.class.php');
 require 'vendor/autoload.php';
 require 'class/typeSportDao.class.php';
+require 'Lang/lang.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -11,6 +12,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('modifierClub.twig');
 
 $club = new ClubDAO();

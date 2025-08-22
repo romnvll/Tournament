@@ -5,6 +5,7 @@ require ('security.php');
 require 'class/equipeDao.class.php';
 require 'class/tournoiDao.class.php';
 require 'vendor/autoload.php';
+require 'Lang/lang.php';
 
 
 
@@ -15,7 +16,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
-
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $tournoi = new tournoiDao();
 
 
@@ -24,7 +25,7 @@ $tournoi = new tournoiDao();
 $template = $twig->load('resultatsParCategorie.twig');
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEnCours' => 'GestionDesRencontres',
   'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),
 

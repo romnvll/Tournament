@@ -35,11 +35,9 @@
 
     
 
-    <div class="row
+    <div class="row">
     
-    {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today >= dateFin %} 
-      d-none
-     {% endif %}">
+    
 
     
 
@@ -205,12 +203,6 @@
 
         </div>
     </div>
-    {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today >= dateFin %}  
-					<div class="col-lg-12">
-						<div class="alert alert-warning" role="alert">
-							<i class="fa-solid fa-exclamation-triangle me-2"></i>
-							Vous avez atteint la limite d'équipes autorisées pour ce tournoi.
-						</div>
-				{% endif %}
+   
 </body>
 </html>

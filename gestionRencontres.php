@@ -9,7 +9,8 @@ require 'class/tournoiDao.class.php';
 
 require 'class/pouleManagerDao.class.php';
 require 'vendor/autoload.php';
-session_start();
+require 'Lang/lang.php';
+
 $_SESSION['idTournoi'] = $_GET['idTournoi'];
 
 
@@ -20,6 +21,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 $tournoi = new tournoiDao();
 $poulemanager = new PouleManager();
@@ -63,7 +65,7 @@ if (isset ($_GET['idPoule'])) {
 $template = $twig->load('GestionRencontres.twig');
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+
   'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
   'pageEnCours' => 'GestionDesRencontres',
   'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),

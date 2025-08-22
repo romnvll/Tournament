@@ -3,6 +3,7 @@ require 'security.php';
 require 'vendor/autoload.php';
 require 'class/assistanceDao.class.php';
 require 'secureCookies.php';
+require 'Lang/lang.php';
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -10,6 +11,7 @@ $twig = new \Twig\Environment($loader, [
     'debug' => true,
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 $assistanceDao = new AssistanceDao();
 

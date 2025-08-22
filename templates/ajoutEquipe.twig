@@ -49,19 +49,19 @@ select::picker(select):popover-open {
                         <div class="card shadow-sm p-4">
                             {% if AfficherLesEquipes['nombre'] > licence.limite_equipes  %}
                                 <div class="alert alert-danger">
-                                    Vous avez atteint la limite de {{ licence.limite_equipes }} équipes pour ce tournoi.
-                                    Veuillez contacter l'administrateur si vous souhaitez ajouter plus d'équipes.
+                                {{t('limiteAtteinteMessage',{'%licence.limite_equipes%':licence.limite_equipes})}}
+                                                                    
                                 </div>
                             {% endif %}
-                            <h5 class="text-center mb-3">Ajouter une équipe</h5>
+                            <h5 class="text-center mb-3">{{t('ajouterEquipe')}}</h5>
                             <div class="form-group mb-3">
-                                <label for="nomEquipe" class="form-label">Noms de l'équipe</label>
+                                <label for="nomEquipe" class="form-label">{{t('nomEquipe')}}</label>
                                 <input type="text" class="form-control" name="nomEquipe" id="nomEquipe" placeholder="Ex: HBCAT2" required />
                             </div>
                             <div class="form-group mb-3">
-                                <label for="Categorie" class="form-label">Choisir la catégorie</label>
+                                <label for="Categorie" class="form-label">{{t('choisirCategorie')}}</label>
                                 <select class="form-select" name="Categorie" id="Categorie" required>
-                                    <option value="" disabled selected>Choisir une catégorie...</option>
+                                    <option value="" disabled selected>{{t('choisirCategorie')}}</option>
                                     {% for categorie in AfficheLesCategories %}
                                         <option value="{{categorie.id_categorie}}">{{categorie.Nom_categorie}}</option>
                                     {% endfor %}
@@ -69,7 +69,7 @@ select::picker(select):popover-open {
                             </div>
                             <input type="hidden" value="{{tournoiEnCours}}" name="IdTournoi">
                             <div class="form-group mb-3">
-                                <label for="club" class="form-label">Choisir le club de l'équipe</label>
+                                <label for="club" class="form-label">{{t('selectionnerClub')}}</label>
                                 <select class="form-select" name="idClubs" id="club" required>
                                     {% for club in AfficherClub %}
                                         <option value="{{ club.id }}">{{ club.nom|upper }}</option>
@@ -81,17 +81,17 @@ select::picker(select):popover-open {
 
                               <div class="d-grid gap-2">
                                     {% if AfficherLesEquipes['nombre'] < licence.limite_equipes %}
-                                        <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
+                                        <input type="submit" class="btn btn-success btn-lg" value="{{t('ajouterEquipe')}}" />
                                     {% elseif AfficherLesEquipes['nombre'] > licence.limite_equipes or today > dateFin %}
                                         <button type="submit" class="btn btn-secondary btn-lg" disabled>
                                             {% if today > dateFin %}
-                                                Tournoi terminé
+                                                {{t('tournoiTermine')}}
                                             {% else %}
-                                                Ajouter l'équipe (limite atteinte) 
+                                                {{t('ajouterEquipe')}} ({{t('limiteAtteinte')}}) 
                                             {% endif %}
                                         </button>
                                     {% else %}
-                                        <input type="submit" class="btn btn-success btn-lg" value="Ajouter l'équipe" />
+                                        <input type="submit" class="btn btn-success btn-lg" value="{{t('ajouterEquipe')}}" />
                                     {% endif %}
                                 </div>
 
@@ -108,7 +108,7 @@ select::picker(select):popover-open {
                                 {{tournament.nom}} <i class="fas fa-trophy"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="z-index: 10;">
                                     {{tournament.nombre_equipes}}/{{licence.limite_equipes}}
-                                    <span class="visually-hidden">équipes</span>
+                                    <span class="visually-hidden">{{t('equipe')}}</span>
                                 </span>
                             </a>
                         {% endif %}
@@ -121,7 +121,7 @@ select::picker(select):popover-open {
                                 type="text" 
                                 class="form-control" 
                                 name="query" 
-                                placeholder="Rechercher une équipe, un club, une catégorie..."
+                                placeholder="{{t('RechercherUneEquipeUnClubUneCategorie')}}"
                                 value="{{ query|default('') }}"  
                             >
                             <button class="btn btn-primary" type="submit">🔍</button>
@@ -132,11 +132,11 @@ select::picker(select):popover-open {
                             >❌</a>
                         </div>
                             <div class="form-text text-muted">
-                                🔢  nombre : <strong>{{ AfficherLesEquipes.nombre }}</strong>
+                                🔢  {{t('nombre')}} : <strong>{{ AfficherLesEquipes.nombre }}</strong>
                             </div>
                         {% if query is defined and query != '' %}
                             <div class="form-text text-muted">
-                                🔎 Filtre actif : <strong>{{ query }}</strong>
+                                🔎 {{t('filtreActif')}} : <strong>{{ query }}</strong>
                             </div>
                         {% endif %}
                     </form>
@@ -149,12 +149,12 @@ select::picker(select):popover-open {
                         <thead>
                             <tr>
                                 <th scope="col" class="text-center" style="display:none">Id</th>
-                                <th scope="col" class="text-center">Club</th>
-                                <th scope="col" class="text-center">Nom de l'équipe</th>
+                                <th scope="col" class="text-center">{{t('Club')}}</th>
+                                <th scope="col" class="text-center">{{t('nomEquipe')}}</th>
                                {% if infotournoi.gestionVoix == 1 %} <th scope="col" class="text-center">Son de l'équipe</th> {% endif %}
-                                <th scope="col">Categorie</th>
-                                <th scope="col">Changer vers categorie</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">{{t('categorie')}}</th>
+                                <th scope="col">{{t('changerVersCategorie')}}</th>
+                                <th scope="col">{{t('action')}}</th>
                                 
                             </tr>
                           
@@ -179,7 +179,7 @@ select::picker(select):popover-open {
                             <input type="hidden" name="changeClub" value="true">
                             
                                 <select name="club_id" class="form-select float-start" style="display:none;" onchange="this.form.submit()">
-                                    <option value="">-- Sélectionner un club --</option>
+                                    <option value="">{{t('selectionnerClub')}}</option>
                                    {% for club in AfficherClub %}
                                     <option value="{{ club.id }}"
                                         {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today > dateFin %} disabled {% endif %}>
@@ -204,7 +204,8 @@ select::picker(select):popover-open {
                                         <input 
                                             type="text" 
                                             class="form-control" 
-                                            size="20" 
+                                            size="12"
+                                            maxlength="12"
                                             name="nomEquipe" 
                                             value="{{ equipe.nom }}"
                                             hx-post="modifierEquipe.php"
@@ -244,8 +245,8 @@ select::picker(select):popover-open {
                                     </td>
                                     {% if infoTournoi.gestionVoix == 1 %}
                                   <td class="text-center" data-id-tournoi="{{tournoiEnCours}}" data-id-equipe="{{ equipe.id }}">
-                                        <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ Enregistrer</button>
-                                            <button onclick="stopRecording(this)" class="btn btn-sm btn-danger" disabled>⏹️ Stop</button>
+                                        <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ {{t('enregistrer')}}</button>
+                                            <button onclick="stopRecording(this)" class="btn btn-sm btn-danger" disabled>⏹️ {{t('stop')}}</button>
                                             <br>
                                             <audio controls style="margin-top:5px;" preload="none" src=Audio/{{idTournoi}}/Equipe/{{ equipe.id }}.wav></audio>
                                         {% if equipe.audio_path == null %}
