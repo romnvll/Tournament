@@ -1,6 +1,6 @@
 <?php
 
-use Twig\Node\Expression\ConstantExpression;
+session_start();
 
 require 'vendor/autoload.php';
 require 'class/PersonneTableDao.class.php';
@@ -29,7 +29,6 @@ $infoUser=null;
 $affichagePlanification=null;
 $key = null;
 
-session_start();
 
 
 $tournoiId = $_SESSION['tournoiId'];

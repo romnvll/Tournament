@@ -103,27 +103,37 @@
             </div>
             
         {% else %}
+        
             {% set countVisibleTournois = 0 %}
             {% for tournoi in ListeDesTournois %}
+            
                 {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
                     {% set countVisibleTournois = countVisibleTournois + 1 %}
                 {% endif %}
             {% endfor %}
 
             {% if infoTournoiEnCours|length == 0 %}
-             
+            
 
 {% include ('accueil.twig') %}
 
+            {% elseif countVisibleTournois == 0 and infoTournoiEnCours.isArchived == 0 and infoTournoiEnCours.isVisible == 1 %}
+                <div class="container-fluid">
+                    <div class="alert alert-warning text-center mt-5">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Ce tournoi n'est plus disponible</h2>
+                        <p>Il n'y a actuellement aucun tournoi en cours ou à venir.</p>
+                    </div>
+                </div>
+            {% else %}
  {% set hasNonArchived = false %}
 
-{% for tournoi in ListeDesTournois %}
+        {% for tournoi in ListeDesTournois %}
 
-    {% if tournoi.isArchived == 0 %}
-        {% set hasNonArchived = true %}
-        
-    {% endif %}
-{% endfor %}
+            {% if tournoi.isArchived == 0 %}
+                {% set hasNonArchived = true %}
+                
+            {% endif %}
+        {% endfor %}
 
 
                 <div class="container-lg">
@@ -153,6 +163,7 @@
                         <div class="col-lg-3 text-left choisirClub">
                             {% if idTournoi %}
                                 {% if visibility == 1 %}
+                                
                                     <div class="bg-success bg-opacity-10 border border-success rounded-3 p-3 shadow-sm">
                                         <div class="d-flex justify-content-between">
                                             <div>
@@ -172,6 +183,7 @@
 
                                     <ul class="list-group no-bullet">
                                     <li class="">
+                                    
                                         {% for club in listeDesCLubs %}
                          
                                     <li>
@@ -403,105 +415,98 @@
                                     </td>
                                     <td class="align-middle text-center">
 
-                                        <div class="d-flex justify-content-center flex-column align-items-center mt-2">
-                                           
+  <!-- Heure -->
+  {% if heureIsVisible == 1 and equipe.creneau_nom is not empty %}
+    <div class="mb-2 p-2 bg-light rounded shadow-sm d-inline-flex align-items-center">
+      <i class="fas fa-clock me-2 text-primary"></i>
+      <span class="fw-bold">{{ equipe.creneau_nom|slice(0, -3) }}</span>
+    </div>
+  {% endif %}
 
-                                              {% if heureIsVisible == 1 %}
-                                                    {% if not equipe.creneau_nom is empty %}
-                                                    <p class="fw-bold">
-                                                    <i class="fas fa-clock"></i>
-                                                    {{ equipe.creneau_nom|slice(0, -3) }}
-                                                    </p>                                          
-                                                 {% else %}
-                                           
-                                                <span class="badge bg-warning text-dark">
-                                                    A planifier
-                                                </span>
-                                                    
-                                                {% endif %}
-                                            {% endif %}
+  <!-- Terrain -->
+  {% if nbrTerrains > 1 and equipe.terrain_nom != 0 %}
+    <a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true"
+       class="d-inline-block mb-2 text-decoration-none">
+      <span class="badge rounded-pill bg-success px-3 py-2 shadow">
+        <i class="fas fa-map-marker-alt me-1"></i> {{ equipe.terrain_nom|upper }}
+      </span>
+    </a>
+  {% endif %}
 
-                                    </div>
+  <!-- Arbitre -->
+  {% if gestionArbitres == 1 and (equipe.arbitre_nom or equipe.arbitre_club_nom) %}
+    <div class="mb-2 small text-muted">
+      <i class="fas fa-user-tie me-1 text-dark"></i>
+      {{ equipe.arbitre_nom|capitalize }} ({{ equipe.arbitre_club_nom|upper }})
+    </div>
+  {% endif %}
 
-                                     <div class="d-flex justify-content-center flex-column align-items-center mb-2 position-relative">
-                                           {% if nbrTerrains > 1 %} 
-                                            {% if equipe.terrain_nom != 0 %}
-                                        
-                                            <a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true">
-                                                <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50" alt="terrain">
-                                                <h6 class="position-absolute top-50 start-50 translate-middle">
-                                                    <span class="badge rounded-pill bg-danger">{{ equipe.terrain_nom }}</span>
-                                                </h6>
-                                            </a>
-                                        
-                                    
-                                        {% endif %}
-                                        {% endif %}
-                                     </div>
+  <!-- Catégorie -->
+  <div class="mb-2">
+    <span class="badge rounded-pill px-3" 
+          style="background-color: {{ equipe.equipe2_categorie_couleur }}; color:#000;">
+      {{ equipe.equipe2_categorie_nom }}
+    </span>
+  </div>
 
-                                     
-                                        <div class="d-flex justify-content-center flex-column align-items-center mb-2">
-                                            {% if gestionArbitres == 1 and equipe.arbitre_nom or equipe.arbitre_club_nom %}
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-user-tie"></i><i class="material-icons me-2" style="color: black; font-size: 20px;">sports</i>
-                                                    <span>{{ equipe.arbitre_nom|capitalize  }} {{ equipe.arbitre_club_nom|upper }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="d-flex justify-content-center flex-nowrap mb-2">
-                                            
-                                            <span class="badge" style="background-color: {{ equipe.equipe2_categorie_couleur }}; color: #000;">
-                                                {{ equipe.equipe2_categorie_nom }} 
-                                            </span>
-                                        </div>
-                                        <div class="d-flex justify-content-center flex-nowrap">
-                                            {% if equipe.score1 > equipe.score2 %}
-                                                <span class="badge bg-success">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-danger">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 < equipe.score2 %}
-                                                <span class="badge bg-danger">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-success">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 is same as(equipe.score2) and (equipe.score1 is not null or equipe.score2 is not null) %}
-                                                <span class="badge bg-secondary">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-secondary">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 or equipe.score2 == null %}
-                                                <span class="badge bg-secondary">0</span>-
-                                                <span class="badge bg-secondary">0</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            {% if equipe.isTerminated == 0 %}
-                                                <span class="badge bg-warning text-dark">À venir</span>
-                                            {% elseif equipe.isTerminated == 1 %}
-                                                <span class="badge bg-danger">Rencontre terminée</span>
-                                            {% elseif equipe.isTerminated == 2 %}
-                                                <span class="badge bg-info text-dark d-inline-flex align-items-center">
-                                                    <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-                                                    Rencontre en cours
-                                                </span>
-                                            {% endif %}
-                                        </div>
+  <!-- Score -->
+  <div class="mb-2 fs-5 fw-bold">
+    {% if equipe.score1 > equipe.score2 %}
+      <span class="badge bg-success px-3">{{ equipe.score1 }}</span>
+      <span class="mx-1">-</span>
+      <span class="badge bg-danger px-3">{{ equipe.score2 }}</span>
+    {% elseif equipe.score1 < equipe.score2 %}
+      <span class="badge bg-danger px-3">{{ equipe.score1 }}</span>
+      <span class="mx-1">-</span>
+      <span class="badge bg-success px-3">{{ equipe.score2 }}</span>
+    {% else %}
+      <span class="badge bg-secondary px-3">{{ equipe.score1 ?? 0 }}</span>
+      <span class="mx-1">-</span>
+      <span class="badge bg-secondary px-3">{{ equipe.score2 ?? 0 }}</span>
+    {% endif %}
+  </div>
 
-                                         {% if partenaires is not empty %}
-                                            {% set randIndex = random(0, partenaires|length - 1) %}
-                                            {% set sponsor = partenaires[randIndex] %}
-                                                    <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                        <div class="text-muted small">
-                                                            <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                            {% if sponsor.description %}
-                                                                <br><em>{{ sponsor.description }}</em>
-                                                            {% endif %}
-                                                        </div>
+  <!-- Statut du match -->
+  <div class="mb-2">
+    {% if equipe.isTerminated == 0 %}
+      <span class="badge bg-warning text-dark shadow-sm">À venir</span>
+    {% elseif equipe.isTerminated == 1 %}
+      <span class="badge bg-danger shadow-sm">Rencontre terminée</span>
+    {% elseif equipe.isTerminated == 2 %}
+      <span class="badge bg-info text-dark d-inline-flex align-items-center shadow-sm">
+        <span class="spinner-grow spinner-grow-sm me-2" role="status"></span>
+        Rencontre en cours
+      </span>
+    {% endif %}
+  </div>
 
-                                                        {% if sponsor.logo %}
-                                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                        {% endif %}
+  <!-- Sponsor -->
+  {% if partenaires is not empty %}
+    {% set randIndex = random(0, partenaires|length - 1) %}
+    {% set sponsor = partenaires[randIndex] %}
+    <div class="card mt-2 shadow-sm border-0">
+      <div class="card-body p-2 d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+          Sponsorisé par 
+          <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" class="fw-bold text-decoration-none">
+            {{ sponsor.nom }}
+          </a>
+          {% if sponsor.description %}
+            <br><em>{{ sponsor.description }}</em>
+          {% endif %}
+        </small>
+        {% if sponsor.logo %}
+          <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" 
+                 class="img-fluid ms-2" style="max-height:40px;">
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
 
-                                    </td>
+</td>
+
                                     <td class="align-middle text-center">
                                         <div class="d-flex flex-column align-items-center">
                                             <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByTeam=true">
