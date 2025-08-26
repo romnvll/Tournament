@@ -22,7 +22,7 @@
    <div class="alert alert-danger alert-dismissible fade show d-flex" role="alert">
   <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
   <div>
-    <strong>Attention!</strong> Des rencontres sont deja créées dans cette poule, si vous devez modifier une poule, il faut supprimer les rencontres existantes <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">ici</a> .
+    <strong>{{ t('attention')}}</strong> {{t('rencontresDejaPlacees')}} <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">{{t('placerLesRencontres')}}</a> .
   </div>
 </div>
 {% endif %}
@@ -90,9 +90,9 @@
                        <table class="table">
                         <thead>
                             <tr>
-                            <th scope="col">Equipe</th>
-                            <th scope="col">Deplacer dans cette poule</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">{{t('equipe')}}</th>
+                            <th scope="col">{{t('deplacerDansCettePoule')}}</th>
+                            <th scope="col">{{t('action')}}</th>
                             
                             </tr>
                         </thead>
@@ -108,7 +108,7 @@
                           
                             
                             <select class="form-select" aria-label="Default select example" name="dstpoule">
-                              <option value="" disabled selected>Poule de destination</option>
+                              <option value="" disabled selected>{{t('pouleDeDestination')}}</option>
                               {% for poule in poules %}
                                   {% set pouleCategorieParts = poule.nomPoule|split('-') %}
                                   {% if poule.nomPoule starts with 'Mini' or (pouleCategorieParts|length > 1 and pouleCategorieParts[0]|trim == equipe.Nom_categorie) %}
@@ -126,7 +126,7 @@
                               </select>
                               
                              </td>
-                            <td> <input type="submit" class="btn btn-primary" value="Déplacer">   </td>
+                            <td> <input type="submit" class="btn btn-primary" value="{{t('deplacer')}}">   </td>
                             </form>
                              </tr>
                             {% endfor %}

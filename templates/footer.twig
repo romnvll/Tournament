@@ -6,44 +6,44 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tarifsModalLabel">Tarifs</h5>
+        <h5 class="modal-title" id="tarifsModalLabel">{{t('footerTarifs')}}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
       <div class="modal-body">
-        <p>Voici les tarifs pour l'utilisation de Brackito :</p>
+        <p>{{t('captionTitre')}}</p>
         <div class="row">
   <div class="col-md-4 mb-3">
     <div class="card h-100">
-      <div class="card-header text-bg-secondary">Gratuit</div>
+      <div class="card-header text-bg-secondary">{{t('captionGratuit')}}</div>
       <div class="card-body">
-        <p><strong>Nombre de tournoi :</strong> 1</p>
-        <p><strong>Équipes / tournoi :</strong> 8</p>
-        <p><strong>Durée de validité :</strong> Illimité</p>
-        <p><strong>Tarif :</strong> 0 €</p>
+        <p><strong>{{t('nombreDeTournois')}}:</strong> 1</p>
+        <p><strong>{{t('equipesParTournoi')}}:</strong> 8</p>
+        <p><strong>{{t('dureeDeValidite')}}:</strong> {{t('illimite')}}</p>
+        <p><strong>{{t('footerTarifs')}} :</strong> 0 €</p>
       </div>
     </div>
   </div>
 
   <div class="col-md-4 mb-3">
     <div class="card h-100">
-      <div class="card-header text-bg-info">Basique</div>
+      <div class="card-header text-bg-info">{{t('captionBasique')}}</div>
       <div class="card-body">
-        <p><strong>Nombre de tournoi :</strong> 2</p>
-        <p><strong>Équipes / tournoi :</strong> 64</p>
-        <p><strong>Durée de validité :</strong> 7 jours</p>
-        <p><strong>Tarif :</strong> 49,99 € / tournoi</p>
+        <p><strong>{{t('nombreDeTournois')}}:</strong> 2</p>
+        <p><strong>{{t('equipesParTournoi')}}:</strong> 64</p>
+        <p><strong>{{t('dureeDeValidite')}}:</strong> 7 {{t('jours')}} </p>
+        <p><strong>{{t('footerTarifs')}} :</strong> 49,99 € / {{t('tournoi')}}</p>
       </div>
     </div>
   </div>
 
   <div class="col-md-4 mb-3">
     <div class="card h-100">
-      <div class="card-header text-bg-warning">Premium</div>
+      <div class="card-header text-bg-warning">{{t('captionPremium')}}</div>
       <div class="card-body">
-        <p><strong>Nombre de tournoi :</strong> 10</p>
-        <p><strong>Équipes / tournoi :</strong> 128</p>
-        <p><strong>Durée de validité :</strong> 365 jours</p>
-        <p><strong>Tarif :</strong> 199,99 €</p>
+        <p><strong>{{t('nombreDeTournois')}}</strong> 10</p>
+        <p><strong>{{t('equipesParTournoi')}}</strong> 128</p>
+        <p><strong>{{t('dureeDeValidite')}}</strong> 365 {{t('jours')}}</p>
+        <p><strong>{{t('footerTarifs')}} :</strong> 199,99 €</p>
       </div>
     </div>
   </div>
@@ -66,7 +66,7 @@
         <!-- Liens à gauche -->
         <ul class="list-unstyled d-flex mb-0">
             <li class="mx-2">
-                <a href="index.php" class="btn btn-primary btn-sm">Fonctionnalités</a>
+                <a href="index.php" class="btn btn-primary btn-sm">{{t('footerFonctionnalités')}}</a>
             </li>
             <li class="mx-2">
                 <a href="#" class="text-light text-decoration-none small">Vallée Romain</a>
@@ -76,7 +76,7 @@
         <!-- GitHub et Arbitrage à droite -->
         <div class="d-flex align-items-center">
           <a href="#" class="text-light text-decoration-none small me-2" data-bs-toggle="modal" data-bs-target="#tarifsModal">
-            <i class="fas fa-receipt"></i> Tarifs
+            <i class="fas fa-receipt"></i> {{t('footerTarifs')}}
         </a>
 
 

@@ -313,25 +313,57 @@ img {
                                         <h4><i class="fas fa-check-circle"></i> Dernière étape: Choisir la poule</h4>
                                     </div>
                                 {% endif %}
-                                <ul class="list-group no-bullet">
-                                    {% for poule in afficherLesPoules %}
-                                        {% if IdPoules == poule.id %}
-                                        <li>
-                                            <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action active">
-                                                {{ poule.nom|upper }}
-                                            </a>
-                                        </li>
-                                        {% else %}
-                                         <li>
-                                            <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action">
-                                                {{ poule.nom|upper }}
-                                            </a>
-                                        </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
+
+                               
                             {% endif %}
                         </div>
+<div class="row g-3">
+  <!-- Colonne gauche : titre + liste des poules -->
+  <div class="col-12 col-md-4">
+    <p class="fw-bold mb-2 text-center text-md-start">Affichage par poule</p>
+    <div class="list-group">
+      {% for poule in afficherLesPoules %}
+        <a
+          href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{ IdEquipe }}"
+          class="list-group-item list-group-item-action {% if IdPoules == poule.id %}active{% endif %}"
+        >
+          {{ poule.nom|upper }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Colonne droite : actions -->
+  <div class="col-12 col-md-8">
+    <div class="row g-3">
+      <div class="col-12 col-sm-6 text-center">
+        
+        <a
+          href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ IdEquipe }}&affichageByClubs=true"
+          class="btn btn-warning btn-sm fw-bold w-100 w-sm-auto"
+        >
+          Rencontres du club {{ getNomClubCourant }} 
+         
+            <img src="{{ logoClub }}" alt="Logo du club {{ getNomClubCourant }}" class="img-fluid ms-2" style="max-height:30px; max-width:30px; vertical-align: middle;">
+          
+        </a>
+      </div>
+
+      <div class="col-12 col-sm-6 text-center">
+        
+        <a
+          href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ IdEquipe }}&affichageByTeam=true"
+          class="btn btn-primary btn-sm fw-bold w-100 w-sm-auto"
+        >
+          Rencontres de l'équipe {{ getNomEquipeCourant }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
                     </div>
                 </div>
             {% endif %}

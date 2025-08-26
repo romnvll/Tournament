@@ -12,8 +12,9 @@ require 'vendor/autoload.php';
 require 'class/creneauxDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
+require 'Lang/lang.php';
 
-session_start();
+
 $_SESSION['id_tournoi'] = $_GET['id_tournoi'];
 
 
@@ -31,6 +32,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 $poulemanager = new PouleManager();

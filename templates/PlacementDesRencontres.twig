@@ -73,18 +73,18 @@
 
           <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
 
-          <label for="bulkAction" class="mb-0">Action&nbsp;groupée</label>
+          <label for="bulkAction" class="mb-0">{{t('actionGroupee')}}</label>
 
           <select name="action"
                   id="bulkAction"
                   class="form-select form-select-sm"
                   required>
-            <option value="" disabled selected>— choisir une action —</option>
-            <option value="deplanifier">Déplanifier ces rencontres</option>
+            <option value="" disabled selected>{{t('actionGroupee')}}</option>
+            <option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
           </select>
 
           <button type="submit" class="btn btn-outline-primary btn-sm">
-            Valider
+            {{t('valider')}}
           </button>
         </form>
         <!-- /fin bulkForm -->
@@ -98,7 +98,7 @@
           <!-- Retarder les rencontres -->
           <div class="d-flex align-items-center">
             <label for="modifMinutes" class="form-label mb-0 me-2">
-              Retarder&nbsp;les&nbsp;rencontres&nbsp;:
+              {{t('retarderLesRencontres')}}&nbsp;:
             </label>
             <input type="number"
                    id="modifMinutes"
@@ -112,7 +112,7 @@
           <!-- Ajuster le pas horaire -->
           <div class="d-flex align-items-center">
             <label for="modifPasHoraire" class="form-label mb-0 me-2">
-              Durée&nbsp;des&nbsp;rencontres&nbsp;:
+              {{t('dureeRencontre')}}:
             </label>
             <input type="number"
                    id="modifPasHoraire"
@@ -133,22 +133,22 @@
         <!-- /fin deuxième formulaire  -->
  <div class="d-flex align-items-center">
                                     <i class="bi bi-info-circle-fill me-2 text-info"></i>
-                                    <span><strong><a href="GererLabels.php?id_tournoi={{idTournoi}}">Labels :</a></strong> {{nombreDeLabel | length}}</span>
+                                    <span><strong><a href="GererLabels.php?id_tournoi={{idTournoi}}">{{t('labels')}} :</a></strong> {{nombreDeLabel | length}}</span>
                                 </div>
       </div><!-- /.d-flex -->
       
   <div class="d-flex align-items-center mt-3 gap-4">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-calendar-check me-2 text-info"></i>
-                                    <span><strong>Planifiées :</strong> {{ nombreDeRencontresPlanifiee }}</span>
+                                    <span><strong>{{t('planifiee')}} :</strong> {{ nombreDeRencontresPlanifiee }}</span>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-list-ol me-2 text-success"></i>
-                                    <span><strong>Total :</strong> {{ nombreRencontreAPlanifier }}</span>
+                                    <span><strong>{{t('total')}} :</strong> {{ nombreRencontreAPlanifier }}</span>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-exclamation-circle me-2 text-warning"></i>
-                                    <span><strong>Restantes :</strong> {{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
+                                    <span><strong>{{t('restantes')}} :</strong> {{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
                                 </div>
                                      <div class="d-flex align-items-center">
 
@@ -161,11 +161,11 @@
        title="Le temps estimé est calculé en multipliant le nombre de rencontres à planifier par le pas horaire du tournoi et le tout divisé par le nombre de terrain">
         <i class="bi bi-clock me-2 text-info"></i>
     </a>
-    <span><strong>Temps estimé :</strong>
+    <span><strong>{{t('tempsEstimeDuTournoi')}} :</strong>
         {% set timeInMinutes = (nombreRencontreAPlanifier * tournoiInfo.pasHoraire) / terrains|length %}
         {% set hours = timeInMinutes // 60 %}
         {% set minutes = timeInMinutes % 60 %}
-        {{ hours }} heures {{ minutes }} minutes
+        {{ hours }} {{t('heures')}} {{ minutes }} {{t('minutes')}}
     </span>      
     </div>
   </div>
@@ -189,7 +189,7 @@
         <table class="table ms-1 {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} d-none {% endif %}" id="planification-table">
             <thead>
                 <tr>
-                    <th scope="col">Heure des rencontres</th>
+                    <th scope="col">{{t('heureDesRencontres')}}</th>
                                         {% for i in 0..terrains|length - 1 %}
                      <th scope="col" class="sticky-top bg-white" style="z-index: 1;">
                         <form id="terrain{{i}}">
@@ -220,7 +220,7 @@
                             <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}&tournoiId={{idTournoi}}&pas={{tournoiInfo.pasHoraire}}"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title="Supprimer ce créneau (il doit être vide)"
+                            title="{{t('supprimerCreneau')}}"
                             class="text-danger">
                                 <i class="fa fa-minus-circle fa-lg" aria-hidden="true"></i>
                             </a>
@@ -243,7 +243,7 @@
                             <a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
-                            title="Insérer un créneau"
+                            title="{{t('insererCreneau')}}"
                             class="text-success">
                                 <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i>
                             </a>
@@ -299,10 +299,10 @@
                                    {% if tournoiInfo.gestionArbitres == 1 %}
                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
                                             <select class="form-select"  name="Addevent" id="listeArbitre">
-                                             <option value="">Choisir arbitre</option>
+                                             <option value="">{{t('choisirArbitre')}}</option>
                                                 {% for arbitre in listeDesArbitres %}
                                                 <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}' >
-                                                   {% if arbitre.nom is not empty %} Arbitre: {{arbitre.nom}} ({{arbitre.nombre_matchs}}) {% endif %}  Club: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
+                                                   {% if arbitre.nom is not empty %} {{t('arbitre')}}: {{arbitre.nom}} ({{arbitre.nombre_matchs}}) {% endif %}  {{t('club')}}: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
                                                 </option>
                                                 {% endfor %}
                                             </select>
@@ -369,7 +369,7 @@
                             <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel" >
                            
                                 <select class="form-select basic"   name="Addevent" >
-                                    <option value="">Choisir une rencontre ou un label</option>
+                                    <option value="">{{t('choisirRencontreOuLabel')}}</option>
                                     {% for planif in planificationSansCreneauNiTerrain %}
                                         {% if planif.isClassement == 0 %}
                                             <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}}  {{ planif.equipe1_poule_nom|split(' - ')[1] }} </option>
@@ -379,7 +379,7 @@
                                     {% endfor %}
                                     {% for label in libelleParTournoi %}
                                     
-                                        <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>Label: {{label.description}}</option>
+                                        <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>{{t('label')}}: {{label.description}}</option>
                                     {% endfor %}
                                 </select>
                             </form>
@@ -400,14 +400,14 @@
             </tfoot>
         </table>
     </div>
-    <input type="text" id="filter-input" placeholder="Filtrer...">
+    <input type="text" id="filter-input" placeholder="{{t('filtre')}}...">
 
 
          {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}  
          <div class="card shadow-sm">
             <div class="card-body">
                 <div class="alert alert-danger" role="alert">
-                    <strong>Attention :</strong> Vous avez atteint la limite d'équipes pour ce tournoi. Vous ne pouvez plus planifier de rencontres.
+                    <strong>{{t('attention')}}</strong> {{t('limiteAtteinteMessage')}}.
                 </div>
             </div>
          

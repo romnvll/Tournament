@@ -9,6 +9,7 @@ require 'class/clubDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
+require 'Lang/lang.php';
 
 
 
@@ -23,7 +24,9 @@ $twig->addFilter(new \Twig\TwigFilter('shuffle', function ($array) {
     shuffle($array);
     return $array;
 }));
+
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('index.twig');
 
 
@@ -92,6 +95,7 @@ if (isset ($_GET['id_club'])) {
   $listeDesRencontreByClubs = $rencontre->afficherRencontreByTournoiByClub($_GET['id_tournoi'],$_GET['id_club']);
   $listeDesEquipesByClubs = $equipeDao->getAllEquipeByIdTournoiAndClub($_GET['id_tournoi'],$_GET['id_club']);
   $nomClub = $clubdao->getClubById($_GET['id_club'])['nom'];
+  $logoClub = $clubdao->getClubById($_GET['id_club'])['logo'];
 //derniere poules des équipes :
 
 $equipesAvecPoule = [];
@@ -114,6 +118,7 @@ foreach ($listeDesEquipesByClubs as $equipe) {
 }
 
 else {
+  $logoClub = null;
   $nomClub = null;
   $equipesAvecPoule = null;
   $listeDesRencontreByClubs = null;
@@ -224,6 +229,7 @@ echo $template->render([
     'resultatRencontres'=> $GetResultatDesPoules,
     'getNomClubCourant' => $nomClub,
     'getNomEquipeCourant' => $equipeNom,
+    'logoClub' => $logoClub,
     'labels' => $Labels,
     'equipesAvecPoule' => $equipesAvecPoule,
     'nbrTerrains' => $nbrterrain ?? null,

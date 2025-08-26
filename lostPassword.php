@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'vendor/autoload.php';
+require_once 'Lang/lang.php';
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,12 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ";
 
     if ($mail->send()) {
-        $successMsg = "Un lien de réinitialisation a été envoyé à votre adresse email.";
+        $successMsg = t('motDePasseOublieResetSucess');
     } else {
-        $errorMsg = "Erreur lors de l'envoi de l'email. Veuillez réessayer.";
+        $errorMsg = t('echecEnvoiEmail');
     }
 } else {
-    $errorMsg = "Adresse email non reconnue.";
+    $errorMsg =  t('mailNonReconnue') ;
 }
 
 }
@@ -101,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="password-reset-card">
     <div class="text-center">
         <img src="logos/Logo.png" class="logo-img img-fluid" alt="Logo">
-        <h5 class="mb-4">Mot de passe perdu</h5>
+        <h5 class="mb-4"><?= t('motdePasseOublie') ?></h5>
     </div>
 
     <?php if (isset($successMsg)) : ?>
@@ -112,16 +113,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="post">
         <div class="mb-3">
-            <label for="email" class="form-label">Adresse email</label>
+            <label for="email" class="form-label"><?= t('adresseMail') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
+                <input type="email" name="email" id="email" class="form-control" placeholder="<?= t('adresseMail') ?>" required>
             </div>
         </div>
 
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary">
-                <i class="bi bi-send me-1"></i> Envoyer
+                <i class="bi bi-send me-1"></i> <?= t('envoyer') ?> 
             </button>
         </div>
         <div class="text-center mt-3">

@@ -9,6 +9,7 @@ ob_start();
 session_start();
 require_once '../class/databaseInformations.php';
 require_once '../class/utilisateurDao.class.php';
+require_once '../Lang/lang.php';
 
 // Générer une question captcha si non définie
 if (!isset($_SESSION['captcha_question'])) {
@@ -144,10 +145,11 @@ $stmt->close();
 </head>
 <body>
 <div class="login-card">
-    <h2 class="text-center mb-4">Connexion</h2>
+    <h2 class="text-center mb-4"><?= t('login') ?></h2>
     <?php if (isset($_GET['confirmation']) && $_GET['confirmation'] == 'success') : ?>
         <div class="alert alert-success">
-            Votre adresse email a été confirmée avec succès ! Vous pouvez maintenant vous connecter.
+            
+            <?= t('confirmationAdresseMail') ?>
         </div>
     <?php endif; ?> 
     <form method="post" autocomplete="on">
@@ -162,34 +164,34 @@ $stmt->close();
         <?php endif; ?>
 
         <div class="mb-3">
-            <label class="form-label" for="email">Adresse email</label>
+            <label class="form-label" for="email"><?= t('adresseMail') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
+                <input type="email" name="email" id="email" class="form-control" placeholder="<?= t('adresseMail') ?>" required>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="pass">Mot de passe</label>
+            <label class="form-label" for="pass">Mot de passe <?= t('motDePasse') ?></label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="pass" id="pass" class="form-control" placeholder="Mot de passe" required>
+                <input type="password" name="pass" id="pass" class="form-control" placeholder="<?= t('motDePasse') ?>" required>
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label" for="captcha">Captcha : <?php echo $_SESSION['captcha_question']; ?></label>
-            <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Réponse" required>
+            <label class="form-label" for="captcha"><?= t('captcha') ?> : <?php echo $_SESSION['captcha_question']; ?></label>
+            <input type="text" name="captcha" id="captcha" class="form-control" placeholder="<?= t('reponse') ?>" required>
         </div>
 
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary" name="btn-login">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
+                <i class="bi bi-box-arrow-in-right me-1"></i> <?= t('login') ?>
             </button>
         </div>
         <div class="text-center mt-3">
     <a href="../lostPassword.php" class="text-decoration-none">
-        <i class="bi bi-key me-1"></i> Mot de passe perdu ?
+        <i class="bi bi-key me-1"></i> <?= t('motdePasseOublie') ?>
     </a>
         </div>
 

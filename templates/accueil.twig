@@ -20,10 +20,11 @@
     <!-- Bloc droit : boutons -->
     <div class="d-flex gap-2">
         <a href="register.php" class="btn btn-outline-primary me-2">
-            <i class="fas fa-user-plus me-1"></i> Inscription
+            <i class="fas fa-user-plus me-1"></i> {{t('inscription')}}
         </a>
         <a href="Auth/" class="btn btn-primary">
-            <i class="fas fa-sign-in-alt me-1"></i> Connexion
+            <i class="fas fa-sign-in-alt me-1"></i> {{t('login')}}
+            
         </a>
     </div>
 </header>
@@ -35,19 +36,19 @@
     <!-- Colonne gauche : texte -->
     <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center p-4">
         <div class="text-center text-dark">
-            <h1 class="mb-4 text-primary">Gérez vos tournois comme un pro</h1>
+            <h1 class="mb-4 text-primary">{{t('titreIndex')}}</h1>
             <p class="lead mb-4">
-                Simplifiez l'organisation de vos compétitions avec notre outil tout-en-un pensé pour les clubs de sport.
+            {{t('sousTitreIndex')}}
             </p>
             <div class="text-start fs-5">
-                <p><i class="fas fa-users-gear me-2 text-primary"></i> Création automatique des poules</p>
-                <p><i class="fas fa-calendar-alt me-2 text-success"></i> Planification optimisée des rencontres</p>
-                <p><i class="fas fa-trophy me-2 text-warning"></i> Suivi en temps réel des scores et classements pour les coachs et la famille</p>
-                <p><i class="fas fa-user-slash me-2 text-danger"></i> Gestion des absences d'équipes</p>
-                <p><i class="fas fa-mobile-screen-button me-2 text-info"></i> Interface mobile pour les bénévoles, arbitres et gestionnaires des tables</p>
-                <p> 🤝 Gestion des partenaires / sponsors</p>
-                <p><i class="fas fa-layer-group me-2 text-secondary"></i> Gestion intuitive des catégories (U9, U11, etc.)</p>
-                <p><i class="fas fa-circle-info me-2 text-dark"></i> <strong>Ce logiciel est conçu uniquement pour les tournois de type poule ou poule aller/retour</strong></p>
+                <p><i class="fas fa-users-gear me-2 text-primary"></i>{{t('indexCreationDePoules')}}</p>
+                <p><i class="fas fa-calendar-alt me-2 text-success"></i>{{t('indexPlanification')}} </p>
+                <p><i class="fas fa-trophy me-2 text-warning"></i>{{t('indexSuivi')}} </p>
+                <p><i class="fas fa-user-slash me-2 text-danger"></i>{{t('indexGestionDesAbsences')}} </p>
+                <p><i class="fas fa-mobile-screen-button me-2 text-info"></i> {{t('indexInterfaceMobile')}}</p>
+                <p> 🤝 {{t('indexGestionDesPartenaires')}}</p>
+                <p><i class="fas fa-layer-group me-2 text-secondary"></i>{{t('indexGestionCategories')}} </p>
+                <p><i class="fas fa-circle-info me-2 text-dark"></i> <strong>{{t('indexTypePoule')}}</strong></p>
             </div>
         </div>
     </div>
@@ -74,8 +75,8 @@
         <div class="position-absolute text-end p-3 rounded" 
             style="bottom:20px; right:10px; max-width:320px; background:rgba(255,255,255,0.8); z-index:1;">
             <small>
-                Le club <strong>HBCAT</strong> fait confiance à <strong>Brackito</strong> pour organiser son 
-                tournoi sur herbe, qui rassemble <strong>près de 100 équipes</strong> sur un week-end <br>(Merci à Gontran pour la vidéo).
+                {{t('indexCaptionVideo1') }}
+                
             </small>
         </div>
     </div>
