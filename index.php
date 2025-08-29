@@ -9,6 +9,7 @@ require 'class/clubDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
+require 'class/licenceDao.class.php';
 require 'Lang/lang.php';
 
 
@@ -38,6 +39,10 @@ $tournoiDao = new tournoiDao();
 $poulemanager = new PouleManager();
 $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
+$licenceDao = new LicenceDAO();
+
+
+
 $listeDesTournois = $tournoiDao->afficherTousLesTournois();
 $RencontreByPoule=null;
 $Labels= new LabelDao();
@@ -234,7 +239,8 @@ echo $template->render([
     'equipesAvecPoule' => $equipesAvecPoule,
     'nbrTerrains' => $nbrterrain ?? null,
     'partenaires' => $listeDesPartenaires ??null,
-    'idTournoi' => $idTournoi
+    'idTournoi' => $idTournoi,
+    'licence' =>$licenceDao->getTousLesTypesDeLicence(),
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

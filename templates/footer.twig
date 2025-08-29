@@ -16,8 +16,8 @@
     <div class="card h-100">
       <div class="card-header text-bg-secondary">{{t('captionGratuit')}}</div>
       <div class="card-body">
-        <p><strong>{{t('nombreDeTournois')}}:</strong> 1</p>
-        <p><strong>{{t('equipesParTournoi')}}:</strong> 8</p>
+        <p><strong>{{t('nombreDeTournois')}}:</strong> {{licence[0]['limite_tournois']}}</p>
+        <p><strong>{{t('equipesParTournoi')}}:</strong> {{licence[0]['limite_equipes']}}</p>
         <p><strong>{{t('dureeDeValidite')}}:</strong> {{t('illimite')}}</p>
         <p><strong>{{t('footerTarifs')}} :</strong> 0 €</p>
       </div>
@@ -28,10 +28,10 @@
     <div class="card h-100">
       <div class="card-header text-bg-info">{{t('captionBasique')}}</div>
       <div class="card-body">
-        <p><strong>{{t('nombreDeTournois')}}:</strong> 2</p>
-        <p><strong>{{t('equipesParTournoi')}}:</strong> 64</p>
-        <p><strong>{{t('dureeDeValidite')}}:</strong> 7 {{t('jours')}} </p>
-        <p><strong>{{t('footerTarifs')}} :</strong> 49,99 € / {{t('tournoi')}}</p>
+        <p><strong>{{t('nombreDeTournois')}}:</strong> {{licence[1]['limite_tournois']}}</p>
+        <p><strong>{{t('equipesParTournoi')}}:</strong> {{licence[1]['limite_equipes']}}</p>
+        <p><strong>{{t('dureeDeValidite')}}:</strong> {{licence[1]['duree_jours']}} {{t('jours')}} </p>
+        <p><strong>{{t('footerTarifs')}} :</strong> {{licence[1]['prix']}} € / {{t('tournoi')}}</p>
       </div>
     </div>
   </div>
@@ -40,10 +40,10 @@
     <div class="card h-100">
       <div class="card-header text-bg-warning">{{t('captionPremium')}}</div>
       <div class="card-body">
-        <p><strong>{{t('nombreDeTournois')}}</strong> 10</p>
-        <p><strong>{{t('equipesParTournoi')}}</strong> 128</p>
-        <p><strong>{{t('dureeDeValidite')}}</strong> 365 {{t('jours')}}</p>
-        <p><strong>{{t('footerTarifs')}} :</strong> 199,99 €</p>
+        <p><strong>{{t('nombreDeTournois')}}</strong> {{licence[2]['limite_tournois']}}</p>
+        <p><strong>{{t('equipesParTournoi')}}</strong> {{licence[2]['limite_equipes']}}</p>
+        <p><strong>{{t('dureeDeValidite')}}</strong> {{licence[2]['duree_jours']}} {{t('jours')}}</p>
+        <p><strong>{{t('footerTarifs')}} :</strong>  {{licence[2]['prix']}} € </p>
       </div>
     </div>
   </div>

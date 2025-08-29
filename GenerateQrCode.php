@@ -83,14 +83,36 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
             <i class="fas fa-print"></i> <?= t('imprimer') ?>
         </button>
 
-        <h2 class="mt-1">
-            <i class="fas fa-qrcode"></i> <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
-        </h2>
+        
 
-        <p class="text-primary fw-bold fs-4">
-            <i class="fas fa-trophy me-2"></i> <?= $tournoiNom ?>
-            <br><span class="fs-5 text-secondary">📅 <?= $dateFormatted ?></span>
-        </p>
+        
+                <img src="logos/Logo.png" alt="Logo Brackito" style="height:60px;" class="me-3 rounded shadow-sm">
+
+                 <p class="mb-0 text-dark fw-semibold fst-italic">
+                        🎯 Simplifiez, organisez et gagnez du temps avec Brackito — l’outil tout-en-un pour vos compétitions sportives.
+                    </p>
+                <div>
+                    <h2 class="mb-1 text-primary fw-bold">
+                        <i class="fas fa-qrcode me-2"></i> 
+                        <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
+                    </h2>
+                   
+                </div>
+            
+
+            <p class="text-primary fw-bold fs-4 mt-3">
+                <i class="fas fa-trophy me-2"></i> <?= $tournoiNom ?>
+                <br>
+                <span class="fs-5 text-secondary">📅 <?= $dateFormatted ?></span>
+            </p>
+
+
+
+
+
+
+
+
 
         <div class="row mt-4 align-items-center justify-content-center">
             <div class="col-md-3 ">
