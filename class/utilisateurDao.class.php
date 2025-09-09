@@ -93,6 +93,14 @@ class UtilisateurDAO {
                 $stmt->execute();
             }
 
+            public function getUserByToken(string $token): ?array {
+    $stmt = $this->connexion->prepare("SELECT * FROM Utilisateurs WHERE email_token = :token");
+    $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ;
+}
+
 
     public function getTousLesUtilisateurs(): array {
         $stmt = $this->connexion->prepare("SELECT id, nom, email FROM Utilisateurs ORDER BY nom ASC");

@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     include('./config.php'); // Fichier où PHPMailer est configuré
 
-    $mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
+    $mail->setFrom('romain@brackito.net', 'BRACKITO');
     $mail->CharSet = 'UTF-8'; // 👈 ajoute cette ligne
     $mail->isHTML(true);
     $mail->addAddress($email, "$prenom $nom");

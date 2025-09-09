@@ -133,7 +133,7 @@ WHERE pr.id = :PersonneTableId;
     if ($result) {
         try {
             include('./config.php');
-            $mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
+            $mail->setFrom('romain@brackito.net', 'BRACKITO');
             $mail->isHTML(true);
             $mail->addAddress($result['Mail'], "{$result['Prenom']} {$result['Nom']}");
             $mail->Subject = "[Tournoi" .$result['tournoi_nom']. "]Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";

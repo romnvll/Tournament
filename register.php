@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Envoie l'email de confirmation
 
          include('./config.php');
-$mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
+$mail->setFrom('romain@brackito.net', 'BRACKITO ');
 $mail->isHTML(true);
 $mail->addAddress($email, "$prenom $nom");
 
