@@ -81,23 +81,29 @@
 				<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
 
 			</div>
-			<div class="sticky-top bg-light p-3 shadow-sm rounded mb-3" style="z-index: 200;">
-				<form method="post" action="PlacementDesRencontresTraitement.php" class="row g-2 align-items-end">
-					
-					<div class="col-auto">
-						<label for="modifMinutes" class="form-label fw-bold no-print mb-1">
-							⏱️ Retarder les rencontres :
-						</label>
-						<input type="number" id="modifMinutes" name="modifMinutes" class="form-control no-print" placeholder="Minutes">
-					</div>
+			<<div class="sticky-top bg-light p-3 shadow-sm rounded mb-3 d-flex justify-content-between align-items-center" style="z-index: 200;">
+    
+    <form method="post" action="PlacementDesRencontresTraitement.php" class="row g-2 align-items-end mb-0">
+        
+        <div class="col-auto">
+            <label for="modifMinutes" class="form-label fw-bold no-print mb-1">
+                ⏱️ Retarder les rencontres :
+            </label>
+            <input type="number" id="modifMinutes" name="modifMinutes" class="form-control no-print" placeholder="Minutes">
+        </div>
 
-					<div class="col-auto">
-						<input type="submit" class="btn btn-primary no-print" value="Appliquer le retard">
-					</div>
+        <div class="col-auto">
+            <input type="submit" class="btn btn-primary no-print" value="Appliquer le retard">
+        </div>
 
-					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
-				</form>
-			</div>
+        <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+    </form>
+
+    <!-- Affichage de l'heure -->
+    <div class="fw-bold text-primary ms-3 no-print">
+        🕒 <span id="horloge"></span>
+    </div>
+</div>
 
 
 
@@ -470,6 +476,21 @@ function ouvrirLectureAudio(idCreneau) {
     const options = 'width=400,height=200,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
     window.open(url, '_blank', options);
 }
+</script>
+
+
+<script>
+function majHorloge() {
+    const maintenant = new Date();
+    const heures = String(maintenant.getHours()).padStart(2, '0');
+    const minutes = String(maintenant.getMinutes()).padStart(2, '0');
+    const secondes = String(maintenant.getSeconds()).padStart(2, '0');
+    document.getElementById("horloge").textContent = `${heures}:${minutes}:${secondes}`;
+}
+
+// Met à jour immédiatement puis toutes les secondes
+majHorloge();
+setInterval(majHorloge, 1000);
 </script>
 
 
