@@ -147,8 +147,8 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
 
         <div>
             <h2 class="mb-1 text-primary fw-bold">
-                <i class="fas fa-qrcode me-2"></i> 
-                <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
+               <!-- <i class="fas fa-qrcode me-2"></i> 
+                <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?> -->
             </h2>
         </div>
 
@@ -175,13 +175,49 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
     </div>-->
 
     <!-- QR Code -->
-    <div class="col-md-3">
-        <div class="card p-3 text-center">
-            <img src="<?= $qrcode ?>" alt="QR Code" style="max-height:250px; ">
+    <div class="col-md-6">
+        
+       
+    <div class="card p-3 text-center position-relative">
+    <div class="d-flex justify-content-center align-items-center">
+        <!-- Colonne gauche -->
+        <div class="d-flex flex-column align-items-center me-3" style="max-height:250px; overflow-y:auto;">
+            <?php foreach ($clubDao->clubsParticipatingInTournoi($_GET['idTournoi']) as $i => $club): ?>
+                <?php if ($i % 2 == 0): // Clubs pairs à gauche ?>
+                    <img src="<?= htmlspecialchars($club['logo']) ?>" 
+                         alt="<?= htmlspecialchars($club['nom']) ?>" 
+                         class="mb-2"
+                         style="max-height:40px; max-width:100px; object-fit:contain;">
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- QR Code -->
+        <div>
+            <img src="<?= $qrcode ?>" alt="QR Code" style="max-height:250px;">
             <p class="mt-2">
-                <i class="fas fa-mobile-alt"></i> <?= t('ScannezAvecVotreSmartphone') ?>
+                <i class="fas fa-mobile-alt"></i> <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
             </p>
         </div>
+
+        <!-- Colonne droite -->
+        <div class="d-flex flex-column align-items-center ms-3" style="max-height:250px; overflow-y:auto;">
+            <?php foreach ($clubDao->clubsParticipatingInTournoi($_GET['idTournoi']) as $i => $club): ?>
+                <?php if ($i % 2 == 1): // Clubs impairs à droite ?>
+                    <img src="<?= htmlspecialchars($club['logo']) ?>" 
+                         alt="<?= htmlspecialchars($club['nom']) ?>" 
+                         class="mb-2"
+                         style="max-height:40px; max-width:60px; object-fit:contain;">
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+
+
+
+
     </div>
                 </div>
 
