@@ -81,17 +81,24 @@
 				<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
 
 			</div>
-			<div class="d-flex align-items-center mb-2" style="position: sticky; top: 0; z-index: 200;">
-
-				<form method="post" action="PlacementDesRencontresTraitement.php" class="d-flex align-items-center">
-					<div data-mdb-input-init class="form-outline me-2">
-						<label class="form-label mb-0 no-print">Retarder les rencontres:</label>
-
-						<input type="number" size="2" class="form-control no-print" name="modifMinutes" onfocusout="this.form.submit()">
+			<div class="sticky-top bg-light p-3 shadow-sm rounded mb-3" style="z-index: 200;">
+				<form method="post" action="PlacementDesRencontresTraitement.php" class="row g-2 align-items-end">
+					
+					<div class="col-auto">
+						<label for="modifMinutes" class="form-label fw-bold no-print mb-1">
+							⏱️ Retarder les rencontres :
+						</label>
+						<input type="number" id="modifMinutes" name="modifMinutes" class="form-control no-print" placeholder="Minutes">
 					</div>
+
+					<div class="col-auto">
+						<input type="submit" class="btn btn-primary no-print" value="Appliquer le retard">
+					</div>
+
 					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
 				</form>
 			</div>
+
 
 
 			<div class="col-lg-12">
