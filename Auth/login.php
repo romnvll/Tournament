@@ -155,7 +155,7 @@ $stmt->close();
     <?php endif; ?> 
     <form method="post" autocomplete="on">
         <div class="text-center">
-            <img src="../logos/Logo.png" class="logo-img img-fluid" alt="Logo">
+            <a href = "../index.php"><img src="../logos/Logo.png" class="logo-img img-fluid" alt="Logo"></a>
         </div>
 
         <?php if (isset($errMSG)) : ?>

@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="password-reset-card">
     <div class="text-center">
-        <img src="logos/Logo.png" class="logo-img img-fluid" alt="Logo">
+        <a href="index.php"><img src="logos/Logo.png" class="logo-img img-fluid" alt="Logo"></a>
         <h5 class="mb-4"><?= t('motdePasseOublie') ?></h5>
     </div>
 
