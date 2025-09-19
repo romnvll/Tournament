@@ -100,6 +100,7 @@ if (isset($_GET['categorie'])) {
                        
                        foreach ($poule as $idpoule) {
                         $rencontres->supprimerRencontresParPoule($idpoule);
+                        
                         $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],0,false);
                         
                         }

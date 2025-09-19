@@ -61,6 +61,15 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
         $stmt->execute();
     }
 
+     public function getTournoisEnCours() {
+        $stmt = $this->connexion->query("
+            SELECT id, nom, dateDebut
+            FROM Tournois ;
+           
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function afficherLesTournois(int $utilisateur_id) : array {
         $stmt = $this->connexion->prepare("
             SELECT

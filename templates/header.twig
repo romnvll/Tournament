@@ -169,6 +169,13 @@
                                     <i class="fa-solid fa-circle-question"></i> {{t('assistance')}} 
                                 </a>
                             </li>
+                                {% if role == 'admin' %}
+                             <li>
+                                <a class="dropdown-item" href="admin/">
+                                    <i class="fa-solid fa-tools"></i> Admin 
+                                </a>
+                            </li>
+                                {% endif %}
 
 
                     </ul>

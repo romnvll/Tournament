@@ -15,6 +15,11 @@ class UtilisateurDAO {
         }
     }
 
+     public function getAllUtilisateurs() {
+        $stmt = $this->connexion->query("SELECT id, nom, email, role FROM Utilisateurs");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function ajouterUtilisateur(string $nom, string $email, string $password): void {
         $hash = hash('sha256', $password);
         $stmt = $this->connexion->prepare("INSERT INTO Utilisateurs (nom, email, password) VALUES (:nom, :email, :password)");

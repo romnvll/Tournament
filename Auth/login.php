@@ -42,6 +42,7 @@ if (isset($_POST['btn-login'])) {
     u.nom,
     u.prenom,
     u.email,
+    u.role,
     u.email_confirme,
     u.password    
 FROM Utilisateurs u
@@ -74,7 +75,7 @@ $stmt->close();
                 
                 'exp' => time() + (48 * 60 * 60)
             ];
-
+         
             $payload = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             $signature = hash_hmac('sha256', $payload, $secret);
             $token = base64_encode(json_encode([

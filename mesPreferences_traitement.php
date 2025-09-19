@@ -18,7 +18,7 @@ if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
 
         // Créer le nouveau nom de fichier
         $newFileName = $club_id . '-Sponsors-' . $nom;
-
+        echo $newFileName;
         // Obtenir l'extension du fichier
         $fileExtension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
 
@@ -40,7 +40,7 @@ if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
         $_POST['telephone'] ?? null,
         $_POST['adresse'] ?? null
     ); 
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+      //  header("Location: " . $_SERVER['HTTP_REFERER']);
 }
 
 //modif d'un sponsor

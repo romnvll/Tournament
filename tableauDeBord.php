@@ -82,6 +82,7 @@ $pourcentageTerminees = $total > 0 ? round(($terminees / $total) * 100, 2) : 0;
 
 echo $template->render([
  'email' => $userData['email'],
+ 'role' => $userData['role'],
  
 'pageEnCours' => 'Stats',
 'idTournoi' => $dernierId,
