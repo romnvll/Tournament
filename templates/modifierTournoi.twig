@@ -46,6 +46,9 @@
                     {% endfor %}
                 </div>
             </div>
+
+           
+
             {% if tournoiEnCours != 0 %}
                 <div class="row mt-4">
                     <div class="col-lg-6">
@@ -65,7 +68,7 @@
                                         <label for="nom" class="form-label">
                                             {{ t('nameOfTournament') }}
                                         </label>
-                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ infotournoi.nom }}" readonly>
+                                        <input type="text" class="form-control" id="nom" name="nom" value="{{ infotournoi.nom }}" onchange="this.form.submit()">
                                     </div>
                                     <div class="mb-3">
                                         <label for="dateDebut" class="form-label">
@@ -122,8 +125,8 @@
                                             <input class="form-check-input" type="checkbox" id="gestionPartenaires" name="gestionPartenaires" value="1" {% if infotournoi.gestionPartenaires == 1 %} checked {% endif %} onchange="this.form.submit()">
                                             <label class="form-check-label" for="gestionPartenaires">
                                                 🤝
-                                                {{ t('gestionDesPartenaires') }} {{ t('partenairesDansLesPreferences',{'%tournoiId%': idTournoi})| raw }}
-
+                                                {{ t('gestionDesPartenaires') }}
+                                                {{ t('partenairesDansLesPreferences',{'%tournoiId%': idTournoi})| raw }}
                                             </label>
                                         </div>
                                         <div class="form-check form-switch">
@@ -169,7 +172,7 @@
                         {% if infotournoi.isArchived == 1 %}
                             <a class="btn btn-danger btn-sm" href="deleteTournament.php?idTournoi={{ infotournoi.id }}&action=delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\n l\'action est irréversible');">
                                 <i class="fa-solid fa-trash-can me-1"></i>
-                                {{t('suppressionDuTournoi')}}
+                                {{ t('suppressionDuTournoi') }}
                             </a>
                         {% endif %}
                     </div>
@@ -200,11 +203,11 @@
                                             <div class="card-body text-center">
                                                 <h5 class="card-title">
                                                     <i class="fa-solid fa-qrcode me-2"></i>
-                                                    {{t('pourLesArbitres')}}
+                                                    {{ t('pourLesArbitres') }}
                                                 </h5>
                                                 <a href="GenerateQrCodeArbitre.php?idTournoi={{ infotournoi.id }}" class="btn btn-primary">
                                                     <i class="fa-solid fa-qrcode me-1"></i>
-                                                    {{t('qrCode')}}
+                                                    {{ t('qrCode') }}
                                                 </a>
                                             </div>
                                         </div>
@@ -275,7 +278,6 @@
                                 </button>
                             </li>
                         {% endif %}
-                        
                     </ul>
                     <div class="tab-content mt-3" id="myTabContent">
                         <div class="tab-pane fade  {% if tab == 'arbitres' %} show active {% endif %} " id="arbitres" role="tabpanel" aria-labelledby="arbitres-tab">
@@ -352,14 +354,16 @@
                                                                 {% if infotournoi.gestionVoix == 1 %}
                                                                     <!-- Enregistrement audio -->
                                                                     <button class="btn btn-primary btn-sm" onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-                                                                        🎤 {{t('enregistrer')}}
+                                                                        🎤
+                                                                        {{ t('enregistrer') }}
                                                                     </button>
                                                                     <button id="stopButton_{{ arbitre.arbitre_id }}" class="btn btn-danger btn-sm" onclick="stopRecording()" disabled>
-                                                                        ⏹️ {{t('stop')}}
+                                                                        ⏹️
+                                                                        {{ t('stop') }}
                                                                     </button>
                                                                     {% if arbitre.audio_path == null %}
                                                                         <i class="fa-solid fa-volume-xmark"></i>
-                                                                        {{t('aideEnregistrementArbitre')}}
+                                                                        {{ t('aideEnregistrementArbitre') }}
                                                                     {% else %}
                                                                         <i class="fa-solid fa-volume-high"></i>
                                                                     {% endif %}
@@ -372,7 +376,10 @@
                                         </div>
                                     </div>
                                 </div>
+                                
                             {% endif %}
+
+
                         <!-- fin tab arbitres -->
                         </div>
                         <div class="tab-pane fade {% if tab == 'tableDesPersonnes' %} show active {% endif %} " id="table" role="tabpanel" aria-labelledby="table-tab">
@@ -400,7 +407,7 @@
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="Nom" class="form-label">
-                                                       {{ t('name') }}
+                                                        {{ t('name') }}
                                                     </label>
                                                     <input type="text" class="form-control" id="Nom" name="nom" required>
                                                 </div>
@@ -430,10 +437,10 @@
                                                                 {{ t('email') }}
                                                             </th>
                                                             <th scope="col">
-                                                                {{t ('postionnerPersonneTerrain')}}
+                                                                {{ t ('postionnerPersonneTerrain') }}
                                                             </th>
                                                             <th scope="col">
-                                                                {{t('action')}}
+                                                                {{ t('action') }}
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -466,7 +473,7 @@
                                                                 <td>
                                                                     <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}" class="btn btn-danger btn-sm">
                                                                         <i class="fa fa-trash" aria-hidden="true"></i>
-                                                                        {{t('supprimer')}}
+                                                                        {{ t('supprimer') }}
                                                                     </a>
                                                                 </td>
                                                             </tr>
@@ -481,28 +488,28 @@
                                                         <thead class="table-dark">
                                                             <tr>
                                                                 <th scope="col">
-                                                                    {{t('name')}}
+                                                                    {{ t('name') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('prenom')}}
+                                                                    {{ t('prenom') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('email')}}
+                                                                    {{ t('email') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('terrainN')}}
+                                                                    {{ t('terrainN') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('codePIN')}}
+                                                                    {{ t('codePIN') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('cleSecurisee')}}
+                                                                    {{ t('cleSecurisee') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                    {{t('envoiDesInformations')}}
+                                                                    {{ t('envoiDesInformations') }}
                                                                 </th>
                                                                 <th scope="col">
-                                                                   {{t('supprimerPersonneTerrain')}}
+                                                                    {{ t('supprimerPersonneTerrain') }}
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -530,15 +537,15 @@
                                                                     <td class="align-middle">
                                                                         <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}" class="btn btn-primary btn-sm">
                                                                             <i class="fa fa-envelope" aria-hidden="true"></i>
-                                                                            {{t('envoyer')}}
+                                                                            {{ t('envoyer') }}
                                                                         </a>
                                                                         {% if personneTable.sentMail == 1 %}
                                                                             <span class="badge bg-success">
-                                                                                {{t('envoye')}}
+                                                                                {{ t('envoye') }}
                                                                             </span>
                                                                         {% else %}
                                                                             <span class="badge bg-secondary">
-                                                                                {{t('nonEnvoye')}}
+                                                                                {{ t('nonEnvoye') }}
                                                                             </span>
                                                                         {% endif %}
                                                                     </td>
@@ -556,6 +563,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
                                 {% endif %}
                             <!-- fin tab tables -->
                             </div>
@@ -563,7 +571,7 @@
                                 <div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                                     <div class="d-flex">
                                         <div class="toast-body">
-                                            {{t('emailEnvoyeSuccess')}}
+                                            {{ t('emailEnvoyeSuccess') }}
                                         </div>
                                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                                     </div>
@@ -571,14 +579,14 @@
                                 <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
                                     <div class="d-flex">
                                         <div class="toast-body">
-                                            {{t('emailNonEnvoyeEchec')}}.
+                                            {{ t('emailNonEnvoyeEchec') }}
+                                            .
                                         </div>
                                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>

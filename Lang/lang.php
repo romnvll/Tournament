@@ -186,6 +186,7 @@ $allLangs = [
         'filtre' => 'filtre',
         'insererCreneau' => 'Insérer un créneau',
         'supprimerCreneau' => 'Supprimer ce créneau (il doit être vide)',
+        'planDuSite' => 'Plan du site',
 
         
         
@@ -365,6 +366,7 @@ $allLangs = [
         'insererCreneau' => 'Insert a time slot',
         'supprimerCreneau' => 'Delete this time slot (it must be empty)',
         'label' => 'Label',
+        'planDuSite' => 'Site map',
         
         
 

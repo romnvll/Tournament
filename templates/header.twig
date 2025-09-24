@@ -1,7 +1,7 @@
 {% set idTournoi = idTournoi|default(dernierTournoi|default(0)) %}
 <script src="https://kit.fontawesome.com/0315b9fc45.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-1">
     <div class="container container-fluid">
@@ -56,6 +56,11 @@
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"/></li>
+                            <li>
+                            <a class="dropdown-item" href="planTournoi.php?idTournoi={{idTournoi}}">
+                                <i class="fa-solid fa-map"></i> 2 - {{t('planDuSite')}} 
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

@@ -44,11 +44,16 @@ $arbitre = new arbitreDao();
 
 if (!isset($_GET['idTournoi']) ){
 $idtournoi = 0;
+
 }
 else {
     $idtournoi = $_GET['idTournoi'];
   
 
+}
+
+if ($idtournoi == 0) {
+  header('Location: ajoutTournoi.php');
 }
 
 $template = $twig->load('modifierTournoi.twig');

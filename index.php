@@ -54,6 +54,16 @@ if (isset ($_GET['id_tournoi'])) {
 }
 
 
+if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
+  $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
+  
+}
+else {
+  $planTournoi = null;
+}
+
+
+
 
 if (isset ($_GET['affichageByClubs'])) {
   $affichageByClubs = true;
@@ -241,6 +251,7 @@ echo $template->render([
     'partenaires' => $listeDesPartenaires ??null,
     'idTournoi' => $idTournoi,
     'licence' =>$licenceDao->getTousLesTypesDeLicence(),
+    'planTournoi' => $planTournoi,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

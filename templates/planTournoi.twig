@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Canvas avancé complet</title>
+<style>
+  #drawArea {
+    border: 1px solid #ccc;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .controls {
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="drawArea" width="800" height="500"></canvas>
+
+<div class="controls">
+  <label>Dessin :</label>
+  <select id="mode">
+    <option value="free">Libre</option>
+    <option value="line">Ligne droite</option>
+    <option value="rect">Rectangle</option>
+    <option value="square">Carré</option>
+    <option value="circle">Cercle</option>
+    <option value="text">Texte</option>
+  </select>
+
+  <label>Couleur :</label>
+  <input type="color" id="colorPicker" value="#000000">
+
+  <button id="saveBtn">💾 Enregistrer</button>
+  <button id="clearBtn">🧹 Tout effacer</button>
+  <button id="deleteBtn">❌ Supprimer forme</button>
+  <button id="copyBtn">📋 Copier</button>
+  <button id="pasteBtn">📌 Coller</button>
+</div>
+
+<script>
+const canvas = document.getElementById("drawArea");
+const ctx = canvas.getContext("2d");
+const colorPicker = document.getElementById("colorPicker");
+const modeSelect = document.getElementById("mode");
+const saveBtn = document.getElementById("saveBtn");
+const clearBtn = document.getElementById("clearBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const copyBtn = document.getElementById("copyBtn");
+const pasteBtn = document.getElementById("pasteBtn");
+
+let dessin = false;
+let startX = 0, startY = 0;
+let couleur = colorPicker.value;
+let mode = modeSelect.value;
+let canvasBackup = null;
+
+let shapes = [];
+let lastCopied = null;
+let selectedShape = null;
+let offsetX = 0, offsetY = 0;
+let isDragging = false;
+let currentFreeShape = null;
+
+// --- Gestion couleurs et mode ---
+colorPicker.addEventListener("input", e => couleur = e.target.value);
+modeSelect.addEventListener("change", e => mode = e.target.value);
+
+// --- Effacer tout le canvas ---
+clearBtn.addEventListener("click", () => {
+    shapes = [];
+    selectedShape = null;
+    redrawCanvas();
+});
+
+// --- Supprimer une forme sélectionnée ---
+deleteBtn.addEventListener("click", () => {
+    if(selectedShape){
+        shapes = shapes.filter(s => s !== selectedShape);
+        selectedShape = null;
+        redrawCanvas();
+    }
+});
+
+// --- Copier / Coller ---
+copyBtn.addEventListener("click", () => {
+    if(selectedShape){
+        lastCopied = JSON.parse(JSON.stringify(selectedShape));
+    }
+});
+
+pasteBtn.addEventListener("click", () => {
+    if(lastCopied){
+        const dx = 10, dy = 10;
+        const newShape = JSON.parse(JSON.stringify(lastCopied));
+        if(newShape.type === 'free'){
+            newShape.points.forEach(p => { p.x += dx; p.y += dy; });
+        } else if(newShape.type === 'text'){
+            newShape.startX += dx; newShape.startY += dy;
+        } else {
+            newShape.startX += dx; newShape.startY += dy;
+            newShape.endX += dx; newShape.endY += dy;
+        }
+        shapes.push(newShape);
+        redrawCanvas();
+    }
+});
+
+
+// --- Enregistrer PNG + JSON ---
+saveBtn.addEventListener("click", () => {
+    const dataURL = canvas.toDataURL("image/png");
+    const idTournoi = {{idTournoi}}; // à remplacer via Twig/PHP
+
+    fetch("save_plan.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            idTournoi: idTournoi,
+            image: dataURL,
+            shapes: shapes // <-- on envoie aussi le tableau des formes
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert("Plan sauvegardé : " + data);
+    })
+    .catch(err => {
+        console.error("Erreur sauvegarde :", err);
+    });
+});
+
+
+
+// --- Événements souris ---
+canvas.addEventListener("mousedown", e => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
+    const shape = shapes.slice().reverse().find(s => isInsideShape(mouseX, mouseY, s));
+    selectedShape = shape || null;
+
+    if(selectedShape){
+        offsetX = mouseX - selectedShape.startX;
+        offsetY = mouseY - selectedShape.startY;
+        isDragging = true;
+        dessin = false;
+    } else {
+        if(mode === 'text'){
+            const texte = prompt("Entrez votre texte :");
+            if(texte){
+                const shape = {
+                    type: 'text',
+                    startX: mouseX,
+                    startY: mouseY,
+                    color: couleur,
+                    text: texte
+                };
+                shapes.push(shape);
+                selectedShape = shape;
+                redrawCanvas();
+            }
+        } else if(mode === 'free'){
+            dessin = true;
+            currentFreeShape = { type:'free', points:[{x:mouseX, y:mouseY}], color: couleur };
+        } else {
+            dessin = true;
+            startX = mouseX;
+            startY = mouseY;
+            canvasBackup = ctx.getImageData(0,0,canvas.width,canvas.height);
+        }
+        isDragging = false;
+    }
+    redrawCanvas();
+});
+
+canvas.addEventListener("mousemove", e => {
+    const mouseX = e.offsetX;
+    const mouseY = e.offsetY;
+
+    if(isDragging && selectedShape){
+        const dx = mouseX - selectedShape.startX - offsetX;
+        const dy = mouseY - selectedShape.startY - offsetY;
+        if(selectedShape.type === 'free'){
+            selectedShape.points.forEach(p => { p.x += dx; p.y += dy; });
+        } else if(selectedShape.type === 'text'){
+            selectedShape.startX += dx;
+            selectedShape.startY += dy;
+        } else {
+            selectedShape.startX += dx; selectedShape.startY += dy;
+            selectedShape.endX += dx; selectedShape.endY += dy;
+        }
+        redrawCanvas();
+    } else if(dessin){
+        if(mode === 'free'){
+            const lastPoint = currentFreeShape.points[currentFreeShape.points.length-1];
+            currentFreeShape.points.push({x: mouseX, y: mouseY});
+            ctx.strokeStyle = currentFreeShape.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(lastPoint.x, lastPoint.y);
+            ctx.lineTo(mouseX, mouseY);
+            ctx.stroke();
+        } else {
+            ctx.putImageData(canvasBackup,0,0);
+            dessinerForme(e, true);
+        }
+    }
+});
+
+canvas.addEventListener("mouseup", e => {
+    if(dessin){
+        if(mode === 'free'){
+            shapes.push(currentFreeShape);
+            currentFreeShape = null;
+        } else if(mode !== 'free' && mode !== 'text'){
+            dessinerForme(e);
+        }
+        dessin = false;
+    }
+    isDragging = false;
+    ctx.beginPath();
+});
+
+
+const idTournoi = {{idTournoi}}; // injecté via Twig/PHP
+
+// --- Charger automatiquement un plan existant ---
+function loadPlan(idTournoi) {
+    fetch(`img/planTournoi/${idTournoi}-plan.json`)
+        .then(res => {
+            if (!res.ok) throw new Error("Aucun JSON trouvé");
+            return res.json();
+        })
+        .then(data => {
+            shapes = data;
+            
+            // Charger l'image PNG comme fond
+            const img = new Image();
+            img.src = `img/planTournoi/${idTournoi}-plan.png`;
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                redrawCanvas(); // redessine les formes par-dessus
+            };
+        })
+        .catch(() => {
+            console.log("Pas de plan enregistré pour ce tournoi, démarrage à vide.");
+        });
+}
+
+// Appeler le chargement au démarrage
+window.addEventListener("load", () => {
+    loadPlan(idTournoi);
+});
+
+
+
+
+
+// --- Fonctions dessin ---
+function dessinerForme(e, preview=false){
+    const endX = e.offsetX;
+    const endY = e.offsetY;
+    const shape = {type:mode, startX, startY, endX, endY, color:couleur};
+
+    if(!preview) shapes.push(shape);
+
+    drawShape(ctx, shape, false);
+}
+
+function drawShape(ctx, shape, highlight=false){
+    ctx.strokeStyle = shape.color;
+    ctx.fillStyle = shape.color;
+    ctx.lineWidth = 2;
+
+    if(shape.type === 'free'){
+        ctx.beginPath();
+        const points = shape.points;
+        if(points.length>0){
+            ctx.moveTo(points[0].x, points[0].y);
+            for(let i=1;i<points.length;i++){
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+        }
+    } else if(shape.type === 'line'){
+        ctx.beginPath();
+        ctx.moveTo(shape.startX, shape.startY);
+        ctx.lineTo(shape.endX, shape.endY);
+        ctx.stroke();
+    } else if(shape.type === 'rect' || shape.type==='square'){
+        let w = shape.endX - shape.startX;
+        let h = shape.endY - shape.startY;
+        if(shape.type==='square'){
+            const size = Math.max(Math.abs(w), Math.abs(h));
+            w = w>=0?size:-size;
+            h = h>=0?size:-size;
+        }
+        ctx.strokeRect(shape.startX, shape.startY, w, h);
+    } else if(shape.type === 'circle'){
+        const radius = Math.sqrt((shape.endX-shape.startX)**2 + (shape.endY-shape.startY)**2);
+        ctx.beginPath();
+        ctx.arc(shape.startX, shape.startY, radius, 0, 2*Math.PI);
+        ctx.stroke();
+    } else if(shape.type === 'text'){
+        ctx.font = "16px Arial";
+        ctx.fillText(shape.text, shape.startX, shape.startY);
+    }
+
+    if(highlight && shape.type !== 'free'){
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5,3]);
+        if(shape.type==='rect' || shape.type==='square'){
+            ctx.strokeRect(shape.startX-2, shape.startY-2, shape.endX-shape.startX+4, shape.endY-shape.startY+4);
+        } else if(shape.type==='circle'){
+            const radius = Math.sqrt((shape.endX-shape.startX)**2 + (shape.endY-shape.startY)**2);
+            ctx.beginPath();
+            ctx.arc(shape.startX, shape.startY, radius+2, 0, 2*Math.PI);
+            ctx.stroke();
+        } else if(shape.type==='line'){
+            ctx.beginPath();
+            ctx.moveTo(shape.startX, shape.startY);
+            ctx.lineTo(shape.endX, shape.endY);
+            ctx.stroke();
+        } else if(shape.type==='text'){
+            const width = ctx.measureText(shape.text).width;
+            const height = 16;
+            ctx.strokeRect(shape.startX-2, shape.startY-height, width+4, height+4);
+        }
+        ctx.setLineDash([]);
+    }
+}
+
+function redrawCanvas(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    shapes.forEach(s => drawShape(ctx,s, s===selectedShape));
+}
+
+function isInsideShape(x, y, shape){
+    if(shape.type === 'free'){
+        const xs = shape.points.map(p => p.x);
+        const ys = shape.points.map(p => p.y);
+        const minX = Math.min(...xs)-2;
+        const maxX = Math.max(...xs)+2;
+        const minY = Math.min(...ys)-2;
+        const maxY = Math.max(...ys)+2;
+        return x>=minX && x<=maxX && y>=minY && y<=maxY;
+    } else if(shape.type==='line'){
+        const dx = shape.endX-shape.startX;
+        const dy = shape.endY-shape.startY;
+        const length2 = dx*dx+dy*dy;
+        const t = ((x-shape.startX)*dx + (y-shape.startY)*dy)/length2;
+        if(t<0 || t>1) return false;
+        const closestX = shape.startX + t*dx;
+        const closestY = shape.startY + t*dy;
+        const dist2 = (x-closestX)**2 + (y-closestY)**2;
+        return dist2 <= 25; // tolérance 5px
+    } else if(shape.type==='rect' || shape.type==='square'){
+        const minX = Math.min(shape.startX,shape.endX);
+        const maxX = Math.max(shape.startX,shape.endX);
+        const minY = Math.min(shape.startY,shape.endY);
+        const maxY = Math.max(shape.startY,shape.endY);
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
+    } else if(shape.type==='circle'){
+        const radius = Math.sqrt((shape.endX-shape.startX)**2 + (shape.endY-shape.startY)**2);
+        const dx = x - shape.startX;
+        const dy = y - shape.startY;
+        return dx*dx + dy*dy <= radius*radius;
+    } else if(shape.type==='text'){
+        const width = ctx.measureText(shape.text).width;
+        const height = 16;
+        return x >= shape.startX && x <= shape.startX + width && y >= shape.startY - height && y <= shape.startY;
+    }
+    return false;
+}
+</script>
+
+</body>
+</html>

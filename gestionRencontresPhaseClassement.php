@@ -42,7 +42,7 @@ if ($tournoiDao->droitTournoiClub($_GET['idTournoiBase'], $userData['id']) == nu
 $licenceDao = new LicenceDao();
 $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 $equipe = new EquipeDAO();
-$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['idTournoiBase'], $_GET['query']);
+$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['idTournoiBase']);
 
 //afficher les phase de classement uniquement:
 
@@ -72,6 +72,10 @@ if (isset ($_GET['idPoule'])) {
  
  }
 
+ else {
+  $GetResultatDesPoules = [];
+ }
+
 
  foreach ($GetResultatDesPoules  as &$equipe) {
  
@@ -95,14 +99,25 @@ foreach ($poulesFinales as &$poule) {
 
 
 //Savoir si une poule contient des rencontre
+if (isset ($_GET['idPoule'])) {
+  $idPoule = $_GET['idPoule'];
 $pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);
+} else {
+  $pouleHasRencontres = false;
+  $idPoule = null;
+}
 
 
+if (isset ($_GET['idCategorie'])) {
+  $categorieEnCours = $_GET['idCategorie'];
+} else {
+  $categorieEnCours = null;
+}
 
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
+
   
   'pageEnCours' => 'GestionDesRencontres',
   //'categorieEnCours' => $_GET['categorie'],
@@ -111,14 +126,14 @@ echo $template->render([
   'afficherLespoulesFinales' => $poulesFinales,
   //'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
   'PouleDuTournoi' => $poulemanager->getAllPoulesByTournoi($tournoiId),
-  'pouleEnCours' => $_GET['idPoule'],
+  'pouleEnCours' => $idPoule,
  
   
   'ResultatDesPoules' =>$GetResultatDesPoules,
   //'resultatPoules' => $GetResultatDesPoules,
   'idTournoi' => $tournoiId,
   //'RencontresByPoulephase1' => $rencontreDao->GetEquipesClasseesParPoule($tournoiId),
-  'idCategorieEnCours' => $_GET['idCategorie'],
+  'idCategorieEnCours' => $categorieEnCours,
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
   'TournoisDeBase' => $tournoiDao->afficherLesTournois($userData['id']),
   //'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
