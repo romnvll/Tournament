@@ -27,8 +27,9 @@ foreach ($audioCreneaux->getAudiosPourCreneau($idCreneau) as $audio) {
 
 <?php if (!empty($audioPaths)) : ?>
     <?php foreach ($audioPaths as $path) : ?>
-        <audio class="audio-global" src="<?= htmlspecialchars($path) ?>"></audio>
-    <?php endforeach; ?>
+    <?php $version = file_exists($path) ? filemtime($path) : time(); ?>
+    <audio class="audio-global" src="<?= htmlspecialchars($path) ?>?v=<?= $version ?>"></audio>
+<?php endforeach; ?>
 
     <script>
         window.addEventListener('load', function () {
