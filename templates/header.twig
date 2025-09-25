@@ -55,12 +55,14 @@
                                 <i class="fa-solid fa-sliders"></i> 2 - {{t('parametresTournoi')}} 
                             </a>
                         </li>
+                        {% if idTournoi != 0 %}
                         <li><hr class="dropdown-divider"/></li>
                             <li>
-                            <a class="dropdown-item" href="planTournoi.php?idTournoi={{idTournoi}}">
+                            <a class="dropdown-item" href="planTournoi.php?idTournoi={{idTournoi}}" target="_blank">
                                 <i class="fa-solid fa-map"></i> 2 - {{t('planDuSite')}} 
                             </a>
                         </li>
+                        {% endif %}
                     </ul>
                 </li>
 

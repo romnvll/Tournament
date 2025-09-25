@@ -42,7 +42,7 @@ $licenceDao = new LicenceDao();
 $licence = $licenceDao->getLicencesParUtilisateur($userData['id']);
 $expiration = $licenceDao->retrograderLicencesExpirees();
 
-
+$isArchived = $tournoiDao->afficherLesTournois($userData['id']);
 
 echo $template->render([
  'email' => $userData['email'],
@@ -52,6 +52,7 @@ echo $template->render([
 'tousLesTournois' => $tousLesTournois,
 'licence' => $licence,
 'typeDeSport' => $typeDeSport,
+'isArchived' => $isArchived,
 
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),

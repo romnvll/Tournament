@@ -274,11 +274,21 @@ img {
                                         {% for equipe in equipesAvecPoule %}
                                             <li>
                                                 {% if equipe.idPoule != null %}
-                                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#labels" class="list-group-item list-group-item-action">
+
+                                                    {% if labels.length > 0 or planTournoi is not null %}
+                                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#labels " class="list-group-item list-group-item-action">
                                                         {{ equipe.nom|upper }}
                                                         -
                                                         {{ equipe.Nom_categorie }}
                                                     </a>
+                                                    {% else %}
+                                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#score" class="list-group-item list-group-item-action">
+                                                        {{ equipe.nom|upper }}
+                                                        -
+                                                        {{ equipe.Nom_categorie }}
+
+                                                    </a>
+                                                    {% endif %}
                                                     {% if partenaires is not empty %}
                                                         {% set randIndex = random(0, partenaires|length - 1) %}
                                                         {% set sponsor = partenaires[randIndex] %}
@@ -433,7 +443,7 @@ img {
                         {% set seen_creneaux = seen_creneaux|merge([label['creneau_horaire']]) %}
                     {% endif %}
                 {% endfor %}
-                {% if grouped_labels|length > 0 %}
+                {% if grouped_labels|length > 0 or planTournoi is not null %}
                     
 
 
@@ -442,12 +452,13 @@ img {
 <div class="alert alert-primary p-4 rounded shadow-sm" role="alert" id="labels">
     <div class="d-flex align-items-center mb-3">
         <i class="fa-solid fa-circle-info me-2 text-info" style="font-size: 1.5rem;"></i>
-        <h5 class="mb-0">Informations du tournoi</h5>
+        <h5 class="mb-0">Informations</h5>
     </div>
 
     <div class="d-flex flex-row justify-content-between">
         <!-- Partie Labels -->
         <div class="d-flex flex-column">
+        
             {% for label in grouped_labels %}
                 <div class="d-flex align-items-center mb-2">
                     <i class="fa-solid fa-check-circle me-2 text-success" style="font-size: 1.2rem;"></i>
@@ -457,18 +468,19 @@ img {
                         {{ label['labels'] }}
                     </span>
                 </div>
+                
             {% endfor %}
         </div>
-
+       
         <!-- Aperçu du plan -->
         {% if planTournoi is defined and planTournoi is not null %}
-            <div class="ms-6 text-center" style="margin-top: -50px;">
+            <div class="ms-6 text-center" style="margin-top: -50px; margin-right: -20px;">
                 <h6 class="fw-bold text-secondary">📍 Plan des terrains</h6>
                 <img 
                     src="{{ planTournoi }}" 
                     alt="Plan du tournoi" 
                     class="img-thumbnail shadow-sm" 
-                    style="max-width: 200px; cursor: pointer; margin-right: -20px;" 
+                    style="max-width: 100px; cursor: pointer; margin-right: -20px;" 
                     data-bs-toggle="modal" 
                     data-bs-target="#planModal"
                 >
@@ -476,7 +488,7 @@ img {
         {% endif %}
     </div>
 </div>
-
+ 
 {% if planTournoi is defined and planTournoi is not null %}
     <!-- Modal Bootstrap -->
     <div class="modal fade" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
@@ -506,6 +518,8 @@ img {
 
 
                 {% endif %}
+
+               
                 {# fin Gestion des labels #}
                 <div class="row mt-3">
                     <div class="col-lg-12 col-md-6 col-sm-12 col-12" id="score">

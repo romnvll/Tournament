@@ -37,6 +37,8 @@
   <button id="deleteBtn">❌ Supprimer forme</button>
   <button id="copyBtn">📋 Copier</button>
   <button id="pasteBtn">📌 Coller</button>
+  <button id="deletePlanBtn">🗑️ Supprimer le plan</button>
+
 </div>
 
 <script>
@@ -224,6 +226,25 @@ canvas.addEventListener("mouseup", e => {
     isDragging = false;
     ctx.beginPath();
 });
+
+
+//suppresion du plan
+document.getElementById("deletePlanBtn").addEventListener("click", () => {
+    if(confirm("Voulez-vous vraiment supprimer le plan ?")) {
+        fetch("delete_plan.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idTournoi: {{ idTournoi }} })
+        })
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            location.reload(); // recharge la page pour mettre à jour l'affichage
+        })
+        .catch(err => console.error(err));
+    }
+});
+
 
 
 const idTournoi = {{idTournoi}}; // injecté via Twig/PHP

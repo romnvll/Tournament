@@ -187,6 +187,8 @@ $allLangs = [
         'insererCreneau' => 'Insérer un créneau',
         'supprimerCreneau' => 'Supprimer ce créneau (il doit être vide)',
         'planDuSite' => 'Plan du site',
+        'reactivate' => 'Réactiver'  ,
+        'reactivateHelp' => ' ce tournoi ( pour pouvoir le supprimer )',
 
         
         
@@ -367,8 +369,9 @@ $allLangs = [
         'supprimerCreneau' => 'Delete this time slot (it must be empty)',
         'label' => 'Label',
         'planDuSite' => 'Site map',
-        
-        
+        'reactiver' => 'Reactivate',
+        'reactiverHelp' => ' this tournament - (to delete it)',
+                
 
         
         // ajoute toutes tes traductions anglaises ici

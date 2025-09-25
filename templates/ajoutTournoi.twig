@@ -102,6 +102,12 @@
                              {% if tousLesTournois|length >= licence['0'].limite_tournois %}
                             <div class="alert alert-warning">
                                 {{ t('limit_tournament_warning', {'%limit%': licence['0'].limite_tournois}) }}
+
+                                {% for archived in isArchived %}
+                                    {% if archived.isArchived == 1 %}
+                                    <p>{{ archived.nom }} - <a href="modifierTournoi.php?idTournoi={{ archived.id }}">{{ t('reactivate')}}</a>{{t('reactivateHelp')}}</p>
+                                    {% endif %}
+                                    {% endfor %}
                             </div>
                             {% else %}
                             <button type="submit" class="btn btn-primary w-100 btn-lg">
