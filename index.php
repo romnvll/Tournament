@@ -60,7 +60,7 @@ else {
 }
 
 }
-$planTournoi = null;
+
 
 
 

@@ -44,6 +44,9 @@ if (isset ($_GET['id_tournoi'])) {
 if (isset ($_GET['idPoule'])) {
     $idPoule = $_GET['idPoule'];
 }
+else {
+    $idPoule = null;
+}
 
 echo $template->render([
   'email' => $userData['email'],
@@ -55,7 +58,7 @@ echo $template->render([
     'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_GET['id_tournoi'],true),
     'idTournoi' => $idtournoi,
     'tournoiEnCours' => $idtournoi,
-    'pouleEnCours' => $_GET['idPoule'],
+    'pouleEnCours' => $idPoule,
     
   
   

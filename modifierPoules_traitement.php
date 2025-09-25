@@ -6,7 +6,7 @@ require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
 
 $tournoiDao = new tournoiDao();
-var_dump($_POST);
+
 
 // Prioriser $_POST['idTournoi'], sinon utiliser $_GET['tournoiId']
 if (isset($_POST['id_tournoi']) && is_numeric($_POST['id_tournoi'])) {

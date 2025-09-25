@@ -1,8 +1,19 @@
 <?php
-// delete_plan.php
+require 'security.php';
+
+require 'class/tournoiDao.class.php';
+$tournoiDao = new tournoiDao();
+
+
 
 // Récupère les données JSON envoyées par fetch
 $data = json_decode(file_get_contents('php://input'), true);
+
+if ($tournoiDao->droitTournoiClub($data['idTournoi'], $userData['id']) == null) {
+      
+    exit;
+  }
+
 
 if (!isset($data['idTournoi'])) {
     http_response_code(400);

@@ -1,6 +1,14 @@
     <?php
 
     require 'vendor/autoload.php';
+    require 'security.php';
+    require 'class/tournoiDao.class.php';
+    $tournoiDao = new tournoiDao();
+
+    if ($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) {
+      
+    exit;
+  }
 
     require 'Lang/lang.php';
 
