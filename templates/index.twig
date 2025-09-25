@@ -480,7 +480,7 @@ img {
             <div class="ms-6 text-center" style="margin-top: -50px; margin-right: -20px;">
                 <h6 class="fw-bold text-secondary">📍 Plan des terrains</h6>
                 <img 
-                    src="{{ planTournoi }}" 
+                    src="{{ planTournoi }}?v={{ random() }}"  
                     alt="Plan du tournoi" 
                     class="img-thumbnail shadow-sm" 
                     style="max-width: 100px; cursor: pointer; margin-right: -20px;" 
@@ -512,7 +512,7 @@ img {
 
                 <!-- Corps -->
                 <div class="modal-body text-center">
-                    <img src="{{ planTournoi }}" 
+                    <img src="{{ planTournoi }}?v={{ random() }}"
                         alt="Plan complet du tournoi" 
                         class="img-fluid rounded-3 shadow-sm border">
                 </div>

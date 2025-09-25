@@ -251,7 +251,9 @@ const idTournoi = {{idTournoi}}; // injecté via Twig/PHP
 
 // --- Charger automatiquement un plan existant ---
 function loadPlan(idTournoi) {
-    fetch(`img/planTournoi/${idTournoi}-plan.json`)
+    const bust = Date.now(); // paramètre unique à chaque chargement
+
+    fetch(`img/planTournoi/${idTournoi}-plan.json?v=${bust}`)
         .then(res => {
             if (!res.ok) throw new Error("Aucun JSON trouvé");
             return res.json();
@@ -261,7 +263,7 @@ function loadPlan(idTournoi) {
             
             // Charger l'image PNG comme fond
             const img = new Image();
-            img.src = `img/planTournoi/${idTournoi}-plan.png`;
+            img.src = `img/planTournoi/${idTournoi}-plan.png?v=${bust}`;
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
                 redrawCanvas(); // redessine les formes par-dessus
@@ -276,6 +278,7 @@ function loadPlan(idTournoi) {
 window.addEventListener("load", () => {
     loadPlan(idTournoi);
 });
+
 
 
 
