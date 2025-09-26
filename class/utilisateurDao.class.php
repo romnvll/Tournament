@@ -70,13 +70,13 @@ class UtilisateurDAO {
         $stmt->execute();
         $resultat = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($resultat && hash('sha256', $ancien) === $resultat['password']) {
-            $nouveauHash = hash('sha256', $nouveau);
-            $updateStmt = $this->connexion->prepare("UPDATE Utilisateurs SET password = :password WHERE id = :id");
-            $updateStmt->bindParam(':password', $nouveauHash);
-            $updateStmt->bindParam(':id', $id);
-            return $updateStmt->execute();
-        }
+       if ($resultat && password_verify($ancien, $resultat['password'])) {
+        $nouveauHash = password_hash($nouveau, PASSWORD_DEFAULT);
+        $updateStmt = $this->connexion->prepare("UPDATE Utilisateurs SET password = :password WHERE id = :id");
+        $updateStmt->bindParam(':password', $nouveauHash);
+        $updateStmt->bindParam(':id', $id);
+        return $updateStmt->execute();
+    }
 
         return false;
     }

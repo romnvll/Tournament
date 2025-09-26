@@ -114,7 +114,7 @@ if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POS
     // Vérifier si les deux nouveaux mots de passe sont identiques
     if ($_POST['newPassword1'] === $_POST['newPassword2']) {
         $success = $utilisateurDao->changerMotDePasse($userData['id'], $_POST['oldPassword'], $_POST['newPassword1']);
-
+        
         // Vérifier si le changement de mot de passe a réussi
         if ($success) {
             header("Location: " . $_SERVER['HTTP_REFERER'] ."?status=success");
