@@ -59,7 +59,7 @@
                     <tbody>
                         {% for t in tournoisEnCours %}
                             <tr>
-                                <td>{{ t.id }}</td>
+                                <td><a href="../modifierTournoi.php?idTournoi={{ t.id }}">{{ t.id }}</a></td>
                                 <td>{{ t.nom }}</td>
                                 <td>{{ t.dateDebut }}</td>
                                 <td> {{ t.email_utilisateur }}</td>

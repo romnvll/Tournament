@@ -34,10 +34,15 @@ if (!isset ($_GET['idTournoiBase']) || $_GET['idTournoiBase'] == 0) {
   exit();
 }
 
-if ($tournoiDao->droitTournoiClub($_GET['idTournoiBase'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['idTournoiBase']) ? (int) $_GET['idTournoiBase'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
+
 
 $licenceDao = new LicenceDao();
 $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];

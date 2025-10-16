@@ -29,14 +29,17 @@ $tournoiDao = new tournoiDao();
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 
+$idTournoi = isset($_GET['idTournoi']) ? (int) $_GET['idTournoi'] : 0;
 
-
-if (($tournoiDao->droitTournoiClub($_GET['idTournoi'] ?? null, $userData['id']) == null) 
-    && ($_GET['idTournoi'] == "0")) {
-    
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($idTournoi, $userData['id']) === null &&
+    $idTournoi === 0
+) {
     header("Location: ajoutTournoi.php");
     exit;
 }
+
 
 //check licence
 

@@ -24,11 +24,18 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
     header("Refresh:3; url=ajoutTournoi.php");
     exit();
   }
-  
-  if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-      
+
+
+
+  $idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
     exit;
-  }
+}
+
   
 
 

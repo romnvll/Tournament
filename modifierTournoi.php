@@ -25,10 +25,12 @@ require 'class/PersonneTableDao.class.php';
 require 'Lang/lang.php';
 
 $tournoiDao = new tournoiDao();
-
-if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-   
-  exit;
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) === null &&
+    $_GET['idTournoi'] != "0"
+) {
+    exit;
 }
 
 

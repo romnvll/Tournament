@@ -45,9 +45,13 @@ $planification = new planificationDao();
 $arbitre = new arbitreDao();
 
 
-if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
 
 

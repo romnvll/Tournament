@@ -37,10 +37,15 @@ if (!isset ($_GET['idTournoi']) || $_GET['idTournoi'] == 0) {
   exit();
 }
 
-if ($tournoi->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['idTournoi']) ? (int) $_GET['idTournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
+
 
 
 
