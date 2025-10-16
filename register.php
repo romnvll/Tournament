@@ -114,6 +114,16 @@ $mail->send();
 
 $success = "Un email de confirmation a été envoyé.";
 
+$mail->setFrom('romain@brackito.net', 'BRACKITO ');
+$mail->isHTML(true);
+$mail->addAddress("vallee.romain@gmail.com", "Romain Vallée");
+
+$mail->Subject = "[Brackito] - nouvelle inscription";
+$mail->Body = "Nouvelle inscription : $prenom $nom ($email)";
+$mail->CharSet = 'UTF-8';
+
+$mail->send();
+
     }
 }
 
