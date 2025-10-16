@@ -54,13 +54,11 @@ if (isset ($_GET['id_tournoi'])) {
   if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
   $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
   
+  }
 }
 else {
   $planTournoi = null;
 }
-
-}
-
 
 
 

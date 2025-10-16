@@ -55,6 +55,7 @@
 					<tbody id="arbitreTableBody">
 
 						{% for arbitre in creneauxArbitres %}
+						
 
 							<tr>
 								<td class="text-center">
@@ -65,6 +66,7 @@
                                             <p class="mb-0 fw-bold">{{ arbitre.arbitre_nom|upper }}</p>
                                             <p class="mb-0 text-muted">
                                                 ({{ arbitre.nombre_matchs_arbitre }} rencontre(s) arbitrée(s))
+												
                                             </p>
                                         {% endif %}
                                     </div>

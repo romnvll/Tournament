@@ -58,7 +58,7 @@ if ($_GET['action'] == "sendMail") {
     $personneTable = new PersonneTableDao();
     $status = $personneTable->envoyerMail($_GET['personneTableId']);
     $statusParam = $status ? 'success' : 'error';
-    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#placementPersonneSurTerrain&tab=tableDesPersonnes");
+    header("Location: " . $_SERVER['HTTP_REFERER'] . "&status=$statusParam&#placementPersonneSurTerrain&tab=gestionTables");
     exit(0);
 }
 
@@ -73,7 +73,7 @@ if ($_GET['addPersonne'] == "true") {
    require 'class/personneDao.class.php';
    $personne=new PersonneDao;
    $personne->ajouterPersonne($nom,$prenom,$mail,$idTournoi);
-  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=tableDesPersonnes");
+  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=gestionTables");
 
 }
 

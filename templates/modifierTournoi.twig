@@ -262,25 +262,25 @@
                 {% set tabcontent_arbitres = '' %}
             {% endif %}
             <div class="row mt-4">
-                <div class="container my-5">
-                    <ul class="nav nav-tabs nav justify-content-center" id="myTab" role="tablist">
+                <div class="container my-5 ">
                         {% if infotournoi.gestionArbitres == 1 %}
-                            <li class="nav-item" role="Gestion des arbitres">
-                                <button class="nav-link {% if tab == 'arbitres' %} active {% endif %}" id="arbitres-tab" data-bs-toggle="tab" data-bs-target="#arbitres" type="button" role="tab" aria-controls="arbitres" aria-selected="true">
+
+                                <a href="modifierTournoi.php?idTournoi={{infotournoi.id}}&tab=arbitres" class="btn btn-primary {% if tab == 'arbitres' %} active {% endif %}" id="arbitres-tab"  type="button" >
                                     {{ t('arbitres') }}
-                                </button>
-                            </li>
+                                </a>
+                           
                         {% endif %}
                         {% if infotournoi.gestionTables == 1 %}
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link {% if tab == 'tableDesPersonnes' %} active {% endif %} " id="Table-tab" data-bs-toggle="tab" data-bs-target="#table" type="button" role="tab" aria-controls="table" aria-selected="false">
+                            
+                                <a href="modifierTournoi.php?idTournoi={{infotournoi.id}}&tab=gestionTables" class="btn btn-primary {% if tab == 'gestionTables' %} active {% endif %}" id="arbitres-tab"  type="button" >
                                     Table
-                                </button>
-                            </li>
+                                </a>
+                           
                         {% endif %}
                     </ul>
+                    {% if tab == 'arbitres' %}
                     <div class="tab-content mt-3" id="myTabContent">
-                        <div class="tab-pane fade  {% if tab == 'arbitres' %} show active {% endif %} " id="arbitres" role="tabpanel" aria-labelledby="arbitres-tab">
+                        
                             <!-- debut tab arbitres -->
                             {% if infotournoi.gestionArbitres == 1 %}
                                 <div class="card shadow-lg mt-5">
@@ -379,11 +379,13 @@
                                 
                             {% endif %}
 
-
+                    {% endif %}
                         <!-- fin tab arbitres -->
                         </div>
-                        <div class="tab-pane fade {% if tab == 'tableDesPersonnes' %} show active {% endif %} " id="table" role="tabpanel" aria-labelledby="table-tab">
+
+                        
                             <!-- debut tab tables -->
+                        {% if tab == 'gestionTables' %}
                             {% if infotournoi.gestionTables == 1 %}
                                 <div class="card shadow-lg mt-5">
                                     <div class="card-header bg-primary text-white text-center" id="ajouterDesPersonnesSurTerrain">
@@ -565,6 +567,7 @@
                                     </div>
                                     
                                 {% endif %}
+                            {% endif %}
                             <!-- fin tab tables -->
                             </div>
                             <div class="toast-container position-fixed bottom-0 end-0 p-3">

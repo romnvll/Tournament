@@ -16,7 +16,7 @@ class UtilisateurDAO {
     }
 
      public function getAllUtilisateurs() {
-        $stmt = $this->connexion->query("SELECT id, nom, email, role FROM Utilisateurs");
+        $stmt = $this->connexion->query("SELECT * FROM Utilisateurs");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
