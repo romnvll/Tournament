@@ -1,26 +1,136 @@
 [
     {
         "type": "rect",
-        "startX": 115,
-        "startY": 174,
-        "endX": 284,
-        "endY": 277,
+        "startX": 106,
+        "startY": 193,
+        "endX": 275,
+        "endY": 296,
         "color": "#000000"
     },
     {
         "type": "rect",
-        "startX": 330,
-        "startY": 315,
-        "endX": 557,
-        "endY": 427,
+        "startX": 361,
+        "startY": 184,
+        "endX": 588,
+        "endY": 296,
         "color": "#000000"
     },
     {
         "type": "rect",
-        "startX": 435,
-        "startY": 108,
-        "endX": 671,
-        "endY": 178,
+        "startX": 256,
+        "startY": 37,
+        "endX": 492,
+        "endY": 107,
         "color": "#000000"
+    },
+    {
+        "type": "free",
+        "points": [
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            },
+            {
+                "x": null,
+                "y": null
+            }
+        ],
+        "color": "#000000"
+    },
+    {
+        "type": "free",
+        "points": [
+            {
+                "x": 533,
+                "y": 274
+            }
+        ],
+        "color": "#000000"
+    },
+    {
+        "type": "text",
+        "startX": 134,
+        "startY": 234,
+        "color": "#000000",
+        "text": "Terrain 1"
+    },
+    {
+        "type": "text",
+        "startX": 457,
+        "startY": 248,
+        "color": "#000000",
+        "text": "Terrain 2"
     }
 ]

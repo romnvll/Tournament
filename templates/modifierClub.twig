@@ -86,7 +86,18 @@
 
       <div class="col-12 col-md-6">
         <h3>Liste des Clubs</h3>
-        <table class="table table-bordered table-striped">
+
+<div class="row mb-3">
+  <div class="col-md-6 mb-2">
+    <input type="text" id="searchClub" class="form-control" placeholder="Rechercher un club...">
+  </div>
+  <div class="col-md-6 mb-2">
+    <input type="text" id="searchSport" class="form-control" placeholder="Rechercher un sport...">
+  </div>
+</div>
+
+
+        <table class="table table-bordered table-striped" id="tableClubs">
           <thead>
             <tr>
               <th scope="col">Nom</th>
@@ -136,5 +147,34 @@
 
   <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- FontAwesome for icons -->
 </body>
+
+<script>
+  const searchClub = document.getElementById('searchClub');
+  const searchSport = document.getElementById('searchSport');
+  const rows = document.querySelectorAll('#tableClubs tbody tr');
+
+  function filtrer() {
+    const clubValue = searchClub.value.toLowerCase();
+    const sportValue = searchSport.value.toLowerCase();
+
+    rows.forEach(row => {
+      const nomClub = row.cells[0].innerText.toLowerCase();
+      const sport = row.cells[2].innerText.toLowerCase();
+
+      if (
+        (nomClub.includes(clubValue) || clubValue === '') &&
+        (sport.includes(sportValue) || sportValue === '')
+      ) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  searchClub.addEventListener('keyup', filtrer);
+  searchSport.addEventListener('keyup', filtrer);
+</script>
+
 
 </html>
