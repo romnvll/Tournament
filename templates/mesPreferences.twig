@@ -1,288 +1,253 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Mes préférences</title>
-    <style>
-        .card {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        .card-body {
-            padding: 30px;
-        }
-        .form-group label {
-            font-weight: bold;
-        }
-        .form-control {
-            border-radius: 5px;
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .text-muted {
-            font-style: italic;
-        }
-        .navbar-nav {
-            margin: 0 auto;
-        }
-    </style>
-</head>
-<body>
-    {{ include('header.twig') }}
-    <div class="container my-4">
-    <div class="row">
-      <div class="col-md-8 mt-4">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Gestion des sponsors</span>
-        </div>
-        <div class="card-body">
-            <!-- Formulaire d'ajout de sponsor -->
-            <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" class="mb-4" name="sponsors">
-                <input type="hidden" name="club_id" value="{{ idClub }}">
-                <input type="hidden" name="ajoutSponsor" value="1">
-                <div class="form-group mb-2">
-                    <input type="text" name="nom" class="form-control" placeholder="Nom du sponsor" required>
-                </div>
-                <div class="form-group mb-2">
-                    <input type="url" name="lien_web" class="form-control" placeholder="Lien web (https://...)" >
-                </div>
-                <div class="form-group mb-2">
-                    <textarea name="description" class="form-control" placeholder="Description (facultative)"></textarea>
-                </div>
-                <div class="form-group mb-2">
-                    <input type="text" name="telephone" class="form-control" placeholder="Téléphone du sponsor (facultatif)" >
-                </div>
-                <div class="form-group mb-2">
-                    <input type="text" name="Adresse" class="form-control" placeholder="adresse du sponsor (facultative)" >
-                </div>
-                <div class="form-group mb-2">
-                    <label for="logo">Logo</label>
-                    <input type="file" name="logo" class="form-control">
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm">Ajouter le sponsor</button>
-            </form>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+		 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script><title>
+		Mes préférences
+		</title>
+			<style>
+.card {
+	border: none;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.card-header {
+	background-color: #f8f9fa;
+	font-size: 1.25rem;
+	font-weight: bold;
+}
+.card-body {
+	padding: 30px;
+}
+.form-group label {
+	font-weight: bold;
+}
+.form-control {
+	border-radius: 5px;
+}
+.btn-primary {
+	width: 100%;
+	padding: 10px;
+	border-radius: 5px;
+}
+.text-muted {
+	font-style: italic;
+}
+.navbar-nav {
+	margin: 0 auto;
+}
+	</style>
+	</head>
+		<body>
+		{{ include('header.twig') }}
+			<div class="container my-4 d-flex gap-2"> 
+            <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true" class="btn btn-primary mb-4 {% if affichageSponsors %}active{% endif %}">Gestion des sponsors</a>
+			<a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true" class="btn btn-primary mb-4 {% if monMotDePasse %}active{% endif %}">Gestion du mots de passe</a>
+			<a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn btn-primary mb-4 {% if gestionCategorie %}active{% endif %}">Gestion des catégories</a>
+		</div>
 
-            <!-- Tableau des sponsors existants -->
-            {% if sponsors %}
-             <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Lien</th>
-            <th>Description</th>
-            <th>Téléphone</th>
-            <th>Adresse</th>
-            <th>Logo</th>
-            <th class="text-center">Actif</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        
-        {% for sponsor in sponsors %}
-        <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
-            <tr>
-                <td>
-                    <input type="hidden" name="id" value="{{ sponsor.id }}">
-                    <input type="hidden" name="modifierSponsor" value="1">
-                    <input type="text" name="nom" class="form-control" value="{{ sponsor.nom }}" onchange="this.form.submit()">
-                </td>
-                <td>
-                    <input type="url" name="lien_web" class="form-control" value="{{ sponsor.lien_web }}" onchange="this.form.submit()">
-                </td>
-                <td>
-                    <textarea name="description" class="form-control"  onchange="this.form.submit()">{{ sponsor.description }}</textarea>
-                </td>
-                <td>
-                    <input type="text" name="telephone" class="form-control" value="{{ sponsor.telephone }}" onchange="this.form.submit()">
-                </td>
-                <td>
-                    <input type="text" name="adresse" class="form-control" value="{{ sponsor.adresse }}" onchange="this.form.submit()">
-                </td>
-                <td>
-                    {% if sponsor.logo %}
-                        <img src="{{ sponsor.logo }}" alt="Logo" width="40">
-                    {% endif %}
-                    <input type="file" name="logo" class="form-control form-control-sm mt-1" onchange="this.form.submit()">
-                </td>
-                <td class="text-center">
-                    
-                    <input type="checkbox" name="actif" value="1" {% if sponsor.is_actif %}checked{% endif %} onchange="this.form.submit()">
-                </td>
-
-                <td class="text-center">
-                                <button type="submit" class="btn btn-sm btn-success mb-1">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <input type="hidden" name="club_id" value="{{ idClub }}">
-
-                <a href="mesPreferences_traitement.php?id={{ sponsor.id }}&supprimerSponsors" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce sponsor ?');">
-                    <i class="bi bi-trash"></i>
-                </a>
+		<div class="container-fluid ">
 
 
-                </td>
-            </tr>
-        </form>
-       
-            
-                   
-                        
-                   
-                </td>
-            </tr>
-        </form>
-        {% endfor %}
-    </tbody>
-</table>
+			<div class="row {{ affichageSponsors == true ? '' : 'd-none' }}">
 
-            {% else %}
-                <p class="text-muted">Aucun sponsor pour l'instant.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
-    </div>
 
-    <!--fin sponsors -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Modifier mon mot de passe</h2>
-                    </div>
-                    <div class="card-body">
-                        <form action="mesPreferences_traitement.php" method="post">
-                            <div class="form-group mb-3">
-                                <label for="oldPassword">Ancien mot de passe</label>
-                                <input type="password" name="oldPassword" class="form-control" id="oldPassword" required>
-                                <small id="oldPasswordHelp" class="form-text text-muted">Entrez votre ancien mot de passe pour confirmer votre identité.</small>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="newPassword1">Nouveau mot de passe</label>
-                                <input type="password" name="newPassword1" class="form-control" id="newPassword1" required>
-                                <small id="newPassword1Help" class="form-text text-muted">Entrez un nouveau mot de passe d'au moins 8 caractères.</small>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="newPassword2">Confirmer le nouveau mot de passe</label>
-                                <input type="password" name="newPassword2" class="form-control" id="newPassword2" required>
-                                <small id="newPassword2Help" class="form-text text-muted">Confirmez votre nouveau mot de passe.</small>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
-                        </form>
-                    </div>
-                    {% if message %}
-                        <div class="alert alert-success mt-3" role="alert">
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Gestion des catégories</span>
-                            <form action ="addCategorie.php" method="POST">
-                            <input type="hidden" name="idTournoi" value="0">
-							<input type="text" class="form-control" placeholder="Ajouter une catégorie..." id="AddCategory" name="Nom_categorie" required>
-                            <input type="hidden" name="Couleur" value="#BB8FCE">
-                            <input type="hidden" name="idClub" value="{{ userData.id }}">
-                        <input type="submit"  class="button btn btn-sm btn-primary" value="Ajouter ">
-                        </form>
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <p>La gestion des catégories permet de configurer les différentes catégories auxquelles une équipe peut appartenir.</p>
-                        {% set palette = [
+				<div class="col-6 mt-4 justify-content-center mx-auto"><!-- sponsors -->
+					<div class="card">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<span>Gestion des sponsors</span>
+						</div>
+						<div
+							class="card-body">
+							<!-- Formulaire d'ajout de sponsor -->
+							<form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" class="mb-4" name="sponsors">
+								<input type="hidden" name="club_id" value="{{ idClub }}">
+								<input type="hidden" name="ajoutSponsor" value="1">
+								<div class="form-group mb-2">
+									<input type="text" name="nom" class="form-control" placeholder="Nom du sponsor" required>
+								</div>
+								<div class="form-group mb-2">
+									<input type="url" name="lien_web" class="form-control" placeholder="Lien web (https://...)">
+								</div>
+								<div class="form-group mb-2">
+									<textarea name="description" class="form-control" placeholder="Description (facultative)"></textarea>
+								</div>
+								<div class="form-group mb-2">
+									<input type="text" name="telephone" class="form-control" placeholder="Téléphone du sponsor (facultatif)">
+								</div>
+								<div class="form-group mb-2">
+									<input type="text" name="Adresse" class="form-control" placeholder="adresse du sponsor (facultative)">
+								</div>
+								<div class="form-group mb-2">
+									<label for="logo">Logo</label>
+									<input type="file" name="logo" class="form-control">
+								</div>
+								<button type="submit" class="btn btn-primary btn-sm">Ajouter le sponsor</button>
+							</form>
+
+							<!-- Tableau des sponsors existants -->
+							{% if sponsors %}
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th>Nom</th>
+											<th>Lien</th>
+											<th>Description</th>
+											<th>Téléphone</th>
+											<th>Adresse</th>
+											<th>Logo</th>
+											<th class="text-center">Actif</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+
+										{% for sponsor in sponsors %}
+											<form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+												<tr>
+													<td>
+														<input type="hidden" name="id" value="{{ sponsor.id }}">
+														<input type="hidden" name="modifierSponsor" value="1">
+														<input type="text" name="nom" class="form-control" value="{{ sponsor.nom }}" onchange="this.form.submit()">
+													</td>
+													<td>
+														<input type="url" name="lien_web" class="form-control" value="{{ sponsor.lien_web }}" onchange="this.form.submit()">
+													</td>
+													<td>
+														<textarea name="description" class="form-control" onchange="this.form.submit()">{{ sponsor.description }}</textarea>
+													</td>
+													<td>
+														<input type="text" name="telephone" class="form-control" value="{{ sponsor.telephone }}" onchange="this.form.submit()">
+													</td>
+													<td>
+														<input type="text" name="adresse" class="form-control" value="{{ sponsor.adresse }}" onchange="this.form.submit()">
+													</td>
+													<td>
+														{% if sponsor.logo %}
+															<img src="{{ sponsor.logo }}" alt="Logo" width="40">
+														{% endif %}
+														<input type="file" name="logo" class="form-control form-control-sm mt-1" onchange="this.form.submit()">
+													</td>
+													<td class="text-center">
+
+														<input type="checkbox" name="actif" value="1" {% if sponsor.is_actif %} checked {% endif %} onchange="this.form.submit()">
+													</td>
+
+													<td class="text-center">
+														<button type="submit" class="btn btn-sm btn-success mb-1">
+															<i class="bi bi-pencil"></i>
+														</button>
+														<input type="hidden" name="club_id" value="{{ idClub }}">
+
+														<a href="mesPreferences_traitement.php?id={{ sponsor.id }}&supprimerSponsors" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce sponsor ?');">
+															<i class="bi bi-trash"></i>
+														</a>
+
+
+													</td>
+												</tr>
+											</form>
+										</td>
+									</tbody>
+								</tr>
+							</form>
+						{% endfor %}
+					</tbody>
+				</table>
+
+			{% else %}
+				<p class="text-muted">Aucun sponsor pour l'instant.</p>
+			{% endif %}
+		</div>
+	</body>
+</html></div></div></div><!--fin sponsors --><!-- mot de passe --><div class="col-md-6 {{ monMotDePasse == true ? '' : 'd-none' }} justify-content-center mx-auto"><div class="card"><div class="card-header">
+<h2>Modifier mon mot de passe</h2></div>
+<div class="card-body">
+<form action="mesPreferences_traitement.php" method="post">
+	<div class="form-group mb-3">
+		<label for="oldPassword">Ancien mot de passe</label>
+		<input type="password" name="oldPassword" class="form-control" id="oldPassword" required>
+		<small id="oldPasswordHelp" class="form-text text-muted">Entrez votre ancien mot de passe pour confirmer votre identité.</small>
+	</div>
+	<div class="form-group mb-3">
+		<label for="newPassword1">Nouveau mot de passe</label>
+		<input type="password" name="newPassword1" class="form-control" id="newPassword1" required>
+		<small id="newPassword1Help" class="form-text text-muted">Entrez un nouveau mot de passe d'au moins 8 caractères.</small>
+	</div>
+	<div class="form-group mb-3">
+		<label for="newPassword2">Confirmer le nouveau mot de passe</label>
+		<input type="password" name="newPassword2" class="form-control" id="newPassword2" required>
+		<small id="newPassword2Help" class="form-text text-muted">Confirmez votre nouveau mot de passe.</small>
+	</div>
+	<button type="submit" class="btn btn-primary">Changer le mot de passe</button>
+</form></div>{% if message %}
+<div class="alert alert-success mt-3" role="alert">
+	{{ message }}
+</div>{% endif %}</div></div><div class="col-md-6 {{ gestionCategorie == true ? '' : 'd-none' }} justify-content-center mx-auto"><div class="card"><div class="card-header d-flex justify-content-between align-items-center">
+<span>Gestion des catégories</span>
+<form action="addCategorie.php" method="POST">
+	<input type="hidden" name="idTournoi" value="0">
+	<input type="text" class="form-control" placeholder="Ajouter une catégorie..." id="AddCategory" name="Nom_categorie" required>
+	<input type="hidden" name="Couleur" value="#BB8FCE">
+	<input type="hidden" name="idClub" value="{{ userData.id }}">
+	<input type="submit" class="button btn btn-sm btn-primary" value="Ajouter ">
+</form></a></div><div class="card-body "><p>La gestion des catégories permet de configurer les différentes catégories auxquelles une équipe peut appartenir.</p>{% set palette = [
                             '#BB8FCE', '#FFC300', '#DAF7A6', '#CCFFFF',
                             '#E57373', '#F5B041', '#FF7F7F', '#F9E79F',
                             '#FF6F61', '#85C1E9', '#AED6F1', '#48C9B0',
                             '#73C6B6', '#F39C12', '#E67E22'
-                        ] %}
-                        <form id="preferencesForm" action="mesPreferences_traitement.php" method="post">
-                            <div class="row">
-                                {% for cat in categories %}
-                                <div class="col-md-12 mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="form-group mb-3">
-                                                <label for="nom_categorie">Nom</label>
-                                                <input type="text" class="form-control" name="nomCategorie" value="{{ cat.Nom_categorie }}">
-                                            </div>
-                                            <div class="form-group mb-3">
-                                                <label>Couleur</label>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    {% for color in palette %}
-                                                    <div class="form-check">
-                                                        <input type="hidden" name="ChangeColor" value="true">
+                        ] %}<form id="preferencesForm" action="mesPreferences_traitement.php" method="post">
+<div class="row">
+	{% for cat in categories %}
+		<div class="col-md-12 mb-4">
+			<div class="card">
+				<div class="card-body">
+					<div class="form-group mb-3">
+						<label for="nom_categorie">Nom</label>
+						<input type="text" class="form-control" name="nomCategorie" value="{{ cat.Nom_categorie }}">
+					</div>
+					<div class="form-group mb-3">
+						<label>Couleur</label>
+						<div class="d-flex flex-wrap gap-2">
+							{% for color in palette %}
+								<div class="form-check">
+									<input type="hidden" name="ChangeColor" value="true">
 
-                                                        <input class="form-check-input" type="radio" name="{{ cat.id_categorie }}" id="{{ cat.Nom_categorie }}{{ loop.index }}" value="{{ color }}"
-                                                            {% if cat.Couleur == color %}checked="checked"{% endif %}
-                                                            onchange="document.getElementById('preferencesForm').submit();">
-                                                        <label class="form-check-label" for="{{ cat.Nom_categorie }}{{ loop.index }}">
-                                                            <span class="badge" style="background-color: {{ color }};">{{ color }}</span>
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                <a href="delCategorie.php?delete={{ cat.id_categorie }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette catégorie ?');">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-          
-
-
-
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-  // Stocker la position de défilement avant de quitter la page
-  window.onload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      var scrollPosition = sessionStorage.getItem('scrollPosition');
-      if (scrollPosition !== null) {
-        window.scrollTo(0, scrollPosition);
-      }
-    }
-  };
-
-  window.onbeforeunload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      sessionStorage.setItem('scrollPosition', window.scrollY);
-    }
-  };
-</script>
-
-</body>
-</html>
+									<input class="form-check-input" type="radio" name="{{ cat.id_categorie }}" id="{{ cat.Nom_categorie }}{{ loop.index }}" value="{{ color }}" {% if cat.Couleur == color %} checked="checked" {% endif %} onchange="document.getElementById('preferencesForm').submit();">
+									<label class="form-check-label" for="{{ cat.Nom_categorie }}{{ loop.index }}">
+										<span class="badge" style="background-color: {{ color }};">{{ color }}</span>
+									</label>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<a href="delCategorie.php?delete={{ cat.id_categorie }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette catégorie ?');">
+							<i class="bi bi-trash"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+</div></form></div></div></div></div></div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script> <script>
+		  // Stocker la position de défilement avant de quitter la page
+		  window.onload = function() {
+		    if (typeof(sessionStorage) !== 'undefined') {
+		      var scrollPosition = sessionStorage.getItem('scrollPosition');
+		      if (scrollPosition !== null) {
+		        window.scrollTo(0, scrollPosition);
+		      }
+		    }
+		  };
+		
+		  window.onbeforeunload = function() {
+		    if (typeof(sessionStorage) !== 'undefined') {
+		      sessionStorage.setItem('scrollPosition', window.scrollY);
+		    }
+		  };
+		</script></body></html>

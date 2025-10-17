@@ -43,6 +43,9 @@ echo $template->render([
   'idClub' => $userData['id'],
   'sponsors' => $sponsorDao->getSponsorsParClub($userData['id']),
   'idTournoi' => $_GET['id_tournoi'],
+  'affichageSponsors' => isset($_GET['affichageSponsors']) && $_GET['affichageSponsors'] === 'true',
+  'monMotDePasse' => isset($_GET['monMotDePasse']) && $_GET['monMotDePasse'] === 'true',
+  'gestionCategorie' => isset($_GET['gestionCategorie']) && $_GET['gestionCategorie'] === 'true',
  
    
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
