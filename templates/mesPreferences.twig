@@ -45,7 +45,7 @@
 		<body>
 		{{ include('header.twig') }}
 			<div class="container my-4 d-flex gap-2"> 
-            <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true" class="btn btn-primary mb-4 {% if affichageSponsors %}active{% endif %}">Gestion des sponsors</a>
+            <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true" id="gestion-sponsors" class="btn btn-primary mb-4 {% if affichageSponsors %}active{% endif %}" >Gestion des sponsors</a>
 			<a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true" class="btn btn-primary mb-4 {% if monMotDePasse %}active{% endif %}">Gestion du mots de passe</a>
 			<a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn btn-primary mb-4 {% if gestionCategorie %}active{% endif %}">Gestion des catégories</a>
 		</div>
@@ -250,4 +250,8 @@
 		      sessionStorage.setItem('scrollPosition', window.scrollY);
 		    }
 		  };
-		</script></body></html>
+		</script>
+      
+
+        
+        </body></html>

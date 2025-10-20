@@ -41,7 +41,7 @@ $idTournoi = isset($_GET['idTournoi']) ? (int) $_GET['idTournoi'] : 0;
 
 if (
     $userData['role'] !== 'admin' &&
-    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+    $tournoi->droitTournoiClub($idTournoi, $userData['id']) === null
 ) {
     exit;
 }
