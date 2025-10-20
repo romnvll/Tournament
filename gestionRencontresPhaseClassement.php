@@ -38,7 +38,7 @@ $idTournoi = isset($_GET['idTournoiBase']) ? (int) $_GET['idTournoiBase'] : 0;
 
 if (
     $userData['role'] !== 'admin' &&
-    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+    $tournoiDao->droitTournoiClub($idTournoi, $userData['id']) === null
 ) {
     exit;
 }

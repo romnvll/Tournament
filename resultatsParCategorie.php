@@ -7,6 +7,7 @@ require 'class/tournoiDao.class.php';
 require 'vendor/autoload.php';
 require 'Lang/lang.php';
 
+$tournois = new tournoiDao();
 
 $idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
 
