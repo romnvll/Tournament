@@ -1,47 +1,130 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Brackito editeur de plan</title>
-<style>
-  #drawArea {
-    border: 1px solid #ccc;
-    cursor: crosshair;
-    touch-action: none;
-  }
-  .controls {
-    margin: 10px 0;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brackito - Éditeur de plan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .controls-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .control-group label {
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    select, input[type="color"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button i {
+      font-size: 16px;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .canvas-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+    }
+    #drawArea {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: crosshair;
+      touch-action: none;
+      background-color: white;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
-
-<canvas id="drawArea" width="800" height="500"></canvas>
-
-<div class="controls">
-  <label>Dessin :</label>
-  <select id="mode">
-    <option value="free">Libre</option>
-    <option value="line">Ligne droite</option>
-    <option value="rect">Rectangle</option>
-    <option value="square">Carré</option>
-    <option value="circle">Cercle</option>
-    <option value="text">Texte</option>
-  </select>
-
-  <label>Couleur :</label>
-  <input type="color" id="colorPicker" value="#000000">
-
-  <button id="saveBtn">💾 Enregistrer</button>
-  <button id="clearBtn">🧹 Tout effacer</button>
-  <button id="deleteBtn">❌ Supprimer forme</button>
-  <button id="copyBtn">📋 Copier</button>
-  <button id="pasteBtn">📌 Coller</button>
-  <button id="deletePlanBtn">🗑️ Supprimer le plan</button>
-
-</div>
-
-<script>
+  <div class="header">
+    <h1>📐 Brackito - Éditeur de plan</h1>
+  </div>
+  <div class="controls-container">
+    <div class="control-group">
+      <label>Mode de dessin :</label>
+      <select id="mode">
+        <option value="rect">Rectangle</option>
+        <option value="text">Texte</option>
+        <option value="line">Ligne droite</option>        
+        <option value="square">Carré</option>
+        <option value="circle">Cercle</option>        
+        <option value="free">Libre</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Couleur :</label>
+      <input type="color" id="colorPicker" value="#000000">
+    </div>
+    <div class="action-buttons">
+      <button id="saveBtn"><i class="fas fa-save"></i> Enregistrer</button>
+      <button id="clearBtn"><i class="fas fa-broom"></i> Tout effacer</button>
+      <button id="deleteBtn"><i class="fas fa-trash-alt"></i> Supprimer forme</button>
+      <button id="copyBtn"><i class="fas fa-copy"></i> Copier</button>
+      <button id="pasteBtn"><i class="fas fa-paste"></i> Coller</button>
+      <button id="deletePlanBtn"><i class="fas fa-trash"></i> Supprimer le plan</button>
+    </div>
+  </div>
+  <div class="canvas-container">
+    <canvas id="drawArea" width="800" height="500"></canvas>
+  </div>
+ <script>
 const canvas = document.getElementById("drawArea");
 const ctx = canvas.getContext("2d");
 const colorPicker = document.getElementById("colorPicker");
