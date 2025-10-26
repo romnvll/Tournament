@@ -229,12 +229,31 @@
 																<div
 																	class="mb-3" style="background-color: {{ planification.equipe1_categorie_couleur }};">
 																	<!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
-																	<p class="fw-bold text-center">{{planification.equipe1_categorie_nom}}
-																		- tour
-																		{{planification.tour}}
-																		-
-																		{{ planification.equipe2_poule_nom|split(' - ')[1] }}
-																	</p>
+																	
+																	<div class="text-center fw-bold">
+	{% if planification.isClassement == 1 %}
+		<p class="card-text mb-0">
+			<i class="fa fa-trophy text-warning me-1" aria-hidden="true"></i>
+			Phase finale – Tour {{ planification.tour }} –
+			{{ planification.equipe2_poule_noms|split(',')[0]|trim }}
+			– {{ planification.equipe1_categorie_nom }}
+		</p>
+	{% else %}
+		<p class="card-text mb-0">
+			Tour {{ planification.tour }} –
+			{% if planification.isClassement == 0 %}
+				{{ planification.equipe2_poule_noms|split(',')[1]|trim }}
+			{% else %}
+				{{ planification.equipe2_poule_noms|split(',')[0]|trim }}
+			{% endif %}
+		</p>
+	{% endif %}
+</div>
+
+
+
+
+
 																	{% if planification.isTerminated == 1 %}
 																		<p class="fw-bold text-center text-success bg-dark" id="Label{{planification.rencontre_id}}">Rencontre terminée
 																		</p>
@@ -298,19 +317,7 @@
 																				{% endif %}
 																		</div>
 
-																		<div class="d-flex align-items-center justify-content-center mb-2">
-																		{% if planification.isClassement == 1 %}
-																			  <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PhaseFinale-tour{{planification.tour}}-{{ planification.equipe2_poule_noms|split(',')[0] }} </p>
-																		{% else %}
-	
-																	 <p class="card-text">tour{{planification.tour}}-{{ planification.equipe1_poule_noms|split(',')[0] }} </p>
-
-																		 		{% endif %}
-																			
-
-																			
-																		</div>
-																		
+																																		
 
 
 																		<div class="d-flex">
