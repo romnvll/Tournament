@@ -452,7 +452,7 @@ img {
 
 
 
-<div class="alert alert-primary p-4 rounded shadow-sm" role="alert" id="labels">
+<div class="alert alert-primary p-4 rounded shadow-sm {% if IdEquipe is null %} d-none {% endif %}" role="alert" id="labels">
     <div class="d-flex align-items-center mb-3">
         <i class="fa-solid fa-circle-info me-2 text-info" style="font-size: 1.5rem;"></i>
         <h5 class="mb-0">Informations</h5>
