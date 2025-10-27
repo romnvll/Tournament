@@ -206,6 +206,27 @@ img {
                                         </div>
                                         <ul class="list-group no-bullet">
                                             <li class="">
+
+
+                                            {% if listeDesCLubs|length == 1  %}
+                                                {# Redirection automatique vers le seul club #}
+                                                <script>
+
+                                                        // Récupérer les paramètres de l'URL
+                                                const urlParams = new URLSearchParams(window.location.search);
+
+                                                // Vérifier la valeur du paramètre 'id_club'
+                                                const id_club = urlParams.get('id_club');
+                                                
+                                                if (id_club) {
+                                                }
+                                                else {
+
+                                                    window.location.href = "index.php?id_tournoi={{ idTournoi }}&id_club={{ listeDesCLubs[0].id }}";
+                                                    }
+                                                </script>
+                                                
+                                            {% else %}
                                                 {% for club in listeDesCLubs %}
                                                     <li>
                                                         <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
@@ -247,11 +268,12 @@ img {
                                                 {% endfor %}
                                             </li>
                                         </ul>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col-lg-3 choisirEquipe">
-                             
+                            
                                 {% if idTournoi %}
                                     {% if IdClub %}
                                         {% if visibility == 1 %}
