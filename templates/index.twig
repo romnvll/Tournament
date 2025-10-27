@@ -240,7 +240,7 @@ img {
                                                         {% if partenaires is not empty %}
                                                             {% set randIndex = random(0, partenaires|length - 1) %}
                                                             {% set sponsor = partenaires[randIndex] %}
-                                                            <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
+                                                            <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mb-3 mt-1">
                                                                 <div class="text-muted small">
                                                                     <span>
                                                                         Sponsorisé par
@@ -277,7 +277,7 @@ img {
                                 {% if idTournoi %}
                                     {% if IdClub %}
                                         {% if visibility == 1 %}
-                                            <div class="bg-success bg-opacity-10 border border-success rounded-3 p-3 shadow-sm">
+                                            <div class="bg-success bg-opacity-10 border border-success rounded-3 p-3 shadow-sm mb-2">
                                                 <div class="d-flex justify-content-between">
                                                     <div>
                                                         <h4 class="mb-1 fw-bold text-success">
@@ -297,12 +297,14 @@ img {
                                     <ul class="list-group no-bullet">
                                     
                                         {% for equipe in equipesAvecPoule %}
+                                           
                                             <li>
                                                 {% if equipe.idPoule != null %}
 
                                                     {% if labels.length > 0 or planTournoi is not null %}
+                                                    
                                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#labels " class="list-group-item list-group-item-action">
-                                                        {{ equipe.nom|upper }}
+                                                       <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}"></i> {{ equipe.nom|upper }}
                                                         -
                                                         {{ equipe.Nom_categorie }}
                                                     </a>
@@ -317,7 +319,7 @@ img {
                                                     {% if partenaires is not empty %}
                                                         {% set randIndex = random(0, partenaires|length - 1) %}
                                                         {% set sponsor = partenaires[randIndex] %}
-                                                        <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
+                                                        <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1 mb-1">
                                                             <div class="text-muted small">
                                                                 <span>
                                                                     Sponsorisé par
