@@ -259,7 +259,8 @@ select::picker(select):popover-open {
                                                 "idEquipe": "{{ equipe.id }}",
                                                 "tournoi_id": "{{ equipe.tournoi_id }}",
                                                 "nomEquipe": "{{ equipe.nom }}",
-                                                "changeCategorie" : "true"
+                                                "changeCategorie" : "true",
+                                                "idCategorie" : "{{ equipe.categorie }}"
                                             }'
                                             hx-include="this"
                                             hx-target="#message-{{ equipe.id }}"

@@ -58,6 +58,26 @@ class CategorieDao {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+public function existePlanificationPourCategorie(int $idCategorie): bool
+{
+    $sql = "
+        SELECT COUNT(*) AS nb
+        FROM Planification p
+        INNER JOIN Rencontres r ON p.rencontre_id = r.id
+        INNER JOIN Equipes e1 ON r.equipe1_id = e1.id
+        LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
+        WHERE e1.categorie = :idCategorie OR e2.categorie = :idCategorie
+    ";
+
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindValue(':idCategorie', $idCategorie, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['nb'] > 0;
+}
+
+
 
 
     /**
