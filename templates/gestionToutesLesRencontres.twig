@@ -235,17 +235,15 @@
 		<p class="card-text mb-0">
 			<i class="fa fa-trophy text-warning me-1" aria-hidden="true"></i>
 			Phase finale – Tour {{ planification.tour }} –
-			{{ planification.equipe2_poule_noms|split(',')[0]|trim }}
+			{{planification.poule_nom }}
 			– {{ planification.equipe1_categorie_nom }}
 		</p>
 	{% else %}
 		<p class="card-text mb-0">
 			Tour {{ planification.tour }} –
-			{% if planification.isClassement == 0 %}
-				{{ planification.equipe2_poule_noms|split(',')[1]|trim }}
-			{% else %}
-				{{ planification.equipe2_poule_noms|split(',')[0]|trim }}
-			{% endif %}
+			{{planification.poule_nom }}
+			
+				
 		</p>
 	{% endif %}
 </div>

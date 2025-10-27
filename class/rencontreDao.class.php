@@ -24,32 +24,38 @@ class RencontreDAO
 
 
     public function createRencontreByPoule($pouleId, $tournoi_id, $isClassement = 0, $isMatchRetour = false)
-    {
-        // Récupérer uniquement les équipes de cette poule dont le champ 'IsPresent' est vrai
-        $equipesPresentes = $this->getEquipesPresentesByPoule($pouleId);
-    
-        // Vérifier s'il y a au moins deux équipes présentes pour créer des rencontres
-        if (count($equipesPresentes) >= 2) {
-            // Appliquer l'algorithme du round-robin pour créer les rencontres
-            $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
-           
-            
-            
-            // Insérer les rencontres dans la table Rencontres
-            foreach ($rencontres as $rencontre) {
-                
-                // Vérifier si la rencontre existe déjà dans la table Rencontres
-                if ($this->isRencontreExist($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $rencontre['tour'])) {
-                    //$this->updateTour($rencontre['id'], $rencontre['tour']);
-                } else {
-                    // Si la rencontre n'existe pas, l'insérer dans la table Rencontres
-                    $this->insertRencontre($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $tournoi_id, $isClassement, $rencontre['tour']);
-                    //echo "tour " . $rencontre['tour'] . ": " . $rencontre['equipe1']['id'] . " vs " . $rencontre['equipe2']['id'] . "<br>";
-                    
-                }
+{
+    // Récupérer uniquement les équipes de cette poule dont le champ 'IsPresent' est vrai
+    $equipesPresentes = $this->getEquipesPresentesByPoule($pouleId);
+
+    // Vérifier s'il y a au moins deux équipes présentes pour créer des rencontres
+    if (count($equipesPresentes) >= 2) {
+
+        // Générer les rencontres avec l'algorithme du round-robin
+        $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
+
+        // Insérer les rencontres dans la table Rencontres
+        foreach ($rencontres as $rencontre) {
+
+            // Vérifier si la rencontre existe déjà
+            if ($this->isRencontreExist($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $rencontre['tour'])) {
+                // La rencontre existe déjà, ne rien faire ou éventuellement mettre à jour
+                continue;
             }
+
+            // Insérer la rencontre avec la référence à la poule
+            $this->insertRencontre(
+                $rencontre['equipe1']['id'],
+                $rencontre['equipe2']['id'],
+                $tournoi_id,
+                $isClassement,
+                $rencontre['tour'],
+                $pouleId //  ajout de la poule ici
+            );
         }
     }
+}
+
     
 
     private function isRencontreExist($equipe1Id, $equipe2Id, $tour)
@@ -155,38 +161,45 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     }
 
 
-    public function insertRencontre($equipe1Id, $equipe2Id, $tournoi_id, $isClassement = 0, $tour = null)
-   
-    {
+    public function insertRencontre($equipe1Id, $equipe2Id, $tournoi_id, $isClassement = 0, $tour = null, $pouleId = null)
+{
+    // Vérifie si la rencontre existe déjà dans la même poule et le même tournoi
+    $checkQuery = "SELECT * FROM Rencontres 
+                   WHERE equipe1_id = :equipe1Id 
+                     AND equipe2_id = :equipe2Id 
+                     AND tournoi_id = :tournoi_id 
+                     AND isClassement = :isClassement
+                     AND (poule_id = :pouleId OR (:pouleId IS NULL AND poule_id IS NULL))";
+    
+    $checkStmt = $this->connexion->prepare($checkQuery);
+    $checkStmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
+    $checkStmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
+    $checkStmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $checkStmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
+    $checkStmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $checkStmt->execute();
 
-        
-        // Vérifiez si la rencontre existe déjà
-        $checkQuery = "SELECT * FROM Rencontres WHERE equipe1_id = :equipe1Id AND equipe2_id = :equipe2Id AND tournoi_id = :tournoi_id and isClassement = :isClassement ";
-        $checkStmt = $this->connexion->prepare($checkQuery);
-        $checkStmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
-        $checkStmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
-        $checkStmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-        $checkStmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
-        $checkStmt->execute();
-
-        // Si la rencontre existe déjà, retournez une indication (par exemple : false)
-        if ($checkStmt->fetch()) {
-            return false;  // ou peut-être une exception ou un message d'erreur, selon vos besoins
-        }
-
-        // Si la rencontre n'existe pas, continuez avec l'insertion
-        $query = "INSERT INTO Rencontres (equipe1_id, equipe2_id, tournoi_id, isClassement, tour) VALUES (:equipe1Id, :equipe2Id, :tournoi_id, :isClassement, :tour)";
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
-        $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
-        $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-        $stmt->bindValue(':tour', $tour, PDO::PARAM_INT);
-        $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_BOOL);
-        $stmt->execute();
-
-       
-        return true;  // indication que l'insertion a réussi
+    if ($checkStmt->fetch()) {
+        return false; // La rencontre existe déjà
     }
+
+    // Insertion de la nouvelle rencontre
+    $query = "INSERT INTO Rencontres 
+              (equipe1_id, equipe2_id, tournoi_id, isClassement, tour, poule_id) 
+              VALUES 
+              (:equipe1Id, :equipe2Id, :tournoi_id, :isClassement, :tour, :pouleId)";
+    
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
+    $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
+    $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_BOOL);
+    $stmt->bindValue(':tour', $tour, PDO::PARAM_INT);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return true;
+}
 
     public function supprimerRencontresParPoule(int $idPoule): void
 {

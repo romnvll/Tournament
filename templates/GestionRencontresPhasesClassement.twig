@@ -203,6 +203,22 @@
 
         </div>
     </div>
-   
+   <script>
+  // Stocker la position de défilement avant de quitter la page
+  window.onload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      var scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition !== null) {
+        window.scrollTo(0, scrollPosition);
+      }
+    }
+  };
+
+  window.onbeforeunload = function() {
+    if (typeof(sessionStorage) !== 'undefined') {
+      sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+  };
+</script>
 </body>
 </html>

@@ -311,9 +311,11 @@
                                     {% endif %}
                                     {% if planification.rencontre_id is not null  %}
                                         {% if planification.isClassement == 0 %}
-                                            <p class="card-text">tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} -  {{ planification.equipe2_poule_noms|split(' - ')[1] }}  </p>
+                                        
+                                            <p class="card-text">tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} -  {{ planification.poule_nom }}  </p>
                                         {% elseif planification.isClassement == 1 %}
-                                            <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.equipe2_poule_noms|split(',')[0] }} </p>
+                                       
+                                            <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.poule_nom }} </p>
                                         {% endif %}
                                           <!-- Groupe case à cocher + action planification -->
                             <div class="d-flex align-items-center gap-3">

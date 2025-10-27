@@ -176,7 +176,6 @@ class planificationDao {
             cat1.Nom_categorie AS equipe1_categorie_nom,
             cat1.Couleur AS equipe1_categorie_couleur,
             cat1.utilisateur_id AS equipe1_categorie_utilisateur_id,
-            GROUP_CONCAT(DISTINCT p1.nom SEPARATOR ', ') AS equipe1_poule_noms,
             r.equipe2_id,
             e2.nom AS equipe2_nom,
             e2.categorie AS equipe2_categorie,
@@ -188,7 +187,6 @@ class planificationDao {
             cat2.Nom_categorie AS equipe2_categorie_nom,
             cat2.Couleur AS equipe2_categorie_couleur,
             cat2.utilisateur_id AS equipe2_categorie_utilisateur_id,
-            GROUP_CONCAT(DISTINCT p2.nom SEPARATOR ', ') AS equipe2_poule_noms,
             r.score1,
             r.score2,
             r.tour,
@@ -196,6 +194,8 @@ class planificationDao {
             r.terrain AS rencontre_terrain,
             r.Arbitre AS rencontre_arbitre,
             r.tournoi_id AS rencontre_tournoi_id,
+            r.poule_id AS poule_id,       -- 👈 Ajout de l'ID de la poule
+            pl.nom AS poule_nom,         -- 👈 Ajout du nom de la poule
             p.tournoi_id,
             p.arbitre_id,
             a.nom AS arbitre_nom,
@@ -209,14 +209,11 @@ class planificationDao {
         LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
         LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN Rencontres r ON p.rencontre_id = r.id
+        LEFT JOIN Poules pl ON r.poule_id = pl.id   -- 👈 Jointure directe sur la poule
         LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
         LEFT JOIN Categorie cat1 ON e1.categorie = cat1.id_categorie
-        LEFT JOIN EquipePoule e1p ON e1.id = e1p.equipe_id
-        LEFT JOIN Poules p1 ON e1p.poule_id = p1.id
         LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
         LEFT JOIN Categorie cat2 ON e2.categorie = cat2.id_categorie
-        LEFT JOIN EquipePoule e2p ON e2.id = e2p.equipe_id
-        LEFT JOIN Poules p2 ON e2p.poule_id = p2.id
         LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
         LEFT JOIN Clubs c_club ON a.club_id = c_club.id
         LEFT JOIN Labels l ON p.label_id = l.label_id
@@ -232,7 +229,6 @@ class planificationDao {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 
     public function afficherCreneauxArbitres(int $tournoi_id): array {
         $stmt = $this->connexion->prepare("
