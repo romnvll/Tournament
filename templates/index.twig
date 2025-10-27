@@ -310,8 +310,8 @@ img {
                                                     </a>
                                                     {% else %}
                                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#score" class="list-group-item list-group-item-action">
-                                                        {{ equipe.nom|upper }}
-                                                        -
+                                                      <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}"></i> {{ equipe.nom|upper }}
+                                                         -
                                                         {{ equipe.Nom_categorie }}
 
                                                     </a>

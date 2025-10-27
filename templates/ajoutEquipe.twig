@@ -202,48 +202,38 @@ select::picker(select):popover-open {
 </td>
 
                                  <td>
-                                        <input 
-                                            type="text" 
-                                            class="form-control" 
-                                            size="12"
-                                            maxlength="12"
-                                            name="nomEquipe" 
-                                            value="{{ equipe.nom }}"
-                                            hx-post="modifierEquipe.php"
-                                            hx-vals='{
-                                                "idEquipe": "{{ equipe.id }}",
-                                                "tournoi_id": "{{ equipe.tournoi_id }}",
-                                                "categorie": "{{ equipe.categorie }}",
-                                                "changeNomEquipe": "true"
-                                            }'
-                                            hx-trigger="blur"
-                                            hx-target="#notif-{{ equipe.id }}"
-                                            hx-swap="innerHTML"
-                                             
-                                            {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-                                            {% set today = "now"|date('Y-m-d')|date %}
-                                        {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
-                                        disabled 
-                                        {% endif %}>
+    <input 
+        type="text" 
+        class="form-control nomEquipeInput" 
+        size="12"
+        maxlength="12"
+        name="nomEquipe" 
+        value="{{ equipe.nom }}"
+        data-equipe-id="{{ equipe.id }}"
+        hx-post="modifierEquipe.php"
+        hx-vals='{
+            "idEquipe": "{{ equipe.id }}",
+            "tournoi_id": "{{ equipe.tournoi_id }}",
+            "categorie": "{{ equipe.categorie }}",
+            "changeNomEquipe": "true"
+        }'
+        hx-trigger="blur"
+        hx-target="#notif-{{ equipe.id }}"
+        hx-swap="innerHTML"
+        {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+        {% set today = "now"|date('Y-m-d')|date %}
+        {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
+            disabled 
+        {% endif %}
+    >
 
-                                        
+    <small id="charCount-{{ equipe.id }}" class="text-muted ms-2">
+        {{ 12 - equipe.nom|length }} / 12 caractères restants
+    </small>
 
+    <small id="notif-{{ equipe.id }}" class="text-success ms-2"></small>
+</td>
 
-
-                                           
-   
-      
-
-
-                                       
-                                       
-                                       
-                                        <!-- si la licence est payante, on readonly le champ nomEquipe -->
-                                       
-
-
-                                        <small id="notif-{{ equipe.id }}" class="text-success ms-2"></small>
-                                    </td>
                                     {% if infoTournoi.gestionVoix == 1 %}
                                   <td class="text-center" data-id-tournoi="{{tournoiEnCours}}" data-id-equipe="{{ equipe.id }}">
                                         <button onclick="startRecording(this)" class="btn btn-sm btn-primary">🎙️ {{t('enregistrer')}}</button>
@@ -490,6 +480,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.nomEquipeInput').forEach(function(input) {
+        const equipeId = input.dataset.equipeId;
+        const maxLength = input.getAttribute('maxlength');
+        const counter = document.getElementById('charCount-' + equipeId);
+        
+
+        input.addEventListener('input', function() {
+            const remaining = maxLength - input.value.length;
+            counter.textContent = remaining + ' / ' + maxLength + ' caractères restants';
+        });
+    });
+});
+</script>
+
 
 
 
