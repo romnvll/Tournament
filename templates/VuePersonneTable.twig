@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=0.68"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Gestion de la table</title>
@@ -10,176 +10,600 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
     <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
+
         .container-fluid {
-            padding: 20px;
+            padding: 12px;
+            max-width: 100vw;
         }
-        .table th, .table td {
-            vertical-align: middle;
+
+        /* Header optimisé mobile */
+        .welcome-header {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 20px 16px;
+            margin-bottom: 16px;
+            text-align: center;
         }
-        .table img {
-            max-width: 50px;
+
+        .welcome-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin-bottom: 10px;
         }
-        .btn-success, .btn-danger {
-            margin: 2px;
+
+        .welcome-header p {
+            font-size: 1rem;
+            color: #6b7280;
+            margin: 0;
         }
-        .badge {
-            font-size: 14px;
+
+        .terrain-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 8px;
+            font-size: 0.95rem;
         }
-        .lead {
-            font-size: 16px;
+
+        /* Match Card */
+        .match-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        /* Time header */
+        .time-header {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .time-display {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Teams container - 2 colonnes */
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .team-column {
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            border-right: 2px solid #e5e7eb;
+        }
+
+        .team-column:last-child {
+            border-right: none;
+        }
+
+        .team-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--bg-dark);
+            text-align: center;
+            line-height: 1.2;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 8px 0;
+        }
+
+        /* Score buttons */
+        .score-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-goal {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+        }
+
+        .btn-goal:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .btn-goal.add {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+
+        .btn-goal.remove {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+            font-size: 0.95rem;
+            padding: 10px 16px;
+        }
+
+        .btn-goal:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Info section */
+        .info-section {
+            padding: 20px 16px;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--bg-dark);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            color: #374151;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .status-badge.danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
+
+        .status-badge.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+        }
+
+        .status-badge:active {
+            transform: scale(0.95);
+        }
+
+        /* Category badge */
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: #000;
+            font-size: 0.95rem;
+        }
+
+        /* Sponsor section */
+        .sponsor-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 12px;
+            margin-top: 16px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .sponsor-info {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .sponsor-info strong a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .sponsor-logo {
+            max-width: 80px;
+            max-height: 60px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Label card */
+        .label-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .label-content {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        .label-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .match-card, .label-card {
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Optimisations tactiles */
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Pour très petits écrans */
+        @media (max-width: 360px) {
+            .team-logo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .team-name {
+                font-size: 0.95rem;
+                min-height: 38px;
+            }
+
+            .score-display {
+                font-size: 2.5rem;
+            }
+
+            .btn-goal {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .info-label,
+            .info-value {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row justify-content-center mb-4">
-            <div class="col text-center">
-                <h2><i class="fas fa-user-check"></i> Bonjour {{ prenom }},</h2>
-                <p>vous êtes en charge d'insérer les scores pour le terrain <b>{{ terrain }}</b>.</p>
-            </div>
+        <!-- Welcome header -->
+        <div class="welcome-header">
+            <h2>
+                <i class="fas fa-user-check" style="color: var(--success-color);"></i>
+                Bonjour {{ prenom }} !
+            </h2>
+            <p>
+                Vous êtes en charge d'insérer les scores pour le terrain
+                <span class="terrain-badge">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ terrain }}
+                </span>
+            </p>
         </div>
 
-        <div class="row">
-            <div class="col-12" id="scoreRefresh">
-                <table class="table table-striped table-responsive" id="myTable">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="text-center"><i class="fas fa-clock"></i> Heure</th>
-                            <th scope="col order-2" class="w-25 text-center"><i class="fas fa-futbol"></i> Score équipe 1</th>
-                            <th scope="col order-1" class="w-25 text-center"><i class="fas fa-futbol"></i> Score équipe 2</th>
-                            <th scope="col"><i class="fas fa-info-circle"></i> Informations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for planification in AffichagePlanification %}
-                            <tr id="planification-{{ planification.rencontre_id }}">
-                                {% if planification.rencontre_id is not null %}
-                                    <td class="text-center">
-                                        <h3><i class="fas fa-clock"></i> {{ planification.creneau_nom|slice(0, -3) }}</h3>
-                                    </td>
-                                    <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ planification.rencontre_id }}">
-                                        <input type="hidden" name="return_id" value="row-{{ planification.rencontre_id }}">
-                                        <td class="text-center order-2">
-                                            <img src="{{ planification.club1_logo }}" class="img-fluid rounded">
-                                            <p class="lead text-uppercase">{{ planification.equipe1_nom }}</p>
-                                            <input type="hidden" name="scoreEquipe1" value="{{ planification.score1 }}" id="scoreEquipe1{{ planification.rencontre_id }}">
-                                            <p>Score: <span id="displayScoreEquipe1{{ planification.rencontre_id }}">{{ planification.score1 }}</span></p>
-                                            {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-on::after-request="vibrate(200)" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-center order-1">
-                                            <img src="{{ planification.club2_logo }}" class="img-fluid rounded">
-                                            <p class="lead text-uppercase">{{ planification.equipe2_nom }}</p>
-                                            <input type="hidden" name="scoreEquipe2" value="{{ planification.score2 }}" id="scoreEquipe2{{ planification.rencontre_id }}">
-                                            <p>Score: <span id="displayScoreEquipe2{{ planification.rencontre_id }}">{{ planification.score2 }}</span></p>
-                                            {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(200)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
-                                            {% endif %}
-                                        </td>
-                                        <td class="align-left">
-                                            <table class="table table-borderless mb-0">
-                                                <tbody>
-                                                    <tr>
-                                                        <td><strong>Status :</strong></td>
-                                                        <td>
-                                                            {% if planification.isTerminated == 1 %}
-                                                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Rencontre terminée</span>
-                                                            {% else %}
-                                                                {% if planification.est_premier_zero == true %}
-                                                                    {% if planification.isTerminated == 0 %}
-                                                                        <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Saisir le score</span>
-                                                                    {% elseif planification.isTerminated == 2 %}
-                                                                        <a class="badge bg-primary" id="State{{ planification.rencontre_id }}" role="button" onclick="updateStatus({{ planification.rencontre_id }})"><i class="fas fa-sync-alt"></i> En cours</a>
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Catégorie:</strong></td>
-                                                        <td>
-                                                            <span class="badge" style="background-color: {{ planification.Couleur }}; color: #000;"><i class="fas fa-tag"></i> {{ planification.categorie_equipe1_nom }}</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Arbitre:</strong></td>
-                                                        <td><i class="fas fa-user-tie"></i> {{ planification.arbitre_nom }} {{planification.arbitre_club_nom}} </td>
-                                                    </tr>
-                                                      {% if partenaires is not empty %}
-                                                                {% set randIndex = random(0, partenaires|length - 1) %}
-                                                                {% set sponsor = partenaires[randIndex] %}
-                                                                <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                                            <div class="text-muted small">
-                                                                                <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                                                {% if sponsor.description %}
-                                                                                    <br><em>{{ sponsor.description }}</em>
-                                                                                {% endif %}
-                                                                            </div>
+        <!-- Matches -->
+        <div id="scoreRefresh">
+            {% for planification in AffichagePlanification %}
+                {% if planification.rencontre_id is not null %}
+                    <!-- Match Card -->
+                    <div class="match-card" id="planification-{{ planification.rencontre_id }}">
+                        <!-- Time header -->
+                        <div class="time-header">
+                            <div class="time-display">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ planification.creneau_nom|slice(0, -3) }}</span>
+                            </div>
+                        </div>
 
-                                                                            {% if sponsor.logo %}
-                                                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        </div>
+                        <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ planification.rencontre_id }}">
+                            <input type="hidden" name="return_id" value="row-{{ planification.rencontre_id }}">
+                            
+                            <!-- Teams Grid -->
+                            <div class="teams-grid">
+                                <!-- Team 1 -->
+                                <div class="team-column">
+                                    <img src="{{ planification.club1_logo }}" class="team-logo" alt="{{ planification.equipe1_nom }}">
+                                    <div class="team-name">{{ planification.equipe1_nom }}</div>
+                                    <input type="hidden" name="scoreEquipe1" value="{{ planification.score1 }}" id="scoreEquipe1{{ planification.rencontre_id }}">
+                                    <div class="score-display" id="displayScoreEquipe1{{ planification.rencontre_id }}">
+                                        {{ planification.score1 }}
+                                    </div>
+                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                        <div class="score-buttons">
+                                            <button type="button" 
+                                                    class="btn-goal add" 
+                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" 
+                                                    hx-trigger="click" 
+                                                    hx-on::after-request="vibrate(50)" 
+                                                    hx-swap="innerHTML" 
+                                                    hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" 
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-plus"></i>
+                                                But
+                                            </button>
+                                            <button type="button" 
+                                                    class="btn-goal remove" 
+                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" 
+                                                    hx-on::after-request="vibrate(200)" 
+                                                    hx-trigger="click" 
+                                                    hx-swap="innerHTML" 
+                                                    hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" 
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
 
-                                                        {% endif %}
-                                                </tbody>
-                                              
-                                            </table>
-                                        </td>
-                                    </form>
-                                {% elseif planification.label_description is not null %}
-                                    <td class="w-25 text-center">
-                                        <h3><i class="fas fa-clock"></i> {{ planification.creneau_nom }}</h3>
-                                    </td>
-                                    <td class="w-25 text-center"><p>{{ planification.label_description }}</p></td>
-                                    <td>
-                                        
-                                    </td>
-                                    <td></td>
+                                <!-- Team 2 -->
+                                <div class="team-column">
+                                    <img src="{{ planification.club2_logo }}" class="team-logo" alt="{{ planification.equipe2_nom }}">
+                                    <div class="team-name">{{ planification.equipe2_nom }}</div>
+                                    <input type="hidden" name="scoreEquipe2" value="{{ planification.score2 }}" id="scoreEquipe2{{ planification.rencontre_id }}">
+                                    <div class="score-display" id="displayScoreEquipe2{{ planification.rencontre_id }}">
+                                        {{ planification.score2 }}
+                                    </div>
+                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                        <div class="score-buttons">
+                                            <button type="button" 
+                                                    class="btn-goal add" 
+                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" 
+                                                    hx-trigger="click" 
+                                                    hx-on::after-request="vibrate(50)" 
+                                                    hx-swap="innerHTML" 
+                                                    hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" 
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-plus"></i>
+                                                But
+                                            </button>
+                                            <button type="button" 
+                                                    class="btn-goal remove" 
+                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" 
+                                                    hx-trigger="click" 
+                                                    hx-on::after-request="vibrate(200)" 
+                                                    hx-swap="innerHTML" 
+                                                    hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" 
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Info section -->
+                            <div class="info-section">
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="fas fa-flag"></i>
+                                        Status
+                                    </div>
+                                    <div class="info-value">
+                                        {% if planification.isTerminated == 1 %}
+                                            <span class="status-badge danger">
+                                                <i class="fas fa-check-circle"></i>
+                                                Rencontre terminée
+                                            </span>
+                                        {% else %}
+                                            {% if planification.est_premier_zero == true %}
+                                                {% if planification.isTerminated == 0 %}
+                                                    <span class="status-badge danger">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                        Saisir le score
+                                                    </span>
+                                                {% elseif planification.isTerminated == 2 %}
+                                                    <a class="status-badge primary" 
+                                                       id="State{{ planification.rencontre_id }}" 
+                                                       role="button" 
+                                                       onclick="updateStatus({{ planification.rencontre_id }})">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                        En cours
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="fas fa-tag"></i>
+                                        Catégorie
+                                    </div>
+                                    <div class="info-value">
+                                        <span class="category-badge" style="background-color: {{ planification.Couleur }};">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ planification.categorie_equipe1_nom }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="fas fa-user-tie"></i>
+                                        Arbitre
+                                    </div>
+                                    <div class="info-value">
+                                        {{ planification.arbitre_nom }} {{ planification.arbitre_club_nom }}
+                                    </div>
+                                </div>
+
+                                <!-- Sponsor -->
+                                {% if partenaires is not empty %}
+                                    {% set randIndex = random(0, partenaires|length - 1) %}
+                                    {% set sponsor = partenaires[randIndex] %}
+                                    <div class="sponsor-box">
+                                        <div class="sponsor-info">
+                                            <i class="fas fa-handshake" style="color: var(--primary-color);"></i>
+                                            Sponsorisé par 
+                                            <strong>
+                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                                    {{ sponsor.nom }}
+                                                </a>
+                                            </strong>
+                                            {% if sponsor.description %}
+                                                <br><em>{{ sponsor.description }}</em>
+                                            {% endif %}
+                                        </div>
+                                        {% if sponsor.logo %}
+                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
+                                            </a>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </form>
+                    </div>
+
+                {% elseif planification.label_description is not null %}
+                    <!-- Label Card -->
+                    <div class="label-card">
+                        <div class="time-header">
+                            <div class="time-display">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ planification.creneau_nom }}</span>
+                            </div>
+                        </div>
+                        <div class="label-content">
+                            <div class="label-text">
+                                <i class="fas fa-info-circle"></i>
+                                {{ planification.label_description }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 
     <script>
-       function updateStatus(idRencontre) {
-    if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
-        const target = `#State${idRencontre}`;
+        function updateStatus(idRencontre) {
+            if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
+                const target = `#State${idRencontre}`;
 
-        const handler = function(evt) {
-            if (evt.target.id === `State${idRencontre}`) {
-                document.body.removeEventListener('htmx:afterSwap', handler);
-                location.reload();
+                const handler = function(evt) {
+                    if (evt.target.id === `State${idRencontre}`) {
+                        document.body.removeEventListener('htmx:afterSwap', handler);
+                        location.reload();
+                    }
+                };
+
+                document.body.addEventListener('htmx:afterSwap', handler);
+
+                htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
+                    target: target,
+                    swap: 'outerHTML'
+                });
             }
-        };
-
-        document.body.addEventListener('htmx:afterSwap', handler);
-
-        htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
-            target: target,
-            swap: 'outerHTML'
-        });
-    }
-}
-
+        }
 
         function vibrate(temps) {
-        
             if (navigator.vibrate) {
                 navigator.vibrate(temps);
-                
             }
         }
 

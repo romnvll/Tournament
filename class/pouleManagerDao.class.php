@@ -387,10 +387,16 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     public function afficherPoulesPourCategorie(int $idTournoi, int $nombreEquipesParPoule, int $idCategorie): array {
         // Étape 1 : Récupérer toutes les équipes de la catégorie et du tournoi
         $stmt = $this->connexion->prepare("
-            SELECT id, nom 
-            FROM Equipes 
-            WHERE tournoi_id = :idTournoi 
-            AND categorie = :idCategorie
+           SELECT 
+    e.id, 
+    e.nom AS equipe_nom, 
+    c.nom AS club_nom, 
+    c.logo AS club_logo
+FROM Equipes e
+INNER JOIN Clubs c ON e.club_id = c.id
+WHERE e.tournoi_id = :idTournoi
+  AND e.categorie = :idCategorie;
+
         ");
         $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
         $stmt->bindValue(':idCategorie', $idCategorie, PDO::PARAM_INT);

@@ -48,6 +48,7 @@ $RencontreByPoule=null;
 $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
 $terrain = new TerrainDao();
+$planTournoi = null;
 
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);

@@ -1,180 +1,637 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <!-- Inclure la bibliothèque htmx via CDN -->
-  <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <title>Modifier Club</title>
 
-  <title>Modifier Club</title>
-  <style>
-    .card {
-      /* Ajout d'une ombre pour un effet de relief */
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: box-shadow 0.3s ease-in-out;
-    }
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --secondary-color: #6b7280;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #6b7280;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+        }
 
-    .card:hover {
-      /* Ombre plus marquée au survol pour un effet interactif */
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .img-thumbnail {
-      /* Taille uniforme pour les logos */
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-    }
-  </style>
+        .main-container {
+            margin-top: 40px;
+        }
+
+        /* Card moderne */
+        .modern-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+            margin-bottom: 25px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modern-card:hover {
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Header de card */
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .card-title-modern {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Body de card */
+        .card-body-modern {
+            padding: 30px;
+        }
+
+        /* Form elements */
+        .form-group-modern {
+            margin-bottom: 25px;
+        }
+
+        .form-label-modern {
+            font-weight: 700;
+            color: var(--bg-dark);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label-modern i {
+            color: var(--primary-color);
+        }
+
+        .modern-input, .modern-select {
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .modern-input:focus, .modern-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* File input */
+        .file-input-label {
+            padding: 15px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 10px;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .file-input-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn-save {
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        /* Search section */
+        .search-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            width: 100%;
+            position: relative;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .modern-table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+        }
+
+        .modern-table thead th {
+            padding: 18px 15px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .modern-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .modern-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Logo */
+        .club-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+
+        .club-logo:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Badges */
+        .badge-modern {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-primary-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+        }
+
+        .badge-secondary-modern {
+            background: linear-gradient(135deg, var(--secondary-color), #4b5563);
+            color: white;
+        }
+
+        /* Buttons dans table */
+        .btn-edit {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+
+        .btn-locked {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            background: linear-gradient(135deg, var(--secondary-color), #4b5563);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Title section */
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                margin-top: 20px;
+            }
+
+            .card-body-modern {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .modern-table {
+                font-size: 0.9rem;
+            }
+
+            .club-logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .modern-table tbody tr {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
 </head>
-
 <body>
-  {{ include('header.twig') }}
+    {{ include('header.twig') }}
 
-  <div class="container mt-5">
-    <div class="row">
+    <div class="container main-container">
+        <div class="row">
+            <!-- Colonne modification -->
+            {% if idClub is not null %}
+            <div class="col-12 col-lg-5">
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h5 class="card-title-modern">
+                            <div class="card-title-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            Modifier le Club
+                        </h5>
+                    </div>
+                    <div class="card-body-modern">
+                        <form action="modifierClub_traitement.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="idclub" value="{{ idClub }}">
+                            <input type="hidden" name="IdUser" value="{{idUser}}">
 
-      {% if idClub is not null %}
-      <div class="col-12 col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">Modifier Club</h5>
-          </div>
-          <div class="card-body">
-            <form action="modifierClub_traitement.php" method="POST" enctype="multipart/form-data">
-              <input type="hidden" name="idclub" value="{{ idClub }}">
-            
-            <div class="mb-3">
-    <label for="typeSport" class="form-label">Type de sport</label>
-    <select class="form-select" id="typeSport" name="typeSport" required>
-        <option value="" disabled>-- Choisir un type de sport --</option>
-        {% for type in listeSports %}
-            <option value="{{ type.id }}"
-                {% if type.id == afficheclub.type_sport_id %}selected{% endif %}>
-                {{ type.nom }}
-            </option>
-        {% endfor %}
-    </select>
-</div>
+                            <!-- Type de sport -->
+                            <div class="form-group-modern">
+                                <label for="typeSport" class="form-label-modern">
+                                    <i class="fa-solid fa-basketball"></i>
+                                    Type de sport
+                                </label>
+                                <select class="modern-select" id="typeSport" name="typeSport" required>
+                                    <option value="" disabled>-- Choisir un type de sport --</option>
+                                    {% for type in listeSports %}
+                                        <option value="{{ type.id }}"
+                                            {% if type.id == afficheclub.type_sport_id %}selected{% endif %}>
+                                            {{ type.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
+                            <!-- Nom du club -->
+                            <div class="form-group-modern">
+                                <label for="nomduclub" class="form-label-modern">
+                                    <i class="fa-solid fa-tag"></i>
+                                    Nom du club
+                                </label>
+                                <input type="text" class="modern-input" name="nomduclub" id="nomduclub" 
+                                       placeholder="Nom du club"
+                                       {% if isModify == true %} value="{{ afficheclub.nom }}" {% endif %} 
+                                       required />
+                            </div>
 
+                            <!-- Logo -->
+                            <div class="form-group-modern">
+                                <label for="logo" class="form-label-modern">
+                                    <i class="fa-solid fa-image"></i>
+                                    Logo du club
+                                </label>
+                                <label for="logo" class="file-input-label">
+                                    <div class="file-input-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; margin-bottom: 3px;">
+                                            Choisir un nouveau logo
+                                        </div>
+                                        <small style="color: var(--text-light);">
+                                            PNG ou JPEG (optionnel)
+                                        </small>
+                                    </div>
+                                </label>
+                                <input type="file" class="d-none" name="logo" id="logo" accept="image/png, image/jpeg" />
+                            </div>
 
-              <div class="mb-3">
-                <label for="nomduclub" class="form-label">Nom du club</label>
-                <input type="text" class="form-control" name="nomduclub" id="nomduclub" placeholder="Nom du club"
-                  {% if isModify == true %} value="{{ afficheclub.nom }}" {% endif %} />
-              </div>
-              
-             
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i>
+                                Sauvegarder
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
-              <div class="mb-3">
-                <label for="logo" class="form-label">Logo du club</label>
-                <input type="file" class="form-control" name="logo" id="logo" />
-              </div>
-              <input type="hidden" name="IdUser" value="{{idUser}}">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i> Sauvegarder
-              </button>
-            </form>
-          </div>
+            <!-- Colonne liste -->
+            <div class="col-12 {% if idClub is not null %}col-lg-7{% else %}col-lg-12{% endif %}">
+                <h3 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    Liste des Clubs
+                </h3>
+
+                <!-- Search section -->
+                <div class="search-section">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="searchClub" class="search-input" 
+                                       placeholder="Rechercher un club...">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="search-wrapper">
+                                <i class="fas fa-basketball search-icon"></i>
+                                <input type="text" id="searchSport" class="search-input" 
+                                       placeholder="Rechercher un sport...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table class="table modern-table" id="tableClubs">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Logo</th>
+                                <th>Sport</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for club in ListeDesClubs %}
+                            <tr>
+                                <td>
+                                    {% if idUser == club.utilisateur_id %}
+                                        <a class="btn-edit" href="modifierClub.php?idclub={{ club.id }}">
+                                            <i class="fas fa-edit"></i>
+                                            {{ club.nom }}
+                                        </a>
+                                    {% else %}
+                                        <button type="button" class="btn-locked" disabled>
+                                            <i class="fas fa-lock"></i>
+                                            {{ club.nom }}
+                                        </button>
+                                        <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 5px;">
+                                            Créé par un autre utilisateur
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <img src="{{ club.logo }}" alt="Logo {{ club.nom }}" class="club-logo" />
+                                </td>
+                                <td>
+                                    {% if club.nom_type_sport %}
+                                        <span class="badge-modern badge-primary-modern">
+                                            {{ club.nom_type_sport }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-modern badge-secondary-modern">
+                                            Non spécifié
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-      {% endif %}
-
-      <div class="col-12 col-md-6">
-        <h3>Liste des Clubs</h3>
-
-<div class="row mb-3">
-  <div class="col-md-6 mb-2">
-    <input type="text" id="searchClub" class="form-control" placeholder="Rechercher un club...">
-  </div>
-  <div class="col-md-6 mb-2">
-    <input type="text" id="searchSport" class="form-control" placeholder="Rechercher un sport...">
-  </div>
-</div>
-
-
-        <table class="table table-bordered table-striped" id="tableClubs">
-          <thead>
-            <tr>
-              <th scope="col">Nom</th>
-              <th scope="col">Logo</th>
-              <th scope="col">Sport</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            {% for club in ListeDesClubs %}
-            <tr>
-              <td>
-                {% if idUser == club.utilisateur_id %}
-                
-                  <a class="btn btn-success" href="modifierClub.php?idclub={{ club.id }}">
-                    <i class="fas fa-edit"></i> {{ club.nom }}
-                  </a>
-                {% else %}
-
-               
-                  <button type="button" class="btn btn-secondary" disabled>
-                    <i class="fas fa-lock"></i> {{ club.nom }} créé a été par un autre utilisateur
-                  </button>
-                    
-                 
-                {% endif %}
-              </td>
-              <td>
-                <img src="{{ club.logo }}" alt="Logo {{ club.nom }}" class="img-thumbnail" />
-              </td>
-
-              <td>
-                {% if club.nom_type_sport %}
-                  <span class="badge bg-primary">{{ club.nom_type_sport }}</span>
-                {% else %}
-                  <span class="badge bg-secondary">Non spécifié</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
     </div>
-  </div>
 
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- FontAwesome for icons -->
+    <script>
+        const searchClub = document.getElementById('searchClub');
+        const searchSport = document.getElementById('searchSport');
+        const rows = document.querySelectorAll('#tableClubs tbody tr');
+
+        function filtrer() {
+            const clubValue = searchClub.value.toLowerCase();
+            const sportValue = searchSport.value.toLowerCase();
+
+            rows.forEach(row => {
+                const nomClub = row.cells[0].innerText.toLowerCase();
+                const sport = row.cells[2].innerText.toLowerCase();
+
+                if (
+                    (nomClub.includes(clubValue) || clubValue === '') &&
+                    (sport.includes(sportValue) || sportValue === '')
+                ) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchClub.addEventListener('keyup', filtrer);
+        searchSport.addEventListener('keyup', filtrer);
+
+        // Animation au focus
+        document.querySelectorAll('.modern-input, .modern-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // File input preview
+        const fileInput = document.getElementById('logo');
+        const fileLabel = document.querySelector('.file-input-label');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const fileName = e.target.files[0].name;
+                    fileLabel.style.borderColor = 'var(--success-color)';
+                    fileLabel.style.background = 'rgba(16, 185, 129, 0.05)';
+                    fileLabel.querySelector('div div').textContent = fileName;
+                }
+            });
+        }
+    </script>
+
 </body>
-
-<script>
-  const searchClub = document.getElementById('searchClub');
-  const searchSport = document.getElementById('searchSport');
-  const rows = document.querySelectorAll('#tableClubs tbody tr');
-
-  function filtrer() {
-    const clubValue = searchClub.value.toLowerCase();
-    const sportValue = searchSport.value.toLowerCase();
-
-    rows.forEach(row => {
-      const nomClub = row.cells[0].innerText.toLowerCase();
-      const sport = row.cells[2].innerText.toLowerCase();
-
-      if (
-        (nomClub.includes(clubValue) || clubValue === '') &&
-        (sport.includes(sportValue) || sportValue === '')
-      ) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    });
-  }
-
-  searchClub.addEventListener('keyup', filtrer);
-  searchSport.addEventListener('keyup', filtrer);
-</script>
-
-
 </html>

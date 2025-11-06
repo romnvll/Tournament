@@ -1,118 +1,592 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Charger jQuery en premier -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Créer un tournoi</title>
 
-<!-- Puis charger Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #6b7280;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+        }
 
-  
-    <title>Gestion rencontre</title>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            margin-top: 40px;
+        }
+
+        /* Card moderne */
+        .create-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header de la card */
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .card-header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .card-header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Body de la card */
+        .card-body-modern {
+            padding: 40px;
+        }
+
+        /* Form groups modernes */
+        .form-group-modern {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.2rem;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+
+        .input-icon img {
+            width: 1.2em;
+            height: 1.2em;
+            filter: grayscale(100%);
+        }
+
+        /* Input moderne */
+        .modern-input {
+            padding: 15px 20px 15px 55px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            width: 100%;
+            background: white;
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .modern-input:focus ~ .input-icon {
+            color: var(--primary-color);
+        }
+
+        .modern-input:focus ~ .input-icon img {
+            filter: grayscale(0%) brightness(1.2);
+        }
+
+        /* Labels flottants améliorés */
+        .form-floating-modern {
+            position: relative;
+        }
+
+        .form-floating-modern label {
+            position: absolute;
+            top: 50%;
+            left: 55px;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s;
+            pointer-events: none;
+            background: white;
+            padding: 0 5px;
+        }
+
+        .form-floating-modern .modern-input:focus ~ label,
+        .form-floating-modern .modern-input:not(:placeholder-shown) ~ label {
+            top: 0;
+            left: 50px;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Select moderne */
+        .modern-select {
+            padding: 15px 20px 15px 55px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            width: 100%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .modern-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Bouton moderne */
+        .submit-btn {
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .submit-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Alert moderne */
+        .modern-alert {
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-sm);
+            border: none;
+            border-left: 4px solid var(--warning-color);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .alert-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .alert-content {
+            color: var(--bg-dark);
+            line-height: 1.6;
+        }
+
+        .reactivate-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .reactivate-link:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        .archived-tournament {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 3px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Progress indicator */
+        .form-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 10px;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .progress-step:last-child::after {
+            display: none;
+        }
+
+        .progress-number {
+            width: 30px;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-light);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .progress-number {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                margin-top: 20px;
+            }
+
+            .card-body-modern {
+                padding: 25px;
+            }
+
+            .card-header-title {
+                font-size: 1.5rem;
+            }
+
+            .submit-btn {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+
+            .form-progress {
+                display: none;
+            }
+        }
+
+        /* Animation d'entrée pour les inputs */
+        .form-group-modern {
+            animation: slideInLeft 0.5s ease;
+            animation-fill-mode: both;
+        }
+
+        .form-group-modern:nth-child(1) { animation-delay: 0.1s; }
+        .form-group-modern:nth-child(2) { animation-delay: 0.2s; }
+        .form-group-modern:nth-child(3) { animation-delay: 0.3s; }
+        .form-group-modern:nth-child(4) { animation-delay: 0.4s; }
+        .form-group-modern:nth-child(5) { animation-delay: 0.5s; }
+        .form-group-modern:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
     {{ include('header.twig') }}
 
-    <div class="container mt-4">
+    <div class="container main-container">
         <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card shadow-lg">
-                    <div class="card-header bg-primary text-white text-center">
-                 
-                    
-                      <h4>{{ t('CreateTournament')}}</h4>
-                    </div>
-                    <div class="card-body">
-                    
-                     {% if tousLesTournois|length >= licence['0'].limite_tournois %}
-                        <form action="" method="post">
-                    {% else %}
-                        <form action="ajoutTournoi_traitement.php" method="post">
-                    {% endif %}
-                  <div class="form-floating mb-3 position-relative">
-                        <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                            <i class="fa-solid fa-basketball-ball mt-4"></i> {# tu peux changer l'icône selon le sport #}
-                        </span>
-                        <select class="form-select ps-5" name="typeDeSport" id="typeDeSport" required>
-                            <option value="" disabled selected> </option>
-                            {% for sport in typeDeSport %}
-                                <option value="{{ sport.id }}">{{ sport.nom }}</option>
-                            {% endfor %}
-                        </select>
-                         <label for="typeDeSport">{{ t('typeDeSport') }}</label>
-                        
+            <div class="col-lg-7 col-xl-6">
+                <div class="create-card">
+                    <!-- Header -->
+                    <div class="card-header-modern">
+                        <h4 class="card-header-title">
+                            <div class="card-header-icon">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            {{ t('CreateTournament')}}
+                        </h4>
                     </div>
 
+                    <!-- Body -->
+                    <div class="card-body-modern">
+                        <!-- Progress indicator -->
+                        <div class="form-progress">
+                            <div class="progress-step active">
+                                <div class="progress-number">1</div>
+                                <div class="progress-label">Informations</div>
+                            </div>
+                            <div class="progress-step">
+                                <div class="progress-number">2</div>
+                                <div class="progress-label">Configuration</div>
+                            </div>
+                            <div class="progress-step">
+                                <div class="progress-number">3</div>
+                                <div class="progress-label">Créer</div>
+                            </div>
+                        </div>
+                        <!-- Formulaire -->
+                       
+                        {% if tousLesTournois|length >= licence['0'].limite_tournois %}
+                            <form action="" method="post">
+                        {% else %}
+                            <form action="ajoutTournoi_traitement.php" method="post">
+                        {% endif %}
 
-
-                            <div class="mb-3 position-relative">
-                                <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                    <i class="fa-solid fa-trophy"></i>
-                                </span>
-                                <input type="text" class="form-control ps-5" name="nomTournoi" id="nomTournoi" placeholder="{{ t('nameOfTournament') }}">
+                            <!-- Type de sport -->
+                            <div class="form-group-modern">
+                                <div class="input-wrapper">
+                                    <div class="input-icon">
+                                        <i class="fa-solid fa-basketball"></i>
+                                    </div>
+                                    <select class="modern-select" name="typeDeSport" id="typeDeSport" required>
+                                        <option value="" disabled selected>{{ t('typeDeSport') }}</option>
+                                        {% for sport in typeDeSport %}
+                                            <option value="{{ sport.id }}">{{ sport.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
 
-
-                            <div class="form-floating mb-3 position-relative">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted ">
-                                <i class="fa-regular fa-clock mt-4"></i>
-                            </span>
-                            <input type="time" class="form-control ps-5" name="heuredebut" id="heuredebut" placeholder="{{ t('hourStart') }}">
-                            <label for="heuredebut">{{ t('hourStart') }}</label>
-                        </div>
-
-
-                         <div class="form-floating mb-3 position-relative">
-                        <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                            <img src="img/football.png" alt="terrain" style="width:1.2em; height:1.2em;filter: grayscale(100%);" class="mt-4">
-                        </span>
-                        <input type="number" class="form-control ps-5" name="nbrterrain" id="nbrterrain" min="1" max="20" value="1" placeholder="{{ t('numberOfFields') }}">
-                        <label for="nbrterrain">{{ t('numberOfFields') }}</label>
-                    </div>
-
-
-
-                            <div class="form-floating mb-3 position-relative">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                <i class="fa-regular fa-clock mt-4"></i> {# icône horloge pour la durée #}
-                            </span>
-                            <input type="number" class="form-control ps-5" 
-                                id="PasHoraire" name="pasHoraire" 
-                                value="{{ infotournoi.pasHoraire }}" 
-                                
-                                required>
-                            <label for="PasHoraire">{{ t('dureeRencontre') }}</label>
-                        </div>
-
-
-                            <div class="form-floating mb-3 position-relative">
-                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-                                <i class="fa-regular fa-calendar mt-3"></i>
-                            </span>
-                            <input type="date" class="form-control ps-5" 
-                                id="dateTournoi" name="dateTournoi">
-                            <label for="dateTournoi">{{ t('dateDuTournoi') }}</label>
-                        </div>
-
-                            
-                             {% if tousLesTournois|length >= licence['0'].limite_tournois %}
-                            <div class="alert alert-warning">
-                                {{ t('limit_tournament_warning', {'%limit%': licence['0'].limite_tournois}) }}
-
-                                {% for archived in isArchived %}
-                                    {% if archived.isArchived == 1 %}
-                                    <p>{{ archived.nom }} - <a href="modifierTournoi.php?idTournoi={{ archived.id }}">{{ t('reactivate')}}</a>{{t('reactivateHelp')}}</p>
-                                    {% endif %}
-                                    {% endfor %}
+                            <!-- Nom du tournoi -->
+                            <div class="form-group-modern">
+                                <div class="form-floating-modern">
+                                    <div class="input-icon">
+                                        <i class="fa-solid fa-trophy"></i>
+                                    </div>
+                                    <input type="text" class="modern-input" name="nomTournoi" 
+                                           id="nomTournoi" placeholder=" " required>
+                                    <label for="nomTournoi">{{ t('nameOfTournament') }}</label>
+                                </div>
                             </div>
+
+                            <!-- Heure de début -->
+                            <div class="form-group-modern">
+                                <div class="form-floating-modern">
+                                    <div class="input-icon">
+                                        <i class="fa-regular fa-clock"></i>
+                                    </div>
+                                    <input type="time" class="modern-input" name="heuredebut" 
+                                           id="heuredebut" placeholder=" " required>
+                                    <label for="heuredebut">{{ t('hourStart') }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Nombre de terrains -->
+                            <div class="form-group-modern">
+                                <div class="form-floating-modern">
+                                    <div class="input-icon">
+                                        <img src="img/football.png" alt="terrain">
+                                    </div>
+                                    <input type="number" class="modern-input" name="nbrterrain" 
+                                           id="nbrterrain" min="1" max="20" value="1" 
+                                           placeholder=" " required>
+                                    <label for="nbrterrain">{{ t('numberOfFields') }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Durée des rencontres -->
+                            <div class="form-group-modern">
+                                <div class="form-floating-modern">
+                                    <div class="input-icon">
+                                        <i class="fa-regular fa-hourglass-half"></i>
+                                    </div>
+                                    <input type="number" class="modern-input" id="PasHoraire" 
+                                           name="pasHoraire" value="{{ infotournoi.pasHoraire }}" 
+                                           placeholder=" " required>
+                                    <label for="PasHoraire">{{ t('dureeRencontre') }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Date du tournoi -->
+                            <div class="form-group-modern">
+                                <div class="form-floating-modern">
+                                    <div class="input-icon">
+                                        <i class="fa-regular fa-calendar"></i>
+                                    </div>
+                                    <input type="date" class="modern-input" id="dateTournoi" 
+                                           name="dateTournoi" placeholder=" " required>
+                                    <label for="dateTournoi">{{ t('dateDuTournoi') }}</label>
+                                </div>
+                            </div>
+
+                            <!-- Alert ou Submit -->
+                            {% if tousLesTournois|length >= licence['0'].limite_tournois %}
+                                <div class="modern-alert">
+                                    <div class="alert-title">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        Limite atteinte
+                                    </div>
+                                    <div class="alert-content">
+                                        <p>{{ t('limit_tournament_warning', {'%limit%': licence['0'].limite_tournois}) }}</p>
+                                        
+                                        {% for archived in isArchived %}
+                                            {% if archived.isArchived == 1 %}
+                                                <div class="archived-tournament">
+                                                    <span>
+                                                        <i class="fa-solid fa-archive me-2"></i>
+                                                        {{ archived.nom }}
+                                                    </span>
+                                                    <a href="modifierTournoi.php?idTournoi={{ archived.id }}" 
+                                                       class="reactivate-link">
+                                                        {{ t('reactivate')}}
+                                                        <i class="fa-solid fa-arrow-right"></i>
+                                                    </a>
+                                                </div>
+                                                <small class="text-muted">{{ t('reactivateHelp') }}</small>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             {% else %}
-                            <button type="submit" class="btn btn-primary w-100 btn-lg">
-                                <i class="fa-solid fa-check-circle"></i> {{ t('createTournament') }}
-                            </button>
+                                <button type="submit" class="submit-btn">
+                                    <span>
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        {{ t('createTournament') }}
+                                    </span>
+                                </button>
                             {% endif %}
                         </form>
                     </div>
@@ -121,8 +595,38 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Animation au focus des inputs
+        document.querySelectorAll('.modern-input, .modern-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Progress bar animation
+        let currentStep = 1;
+        document.querySelectorAll('.modern-input, .modern-select').forEach((input, index) => {
+            input.addEventListener('change', function() {
+                if (this.value) {
+                    currentStep = Math.min(3, Math.ceil((index + 1) / 2));
+                    updateProgress();
+                }
+            });
+        });
+
+        function updateProgress() {
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                if (index < currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
-</html>
+</html> 

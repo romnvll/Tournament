@@ -202,7 +202,7 @@ public function retrograderLicencesExpirees(): int
 
     // 2. Définir la date du jour
     $today = (new DateTime())->format('Y-m-d');
-
+    
     // 3. Mettre à jour les licences expirées
     $update = $this->connexion->prepare("
         UPDATE Licence

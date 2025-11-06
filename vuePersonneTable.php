@@ -100,8 +100,12 @@ $infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);
 }
 
 else {
-  echo "erreur";
-  exit(1);
+    echo "<script>
+        alert('Clé invalide ou expirée.');
+        window.history.back();
+    </script>";
+    exit;
+  
 }
 
 

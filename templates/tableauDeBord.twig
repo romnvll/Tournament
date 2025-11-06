@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>Tableau de bord - Gestion tournoi</title>
 
     <!-- Bootstrap & FontAwesome -->
@@ -11,111 +11,493 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            padding: 12px;
+            max-width: 100vw;
+        }
+
+        /* Page Title */
+        .page-title {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin: 0;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.primary::before {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .stat-card.success::before {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .stat-card.warning::before {
+            background: linear-gradient(135deg, var(--warning-color), #f97316);
+        }
+
+        .stat-card.danger::before {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, var(--warning-color), #f97316);
+        }
+
+        .stat-icon.danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        }
+
+        .stat-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #6b7280;
+            line-height: 1.3;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin-top: 8px;
+        }
+
+        .stat-value a {
+            color: var(--bg-dark);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .stat-value a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-body {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            padding: 0;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .custom-table thead {
+            background: var(--bg-light);
+        }
+
+        .custom-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .custom-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: var(--bg-dark);
+        }
+
+        .custom-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+
+            .stat-title {
+                font-size: 0.85rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .chart-body {
+                padding: 16px;
+                min-height: 250px;
+            }
+
+            .custom-table {
+                font-size: 0.8rem;
+            }
+
+            .custom-table th,
+            .custom-table td {
+                padding: 10px 8px;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            body {
+                background: #f8f9fa;
+            }
+
+            .container {
+                padding: 20px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .page-title {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                text-align: left;
+            }
+
+            .stat-card {
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .chart-card,
+            .table-card {
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .chart-header,
+            .table-header {
+                border-radius: 8px 8px 0 0;
+            }
+        }
+
+        /* Grid layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card,
+        .chart-card,
+        .table-card {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
 </head>
 <body>
     {{ include('header.twig') }}
 
     <div class="container mt-4">
-        <h1 class="mb-4">Tableau de bord</h1>
-      {% set tournoisActifs = [] %}
-
-{% for tournoi in tournois %}
-    {% if tournoi.isArchived == 0 %}
-        {% set tournoisActifs = tournoisActifs|merge([tournoi]) %}
-    {% endif %}
-{% endfor %}
-
-
-        <!-- Cartes statistiques -->
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <div class="card text-bg-primary">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Tournoi(s) en cours</h5>
-                        <p class="card-text display-6"><a href="modifierTournoi.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" >{{ tournoisActifs|length }}</a></p>
-                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card text-bg-success">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-users me-2"> </i>Équipes inscrites au tournoi {{tournoisActifs[0].nom}} 
-                           
-                       </h5>
-                        <p class="card-text display-6">  <a href="ajoutEquipe.php?idTournoi={{idTournoi}}" class="text-white fw-bold text-decoration-none" > {{nbrequipe}} </a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card text-bg-warning">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa-solid fa-building-user"></i>Nombre de clubs au tournoi {{tournoisActifs[0].nom}}</h5>
-                        <p class="card-text display-6">{{nbClub}}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card text-bg-danger">
-                   <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-futbol me-2"></i>Total de buts marqués</h5>
-            <p class="card-text display-6">{{ totalButs }}</p>
+        <!-- Page Title -->
+        <div class="page-title">
+            <h1><i class="fas fa-chart-line me-2"></i>Tableau de bord</h1>
         </div>
+
+        {% set tournoisActifs = [] %}
+        {% for tournoi in tournois %}
+            {% if tournoi.isArchived == 0 %}
+                {% set tournoisActifs = tournoisActifs|merge([tournoi]) %}
+            {% endif %}
+        {% endfor %}
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <!-- Tournois actifs -->
+            <div class="stat-card primary">
+                <div class="stat-header">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-title">Tournoi(s) en cours</div>
+                </div>
+                <div class="stat-value">
+                    <a href="modifierTournoi.php?idTournoi={{idTournoi}}">{{ tournoisActifs|length }}</a>
+                </div>
+            </div>
+
+            <!-- Équipes inscrites -->
+            <div class="stat-card success">
+                <div class="stat-header">
+                    <div class="stat-icon success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-title">Équipes inscrites au tournoi {{ tournoisActifs[0].nom }}</div>
+                </div>
+                <div class="stat-value">
+                    <a href="ajoutEquipe.php?idTournoi={{idTournoi}}">{{ nbrequipe }}</a>
+                </div>
+            </div>
+
+            <!-- Clubs -->
+            <div class="stat-card warning">
+                <div class="stat-header">
+                    <div class="stat-icon warning">
+                        <i class="fa-solid fa-building-user"></i>
+                    </div>
+                    <div class="stat-title">Nombre de clubs au tournoi {{ tournoisActifs[0].nom }}</div>
+                </div>
+                <div class="stat-value">{{ nbClub }}</div>
+            </div>
+
+            <!-- Total buts -->
+            <div class="stat-card danger">
+                <div class="stat-header">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <div class="stat-title">Total de buts marqués</div>
+                </div>
+                <div class="stat-value">{{ totalButs }}</div>
+            </div>
+        </div>
+
+       
+        <!-- Charts and Tables -->
+        <div class="charts-grid mt-4">
+            <!-- Chart Card -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <i class="fas fa-chart-pie"></i>
+                    Statut des rencontres
+                </div>
+                <div class="chart-body">
+                    <canvas id="matchStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Upcoming Matches Table -->
+            <div class="table-card">
+    <div class="table-header">
+        <i class="fas fa-calendar-alt"></i>
+        Prochaines rencontres
+    </div>
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Heure</th>
+                    <th>Équipe A</th>
+                    <th>Équipe B</th>
+                    <th>Terrain</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if lastRencontres is not empty %}
+                    {% for rencontre in lastRencontres %}
+                        <tr>
+                            <td>
+                                <strong>
+                                    {{ rencontre.heure ? rencontre.heure|slice(0,5) : '-' }}
+                                </strong>
+                            </td>
+                            <td>
+                                {{ rencontre.equipe1_nom }}
+                                {% if rencontre.isTerminated == 2 %}
+                                    <span class="badge bg-warning text-dark ms-1">En cours</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ rencontre.equipe2_nom }}</td>
+                            <td>
+                                <span style="background: var(--success-color); color: white; padding: 4px 8px; border-radius: 6px; font-weight: 600;">
+                                    {{ rencontre.terrain_nom }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Aucune rencontre à venir</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
-        </div>
 
-        <!-- Graphe + Prochaines rencontres -->
-        <div class="row mt-4">
-            <!-- Graphe Chart.js à gauche -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Statut des rencontres</h5>
-                    </div>
-                    <div class="card-body d-flex align-items-center justify-content-center">
-                        <canvas id="matchStatusChart" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tableau des prochaines rencontres à droite -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Prochaines rencontres</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover table-striped mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Heure</th>
-                                    <th scope="col">Équipe A</th>
-                                    <th scope="col">Équipe B</th>
-                                    <th scope="col">Terrain</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- À générer dynamiquement avec Twig -->
-                                <tr>
-                                    <td>10:00</td>
-                                    <td>Les Lions</td>
-                                    <td>Les Tigres</td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>11:00</td>
-                                    <td>Les Aigles</td>
-                                    <td>Les Ours</td>
-                                    <td>2</td>
-                                </tr>
-                                <!-- ... -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </div>
-      
     </div>
 
     <!-- Script Chart.js -->
@@ -127,25 +509,46 @@
                 labels: ['À venir', 'En cours', 'Terminé'],
                 datasets: [{
                     label: 'Rencontres',
-                    data: [{{nbRencontreAvenir}},{{nbRencontreEncours}} , {{nbRencontreTerminees}}], // Tu peux injecter tes vraies valeurs depuis Twig ici
+                    data: [{{ nbRencontreAvenir }}, {{ nbRencontreEncours }}, {{ nbRencontreTerminees }}],
                     backgroundColor: [
-                        'rgba(0, 123, 255, 0.7)',
-                        'rgba(255, 193, 7, 0.7)',
-                        'rgba(40, 167, 69, 0.7)'
+                        'rgba(249, 158, 11, 0.8)',
+                        'rgba(6, 182, 212, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
                     ],
                     borderColor: [
-                        'rgba(0, 123, 255, 1)',
-                        'rgba(255, 193, 7, 1)',
-                        'rgba(40, 167, 69, 1)'
+                        'rgba(249, 158, 11, 1)',
+                        'rgba(6, 182, 212, 1)',
+                        'rgba(16, 185, 129, 1)'
                     ],
-                    borderWidth: 1
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1
                     }
                 }
             }

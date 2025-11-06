@@ -48,18 +48,18 @@ class PersonneDao {
 }
 
 
-    public function supprimerPersonne($id, $id_tournoi, $id_club) {
+    public function supprimerPersonne($id, $id_tournoi, $id_utilisateur) {
         // Vérifier si le tournoi appartient bien au club de l'utilisateur
         $stmt = $this->connexion->prepare("
             SELECT t.id 
             FROM Tournois t
             JOIN Personne p ON t.id = p.tournoi_id
-            WHERE p.id = :id AND t.id = :tournoi_id AND t.club_id = :club_id
+            WHERE p.id = :id AND t.id = :tournoi_id AND t.utilisateur_id = :utilisateur_id
         ");
         
         $stmt->bindValue(':id', $id);
         $stmt->bindValue(':tournoi_id', $id_tournoi);
-        $stmt->bindValue(':club_id', $id_club);
+        $stmt->bindValue(':utilisateur_id', $id_utilisateur);
         $stmt->execute();
     
         if ($stmt->rowCount() === 0) {

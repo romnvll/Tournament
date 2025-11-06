@@ -8,46 +8,629 @@
 		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 		<title>Gestion rencontre</title>
 
 		<style>
+			:root {
+				--primary-color: #4f46e5;
+				--primary-hover: #4338ca;
+				--danger-color: #ef4444;
+				--warning-color: #f59e0b;
+				--success-color: #10b981;
+				--bg-dark: #1f2937;
+				--bg-light: #f9fafb;
+				--text-light: #6b7280;
+				--shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+				--shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+				--shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+				--border-radius: 12px;
+			}
+
+			body {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				min-height: 100vh;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			}
+
+			.main-container {
+				background: white;
+				border-radius: var(--border-radius);
+				box-shadow: var(--shadow-lg);
+				margin: 20px;
+				padding: 30px;
+			}
+
+			/* Boutons de tournois */
+			.tournament-buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				margin-bottom: 25px;
+			}
+
+			.tournament-btn {
+				padding: 12px 24px;
+				border-radius: 30px;
+				font-weight: 600;
+				border: none;
+				transition: all 0.3s ease;
+				box-shadow: var(--shadow-sm);
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.tournament-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.tournament-btn.active {
+				background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+				color: white;
+			}
+
+			/* Barre de progression moderne */
+			.progress-container {
+				background: white;
+				padding: 20px;
+				border-radius: var(--border-radius);
+				box-shadow: var(--shadow-sm);
+				margin-bottom: 25px;
+			}
+
+			.modern-progress {
+				height: 12px;
+				border-radius: 10px;
+				background: #e5e7eb;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.modern-progress-bar {
+				height: 100%;
+				background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+				transition: width 0.6s ease;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.modern-progress-bar::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+				animation: shimmer 2s infinite;
+			}
+
+			@keyframes shimmer {
+				0% { transform: translateX(-100%); }
+				100% { transform: translateX(100%); }
+			}
+
+			/* Zone de contrôle sticky */
+			.control-panel {
+				background: white;
+				border-radius: var(--border-radius);
+				box-shadow: var(--shadow-md);
+				padding: 20px;
+				margin-bottom: 25px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 20px;
+				position: sticky;
+				top: 20px;
+				z-index: 200;
+			}
+
+			.delay-form {
+				display: flex;
+				gap: 15px;
+				align-items: flex-end;
+				flex-wrap: wrap;
+			}
+
+			.form-group-modern {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+
+			.form-group-modern label {
+				font-weight: 600;
+				color: var(--bg-dark);
+				font-size: 0.9rem;
+			}
+
+			.modern-input {
+				padding: 10px 15px;
+				border: 2px solid #e5e7eb;
+				border-radius: 8px;
+				transition: all 0.3s;
+				font-size: 1rem;
+			}
+
+			.modern-input:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+			}
+
+			.modern-btn {
+				padding: 10px 24px;
+				border-radius: 8px;
+				font-weight: 600;
+				border: none;
+				cursor: pointer;
+				transition: all 0.3s;
+				box-shadow: var(--shadow-sm);
+			}
+
+			.modern-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.btn-primary-modern {
+				background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+				color: white;
+			}
+
+			.clock-display {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-weight: 700;
+				font-size: 1.2rem;
+				color: var(--primary-color);
+				padding: 10px 20px;
+				background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(79, 70, 229, 0.05));
+				border-radius: 10px;
+			}
+
+			/* Container avec scroll horizontal */
+			.modern-table-container {
+				background: white;
+				border-radius: var(--border-radius);
+				overflow: hidden;
+				box-shadow: var(--shadow-md);
+				position: relative;
+			}
+
+			.table-wrapper {
+				overflow-x: auto;
+				-webkit-overflow-scrolling: touch;
+				position: relative;
+			}
+
+			/* Indicateur de scroll sur mobile */
+			.scroll-indicator {
+				display: none;
+				position: absolute;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				width: 40px;
+				background: linear-gradient(to left, rgba(255,255,255,0.95), transparent);
+				pointer-events: none;
+				z-index: 150;
+			}
+
+			.scroll-indicator::after {
+				content: '→';
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 1.5rem;
+				color: var(--primary-color);
+				animation: slideHint 1.5s infinite;
+			}
+
+			@keyframes slideHint {
+				0%, 100% { opacity: 0.3; transform: translateY(-50%) translateX(0); }
+				50% { opacity: 1; transform: translateY(-50%) translateX(5px); }
+			}
+
+			/* Table moderne */
+			.modern-table {
+				width: 100%;
+				border-collapse: separate;
+				border-spacing: 0;
+				min-width: 1200px; /* Force le scroll horizontal sur petits écrans */
+			}
+
+			.modern-table thead {
+				background: linear-gradient(135deg, var(--bg-dark), #374151);
+				color: white;
+			}
+
+			.modern-table thead th {
+				padding: 20px 15px;
+				font-weight: 600;
+				text-align: center;
+				position: sticky;
+				top: 0;
+				z-index: 10;
+			}
+
+			.modern-table tbody td {
+				padding: 20px 15px;
+				border-bottom: 1px solid #e5e7eb;
+				vertical-align: top;
+			}
+
+			.modern-table tbody tr:hover {
+				background: var(--bg-light);
+			}
+
+			/* Cartes de match */
+			.match-card {
+				background: white;
+				border-radius: 12px;
+				padding: 15px;
+				box-shadow: var(--shadow-sm);
+				transition: all 0.3s;
+				border: 2px solid transparent;
+				min-width: 280px;
+			}
+
+			.match-card:hover {
+				box-shadow: var(--shadow-md);
+				transform: translateY(-2px);
+			}
+
+			.match-header {
+				text-align: center;
+				font-weight: 700;
+				padding: 10px;
+				border-radius: 8px;
+				margin-bottom: 12px;
+				color: white;
+				font-size: 0.85rem;
+			}
+
+			.match-status {
+				text-align: center;
+				font-weight: 700;
+				padding: 8px;
+				border-radius: 8px;
+				margin-bottom: 12px;
+			}
+
+			.status-upcoming {
+				background: linear-gradient(135deg, var(--danger-color), #dc2626);
+				color: white;
+			}
+
+			.status-ongoing {
+				background: linear-gradient(135deg, var(--warning-color), #d97706);
+				color: white;
+			}
+
+			.status-finished {
+				background: linear-gradient(135deg, var(--success-color), #059669);
+				color: white;
+			}
+
+			/* Boutons d'état modernisés */
+			.status-buttons {
+				display: flex;
+				justify-content: center;
+				gap: 12px;
+				margin: 12px 0;
+			}
+
+			.status-dot {
+				width: 45px;
+				height: 45px;
+				border-radius: 50%;
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.3s;
+				border: none;
+				box-shadow: var(--shadow-sm);
+				position: relative;
+			}
+
+			.status-dot::after {
+				content: '';
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				border-radius: 50%;
+				opacity: 0;
+				transition: all 0.3s;
+			}
+
+			.status-dot:hover::after {
+				opacity: 0.3;
+				transform: scale(1.3);
+			}
+
+			.status-dot.red {
+				background: linear-gradient(135deg, var(--danger-color), #dc2626);
+			}
+
+			.status-dot.red::after {
+				background: var(--danger-color);
+			}
+
+			.status-dot.orange {
+				background: linear-gradient(135deg, var(--warning-color), #d97706);
+			}
+
+			.status-dot.orange::after {
+				background: var(--warning-color);
+			}
+
+			.status-dot.green {
+				background: linear-gradient(135deg, var(--success-color), #059669);
+			}
+
+			.status-dot.green::after {
+				background: var(--success-color);
+			}
+
+			.status-dot:hover {
+				transform: scale(1.1);
+				box-shadow: var(--shadow-md);
+			}
+
+			/* Champs de score */
+			.score-inputs {
+				display: flex;
+				gap: 10px;
+				justify-content: center;
+				margin-top: 12px;
+			}
+
+			.score-input {
+				width: 70px;
+				padding: 10px;
+				border: 2px solid #e5e7eb;
+				border-radius: 8px;
+				text-align: center;
+				font-weight: 700;
+				font-size: 1.1rem;
+				transition: all 0.3s;
+			}
+
+			.score-input:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+			}
+
+			/* Boutons audio */
+			.audio-controls {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				align-items: center;
+				margin-top: 10px;
+			}
+
+			.audio-btn {
+				padding: 8px 16px;
+				border-radius: 8px;
+				border: none;
+				background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+				color: white;
+				font-size: 0.85rem;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.audio-btn:hover:not(:disabled) {
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.audio-btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			/* Time slot cell */
+			.timeslot-cell {
+				background: linear-gradient(135deg, var(--bg-light), white);
+				font-weight: 600;
+				color: var(--bg-dark);
+				position: sticky;
+				left: 0;
+				z-index: 5;
+			}
+
+			/* Icônes */
+			.icon-badge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				margin: 0 3px;
+			}
+
+			.icon-success {
+				background: rgba(16, 185, 129, 0.2);
+				color: var(--success-color);
+			}
+
+			.icon-danger {
+				background: rgba(239, 68, 68, 0.2);
+				color: var(--danger-color);
+			}
+
+			/* Scrollbar personnalisée */
+			.table-wrapper::-webkit-scrollbar {
+				height: 10px;
+			}
+
+			.table-wrapper::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 10px;
+			}
+
+			.table-wrapper::-webkit-scrollbar-thumb {
+				background: var(--primary-color);
+				border-radius: 10px;
+			}
+
+			.table-wrapper::-webkit-scrollbar-thumb:hover {
+				background: var(--primary-hover);
+			}
+
+			/* Impression */
 			@media print {
 				body {
 					margin: 0;
 					padding: 0;
-					background-color: white; /* Fond blanc pour éviter les problèmes */
+					background: white;
 				}
-				.container {
-					width: 100%;
-					max-width: 100%;
-				}
-				h1 {
-					font-size: 1.5rem;
-					text-align: center;
-				}
-				/* Masquer le bouton lors de l'impression */
 				.no-print {
 					display: none !important;
 				}
-
-                 
-
+				.main-container {
+					box-shadow: none;
+					margin: 0;
+				}
+				.table-wrapper {
+					overflow: visible;
+				}
+				.modern-table {
+					min-width: auto;
+				}
 			}
 
+			/* Responsive */
+			@media (max-width: 768px) {
+				.main-container {
+					margin: 10px;
+					padding: 15px;
+				}
+				
+				.control-panel {
+					flex-direction: column;
+					align-items: stretch;
+					position: static;
+				}
 
-            .touch-friendly {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 5px;
-                    touch-action: manipulation;
-                }
+				.delay-form {
+					flex-direction: column;
+				}
+
+				.modern-input {
+					width: 100%;
+				}
+
+				/* Afficher l'indicateur de scroll sur mobile */
+				.scroll-indicator {
+					display: block;
+				}
+
+				/* Message d'aide scroll */
+				.modern-table-container::before {
+					content: '← Faites glisser pour voir tous les terrains →';
+					display: block;
+					text-align: center;
+					padding: 12px;
+					background: linear-gradient(135deg, #06b6d4, #0891b2);
+					color: white;
+					font-weight: 600;
+					font-size: 0.9rem;
+					position: sticky;
+					left: 0;
+					z-index: 100;
+				}
+
+				/* Optimisation des éléments du tableau */
+				.modern-table {
+					font-size: 0.85rem;
+					min-width: 1400px; /* Augmenté pour plus de confort */
+				}
+
+				.modern-table thead th {
+					padding: 15px 10px;
+					font-size: 0.85rem;
+				}
+
+				.modern-table tbody td {
+					padding: 15px 10px;
+				}
+
+				.match-card {
+					min-width: 260px;
+					padding: 12px;
+				}
+
+				.match-header {
+					font-size: 0.75rem;
+					padding: 8px;
+				}
+
+				.match-status {
+					font-size: 0.8rem;
+					padding: 6px;
+				}
+
+				.status-dot {
+					width: 38px;
+					height: 38px;
+				}
+
+				.score-input {
+					width: 60px;
+					padding: 8px;
+					font-size: 1rem;
+				}
+
+				.audio-btn {
+					font-size: 0.75rem;
+					padding: 6px 12px;
+				}
+
+				.timeslot-cell {
+					font-size: 0.85rem;
+					min-width: 130px;
+				}
+
+				.clock-display {
+					font-size: 1rem;
+					padding: 8px 15px;
+				}
+
+				.tournament-btn {
+					padding: 10px 20px;
+					font-size: 0.9rem;
+				}
+			}
+
+			/* Animation du tableau */
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.modern-table tbody tr {
+				animation: fadeIn 0.3s ease;
+			}
 		</style>
-
 	</head>
 
 	<body>
@@ -55,450 +638,415 @@
 			{{ include('header.twig') }}
 		</div>
 		
-		<div class="row ml-n4">
-		
-			<div class="col-lg-3">
-			
+		<div class="main-container">
+			<!-- Boutons de tournois -->
+			<div class="tournament-buttons no-print">
 				{% for tournoi in ListeDesTournois %}
-				
 					{% if tournoi.isArchived == 0 %}
-						{% if tournoi.id == idTournoi %}
-							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-danger  no-print">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
-						{% else %}
-							<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-primary btn-sm no-print">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
-						{% endif %}
+						<a href="gestionToutesLesRencontres.php?id_tournoi={{ tournoi.id }}" 
+						   class="tournament-btn {% if tournoi.id == idTournoi %}active{% endif %}">
+							<i class="fas fa-trophy"></i>
+							{{ tournoi.nom }}
+						</a>
 					{% endif %}
 				{% endfor %}
 			</div>
-			<div class="col-lg-6">
-				<div class="progress no-print">
-					<div class="progress-bar progress-bar-striped progress-bar-animated no-print" role="progressbar" aria-valuenow="{{pourcentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{pourcentage}}%">
-						{{pourcentage}}%</div>
+
+			<!-- Barre de progression -->
+			<div class="progress-container no-print">
+				<div class="d-flex justify-content-between align-items-center mb-2">
+					<span class="fw-bold">Progression du tournoi</span>
+					<span class="fw-bold text-primary">{{pourcentage}}%</span>
+				</div>
+				<div class="modern-progress">
+					<div class="modern-progress-bar" style="width: {{pourcentage}}%"></div>
+				</div>
+			</div>
+
+			<!-- Panneau de contrôle -->
+			<div class="control-panel">
+				<form method="post" action="PlacementDesRencontresTraitement.php" class="delay-form">
+					<div class="form-group-modern">
+						<label for="modifMinutes">
+							<i class="fas fa-clock"></i> Retarder les rencontres
+						</label>
+						<input type="number" id="modifMinutes" name="modifMinutes" 
+						       class="modern-input" placeholder="Minutes">
+					</div>
+					<button type="submit" class="modern-btn btn-primary-modern">
+						Appliquer le retard
+					</button>
+					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
+				</form>
+
+				<div class="clock-display">
+					<i class="fas fa-clock"></i>
+					<span id="horloge"></span>
 				</div>
 
+				<button class="modern-btn btn-primary-modern" onclick="window.print()">
+					<i class="fas fa-print"></i> Imprimer
+				</button>
 			</div>
-			<div class="col">
-				<button class="btn btn-primary no-print mb-3" onclick="window.print()">Imprimer</button>
 
-			</div>
-			<<div class="sticky-top bg-light p-3 shadow-sm rounded mb-3 d-flex justify-content-between align-items-center" style="z-index: 200;">
-    
-    <form method="post" action="PlacementDesRencontresTraitement.php" class="row g-2 align-items-end mb-0">
-        
-        <div class="col-auto">
-            <label for="modifMinutes" class="form-label fw-bold no-print mb-1">
-                ⏱️ Retarder les rencontres :
-            </label>
-            <input type="number" id="modifMinutes" name="modifMinutes" class="form-control no-print" placeholder="Minutes">
-        </div>
+			<!-- Table des rencontres avec wrapper scrollable -->
+			<div class="modern-table-container">
+				<div class="table-wrapper">
+					<table class="modern-table">
+						<thead>
+							<tr>
+								<th style="width: 150px;">Créneau</th>
+								{% for i in 0..terrains|length - 1 %}
+									<th>
+										<div class="d-flex flex-column align-items-center gap-2">
+											<div>Terrain {{ terrains[i]["nom"] }}</div>
+											{% if tournoiInfo.gestionVoix == 1 %}
+												<div class="audio-controls" data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
+													{% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}
+														<span class="icon-badge icon-danger">
+															<i class="fas fa-microphone-slash"></i>
+														</span>
+													{% else %}
+														<span class="icon-badge icon-success">
+															<i class="fas fa-microphone"></i>
+														</span>
+													{% endif %}
+													<button class="btn-record audio-btn">🎙️ Enregistrer</button>
+													<button class="btn-stop audio-btn" disabled>⏹️ Arrêter</button>
+													<button class="btn-play audio-btn" {% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}disabled{% endif %}>▶️ Écouter</button>
+													{% if terrains[i]['audio_path'] is not null and terrains[i]['audio_path'] != '' %}
+														<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
+													{% endif %}
+												</div>
+											{% endif %}
+										</div>
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for creneau in listCreneaux %}
+								<tr>
+									<td class="timeslot-cell">
+										<div class="text-center mb-3">
+											<div class="mb-2">{{ creneau.nom|slice(0, -3) }}</div>
+											<div class="status-buttons">
+												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
+													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+													<input type="hidden" name="etatTotal" value="Avenir">
+													<button type="submit" class="status-dot red no-print" 
+													        title="Passer les rencontres à 'à venir'"></button>
+												</form>
 
-        <div class="col-auto">
-            <input type="submit" class="btn btn-primary no-print" value="Appliquer le retard">
-        </div>
+												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
+													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+													<input type="hidden" name="etatTotal" value="enCours">
+													<button type="submit" class="status-dot orange no-print" 
+													        title="Passer les rencontres à 'en cours'"></button>
+												</form>
 
-        <input type="hidden" name="idTournoi" value="{{idTournoi}}">
-    </form>
-
-    <!-- Affichage de l'heure -->
-    <div class="fw-bold text-primary ms-3 no-print">
-        🕒 <span id="horloge"></span>
-    </div>
-</div>
-
-
-
-			<div class="col-lg-12">
-				<div class="row">
-					<div class="table table-responsive table-striped table-bordered">
-						<table class="table" id="planification-table">
-							<thead class="table-header">
-								<tr class="text-center">
-    <th scope="col"></th>
-
-					{% for i in 0..terrains|length - 1 %}
-						<th scope="col">
-							Terrain {{ terrains[i]["nom"] }}
-							
-							
-
-				{% if tournoiInfo.gestionVoix == 1 %}
-						<div data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
-							
-							{% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}
-								<!-- Pas encore d’audio -->
-								<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
-								<button class="btn-record">🎙️ Enregistrer</button>
-								<button class="btn-stop" disabled>⏹️ Arrêter</button>
-								<button class="btn-play" disabled>▶️ Écouter</button>
-							{% else %}
-								<!-- Audio disponible -->
-								<i class="fas fa-microphone text-success" title="Audio disponible"></i>
-								<button class="btn-record">🎙️ Réenregistrer</button>
-								<button class="btn-stop" disabled>⏹️ Arrêter</button>
-								<button class="btn-play">▶️ Écouter</button>
-								<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
-							{% endif %}
-							
-						</div>
-					{% endif %}
-
-
-
-
-						</th>
-					{% endfor %}
-</tr>
-
-							</thead>
-							<tbody>
-								{% for creneau in listCreneaux %}
-									<tr>
+												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
+													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+													<input type="hidden" name="etatTotal" value="terminee">
+													<button type="submit" class="status-dot green no-print" 
+													        title="Passer les rencontres à 'terminée'"></button>
+												</form>
+											</div>
+											{% if tournoiInfo.gestionVoix == 1 %}
+												<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" 
+												        class="audio-btn mt-2 no-print">
+													🎧 Lancer la lecture audio
+												</button>
+											{% endif %}
+										</div>
+									</td>
+									{% for j in 0..terrains|length - 1 %}
 										<td>
-
-											<div class="input-group flex-column align-items-start">
-  <div class="mb-1">
-    {{ creneau.nom|slice(0, -3) }} 
-  </div>
-  <div class="d-flex flex-column align-items-center gap-1">
-  
-
-				<div class="d-flex justify-content-center gap-2">
-					<form method="POST" action="gestionRencontres_traitement.php">
-					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
-					<input type="hidden" name="etatTotal" value="Avenir">
-					<button type="submit" class="point no-print touch-friendly" 
-							style="background-color: red;" 
-							title="Passer les rencontres à 'à venir'">
-					</button>
-					</form>
-
-					<form method="POST" action="gestionRencontres_traitement.php">
-					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
-					<input type="hidden" name="etatTotal" value="enCours">
-					<button type="submit" class="point no-print touch-friendly" 
-							style="background-color: orange;" 
-							title="Passer les rencontres à 'en cours'">
-					</button>
-					</form>
-
-					<form method="POST" action="gestionRencontres_traitement.php">
-					<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
-					<input type="hidden" name="etatTotal" value="terminee">
-					<button type="submit" class="point no-print touch-friendly" 
-							style="background-color: green;" 
-							title="Passer les rencontres à 'terminée'">
-					</button>
-					</form>
-				</div>
-		</div>	
- {% if tournoiInfo.gestionVoix == 1 %}
-	<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" class="btn btn-primary">
-    🎧 Lancer la lecture audio
-</button>
-{% endif %}
-
-										</td>
-										{% set Displayed = false %}
-										{% for j in 0..terrains|length - 1 %}
-											<td>
-												{% set planificationFound = false %}
-												{# Variable pour suivre si une planification a été trouvée #}
-												{% set creneauOqp = false %}
-												{# Variable pour suivre si un creneau est OQP #}
-												{% for planification in afficherPlanification %}
-
-													{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
-														{% set planificationFound = true %}
-														{# Variable pour suivre si une planification a été trouvée #}
-
-                                                       
-														{% if planification.rencontre_id is not null or planification.arbitre_id is not null   %}
-                                                        {% if tournoiInfo.gestionArbitres == 1 %}
-															{% if planification.arbitre_id is not null  %}
-																<!-- SI il y a un arbitre selectonné il s'affiche ici avec la possibilité de le supprimer -->
-																<i class="fas fa-user-tie"></i><i class="material-icons me-2" style="font-size: 20px;">sports</i>
-																{{planification.arbitre_nom}}
-																{{planification.club_nom_arbitre}}
-															{% else %}
-																<i class="material-icons me-2" style="font-size: 20px;">sports</i>
-																<i class="fas fa-user-tie"></i>Aucun arbitre
-
+											{% for planification in afficherPlanification %}
+												{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+													{% if planification.rencontre_id is not null or planification.arbitre_id is not null %}
+														<div class="match-card">
+															{% if tournoiInfo.gestionArbitres == 1 %}
+																<div class="text-center mb-2">
+																	<i class="fas fa-user-tie me-1"></i>
+																	{% if planification.arbitre_id is not null %}
+																		<strong>{{planification.arbitre_nom}}</strong>
+																		<small class="text-muted d-block">{{planification.club_nom_arbitre}}</small>
+																	{% else %}
+																		<em class="text-muted">Aucun arbitre</em>
+																	{% endif %}
+																</div>
 															{% endif %}
-                                                        {% endif %}
+
 															{% if planification.rencontre_id is not null %}
-																<div
-																	class="mb-3" style="background-color: {{ planification.equipe1_categorie_couleur }};">
-																	<!-- Ligne 1: Catégorie de l'équipe 1 et tour -->
-																	
-																	<div class="text-center fw-bold">
-	{% if planification.isClassement == 1 %}
-		<p class="card-text mb-0">
-			<i class="fa fa-trophy text-warning me-1" aria-hidden="true"></i>
-			Phase finale – Tour {{ planification.tour }} –
-			{{planification.poule_nom }}
-			– {{ planification.equipe1_categorie_nom }}
-		</p>
-	{% else %}
-		<p class="card-text mb-0">
-			Tour {{ planification.tour }} –
-			{{planification.poule_nom }}
-			
-				
-		</p>
-	{% endif %}
-</div>
-
-
-
-
-
-																	{% if planification.isTerminated == 1 %}
-																		<p class="fw-bold text-center text-success bg-dark" id="Label{{planification.rencontre_id}}">Rencontre terminée
-																		</p>
+																<div class="match-header" style="background: {{ planification.equipe1_categorie_couleur }};">
+																	{% if planification.isClassement == 1 %}
+																		<i class="fa fa-trophy me-1"></i>
+																		Phase finale – Tour {{ planification.tour }} – {{planification.poule_nom }} – {{ planification.equipe1_categorie_nom }}
+																	{% else %}
+																		Tour {{ planification.tour }} – {{planification.poule_nom }}
 																	{% endif %}
-																	{% if planification.isTerminated == 0  %}
-																		<p class="fw-bold text-center text-danger bg-dark" id="Label{{planification.rencontre_id}}">Rencontre à venir</p>
+																</div>
 
-																	{% endif %}
-																	{% if planification.isTerminated == 2 %}
-																		<p class="fw-bold text-center text-warning bg-dark" id="Label{{planification.rencontre_id}}">Rencontre en cours</p>
-																	{% endif %}
+																{% if planification.isTerminated == 1 %}
+																	<div class="match-status status-finished" id="Label{{planification.rencontre_id}}">
+																		✓ Rencontre terminée
+																	</div>
+																{% endif %}
+																{% if planification.isTerminated == 0 %}
+																	<div class="match-status status-upcoming" id="Label{{planification.rencontre_id}}">
+																		⏱️ Rencontre à venir
+																	</div>
+																{% endif %}
+																{% if planification.isTerminated == 2 %}
+																	<div class="match-status status-ongoing" id="Label{{planification.rencontre_id}}">
+																		▶️ Rencontre en cours
+																	</div>
+																{% endif %}
 
-																	<div class="d-flex justify-content-center">
-                                                                        <div class="point no-print touch-friendly" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Passer la rencontre à 'à venir'" 
-                                                                            style="background-color: red;" hx-post="gestionRencontres_traitement.php"
-                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
-                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
-                                                                            hx-swap="innerHTML" hx-vals='{"etat": "Avenir"}'></div>
+																<div class="status-buttons no-print">
+																	<div class="status-dot red" 
+																	     hx-post="gestionRencontres_traitement.php"
+																	     hx-trigger="click touchstart" 
+																	     hx-target="#Label{{planification.rencontre_id}}" 
+																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
+																	     hx-swap="innerHTML" 
+																	     hx-vals='{"etat": "Avenir"}'
+																	     title="À venir"></div>
 
-                                                                        <div class="point no-print touch-friendly"  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Passer la rencontre à 'en cours'" 
-                                                                            style="background-color: orange;" hx-post="gestionRencontres_traitement.php"
-                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
-                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
-                                                                            hx-swap="innerHTML" hx-vals='{"etat": "enCours"}'></div>
+																	<div class="status-dot orange" 
+																	     hx-post="gestionRencontres_traitement.php"
+																	     hx-trigger="click touchstart" 
+																	     hx-target="#Label{{planification.rencontre_id}}" 
+																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
+																	     hx-swap="innerHTML" 
+																	     hx-vals='{"etat": "enCours"}'
+																	     title="En cours"></div>
 
-                                                                        <div class="point no-print touch-friendly" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Passer la rencontre à 'terminée'" 
-                                                                            style="background-color: green;" hx-post="gestionRencontres_traitement.php"
-                                                                            hx-trigger="click touchstart" hx-target="#Label{{planification.rencontre_id}}" 
-                                                                            hx-include="#idRencontre{{ planification.rencontre_id }}" 
-                                                                            hx-swap="innerHTML" hx-vals='{"etat": "terminee"}'></div>
-                                                                    </div>
+																	<div class="status-dot green" 
+																	     hx-post="gestionRencontres_traitement.php"
+																	     hx-trigger="click touchstart" 
+																	     hx-target="#Label{{planification.rencontre_id}}" 
+																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
+																	     hx-swap="innerHTML" 
+																	     hx-vals='{"etat": "terminee"}'
+																	     title="Terminée"></div>
+																</div>
 
-																	<!-- Ligne 2: Noms des équipes et scores, centrée -->
-																	<p class="text-center">terrain
-																		<b>{{planification.terrain_nom}}</b>
-																	</p>
-																	<div class="d-flex flex-column align-items-center justify-content-center">
-																		<div class="d-flex align-items-center justify-content-center mb-2">
-																			<p class="mb-0">{{ planification.equipe1_nom }}</p>
-																				{% if tournoiInfo.gestionVoix == 1 %}
-																					{% if planification.audio1 is null %}
-																						<!-- Icône micro barré (pas d'audio) -->
-																						<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
-																					{% else %}
-																						<!-- Icône micro normal (audio présent) -->
-																						<i class="fas fa-microphone text-success" title="Audio disponible"></i>
-																					{% endif %}
-																				{% endif %}
+																<div class="text-center mb-2">
+																	<small class="text-muted">Terrain <strong>{{planification.terrain_nom}}</strong></small>
+																</div>
 
-																			
-																			<span class="mx-2">vs</span>
-																			<p class="mb-0">{{ planification.equipe2_nom }}</p>
-																				{% if tournoiInfo.gestionVoix == 1 %}
-																					{% if planification.audio2 is null %}
-																						<!-- Icône micro barré (pas d'audio) -->
-																						<i class="fas fa-microphone-slash text-danger" title="Pas d'audio"></i>
-																					{% else %}
-																						<!-- Icône micro normal (audio présent) -->
-																						<i class="fas fa-microphone text-success" title="Audio disponible"></i>
-																					{% endif %}
-																				{% endif %}
-																		</div>
-
-																																		
-
-
-																		<div class="d-flex">
-																			<input type="hidden" name="idRencontre" value="{{ planification.rencontre_id }}" id="idRencontre{{ planification.rencontre_id }}">
-
-																			<input type="number" name="scoreEquipe1" value="{{ planification.score1 }}" class="form-control me-2" min="0" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="#idRencontre{{ planification.rencontre_id }}">
-
-																			<input type="number" name="scoreEquipe2" value="{{ planification.score2 }}" class="form-control ms-2" min="0" hx-post="gestionRencontres_traitement.php" hx-trigger="change" hx-include="#idRencontre{{ planification.rencontre_id }}">
-																		</div>
+																<div class="text-center">
+																	<div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+																		<span class="fw-bold">{{ planification.equipe1_nom }}</span>
+																		{% if tournoiInfo.gestionVoix == 1 %}
+																			<span class="icon-badge {% if planification.audio1 is null %}icon-danger{% else %}icon-success{% endif %}">
+																				<i class="fas fa-microphone{% if planification.audio1 is null %}-slash{% endif %}"></i>
+																			</span>
+																		{% endif %}
+																		<span class="text-muted">vs</span>
+																		<span class="fw-bold">{{ planification.equipe2_nom }}</span>
+																		{% if tournoiInfo.gestionVoix == 1 %}
+																			<span class="icon-badge {% if planification.audio2 is null %}icon-danger{% else %}icon-success{% endif %}">
+																				<i class="fas fa-microphone{% if planification.audio2 is null %}-slash{% endif %}"></i>
+																			</span>
+																		{% endif %}
 																	</div>
 
+																	<input type="hidden" name="idRencontre" value="{{ planification.rencontre_id }}" id="idRencontre{{ planification.rencontre_id }}">
 
-																	{% set creneauOqp = true %}
-																{% endif %}
-																<script>
-																	var tdElement = document.currentScript.parentElement;
-                                                                        // Appliquer la couleur de fond au <td> parent
-                                                                       // tdElement.style.backgroundColor = '{{ planification.equipe1_categorie_couleur }}';
-																</script>
+																	<div class="score-inputs">
+																		<input type="number" name="scoreEquipe1" value="{{ planification.score1 }}" 
+																		       class="score-input" min="0" 
+																		       hx-post="gestionRencontres_traitement.php" 
+																		       hx-trigger="change" 
+																		       hx-include="#idRencontre{{ planification.rencontre_id }}">
 
-															{% elseif planification.label_id is not null %}
-																{{ planification.label_description }}
-																<script>
-																	var tdElement = document.currentScript.parentElement;
-// Appliquer la couleur de fond au <td> parent
-tdElement.style.backgroundColor = 'grey';
-																</script>
+																		<input type="number" name="scoreEquipe2" value="{{ planification.score2 }}" 
+																		       class="score-input" min="0" 
+																		       hx-post="gestionRencontres_traitement.php" 
+																		       hx-trigger="change" 
+																		       hx-include="#idRencontre{{ planification.rencontre_id }}">
+																	</div>
+																</div>
 															{% endif %}
-
-
-														{% endif %}
-
-													{% endfor %}
-
-
-												</td>
+														</div>
+													{% elseif planification.label_id is not null %}
+														<div class="match-card" style="background: #9ca3af; color: white;">
+															<div class="text-center fw-bold">
+																{{ planification.label_description }}
+															</div>
+														</div>
+													{% endif %}
+												{% endif %}
 											{% endfor %}
-										</tr>
+										</td>
 									{% endfor %}
-								</tbody>
-							</tbody>
-						</table>
-					</div>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					<div class="scroll-indicator"></div>
 				</div>
 			</div>
+		</div>
 
+		<!-- Scripts -->
+		<script>
+			$(document).ready(function () {
+				$('.rencontreLabel .form-select').on('change', function () {
+					var $form = $(this).closest('form');
+					var formAction = $form.attr('action');
+					var formData = $form.serialize();
+					$.post(formAction, formData, function () {
+						location.reload();
+					});
+				});
+			});
+		</script>
 
-			<script>
-				$(document).ready(function () {
-$('.rencontreLabel .form-select').on('change', function () {
-var $form = $(this).closest('form');
-var formAction = $form.attr('action');
-var formData = $form.serialize();
+		<script>
+			window.onload = function() {
+				if (typeof(sessionStorage) !== 'undefined') {
+					var scrollPosition = sessionStorage.getItem('scrollPosition');
+					if (scrollPosition !== null) {
+						window.scrollTo(0, scrollPosition);
+					}
+				}
+			};
 
-$.post(formAction, formData, function () {
-location.reload();
-});
-});
-});
-			</script>
+			window.onbeforeunload = function() {
+				if (typeof(sessionStorage) !== 'undefined') {
+					sessionStorage.setItem('scrollPosition', window.scrollY);
+				}
+			};
+		</script>
 
-<script>
-  // Stocker la position de défilement avant de quitter la page
-  window.onload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      var scrollPosition = sessionStorage.getItem('scrollPosition');
-      if (scrollPosition !== null) {
-        window.scrollTo(0, scrollPosition);
-      }
-    }
-  };
+		<script>
+			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+			tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+				new bootstrap.Tooltip(tooltipTriggerEl);
+			});
+		</script>
 
-  window.onbeforeunload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      sessionStorage.setItem('scrollPosition', window.scrollY);
-    }
-  };
-</script>
-			
+		<script>
+			document.querySelectorAll('div[data-terrain-id]').forEach(container => {
+				let mediaRecorder;
+				let audioChunks = [];
 
+				const recordBtn = container.querySelector('.btn-record');
+				const stopBtn = container.querySelector('.btn-stop');
+				const playBtn = container.querySelector('.btn-play');
+				const audioElement = container.querySelector('.audio-preview');
 
-			<script>
-				// Initialiser tous les tooltips sur la page
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-new bootstrap.Tooltip(tooltipTriggerEl);
-});
-			</script>
-		
-<script>
-document.querySelectorAll('div[data-terrain-id]').forEach(container => {
-    let mediaRecorder;
-    let audioChunks = [];
+				const idTournoi = container.dataset.tournoiId;
+				const idTerrain = container.dataset.terrainId;
 
-    const recordBtn = container.querySelector('.btn-record');
-    const stopBtn = container.querySelector('.btn-stop');
-    const playBtn = container.querySelector('.btn-play');
-    const audioElement = container.querySelector('.audio-preview');
+				recordBtn.addEventListener('click', async () => {
+					try {
+						const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+						mediaRecorder = new MediaRecorder(stream);
+						audioChunks = [];
 
-    const idTournoi = container.dataset.tournoiId;
-    const idTerrain = container.dataset.terrainId;
+						mediaRecorder.ondataavailable = event => {
+							audioChunks.push(event.data);
+						};
 
-    recordBtn.addEventListener('click', async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
+						mediaRecorder.onstop = async () => {
+							const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+							const formData = new FormData();
+							formData.append('audio', audioBlob, 'audio.wav');
+							formData.append('idTournoi', idTournoi);
+							formData.append('idTerrain', idTerrain);
 
-            mediaRecorder.ondataavailable = event => {
-                audioChunks.push(event.data);
-            };
+							const response = await fetch('upload_audio.php', {
+								method: 'POST',
+								body: formData
+							});
 
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const formData = new FormData();
-                formData.append('audio', audioBlob, 'audio.wav');
-                formData.append('idTournoi', idTournoi);
-                formData.append('idTerrain', idTerrain);
+							if (response.ok) {
+								const timestamp = new Date().getTime();
+								audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
+								playBtn.disabled = false;
+							} else {
+								alert("Erreur lors de l'enregistrement");
+							}
+						};
 
-                const response = await fetch('upload_audio.php', {
-                    method: 'POST',
-                    body: formData
-                });
+						mediaRecorder.start();
+						recordBtn.disabled = true;
+						stopBtn.disabled = false;
+						playBtn.disabled = true;
+					} catch (err) {
+						alert("Impossible d'accéder au microphone : " + err.message);
+					}
+				});
 
-                if (response.ok) {
-                    // Recharge la source audio avec un timestamp pour forcer le rechargement
-                    const timestamp = new Date().getTime();
-                    audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
-                    playBtn.disabled = false;
-                } else {
-                    alert("Erreur lors de l'enregistrement");
-                }
-            };
+				stopBtn.addEventListener('click', () => {
+					if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+						mediaRecorder.stop();
+						recordBtn.disabled = false;
+						stopBtn.disabled = true;
+					}
+				});
 
-            mediaRecorder.start();
-            recordBtn.disabled = true;
-            stopBtn.disabled = false;
-            playBtn.disabled = true;
-        } catch (err) {
-            alert("Impossible d'accéder au microphone : " + err.message);
-        }
-    });
+				playBtn.addEventListener('click', () => {
+					audioElement.play();
+				});
+			});
+		</script>
 
-    stopBtn.addEventListener('click', () => {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-            recordBtn.disabled = false;
-            stopBtn.disabled = true;
-        }
-    });
+		<script>
+			function ouvrirLectureAudio(idCreneau) {
+				const url = `lectureAudio.php?idCreneau=${idCreneau}`;
+				const options = 'width=400,height=200,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
+				window.open(url, '_blank', options);
+			}
+		</script>
 
-    playBtn.addEventListener('click', () => {
-        audioElement.play();
-    });
-});
+		<script>
+			function majHorloge() {
+				const maintenant = new Date();
+				const heures = String(maintenant.getHours()).padStart(2, '0');
+				const minutes = String(maintenant.getMinutes()).padStart(2, '0');
+				const secondes = String(maintenant.getSeconds()).padStart(2, '0');
+				document.getElementById("horloge").textContent = `${heures}:${minutes}:${secondes}`;
+			}
 
-</script>
+			majHorloge();
+			setInterval(majHorloge, 1000);
+		</script>
 
+		<script>
+			// Gérer l'indicateur de scroll sur mobile
+			document.addEventListener("DOMContentLoaded", function() {
+				const tableWrapper = document.querySelector('.table-wrapper');
+				const scrollIndicator = document.querySelector('.scroll-indicator');
+				
+				if (tableWrapper && scrollIndicator) {
+					// Fonction pour vérifier et mettre à jour l'indicateur
+					function updateScrollIndicator() {
+						const scrollLeft = tableWrapper.scrollLeft;
+						const scrollWidth = tableWrapper.scrollWidth;
+						const clientWidth = tableWrapper.clientWidth;
+						
+						// Masquer l'indicateur quand on est scrollé au maximum à droite
+						if (scrollLeft + clientWidth >= scrollWidth - 10) {
+							scrollIndicator.style.opacity = '0';
+						} else {
+							scrollIndicator.style.opacity = '1';
+						}
+					}
 
-<script>
-function ouvrirLectureAudio(idCreneau) {
-    const url = `lectureAudio.php?idCreneau=${idCreneau}`;
-    const options = 'width=400,height=200,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
-    window.open(url, '_blank', options);
-}
-</script>
-
-
-<script>
-function majHorloge() {
-    const maintenant = new Date();
-    const heures = String(maintenant.getHours()).padStart(2, '0');
-    const minutes = String(maintenant.getMinutes()).padStart(2, '0');
-    const secondes = String(maintenant.getSeconds()).padStart(2, '0');
-    document.getElementById("horloge").textContent = `${heures}:${minutes}:${secondes}`;
-}
-
-// Met à jour immédiatement puis toutes les secondes
-majHorloge();
-setInterval(majHorloge, 1000);
-</script>
-
+					// Écouter les événements de scroll
+					tableWrapper.addEventListener('scroll', updateScrollIndicator);
+					
+					// Vérifier au chargement
+					updateScrollIndicator();
+				}
+			});
+		</script>
 
 	</body>
-
 </html>

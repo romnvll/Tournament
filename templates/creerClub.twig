@@ -1,81 +1,630 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <!-- Inclure la bibliothèque htmx via CDN -->
-  <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <title>Créer un club</title>
 
-  <title>Gestion rencontre</title>
-  <style>
-    .card {
-      /* Ajout d'une ombre pour l'effet de relief */
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: box-shadow 0.3s ease-in-out;
-    }
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #6b7280;
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+        }
 
-    .card:hover {
-      /* Ombre plus marquée au survol pour un effet interactif */
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-  </style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            margin-top: 40px;
+        }
+
+        /* Card moderne */
+        .create-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+            border: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .create-card:hover {
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Header de la card */
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .card-header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .card-header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Body de la card */
+        .card-body-modern {
+            padding: 40px;
+        }
+
+        /* Form groups modernes */
+        .form-group-modern {
+            margin-bottom: 30px;
+            animation: slideInLeft 0.5s ease;
+            animation-fill-mode: both;
+        }
+
+        .form-group-modern:nth-child(1) { animation-delay: 0.1s; }
+        .form-group-modern:nth-child(2) { animation-delay: 0.2s; }
+        .form-group-modern:nth-child(3) { animation-delay: 0.3s; }
+        .form-group-modern:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-label-modern {
+            font-weight: 700;
+            color: var(--bg-dark);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label-modern i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Input moderne */
+        .modern-input {
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            width: 100%;
+            background: white;
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Select moderne */
+        .modern-select {
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            width: 100%;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234f46e5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
+        }
+
+        .modern-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* File input moderne */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-label {
+            padding: 15px 20px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 10px;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .file-input-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .file-input-text {
+            font-weight: 600;
+            color: var(--bg-dark);
+        }
+
+        .file-input-subtext {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .modern-file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-radius: 10px;
+            border-left: 4px solid var(--success-color);
+            display: none;
+        }
+
+        .file-preview.show {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-preview-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .file-preview-info {
+            flex: 1;
+        }
+
+        .file-preview-name {
+            font-weight: 700;
+            color: var(--bg-dark);
+        }
+
+        .file-preview-size {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Helper text */
+        .form-text-modern {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-text-modern i {
+            color: var(--primary-color);
+        }
+
+        /* Bouton submit moderne */
+        .submit-btn {
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .submit-btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                margin-top: 20px;
+            }
+
+            .card-body-modern {
+                padding: 25px;
+            }
+
+            .card-header-title {
+                font-size: 1.5rem;
+            }
+
+            .submit-btn {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Info badge */
+        .info-badge {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05));
+            border-left: 4px solid #06b6d4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        .info-badge-icon {
+            width: 30px;
+            height: 30px;
+            background: #06b6d4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .info-badge-text {
+            color: var(--bg-dark);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
-
 <body>
+    {{ include('header.twig') }}
 
-  {{ include('header.twig') }}
+    <div class="container-fluid main-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-xl-5">
+                <div class="create-card">
+                    <!-- Header -->
+                    <div class="card-header-modern">
+                        <h3 class="card-header-title">
+                            <div class="card-header-icon">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            Créer un club
+                        </h3>
+                    </div>
 
-  <div class="container-fluid">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="card mt-5">
-          <div class="card-header text-center">
-            <h3>Créer un club</h3>
-          </div>
-          <div class="card-body">
-            <form action="creerClub_traitement.php" method="POST" enctype="multipart/form-data">
+                    <!-- Body -->
+                    <div class="card-body-modern">
+                        <!-- Info badge -->
+                        <div class="info-badge">
+                            <div class="info-badge-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="info-badge-text">
+                                Créez un club pour regrouper vos équipes. Le logo sera affiché dans l'interface du tournoi.
+                            </div>
+                        </div>
 
-             <!-- Nouveau champ Type de sport -->
-              <div class="mb-3">
-                <label for="typeSport" class="form-label">Type de sport</label>
-                <select class="form-select" id="typeSport" name="typeSport" required>
-                  <option value="" disabled selected>-- Choisir un type de sport --</option>
-                  <!-- Boucle pour afficher les types de sport -->
-                  {% for type in listeSports %}
-                    <option value="{{ type.id }}">{{ type.nom }}</option>
-                  {% endfor %}
-                  
-                  
-                </select>
-              </div>
+                        <form action="creerClub_traitement.php" method="POST" enctype="multipart/form-data">
+                            <!-- Type de sport -->
+                            <div class="form-group-modern">
+                                <label for="typeSport" class="form-label-modern">
+                                    <i class="fa-solid fa-basketball"></i>
+                                    Type de sport
+                                </label>
+                                <select class="modern-select" id="typeSport" name="typeSport" required>
+                                    <option value="" disabled selected>-- Choisir un type de sport --</option>
+                                    {% for type in listeSports %}
+                                        <option value="{{ type.id }}">{{ type.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text-modern">
+                                    <i class="fas fa-info-circle"></i>
+                                    Sélectionnez la discipline sportive du club
+                                </div>
+                            </div>
 
-              <div class="mb-3">
-                <label for="nomduclub" class="form-label">Nom du club</label>
-                <input type="text" class="form-control" id="nomduclub" name="nomduclub" required />
-                <div id="nomduclub" class="form-text">Nom du club</div>
-              </div>
+                            <!-- Nom du club -->
+                            <div class="form-group-modern">
+                                <label for="nomduclub" class="form-label-modern">
+                                    <i class="fa-solid fa-tag"></i>
+                                    Nom du club
+                                </label>
+                                <input type="text" class="modern-input" id="nomduclub" 
+                                       name="nomduclub" placeholder="Ex: FC Barcelona" required />
+                                <div class="form-text-modern">
+                                    <i class="fas fa-info-circle"></i>
+                                    Entrez le nom officiel du club
+                                </div>
+                            </div>
 
-             
+                            <!-- Logo -->
+                            <div class="form-group-modern">
+                                <label for="logo" class="form-label-modern">
+                                    <i class="fa-solid fa-image"></i>
+                                    Logo du club
+                                </label>
+                                <div class="file-input-wrapper">
+                                    <label for="logo" class="file-input-label" id="fileLabel">
+                                        <div class="file-input-icon">
+                                            <i class="fas fa-upload"></i>
+                                        </div>
+                                        <div class="file-input-text">
+                                            Cliquez pour choisir un logo
+                                        </div>
+                                        <div class="file-input-subtext">
+                                            PNG ou JPEG (recommandé: 200x200px)
+                                        </div>
+                                    </label>
+                                    <input type="file" name="logo" id="logo" 
+                                           accept="image/png, image/jpeg" 
+                                           class="modern-file-input" />
+                                </div>
+                                <div class="file-preview" id="filePreview">
+                                    <div class="file-preview-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="file-preview-info">
+                                        <div class="file-preview-name" id="fileName"></div>
+                                        <div class="file-preview-size" id="fileSize"></div>
+                                    </div>
+                                </div>
+                            </div>
 
-              <div class="mb-3">
-                <label for="logo" class="form-label">Choisir un logo</label>
-                <input type="file" name="logo" accept="image/png, image/jpeg" class="form-control" />
-              </div>
-
-              <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-check me-2"></i> Soumettre
-              </button>
-
-            </form>
-          </div>
+                            <!-- Submit button -->
+                            <button type="submit" class="submit-btn">
+                                <span>
+                                    <i class="fas fa-check-circle"></i>
+                                    Créer le club
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+
+    <script>
+        // Gestion du fichier
+        const fileInput = document.getElementById('logo');
+        const fileLabel = document.getElementById('fileLabel');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Afficher le preview
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                filePreview.classList.add('show');
+
+                // Changer l'apparence du label
+                fileLabel.style.borderColor = 'var(--success-color)';
+                fileLabel.style.background = 'rgba(16, 185, 129, 0.05)';
+                
+                const icon = fileLabel.querySelector('.file-input-icon');
+                icon.style.background = 'linear-gradient(135deg, var(--success-color), #059669)';
+                
+                const text = fileLabel.querySelector('.file-input-text');
+                text.textContent = 'Logo sélectionné';
+                text.style.color = 'var(--success-color)';
+            }
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Animation au focus des inputs
+        document.querySelectorAll('.modern-input, .modern-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Drag and drop pour le fichier
+        const fileWrapper = document.querySelector('.file-input-wrapper');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileWrapper.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileWrapper.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileWrapper.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            fileLabel.style.borderColor = 'var(--primary-color)';
+            fileLabel.style.background = 'rgba(79, 70, 229, 0.1)';
+            fileLabel.style.transform = 'scale(1.02)';
+        }
+
+        function unhighlight(e) {
+            fileLabel.style.borderColor = '#e5e7eb';
+            fileLabel.style.background = 'var(--bg-light)';
+            fileLabel.style.transform = 'scale(1)';
+        }
+
+        fileWrapper.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            // Déclencher l'événement change
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+    </script>
 
 </body>
-
 </html>

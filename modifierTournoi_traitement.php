@@ -32,11 +32,11 @@ if ($_GET['action'] == "ajoutUserSurTable") {
     
     try {
     $personneTable->genererUrlEtCodePin($_GET['idPersonne'],$_GET['idterrain'],$_GET['tournoiId']);
-  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=tableDesPersonnes");
+  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=gestionTables");
 
     }
     catch (Exception $e) {
-  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=tableDesPersonnes");
+  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=gestionTables");
 
         echo 'Exception reçue : ',  $e->getMessage(), "\n";
     }
@@ -49,7 +49,7 @@ if ($_GET['action'] == "delPersonneTable") {
     $personneTable = new PersonneTableDao();
     $personneTable->supprimerPersonneTable($_GET['personneTableId']);
     
-    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."&tab=tableDesPersonnes");
+    header("Location:modifierTournoi.php?idTournoi=".$_GET['tournoiId']."&tab=gestionTables");
     exit(0);
 }
 
@@ -84,7 +84,7 @@ if ($_GET['action'] == "delPersonne") {
     require 'class/personneDao.class.php';
     $personne=new PersonneDao;
     $personne->supprimerPersonne($idPersonne,$idTournoi,$userData['id']);
-  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=tableDesPersonnes");
+  header("Location:  modifierTournoi.php?idTournoi=".$idTournoi."&tab=gestionTables");
     exit();
  }
  

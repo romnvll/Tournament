@@ -2,19 +2,425 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Gestion rencontre</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            /* Tournois selector */
+            .row:first-of-type .col {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                padding: 16px;
+                margin: 12px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .btn-secondary,
+            .btn-danger {
+                padding: 12px 20px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                border: none;
+                text-decoration: none;
+                display: inline-block;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .btn-secondary {
+                background: linear-gradient(135deg, #6b7280, #4b5563);
+                color: white;
+            }
+
+            .btn-danger {
+                background: linear-gradient(135deg, var(--danger-color), #dc2626);
+                color: white;
+            }
+
+            /* Poules selector */
+            .col-md-6:first-child {
+                padding: 0 12px;
+            }
+
+            .col-md-6:first-child h3 {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                padding: 16px;
+                margin: 12px 0;
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--bg-dark);
+            }
+
+            .badge.bg-secondary {
+                background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                margin-left: 10px;
+            }
+
+            .btn-primary {
+                padding: 10px 16px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 0.9rem;
+                border: none;
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+                color: white;
+                box-shadow: var(--shadow-sm);
+                margin: 4px;
+            }
+
+            /* Cacher le tableau sur mobile */
+            .table-responsive,
+            .table {
+                display: none;
+            }
+
+            /* Cards pour mobile */
+            .mobile-team-cards {
+                display: block;
+            }
+
+            /* Styles des cartes d'équipes */
+            .team-mobile-card {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                margin-bottom: 16px;
+                overflow: hidden;
+            }
+
+            .team-mobile-header {
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+                color: white;
+                padding: 14px;
+                font-size: 1.1rem;
+                font-weight: 700;
+            }
+
+            .team-mobile-stats {
+                padding: 16px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-box {
+                background: var(--bg-light);
+                padding: 12px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+                color: #6b7280;
+                margin-bottom: 4px;
+                font-weight: 600;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--bg-dark);
+            }
+
+            .team-mobile-actions {
+                padding: 16px;
+                border-top: 2px solid #e5e7eb;
+                background: var(--bg-light);
+            }
+
+            .action-label {
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #6b7280;
+                margin-bottom: 10px;
+            }
+
+            .action-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* Colonne droite */
+            .col-md-6:last-child h3 {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                padding: 16px;
+                margin: 12px;
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--bg-dark);
+            }
+
+            .col-md-6:last-child .row:first-child {
+                padding: 0 12px;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e5e7eb;
+                border-radius: 10px;
+                font-size: 1rem;
+                margin: 12px 0;
+            }
+
+            .card {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                margin: 12px;
+                overflow: hidden;
+                border: none;
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, var(--info-color), #0891b2);
+                color: white;
+                padding: 14px;
+                border: none;
+            }
+
+            .card-header .badge {
+                background: white !important;
+                color: var(--info-color);
+                font-weight: 700;
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+
+            .card-body {
+                padding: 16px;
+            }
+
+            .card-title {
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--bg-dark);
+                margin-bottom: 12px;
+            }
+
+            .card .table {
+                display: table;
+                font-size: 0.85rem;
+            }
+
+            .card .table th,
+            .card .table td {
+                padding: 8px;
+            }
+
+            .text-success {
+                color: var(--success-color) !important;
+            }
+
+            .text-danger {
+                color: var(--danger-color) !important;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            body {
+                background: #f8f9fa;
+            }
+
+            .mobile-team-cards {
+                display: none;
+            }
+
+            .row {
+                margin: 0;
+            }
+
+            .row:first-of-type {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                padding: 16px;
+                margin: 20px;
+            }
+
+            .btn-secondary,
+            .btn-danger,
+            .btn-primary {
+                border-radius: 8px;
+                font-weight: 600;
+                padding: 8px 16px;
+                margin: 4px;
+            }
+
+            .col-md-6 h3 {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--bg-dark);
+                margin: 20px 0;
+            }
+
+            .badge.bg-secondary {
+                background: #6b7280 !important;
+                padding: 6px 12px;
+                border-radius: 8px;
+                margin-left: 10px;
+            }
+
+            .table {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .table thead {
+                background: var(--bg-light);
+            }
+
+            .table th {
+                font-weight: 700;
+                color: var(--bg-dark);
+                padding: 12px;
+            }
+
+            .table td {
+                padding: 12px;
+                vertical-align: middle;
+            }
+
+            .table tbody tr:hover {
+                background: var(--bg-light);
+            }
+
+            .card {
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                border: none;
+                margin-bottom: 20px;
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, var(--info-color), #0891b2);
+                color: white;
+                border-radius: 8px 8px 0 0;
+                border: none;
+            }
+
+            .form-control {
+                border-radius: 8px;
+                border: 2px solid #e5e7eb;
+                padding: 10px;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+                border: none;
+                padding: 10px 20px;
+                font-weight: 600;
+            }
+
+            .btn-danger {
+                background: linear-gradient(135deg, var(--danger-color), #dc2626);
+                border: none;
+            }
+
+            .badge.rounded-pill {
+                padding: 8px 14px;
+                font-weight: 600;
+            }
+
+            .badge.bg-success {
+                background: var(--success-color) !important;
+            }
+
+            .badge.bg-info {
+                background: var(--info-color) !important;
+            }
+        }
+
+        /* Styles communs */
+        .badge.rounded-pill.bg-success {
+            background: linear-gradient(135deg, var(--success-color), #059669) !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            margin: 4px;
+        }
+
+        .btn-danger.btn-sm {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px;
+        }
+
+        .text-success.fw-bold {
+            color: var(--success-color) !important;
+        }
+
+        .text-danger.fw-bold {
+            color: var(--danger-color) !important;
+        }
+    </style>
 </head>
 <body>
     {{ include('header.twig') }}
-     {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-{% set today = "now"|date('Y-m-d')|date %}
+    {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+    {% set today = "now"|date('Y-m-d')|date %}
 
     <div class="row">
         <div class="col">
-
-      
             {% set lastTournoiIdParent = null %}
             {% for tournoi in TournoisDeBase %}
                 {% if tournoi.isArchived == 0 %}
@@ -27,24 +433,15 @@
                 {% endif %}
             {% endfor %}
         </div>
-
         <div class="col"></div>
     </div>
 
-
-
-    
-
     <div class="row">
-    
-    
-
-    
-
-
-           <div class="col-md-6">
-            <h3 class="text-center">Selection des poules</h3>
-            <span class="badge bg-secondary">{{ NombreEquipeParPoules }}</span>
+        <div class="col-md-6">
+            <h3 class="text-center">
+                Sélection des poules
+                <span class="badge bg-secondary">{{ NombreEquipeParPoules }}</span>
+            </h3>
           
             {% for poule in afficherLesPoules %}
                 {% set btnClass = "btn btn-primary" %}
@@ -54,6 +451,7 @@
                 <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{ poule.fk_idcategorie }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
             {% endfor %}
 
+            <!-- Desktop table -->
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
@@ -77,14 +475,12 @@
                             <td id="section-{{ equipe.id }}">
                                 {% for poule in afficherLespoulesFinales %}
                                     {% if equipe.categorie == poule.fk_idcategorie %}
-                                      <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="text-decoration-none">
-                                        <span class="badge rounded-pill bg-success text-white p-2 d-flex align-items-center">
-                                            <i class="fas fa-plus-circle me-2"></i> <!-- Icône d'ajout -->
-                                            {{ poule.nom }}
-                                        </span>
-                                    </a>
-
-
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="text-decoration-none">
+                                            <span class="badge rounded-pill bg-success text-white p-2 d-flex align-items-center">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                {{ poule.nom }}
+                                            </span>
+                                        </a>
                                     {% endif %}
                                 {% endfor %}
                             </td>
@@ -94,11 +490,9 @@
                                         <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
                                             class="btn btn-danger btn-sm d-inline-flex align-items-center"
                                             onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe de la poule ? Cela supprimera également les rencontres associées.')">
-                                              <i class="fas fa-trash-alt me-2"></i> <!-- Icône de suppression -->
-                                              <span>{{ poule.nom }}</span>
-                                          </a>
-
-                                   
+                                            <i class="fas fa-trash-alt me-2"></i>
+                                            <span>{{ poule.nom }}</span>
+                                        </a>
                                     {% endif %}
                                 {% endfor %}
                             </td>
@@ -106,6 +500,71 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Mobile cards -->
+            <div class="mobile-team-cards">
+                {% for equipe in ResultatDesPoules %}
+                    <div class="team-mobile-card" id="section-mobile-{{ equipe.id }}">
+                        <div class="team-mobile-header">
+                            {{ equipe.nom }}
+                        </div>
+                        <div class="team-mobile-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">Points</div>
+                                <div class="stat-value">{{ equipe.TotalDesPoints }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Buts marqués</div>
+                                <div class="stat-value">{{ equipe.nombreButsMarque }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Buts encaissés</div>
+                                <div class="stat-value">{{ equipe.nombreButsEncaisse }}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Différence</div>
+                                <div class="stat-value">{{ equipe.DifferenceButs }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="team-mobile-actions">
+                            <div class="action-label">
+                                <i class="fas fa-plus-circle"></i>
+                                Ajouter dans une poule
+                            </div>
+                            <div class="action-buttons">
+                                {% for poule in afficherLespoulesFinales %}
+                                    {% if equipe.categorie == poule.fk_idcategorie %}
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="badge rounded-pill bg-success">
+                                            <i class="fas fa-plus"></i>
+                                            {{ poule.nom }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            
+                            {% if equipe.poules|length > 0 %}
+                                <div class="action-label" style="margin-top: 12px;">
+                                    <i class="fas fa-times-circle"></i>
+                                    Retirer de la poule
+                                </div>
+                                <div class="action-buttons">
+                                    {% for poule in equipe.poules %}
+                                        {% if poule.is_classement == 1 %}
+                                            <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe de la poule ?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                                {{ poule.nom }}
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
         <div class="col-md-6">
@@ -117,15 +576,14 @@
                         <input type="hidden" name="categorie" value="{{ idCategorieEnCours }}">
                         <input type="text" class="form-control" id="inlineFormInputGroupUsername2" placeholder="Ex:Poule1erU15" name="pouledeClassement">
                         <button type="submit" class="btn btn-primary mb-2">Créer la poule de classement</button>
+                    </form>
                 {% else %}
                     <h3><--Choisir une poule</h3>
                 {% endif %}
             </div>
 
             <div class="row">
-            
                 {% for poule in afficherLespoulesFinales %}
-               
                     <div class="card mb-3 {% if poule.fk_idcategorie != idCategorieEnCours %}d-none{% endif %}">
                         <div class="card-header">
                             <div class="d-flex align-items-center justify-content-between p-3 border rounded shadow-sm bg-light">
@@ -134,7 +592,6 @@
                                     <i class="fas fa-plus-circle me-1"></i> Créer les rencontres
                                 </a>
                                 <div class="d-flex align-items-center">
-                              
                                     {% if poule.hasRencontres %}
                                         <span class="text-success fw-bold me-2">Rencontres créées</span>
                                         <i class="fas fa-check-circle text-success fs-4"></i>
@@ -169,10 +626,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% set nbEquipes = poule.contenu|length %}
+                                        {% set nbEquipes = poule.contenu|length %}
                                         {% set nbRencontres = (nbEquipes * (nbEquipes - 1)) // 2 %}
-                                         {{ nbRencontres }} rencontres à planifier
-
+                                        <tr>
+                                            <td colspan="5" class="text-center fw-bold">
+                                                {{ nbRencontres }} rencontres à planifier
+                                            </td>
+                                        </tr>
                                         {% for equipe in poule.contenu %}
                                             <tr>
                                                 <td>{{ equipe.nom }}</td>
@@ -189,36 +649,32 @@
                             {% endif %}
                         </div>
                     </div>
-                    
                 {% else %}
                     <p>Aucune poule finale trouvée pour ce tournoi.</p>
                 {% endfor %}
-<a href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}" class="btn btn-primary">
-    <i class="fas fa-random"></i> Placer les rencontres
-</a>
+                <a href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}" class="btn btn-primary">
+                    <i class="fas fa-random"></i> Placer les rencontres
+                </a>
             </div>
-
- 
-
-
         </div>
     </div>
-   <script>
-  // Stocker la position de défilement avant de quitter la page
-  window.onload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      var scrollPosition = sessionStorage.getItem('scrollPosition');
-      if (scrollPosition !== null) {
-        window.scrollTo(0, scrollPosition);
-      }
-    }
-  };
 
-  window.onbeforeunload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      sessionStorage.setItem('scrollPosition', window.scrollY);
-    }
-  };
-</script>
+    <script>
+        // Stocker la position de défilement avant de quitter la page
+        window.onload = function() {
+            if (typeof(sessionStorage) !== 'undefined') {
+                var scrollPosition = sessionStorage.getItem('scrollPosition');
+                if (scrollPosition !== null) {
+                    window.scrollTo(0, scrollPosition);
+                }
+            }
+        };
+
+        window.onbeforeunload = function() {
+            if (typeof(sessionStorage) !== 'undefined') {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            }
+        };
+    </script>
 </body>
 </html>

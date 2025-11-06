@@ -252,6 +252,45 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
     }
 
 
+    public function getProchainesRencontres($tournoiId)
+{
+    $query = "
+        SELECT 
+            r.id AS rencontre_id,
+            r.equipe1_id,
+            r.equipe2_id,
+            e1.nom AS equipe1_nom,
+            e2.nom AS equipe2_nom,
+            r.score1,
+            r.score2,
+            r.isTerminated,
+            c.nom AS heure,
+            t.nom AS terrain_nom,
+            a.nom AS arbitre_nom
+        FROM Rencontres r
+        JOIN Planification p ON p.rencontre_id = r.id
+        LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
+        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
+        LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
+        WHERE r.isTerminated IN (0, 2)
+          AND r.tournoi_id = :tournoiId
+        ORDER BY c.ordre ASC, r.id ASC
+        LIMIT 15
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $rencontres = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $rencontres;
+}
+
+
+
     function rencontresCategorieDejaPlanifiees($categorieId, $tournoiId) {
         // Étape 1: Récupérer les identifiants des équipes de la catégorie concernée.
         $query = "SELECT id FROM Equipes WHERE categorie = :categorieId";

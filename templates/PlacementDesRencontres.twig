@@ -7,425 +7,1060 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-  
-
-  
-  
 
     <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #6b7280;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin: 20px;
+            padding: 30px;
+        }
+
+        /* Boutons de tournois */
+        .tournament-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .tournament-btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .tournament-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tournament-btn.active {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
+
+        .tournament-btn:not(.active) {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+        }
+
+        /* Card de contrôle moderne */
+        .control-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+      .control-section {
+    display: flex;
+    flex-direction: column; /* Changé en colonne */
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--bg-light);
+}
+
+       .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%; /* Prend toute la largeur */
+}
+
+       .control-label {
+    font-weight: 600;
+    color: var(--bg-dark);
+    font-size: 0.9rem;
+    margin: 0;
+    min-width: 180px; /* Largeur fixe pour aligner les inputs */
+}
+
+
+      .modern-input {
+    padding: 8px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+    flex: 1; /* Prend l'espace restant */
+    max-width: 200px;
+}
+
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+       .modern-select {
+    padding: 8px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+    background: white;
+    cursor: pointer;
+    flex: 1; /* Prend l'espace restant */
+    max-width: 300px;
+}
+
+        .modern-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modern-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+        }
+
+        /* Stats section */
+       .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Grid responsive */
+    gap: 15px;
+    padding-top: 20px;
+}
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--bg-light), white);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
+}
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-icon.info {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--info-color);
+        }
+
+        .stat-icon.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .stat-icon.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .stat-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+        }
+
+        /* Filter input */
+        .filter-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .filter-input {
+            padding: 10px 15px;
+            border: 2px solid white;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.9rem;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            width: 250px;
+        }
+
+        /* Table moderne */
+        .modern-table-container {
+           background: white;
+    border-radius: var(--border-radius);
+    overflow-x: auto; /* Permet le scroll horizontal */
+    overflow-y: visible;
+    box-shadow: var(--shadow-md);
+    margin-top: 25px;
+    -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
+        }
+
+        .modern-table {
+           width: 100%;
+    min-width: 600px; /* Largeur minimale pour forcer le scroll si nécessaire */
+    border-collapse: separate;
+    border-spacing: 0;
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+        }
+
+        .modern-table thead th {
+            padding: 20px 15px;
+            font-weight: 600;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .terrain-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .terrain-input {
+            padding: 6px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            transition: all 0.3s;
+            max-width: 120px;
+        }
+
+        .terrain-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .terrain-delete {
+            color: var(--danger-color);
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .terrain-delete:hover {
+            transform: scale(1.2);
+        }
+
+        .add-terrain-btn {
+            background: none;
+            border: none;
+            color: var(--success-color);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-terrain-btn:hover {
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        .modern-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+            transition: all 0.3s;
+        }
+
+        .modern-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Time slot cell */
+        .timeslot-cell {
+            background: linear-gradient(135deg, var(--bg-light), white);
+            font-weight: 600;
+            color: var(--bg-dark);
+        }
+
+        .timeslot-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-input {
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            width: 80px;
+            transition: all 0.3s;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .time-action {
+            color: var(--danger-color);
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 1.3rem;
+        }
+
+        .time-action:hover {
+            transform: scale(1.2);
+        }
+
+        .time-action.add {
+            color: var(--success-color);
+        }
+
+        /* Match/Label cards */
+        .planif-cell {
+            min-height: 80px;
+            padding: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .planif-cell:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .match-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .match-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .match-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 8px 0;
+        }
+
+        .match-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .match-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .delete-match-btn {
+            color: var(--danger-color);.modern-table-container::after {
+        content: '→';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: var(--primary-color);
+        opacity: 0.5;
+        pointer-events: none;
+        animation: slideHint 2s infinite;
+    }
+    
+    @keyframes slideHint {
+        0%, 100% { transform: translateY(-50%) translateX(0); }
+        50% { transform: translateY(-50%) translateX(10px); }
+    }
+    
+    /* Masquer l'indicateur quand on a scrollé */
+    .modern-table-container.scrolled::after {
+        display: none;
+    }
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .delete-match-btn:hover {
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        .arbitre-card {
+            background: var(--bg-dark);
+            color: white;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .label-card {
+            background: var(--bg-dark);
+            color: var(--warning-color);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .empty-select:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .empty-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
         .hidden {
             display: none;
         }
-        #filter-input {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px;
-            z-index: 1000;
-            width: 150px;
-            font-size: 12px;
+
+        /* Alert moderne */
+        .modern-alert {
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-   
+        .modern-alert.danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border-left: 4px solid var(--danger-color);
+        }
 
+        .modern-alert.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .alert-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .alert-icon.danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .alert-icon.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            .modern-table-container {
+        position: relative;
+    }
+    
+    .modern-table thead th:first-child,
+    .modern-table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: white;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1); /* Ombre pour voir la séparation */
+    }
+    
+    .modern-table thead th:first-child {
+        z-index: 3; /* Plus haut pour rester au-dessus pendant le scroll */
+        background: linear-gradient(135deg, var(--bg-dark), #374151);
+    }
+    
+    .timeslot-cell {
+        background: linear-gradient(135deg, var(--bg-light), white) !important;
+    }
+
+.modern-table-container::after {
+        content: '→';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: var(--primary-color);
+        opacity: 0.5;
+        pointer-events: none;
+        animation: slideHint 2s infinite;
+    }
+    
+    @keyframes slideHint {
+        0%, 100% { transform: translateY(-50%) translateX(0); }
+        50% { transform: translateY(-50%) translateX(10px); }
+    }
+    
+    /* Masquer l'indicateur quand on a scrollé */
+    .modern-table-container.scrolled::after {
+        display: none;
+    }
+
+
+}
+
+
+            .main-container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .control-section,
+            .stats-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-container {
+                position: static;
+                margin: 10px 0;
+            }
+
+            .filter-input {
+                width: 100%;
+            }
+        }
+
+        /* Animation de chargement */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .match-card,
+        .stat-item {
+            animation: fadeIn 0.3s ease;
+        }
     </style>
-
-
-
-
-
-
 </head>
-
-
-
 
 <body>
     {{ include('header.twig') }}
-    <div class="row ml-n4">
-        <div class="col-lg-3">
+    
+    <div class="main-container">
+        <!-- Boutons de tournois -->
+        <div class="tournament-buttons">
             {% for tournoi in ListeDesTournois %}
-            {% if tournoi.isArchived == 0 %}
-            {% if tournoi.id == idTournoi %}
-            <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-danger">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
-            {% else %}
-            <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="btn btn-primary btn-sm ">{{ tournoi.nom }} <i class="fas fa-trophy"></i></a>
-            {% endif %}
-            {% endif %}
+                {% if tournoi.isArchived == 0 %}
+                    <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" 
+                       class="tournament-btn {% if tournoi.id == idTournoi %}active{% endif %}">
+                        <i class="fas fa-trophy"></i>
+                        {{ tournoi.nom }}
+                    </a>
+                {% endif %}
             {% endfor %}
         </div>
-        <div class="col-lg-12">
-           <div class="container my-4">
 
-  <div class="card shadow-sm  {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} d-none {% endif %}">
-    <div class="card-body">
+        {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+        {% set today = "now"|date('Y-m-d')|date %}
 
-      <!-- Rangée flex : chaque formulaire est un "bloc" côte-à-côte -->
-      <div class="d-flex align-items-center flex-wrap gap-3">
+        <!-- Card de contrôle -->
+        {% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
+        <div class="control-card">
+            <!-- Section des contrôles -->
+            <div class="control-section">
+                <!-- Action groupée -->
+                <form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post" class="control-group">
+                    <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                    <label for="bulkAction" class="control-label">
+                        <i class="bi bi-check2-square"></i> {{t('actionGroupee')}}
+                    </label>
+                    <select name="action" id="bulkAction" class="modern-select" required>
+                        <option value="" disabled selected>{{t('actionGroupee')}}</option>
+                        <option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
+                    </select>
+                    <button type="submit" class="modern-btn btn-primary-modern">
+                        <i class="bi bi-check-lg"></i> {{t('valider')}}
+                    </button>
+                </form>
 
-        <!-- 1) FORMULAIRE D’ACTION GROUPÉE ------------------------------- -->
-        <form id="bulkForm"
-              action="PlacementDesRencontresTraitement.php"
-              method="post"
-              class="d-inline-flex align-items-center gap-2">
+                <!-- Modification des horaires -->
+                <form action="PlacementDesRencontresTraitement.php" method="post" style="display: contents;">
+                    <div class="control-group">
+                        <label for="modifMinutes" class="control-label">
+                            <i class="bi bi-clock-history"></i> {{t('retarderLesRencontres')}}
+                        </label>
+                        <input type="number" id="modifMinutes" name="modifMinutes" 
+                               placeholder="Minutes" class="modern-input" 
+                               onfocusout="this.form.submit()">
+                    </div>
 
-          <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                    <div class="control-group">
+                        <label for="modifPasHoraire" class="control-label">
+                            <i class="bi bi-hourglass-split"></i> {{t('dureeRencontre')}}
+                        </label>
+                        <input type="number" id="modifPasHoraire" name="modifPasHoraire" 
+                               min="0" value="{{ tournoiInfo['pasHoraire'] }}" 
+                               class="modern-input"
+                               oninput="this.value = this.value < 0 ? 0 : this.value;"  
+                               onchange="this.form.submit()">
+                    </div>
 
-          <label for="bulkAction" class="mb-0">{{t('actionGroupee')}}</label>
+                    <input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
+                    <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                </form>
 
-          <select name="action"
-                  id="bulkAction"
-                  class="form-select form-select-sm"
-                  required>
-            <option value="" disabled selected>{{t('actionGroupee')}}</option>
-            <option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
-          </select>
+                <div class="stat-item">
+                    <div class="stat-icon info">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-label">
+                            <a href="GererLabels.php?id_tournoi={{idTournoi}}" style="text-decoration: none;">{{t('labels')}}</a>
+                        </span>
+                        <span class="stat-value">{{nombreDeLabel | length}}</span>
+                    </div>
+                </div>
+            </div>
 
-          <button type="submit" class="btn btn-outline-primary btn-sm">
-            {{t('valider')}}
-          </button>
-        </form>
-        <!-- /fin bulkForm -->
+            <!-- Section des statistiques -->
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-icon info">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{t('planifiee')}}</span>
+                        <span class="stat-value">{{ nombreDeRencontresPlanifiee }}</span>
+                    </div>
+                </div>
 
+                <div class="stat-item">
+                    <div class="stat-icon success">
+                        <i class="bi bi-list-ol"></i>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{t('total')}}</span>
+                        <span class="stat-value">{{ nombreRencontreAPlanifier }}</span>
+                    </div>
+                </div>
 
-        <!-- 2) FORMULAIRE MODIFICATION DES HORAIRES  -->
-        <form action="PlacementDesRencontresTraitement.php"
-              method="post"
-              class="d-inline-flex align-items-center flex-wrap gap-3">
+                <div class="stat-item">
+                    <div class="stat-icon warning">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{t('restantes')}}</span>
+                        <span class="stat-value">{{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
+                    </div>
+                </div>
 
-          <!-- Retarder les rencontres -->
-          <div class="d-flex align-items-center">
-            <label for="modifMinutes" class="form-label mb-0 me-2">
-              {{t('retarderLesRencontres')}}&nbsp;:
-            </label>
-            <input type="number"
-                   id="modifMinutes"
-                   name="modifMinutes"
-                   placeholder="Minutes"
-                   class="form-control form-control-sm"
-                   style="width: 100px;"
-                   onfocusout="this.form.submit()">
-          </div>
-
-          <!-- Ajuster le pas horaire -->
-          <div class="d-flex align-items-center">
-            <label for="modifPasHoraire" class="form-label mb-0 me-2">
-              {{t('dureeRencontre')}}:
-            </label>
-            <input type="number"
-                   id="modifPasHoraire"
-                   name="modifPasHoraire"
-                   min="0"
-                   value="{{ tournoiInfo['pasHoraire'] }}"
-                   class="form-control form-control-sm"
-                   style="width: 100px;"
-                  oninput="this.value = this.value < 0 ? 0 : this.value;"  
-
-                   onchange="this.form.submit()">
-          </div>
-
-          <!-- Champs cachés communs -->
-          <input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
-          <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
-        </form>
-        <!-- /fin deuxième formulaire  -->
- <div class="d-flex align-items-center">
-                                    <i class="bi bi-info-circle-fill me-2 text-info"></i>
-                                    <span><strong><a href="GererLabels.php?id_tournoi={{idTournoi}}">{{t('labels')}} :</a></strong> {{nombreDeLabel | length}}</span>
-                                </div>
-      </div><!-- /.d-flex -->
-      
-  <div class="d-flex align-items-center mt-3 gap-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-calendar-check me-2 text-info"></i>
-                                    <span><strong>{{t('planifiee')}} :</strong> {{ nombreDeRencontresPlanifiee }}</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-list-ol me-2 text-success"></i>
-                                    <span><strong>{{t('total')}} :</strong> {{ nombreRencontreAPlanifier }}</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-exclamation-circle me-2 text-warning"></i>
-                                    <span><strong>{{t('restantes')}} :</strong> {{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
-                                </div>
-                                     <div class="d-flex align-items-center">
-
-                               
-                                    </div>
-                                <div class="d-flex align-items-center">
-    <a href="#"
-       data-bs-toggle="tooltip"
-       data-bs-placement="top"
-       title="Le temps estimé est calculé en multipliant le nombre de rencontres à planifier par le pas horaire du tournoi et le tout divisé par le nombre de terrain">
-        <i class="bi bi-clock me-2 text-info"></i>
-    </a>
-    <span><strong>{{t('tempsEstimeDuTournoi')}} :</strong>
-        {% set timeInMinutes = (nombreRencontreAPlanifier * tournoiInfo.pasHoraire) / terrains|length %}
-        {% set hours = timeInMinutes // 60 %}
-        {% set minutes = timeInMinutes % 60 %}
-        {{ hours }} {{t('heures')}} {{ minutes }} {{t('minutes')}}
-    </span>      
-    </div>
-  </div>
-</div>
-
-
-                               
-                            </div>
-                        </form>
+                <div class="stat-item">
+                    <div class="stat-icon info">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="stat-text">
+                        <span class="stat-label">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Le temps estimé est calculé en multipliant le nombre de rencontres à planifier par le pas horaire du tournoi et le tout divisé par le nombre de terrain"
+                               style="text-decoration: none; color: inherit;">
+                                {{t('tempsEstimeDuTournoi')}}
+                            </a>
+                        </span>
+                        <span class="stat-value">
+                            {% set timeInMinutes = (nombreRencontreAPlanifier * tournoiInfo.pasHoraire) / terrains|length %}
+                            {% set hours = timeInMinutes // 60 %}
+                            {% set minutes = timeInMinutes % 60 %}
+                            {{ hours }}h {{ minutes }}min
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-       
 
-{% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-  {% set today = "now"|date('Y-m-d')|date %}
-
-
-        
-        <table class="table ms-1 {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %} d-none {% endif %}" id="planification-table">
-            <thead>
-                <tr>
-                    <th scope="col">{{t('heureDesRencontres')}}</th>
-                                        {% for i in 0..terrains|length - 1 %}
-                     <th scope="col" class="sticky-top bg-white" style="z-index: 1;">
-                        <form id="terrain{{i}}">
-                            <input type="hidden" name="terrain_id" value="{{terrains[i]['terrain_id']}}">
-                            <input type="text" class="form-control form-control-sm" value="{{terrains[i]['nom']}}" name="nomTerrain"
-                                maxlength="10"
-                                hx-post="PlacementDesRencontresTraitement.php"
-                                hx-trigger="change"
-                                hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']"
-                            >
-                            <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}">
-                                <p class="text-danger"><i class="fa fa-minus-circle fa-sm" aria-hidden="true"></i></p>
-                            </a>
-                        </form>
-                    </th>
-
-                    {% endfor %}
-                    <th scope="col"><a href="PlacementDesRencontresTraitement.php?action=addTerrain&idTournoi={{idTournoi}}"><h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2></a></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for creneau in listCreneaux %}
-                <tr>
-                    <td class="col-md-1 align-middle text-center">
-                        <div class="d-flex flex-column align-items-center gap-1">
-
-                            <!-- Bouton supprimer (en haut) -->
-                            <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}&tournoiId={{idTournoi}}&pas={{tournoiInfo.pasHoraire}}"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="{{t('supprimerCreneau')}}"
-                            class="text-danger">
-                                <i class="fa fa-minus-circle fa-lg" aria-hidden="true"></i>
-                            </a>
-
-                            <!-- Champ modifiable de l'heure -->
-                            <input type="text" name="creneau" class="form-control text-center p-1"
-                                value="{{ creneau.nom|slice(0, -3) }}" size="4"
-                                hx-post="PlacementDesRencontresTraitement.php"
-                                hx-trigger="change"
-                                hx-target="this"
-                                hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
-                                pattern="^([01]\d|2[0-3]):[0-5]\d$"
-                                title="Veuillez entrer une heure au format HH:MM (par exemple, 09:12 ou 14:30)."
-                            >
-
-                            <!-- Champ caché -->
-                            <input type="hidden" name="idTournoi" value="{{idTournoi}}">
-
-                            <!-- Bouton ajouter (en bas) -->
-                            <a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom"
-                            title="{{t('insererCreneau')}}"
-                            class="text-success">
-                                <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i>
-                            </a>
-                        </div>
-                    </td>
-
-                    {% set Displayed = false %}
-                    {% for j in 0..terrains|length - 1 %}
-
-
-                    {# Trouver la planification correspondante #}
-                       {% set couleurDeFond = '#ffffff' %} {# Valeur par défaut #}
-                            {% for planification in afficherPlanification %}
-                                {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
-                                    {% if planification.label_couleur is not empty %}
-                                        {% set couleurDeFond = planification.label_couleur %}
-                                    {% else %}
-                                        {% set couleurDeFond = planification.equipe1_categorie_couleur %}
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-
-
-
-                    <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"  style="background-color: {{ couleurDeFond }}" class="planif-item">
-
-                    
-                        {% set planificationFound = false %}
-                        {% set creneauOqp = false %}
-                        {% set maCouleurDeFond = planification.equipe1_categorie_couleur %}
-                        {% for planification in afficherPlanification %}
-                            {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id  %}
-                                {% set planificationFound = true %}
-                                {% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null   %}
-                                    {% if planification.arbitre_id is not null and  tournoiInfo.gestionArbitres == 1 %}
-                                    
-                                     <div class="d-flex align-items-center bg-dark text-light p-2 rounded">
-                                        <!-- Icône calendrier à gauche -->
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
-                                            class="text-danger me-3">
-                                            <i class="fas fa-calendar-times fa-lg"></i>
+        <!-- Table de planification -->
+        <div class="modern-table-container">
+            <table class="modern-table" id="planification-table">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">{{t('heureDesRencontres')}}</th>
+                        {% for i in 0..terrains|length - 1 %}
+                            <th>
+                                <div class="terrain-header">
+                                    <form id="terrain{{i}}">
+                                        <input type="hidden" name="terrain_id" value="{{terrains[i]['terrain_id']}}">
+                                        <input type="text" class="terrain-input" 
+                                               value="{{terrains[i]['nom']}}" 
+                                               name="nomTerrain"
+                                               maxlength="10"
+                                               hx-post="PlacementDesRencontresTraitement.php"
+                                               hx-trigger="change"
+                                               hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']">
+                                        <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}"
+                                           class="terrain-delete">
+                                            <i class="fa fa-minus-circle"></i>
                                         </a>
+                                    </form>
+                                </div>
+                            </th>
+                        {% endfor %}
+                        <th>
+                            <a href="PlacementDesRencontresTraitement.php?action=addTerrain&idTournoi={{idTournoi}}"
+                               class="add-terrain-btn">
+                                <i class="fa fa-plus-circle"></i>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for creneau in listCreneaux %}
+                        <tr>
+                            <td class="timeslot-cell">
+                                <div class="timeslot-controls">
+                                    <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}&tournoiId={{idTournoi}}&pas={{tournoiInfo.pasHoraire}}"
+                                       data-bs-toggle="tooltip" title="{{t('supprimerCreneau')}}"
+                                       class="time-action">
+                                        <i class="fa fa-minus-circle"></i>
+                                    </a>
 
-                                        <!-- Texte arbitre -->
-                                        <p class="mb-0">
-                                            <i class="fas fa-user-tie"></i>
-                                            <i class="material-icons me-2" style="font-size: 20px;">sports</i>
-                                            {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
-                                        </p>
-                                        </div>
+                                    <input type="text" name="creneau" class="time-input"
+                                           value="{{ creneau.nom|slice(0, -3) }}"
+                                           hx-post="PlacementDesRencontresTraitement.php"
+                                           hx-trigger="change"
+                                           hx-target="this"
+                                           hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
+                                           pattern="^([01]\d|2[0-3]):[0-5]\d$"
+                                           title="Format HH:MM">
 
-                                    {% else %}
-                                   {% if tournoiInfo.gestionArbitres == 1 %}
-                                       <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
-                                            <select class="form-select"  name="Addevent" id="listeArbitre">
-                                             <option value="">{{t('choisirArbitre')}}</option>
-                                                {% for arbitre in listeDesArbitres %}
-                                                <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}' >
-                                                   {% if arbitre.nom is not empty %} {{t('arbitre')}}: {{arbitre.nom}} ({{arbitre.nombre_matchs}}) {% endif %}  {{t('club')}}: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
-                                                </option>
+                                    <input type="hidden" name="idTournoi" value="{{idTournoi}}">
+
+                                    <a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}"
+                                       data-bs-toggle="tooltip" title="{{t('insererCreneau')}}"
+                                       class="time-action add">
+                                        <i class="fa fa-plus-circle"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                            {% for j in 0..terrains|length - 1 %}
+                                {% set couleurDeFond = '#ffffff' %}
+                                {% for planification in afficherPlanification %}
+                                    {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+                                        {% if planification.label_couleur is not empty %}
+                                            {% set couleurDeFond = planification.label_couleur %}
+                                        {% else %}
+                                            {% set couleurDeFond = planification.equipe1_categorie_couleur %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" 
+                                    style="background-color: {{ couleurDeFond }}" 
+                                    class="planif-cell planif-item">
+                                    
+                                    {% set planificationFound = false %}
+                                    {% set creneauOqp = false %}
+                                    
+                                    {% for planification in afficherPlanification %}
+                                        {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+                                            {% set planificationFound = true %}
+                                            
+                                            {% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null %}
+                                                
+                                                <!-- Arbitre -->
+                                                {% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
+                                                    <div class="arbitre-card">
+                                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                           class="delete-match-btn">
+                                                            <i class="fas fa-calendar-times"></i>
+                                                        </a>
+                                                        <div>
+                                                            <i class="fas fa-user-tie"></i>
+                                                            <i class="material-icons" style="font-size: 20px;">sports</i>
+                                                            {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    {% if tournoiInfo.gestionArbitres == 1 %}
+                                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
+                                                            <select class="empty-select" name="Addevent">
+                                                                <option value="">{{t('choisirArbitre')}}</option>
+                                                                {% for arbitre in listeDesArbitres %}
+                                                                    <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
+                                                                        {% if arbitre.nom is not empty %}{{t('arbitre')}}: {{arbitre.nom}} ({{arbitre.nombre_matchs}}){% endif %} {{t('club')}}: {{arbitre.club_nom}} ({{arbitre.nombre_matchs_club}})
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </form>
+                                                    {% endif %}
+                                                {% endif %}
+
+                                                <!-- Rencontre -->
+                                                {% if planification.rencontre_id is not null %}
+                                                    <div class="match-card">
+                                                        <div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
+                                                            {% if planification.isClassement == 1 %}
+                                                                <span><i class="fa fa-trophy"></i> Phase finale</span>
+                                                            {% else %}
+                                                               {{ planification.poule_nom }}</span>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="match-text">
+                                                            {% if planification.isClassement == 0 %}
+                                                                <strong>Tour {{planification.tour}}</strong> - {{planification.equipe1_categorie_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+                                                            {% elseif planification.isClassement == 1 %}
+                                                                <strong>PF Tour {{planification.tour}}</strong> - {{planification.equipe1_categorie_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="match-actions">
+                                                            <input type="checkbox"
+                                                                   class="match-checkbox form-check-input"
+                                                                   id="rencontreCheck{{ planification.planification_id }}"
+                                                                   name="rencontreCheck[]"
+                                                                   value="{{ planification.planification_id }}"
+                                                                   form="bulkForm">
+
+                                                            <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}&rencontreId={{ planification.rencontre_id }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                               class="delete-match-btn"
+                                                               data-bs-toggle="tooltip"
+                                                               title="Supprimer cette planification">
+                                                                <i class="fas fa-calendar-times"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    {% set creneauOqp = true %}
+                                                {% endif %}
+
+                                                <!-- Label -->
+                                                {% if planification.label_id is not null %}
+                                                    <div class="label-card">
+                                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                           class="delete-match-btn">
+                                                            <i class="fas fa-calendar-times"></i>
+                                                        </a>
+                                                        <div>
+                                                            {{ planification.label_description }}
+                                                        </div>
+                                                    </div>
+                                                    {% set creneauOqp = true %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <!-- Sélecteur vide -->
+                                    {% if creneauOqp == false %}
+                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
+                                            <select class="empty-select" name="Addevent">
+                                                <option value="">{{t('choisirRencontreOuLabel')}}</option>
+                                                {% for planif in planificationSansCreneauNiTerrain %}
+                                                    {% if planif.isClassement == 0 %}
+                                                        <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
+                                                            tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom|split(' - ')[1] }}
+                                                        </option>
+                                                    {% elseif planif.isClassement == 1 %}
+                                                        <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
+                                                            PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom }}
+                                                        </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% for label in libelleParTournoi %}
+                                                    <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>
+                                                        {{t('label')}}: {{label.description}}
+                                                    </option>
                                                 {% endfor %}
                                             </select>
                                         </form>
-                                     {% endif %}
                                     {% endif %}
-                                    {% if planification.rencontre_id is not null  %}
-                                        {% if planification.isClassement == 0 %}
-                                        
-                                            <p class="card-text">tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} -  {{ planification.poule_nom }}  </p>
-                                        {% elseif planification.isClassement == 1 %}
-                                       
-                                            <p class="card-text"><i class="fa fa-trophy" aria-hidden="true"></i> PF-tour{{planification.tour}}-{{planification.equipe1_categorie_nom}}-{{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} vs {{planification.equipe2_nom}} - {{ planification.poule_nom }} </p>
-                                        {% endif %}
-                                          <!-- Groupe case à cocher + action planification -->
-                            <div class="d-flex align-items-center gap-3">
-                          
-
-            <!-- La checkbox (cachée ou non) -->
-            <input type="checkbox"
-                class="form-check-input me-2"
-                id="rencontreCheck{{ planification.planification_id }}"
-                name="rencontreCheck[]"
-                value="{{ planification.planification_id }}"
-                form="bulkForm">
-
-            <!-- (mets ici le texte ou les icônes que tu veux) -->
-            {{ planification.label_description }}
-       
-
-  <!-- Le lien calendrier reste à droite et ne déclenche PAS le label -->
-  <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}&rencontreId={{ planification.rencontre_id }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
-     class="text-danger"
-     data-bs-toggle="tooltip"
-     title="Supprimer uniquement cette planification">
-    <i class="fas fa-calendar-times fa-lg"></i>
-  </a>
-</div>
-
-
-
-                                        {% set creneauOqp = true %}
-                                    {% endif %}
-                                {% endif %}  
-                               {% if planification.label_id is not null %}
-                                        
-                                   <div class="d-flex align-items-center bg-dark text-warning p-2 rounded">
-                                        <!-- Icône calendrier à gauche -->
-                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
-                                            class="text-danger me-3">
-                                            <i class="fas fa-calendar-times fa-lg"></i>
-                                        </a>
-
-                                        <!-- Description du label -->
-                                        <p class="mb-0">
-                                            {{ planification.label_description }}
-                                        </p>
-                                        </div>
-
-                            {% set creneauOqp = true %}
-
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if creneauOqp == false %}
-                            <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel" >
-                           
-                                <select class="form-select basic"   name="Addevent" >
-                                    <option value="">{{t('choisirRencontreOuLabel')}}</option>
-                                    {% for planif in planificationSansCreneauNiTerrain %}
-                                        {% if planif.isClassement == 0 %}
-                                            <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}}  {{ planif.equipe1_poule_nom|split(' - ')[1] }} </option>
-                                        {% elseif planif.isClassement == 1 %}
-                                            <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom }} </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% for label in libelleParTournoi %}
-                                    
-                                        <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>{{t('label')}}: {{label.description}}</option>
-                                    {% endfor %}
-                                </select>
-                            </form>
-                        {% endif %}
-                    </td>
+                                </td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <td>
-                    <a id="add-creneau-link"
-                       href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}">
-                        <h2><p class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i></p></h2>
-                    </a>
-                    <span id="bottom"></span>
-                </td>
-            </tfoot>
-        </table>
-    </div>
-    <input type="text" id="filter-input" placeholder="{{t('filtre')}}...">
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="100%">
+                            <div style="text-align: center; padding: 20px;">
+                                <a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}"
+                                   class="add-terrain-btn">
+                                    <i class="fa fa-plus-circle"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% endif %}
 
-
-         {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}  
-         <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="alert alert-danger" role="alert">
+        <!-- Alertes -->
+        {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}
+            <div class="modern-alert danger">
+                <div class="alert-icon danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
                     <strong>{{t('attention')}}</strong> {{t('limiteAtteinteMessage')}}.
                 </div>
             </div>
-         
-         {% endif %}
+        {% endif %}
+    
+        {% if dateFin <= today %}
+            <div class="modern-alert warning">
+                <div class="alert-icon warning">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+                <div>
+                    <strong>Attention :</strong> La date de fin de votre licence est dépassée. Vous ne pouvez plus planifier de rencontres.
+                </div>
+            </div>
+        {% endif %}
+    </div>
 
+    <!-- Filter input -->
+    <div class="filter-container">
+        <input type="text" id="filter-input" class="filter-input" placeholder="🔍 {{t('filtre')}}...">
+    </div>
 
-
-
-{% if dateFin > today %}
-
-
-    <div class="alert alert-warning mt-3">  
-        <strong>Attention :</strong> La date de fin de votre licence est dépassée. Vous ne pouvez plus planifier de rencontres.     
-        </div>
-{% endif %}
-
+    <!-- Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const filterInput = document.getElementById('filter-input');
@@ -459,7 +1094,17 @@
 
     <script>
         $(document).ready(function() {
-            $('.rencontreLabel .form-select').on('change', function() {
+            $('.rencontreLabel .form-select, .rencontreLabel .empty-select').on('change', function() {
+                var $form = $(this).closest('form');
+                var formAction = $form.attr('action');
+                var formData = $form.serialize();
+
+                $.post(formAction, formData, function() {
+                    location.reload();
+                });
+            });
+
+            $('.arbitreForm .form-select, .arbitreForm .empty-select').on('change', function() {
                 var $form = $(this).closest('form');
                 var formAction = $form.attr('action');
                 var formData = $form.serialize();
@@ -469,20 +1114,6 @@
                 });
             });
         });
-
-
-
-           $(document).ready(function() {
-        $('.arbitreForm .form-select').on('change', function() {
-            var $form = $(this).closest('form');
-            var formAction = $form.attr('action');
-            var formData = $form.serialize();
-
-            $.post(formAction, formData, function() {
-                location.reload();
-            });
-        });
-    });
     </script>
 
     <script>
@@ -491,7 +1122,7 @@
                 const value = e.target.value;
                 const regex = /^([01]\d|2[0-3]):[0-5]\d$/;
                 if (!regex.test(value) && value.length >= 5) {
-                    alert('Please enter a valid time in HH:MM format (e.g., 09:12 or 14:30).');
+                    alert('Veuillez entrer une heure au format HH:MM (ex: 09:12 ou 14:30).');
                     e.target.value = value.slice(0, -1);
                 }
             });
@@ -500,50 +1131,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("DOM fully loaded and parsed");
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            console.log("Tooltip elements:", tooltipTriggerList);
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                console.log("Initializing tooltip for element:", tooltipTriggerEl);
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             })
         });
     </script>
 
+    <script>
+        window.onload = function() {
+            if (typeof(sessionStorage) !== 'undefined') {
+                var scrollPosition = sessionStorage.getItem('scrollPosition');
+                if (scrollPosition !== null) {
+                    window.scrollTo(0, scrollPosition);
+                }
+            }
+        };
 
-<script>
-  // Stocker la position de défilement avant de quitter la page
-  window.onload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      var scrollPosition = sessionStorage.getItem('scrollPosition');
-      if (scrollPosition !== null) {
-        window.scrollTo(0, scrollPosition);
-      }
-    }
-  };
+        window.onbeforeunload = function() {
+            if (typeof(sessionStorage) !== 'undefined') {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            }
+        };
+    </script>
 
-  window.onbeforeunload = function() {
-    if (typeof(sessionStorage) !== 'undefined') {
-      sessionStorage.setItem('scrollPosition', window.scrollY);
-    }
-  };
-</script>
+    <script>
+        document.querySelectorAll('.planif-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            
+            if (checkbox) {
+                item.addEventListener('click', e => {
+                    if (e.target.closest('a')) return;
+                    if (e.target.tagName === 'SELECT') return;
+                    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') return;
+                    
+                    checkbox.checked = !checkbox.checked;
+                });
+            }
+        });
+    </script>
 
-<script>
-document.querySelectorAll('.planif-item').forEach(item => {
-  const checkbox = item.querySelector('input[type="checkbox"]');
-
-  item.addEventListener('click', e => {
-    // Si on clique sur le lien (ou son icône), on ne touche pas à la case
-    if (e.target.closest('a')) return;
-
-    checkbox.checked = !checkbox.checked;   // toggle
-  });
-});
-</script>
-
-
-
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
