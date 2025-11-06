@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiche Tournoi A5 - Recto-Verso</title>
+    <style>
+        @page {
+            size: A5;
+            margin: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .page {
+            width: 148mm;
+            height: 210mm;
+            padding: 15mm;
+            box-sizing: border-box;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* RECTO */
+        .recto {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 200px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+        
+        .recto h1 {
+            font-size: 42px;
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .recto .trophy {
+            font-size: 80px;
+            margin: 20px 0;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        
+        .recto .subtitle {
+            font-size: 24px;
+            margin: 15px 0;
+            font-weight: 300;
+        }
+        
+        .recto .tagline {
+            font-size: 16px;
+            font-style: italic;
+            margin-top: 30px;
+            opacity: 0.9;
+        }
+        
+        /* VERSO */
+        .verso {
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .verso h2 {
+            color: #667eea;
+            font-size: 28px;
+            margin: 0 0 20px 0;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .feature-box {
+            background: white;
+            border-left: 4px solid #764ba2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .feature-box h3 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .feature-box p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .contact-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .contact-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        
+        .contact-section p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+            }
+            .page {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- RECTO -->
+    <div class="page recto">
+        <img src="logo.png" alt="Brackito Logo" class="logo">
+        <div class="trophy">🏆</div>
+        <h1>Gestion de<br>Tournoi</h1>
+        <div class="subtitle">Solution Complète</div>
+        <div class="tagline">Organisez vos compétitions en toute simplicité</div>
+    </div>
+    
+    <!-- VERSO -->
+    <div class="page verso">
+        <h2>Fonctionnalités</h2>
+        
+        <div class="feature-box">
+            <h3>📋 Organisation Simplifiée</h3>
+            <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
+        </div>
+        
+        <div class="feature-box">
+            <h3>👥 Gestion des Participants</h3>
+            <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
+        </div>
+        
+        <div class="feature-box">
+            <h3>📊 Tableaux & Classements</h3>
+            <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
+                        <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
+
+        </div>
+        
+                
+        <div class="feature-box">
+            <h3>🔉 Vous êtes timide?</h3>
+            <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous</p>    
+        </div>
+
+        <div class="contact-section">
+            <h3>Contactez-nous</h3>
+            <p>📧 romain@brackito.net</p>
+            <p>📞 06 79 77 49 35</p>
+            <p>🌐 www.brackito.net</p>
+        </div>
+    </div>
+
+    <script>
+        // Instructions pour l'impression
+        window.onload = function() {
+            console.log('Pour imprimer : Ctrl+P ou Cmd+P');
+            console.log('Configurez l\'impression en A5 recto-verso');
+        };
+    </script>
+</body>
+</html>
