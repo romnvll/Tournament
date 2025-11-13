@@ -846,7 +846,7 @@
                 {% endif %}
 
                 <!-- Club Selection -->
-                {% if idTournoi and visibility == 1 and not IdClub %}
+                {% if idTournoi and visibility == 1 and not IdClub and affichageByTerrain is not defined %}
                     <div class="card-modern choisirClub">
                         <div class="card-header-modern">
                             <i class="fas fa-users"></i>
@@ -885,7 +885,7 @@
                 {% endif %}
 
                 <!-- Team Selection -->
-                {% if idTournoi and IdClub and visibility == 1 %}
+                {% if idTournoi and IdClub and visibility == 1  %}
                     <div class="card-modern choisirEquipe">
                         <div class="card-header-modern">
                             <i class="fas fa-users"></i>
@@ -967,6 +967,17 @@
                             {{ getNomEquipeCourant }}
                             <i class="fas fa-chevron-right"></i>
                         </a>
+                    </div>
+                {% endif %}
+
+
+                <!-- Terrain Matches -->
+                {% if  affichageByTerrain %}
+                    <div class="card-modern">
+                        <div class="card-header-modern">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Rencontres par terrain 
+                        </div>
                     </div>
                 {% endif %}
 
