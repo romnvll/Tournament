@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affiche Tournoi A5 - Recto-Verso</title>
+    <title>2 Flyers A5 Recto-Verso sur A4</title>
     <style>
         @page {
-            size: A5;
+            size: A4 landscape;
             margin: 0;
         }
         
@@ -17,17 +17,28 @@
         }
         
         .page {
-            width: 148mm;
+            width: 297mm;
+            height: 210mm;
+            display: flex;
+            flex-direction: row;
+            page-break-after: always;
+        }
+        
+        .flyer {
+            width: 148.5mm;
             height: 210mm;
             padding: 15mm;
             box-sizing: border-box;
-            page-break-after: always;
             position: relative;
             overflow: hidden;
         }
         
+        .flyer:first-child {
+            border-right: 1px dashed #999;
+        }
+        
         /* RECTO */
-        .recto {
+        .recto-flyer {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             display: flex;
@@ -38,91 +49,95 @@
         }
         
         .logo {
-            width: 200px;
+            width: 180px;
             margin-bottom: 20px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
         }
         
-        .recto h1 {
-            font-size: 42px;
-            margin: 0 0 20px 0;
+        .recto-flyer h1 {
+            font-size: 38px;
+            margin: 0 0 18px 0;
             text-transform: uppercase;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .recto .trophy {
-            font-size: 80px;
-            margin: 20px 0;
+        .trophy {
+            font-size: 70px;
+            margin: 18px 0;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
         
-        .recto .subtitle {
-            font-size: 24px;
-            margin: 15px 0;
+        .subtitle {
+            font-size: 22px;
+            margin: 12px 0;
             font-weight: 300;
         }
         
-        .recto .tagline {
-            font-size: 16px;
+        .tagline {
+            font-size: 15px;
             font-style: italic;
-            margin-top: 30px;
+            margin-top: 25px;
             opacity: 0.9;
         }
         
         /* VERSO */
-        .verso {
+        .verso-flyer {
             background: #f8f9fa;
             color: #333;
         }
         
-        .verso h2 {
+        .verso-flyer h2 {
             color: #667eea;
-            font-size: 28px;
-            margin: 0 0 20px 0;
+            font-size: 26px;
+            margin: 0 0 18px 0;
             text-align: center;
             border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
         
         .feature-box {
             background: white;
             border-left: 4px solid #764ba2;
-            padding: 15px;
-            margin: 15px 0;
+            padding: 12px;
+            margin: 12px 0;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .feature-box h3 {
             color: #667eea;
-            margin: 0 0 10px 0;
-            font-size: 18px;
+            margin: 0 0 8px 0;
+            font-size: 16px;
         }
         
         .feature-box p {
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.6;
+            margin: 0 0 5px 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .feature-box p:last-child {
+            margin-bottom: 0;
         }
         
         .contact-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 15px;
             text-align: center;
         }
         
         .contact-section h3 {
-            margin: 0 0 10px 0;
-            font-size: 20px;
+            margin: 0 0 8px 0;
+            font-size: 18px;
         }
         
         .contact-section p {
-            margin: 5px 0;
-            font-size: 14px;
+            margin: 4px 0;
+            font-size: 13px;
         }
         
         @media print {
@@ -136,55 +151,99 @@
     </style>
 </head>
 <body>
-    <!-- RECTO -->
-    <div class="page recto">
-        <img src="logo.png" alt="Brackito Logo" class="logo">
-        <div class="trophy">🏆</div>
-        <h1>Gestion de<br>Tournoi</h1>
-        <div class="subtitle">Solution Complète</div>
-        <div class="tagline">Organisez vos compétitions en toute simplicité</div>
+    <!-- PAGE 1 : RECTO (2 flyers identiques côte à côte) -->
+    <div class="page">
+        <div class="flyer recto-flyer">
+            <img src="Logo.png" alt="Brackito Logo" class="logo">
+            <div class="trophy">🏆</div>
+            <h1>Gestion de<br>Tournoi</h1>
+            <div class="subtitle">Solution Complète</div>
+            <div class="tagline">Organisez vos compétitions de type bracket en toute simplicité</div>
+        </div>
+        
+        <div class="flyer recto-flyer">
+            <img src="Logo.png" alt="Brackito Logo" class="logo">
+            <div class="trophy">🏆</div>
+            <h1>Gestion de<br>Tournoi</h1>
+            <div class="subtitle">Solution Complète</div>
+            <div class="tagline">Organisez vos compétitions de type bracket en toute simplicité</div>
+        </div>
     </div>
     
-    <!-- VERSO -->
-    <div class="page verso">
-        <h2>Fonctionnalités</h2>
-        
-        <div class="feature-box">
-            <h3>📋 Organisation Simplifiée</h3>
-            <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
-        </div>
-        
-        <div class="feature-box">
-            <h3>👥 Gestion des Participants</h3>
-            <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
-        </div>
-        
-        <div class="feature-box">
-            <h3>📊 Tableaux & Classements</h3>
-            <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
-                        <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
+    <!-- PAGE 2 : VERSO (2 flyers inversés pour bord long) -->
+    <div class="page">
+        <div class="flyer verso-flyer">
+            <h2>Fonctionnalités</h2>
+            
+            <div class="feature-box">
+                <h3>📋 Organisation Simplifiée</h3>
+                <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>👥 Gestion des Participants</h3>
+                <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>📊 Tableaux & Classements</h3>
+                <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
+                <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>🫣 Vous êtes timide?</h3>
+                <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous 🔉</p>    
+            </div>
 
+            <div class="contact-section">
+                <h3>Contactez-nous</h3>
+                <p>📧 romain@brackito.net</p>
+                <p>📞 06 79 77 49 35</p>
+                <p>🌐 www.brackito.net</p>
+            </div>
         </div>
         
-                
-        <div class="feature-box">
-            <h3>🔉 Vous êtes timide?</h3>
-            <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous</p>    
-        </div>
+        <div class="flyer verso-flyer">
+            <h2>Fonctionnalités</h2>
+            
+            <div class="feature-box">
+                <h3>📋 Organisation Simplifiée</h3>
+                <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>👥 Gestion des Participants</h3>
+                <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>📊 Tableaux & Classements</h3>
+                <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
+                <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>🫣 Vous êtes timide?</h3>
+                <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous 🔉</p>    
+            </div>
 
-        <div class="contact-section">
-            <h3>Contactez-nous</h3>
-            <p>📧 romain@brackito.net</p>
-            <p>📞 06 79 77 49 35</p>
-            <p>🌐 www.brackito.net</p>
+            <div class="contact-section">
+                <h3>Contactez-nous</h3>
+                <p>📧 romain@brackito.net</p>
+                <p>📞 06 79 77 49 35</p>
+                <p>🌐 www.brackito.net</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Instructions pour l'impression
         window.onload = function() {
             console.log('Pour imprimer : Ctrl+P ou Cmd+P');
-            console.log('Configurez l\'impression en A5 recto-verso');
+            console.log('Page 1 = RECTO (2 flyers côte à côte)');
+            console.log('Page 2 = VERSO (2 flyers côte à côte)');
+            console.log('Imprimez en A4 paysage recto-verso BORD LONG (flip long edge)');
+            console.log('Découpez au milieu pour obtenir 2 flyers A5 recto-verso');
         };
     </script>
 </body>

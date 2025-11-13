@@ -16,6 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
     <title>
@@ -61,7 +62,7 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            padding-bottom: 60px;
+            padding-bottom: 200px; /* Augmenté pour le footer */
         }
 
         .container-fluid {
@@ -223,7 +224,6 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            
         }
 
         .team-logo {
@@ -240,10 +240,9 @@
             text-align: center;
             background: var(--bg-dark);
             color: white;
-            padding: 4px 1px;
+            padding: 4px 8px;
             border-radius: 8px;
             text-decoration: none;
-            margin-right: 30 px;
         }
 
         .match-center {
@@ -354,68 +353,65 @@
 
         /* Ranking */
         .ranking-card {
-    margin-left: -5%;
-    
-    padding: 0; /* Enlève le padding */
-}
+            margin-left: -5%;
+            padding: 0;
+        }
 
-.ranking-header {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--bg-dark);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 16px 12px 16px; /* Ajoute le padding seulement au header */
-    border-bottom: 2px solid var(--warning-color);
-}
+        .ranking-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px 12px 16px;
+            border-bottom: 2px solid var(--warning-color);
+        }
 
-.ranking-card .table-responsive {
-    padding: 0 16px; /* Ajoute le padding à la table */
-}
-  
+        .ranking-card .table-responsive {
+            padding: 0 16px;
+        }
+
         .ranking-row:last-child {
             border-bottom: none;
         }
 
-     
+        .ranking-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 50px 40px 40px 45px;
+            gap: 10px;
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+            font-size: 0.9rem;
+        }
 
-    .ranking-row {
-    display: grid;
-    grid-template-columns: 40px 1fr 50px 40px 40px 45px;
-    gap: 10px;
-    padding: 12px 8px;
-    border-bottom: 1px solid #e5e7eb;
-    align-items: center;
-    font-size: 0.9rem;
-}
+        .ranking-team {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            overflow: hidden;
+        }
 
-.ranking-team {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0; /* Permet au flex de se contracter */
-    overflow: hidden; /* Cache le débordement */
-}
+        .ranking-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
 
-.ranking-logo {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0; /* Empêche le logo de rétrécir */
-}
-
-.ranking-team span {
-    font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Maximum 2 lignes */
-    -webkit-box-orient: vertical;
-    line-height: 1.2;
-}
+        .ranking-team span {
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.2;
+        }
 
         .ranking-points {
             background: var(--warning-color);
@@ -444,28 +440,331 @@
             border-radius: 6px;
         }
 
-        /* Footer */
-        footer {
+        /* Footer Styles - INTÉGRÉ */
+        .modern-footer {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            padding: 24px 0;
+            margin-top: 40px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(135deg, var(--bg-dark), #374151);
-            color: white;
-            padding: 12px 16px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
             z-index: 100;
         }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 12px;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .footer-link.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .footer-link.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .footer-actions {
+            display: nowrap;
+            flex-wrap: nowrap;
+            gap: 8px;
+            
+        }
+
+        .footer-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: white;
+        }
+
+        .footer-btn.tarifs {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-btn.tarifs:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-btn.arbitrage {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .footer-btn.arbitrage:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Modal Styles */
         
+
+
+        
+        .modal-modern .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            overflow: hidden;
+            position: relative;
+            z-index: 1056;
+        }
+        
+        .modal-backdrop {
+            z-index: 1055;
+        }
+        
+        .modal {
+            z-index: 1056;
+        }
+
+        .modal-modern .modal-header {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            border: none;
+            padding: 20px 24px;
+        }
+
+        .modal-modern .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-modern .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 1;
+        }
+        
+        .modal-modern .btn-close:hover {
+            opacity: 0.8;
+        }
+
+        .modal-modern .modal-body {
+            padding: 32px 24px;
+        }
+
+        .modal-intro {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+ 
+
+        /* Pricing Cards */
+        .pricing-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .pricing-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .pricing-header.free {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .pricing-header.basic {
+            background: linear-gradient(135deg, var(--info-color), #0891b2);
+        }
+
+        .pricing-header.premium {
+            background: linear-gradient(135deg, var(--warning-color), #f97316);
+        }
+
+        .pricing-body {
+            padding: 24px;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            padding: 10px 0;
+            color: var(--bg-dark);
+        }
+
+        .pricing-feature i {
+            color: var(--success-color);
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
+        .pricing-feature strong {
+            color: #6b7280;
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+
+        .modal-modern .modal-footer {
+            background: var(--bg-light);
+            border: none;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-logo {
+            height: 30px;
+            opacity: 0.6;
+        }
+
+        .btn-close-modal {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            background: var(--bg-dark);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-close-modal:hover {
+            background: #374151;
+            transform: translateY(-2px);
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            body {
+                padding-bottom: 250px; /* Plus d'espace pour le footer mobile */
+            }
+
+            .modern-footer {
+                padding: 20px 0;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .footer-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .footer-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .pricing-price {
+                font-size: 2rem;
+            }
+        }
 
         /* Desktop */
         @media (min-width: 768px) {
             body {
                 background: #f8f9fa;
-                padding-bottom: 0;
+                padding-bottom: 120px;
             }
 
-            footer {
+            .modern-footer {
                 position: relative;
             }
 
@@ -477,10 +776,6 @@
             .match-score {
                 font-size: 2.2rem;
             }
-        }
-
-        .d-none {
-            display: none !important;
         }
     </style>
 </head>
@@ -542,7 +837,7 @@
                 {% if idclub is not null or idIdPoules is not null or IdEquipe is not null %}
                     <div class="card-modern" style="text-align: center;">
                         <a href="index.php">
-                            <img src="logos/Logo.png" alt="Brackito" style="max-height: 60px;">
+                            <img src="logos/Logo.png" loading="lazy" alt="Brackito" style="max-height: 60px;">
                         </a>
                         <p style="color: #6b7280; font-size: 0.9rem; margin-top: 8px;">
                             Simplifiez l'organisation de vos compétitions
@@ -568,7 +863,7 @@
                         {% else %}
                             {% for club in listeDesCLubs %}
                                 <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
-                                    <img src="{{ club.logo }}" alt="{{ club.nom }}" class="selection-logo">
+                                    <img src="{{ club.logo }}" alt="{{ club.nom }}" loading="lazy" class="selection-logo">
                                     <div class="selection-text">{{ club.nom|upper }}</div>
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
@@ -580,7 +875,7 @@
                                             Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
                                         </div>
                                         {% if sponsor.logo %}
-                                            <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}">
+                                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -612,7 +907,7 @@
                                             Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
                                         </div>
                                         {% if sponsor.logo %}
-                                            <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}">
+                                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -655,7 +950,7 @@
                            class="nav-button {% if affichageByClubs %}active{% endif %}" style="border-color: var(--warning-color); color: var(--warning-color);">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span>{{ getNomClubCourant }}</span>
-                                <img src="{{ logoClub }}" style="width: 30px; height: 30px; border-radius: 50%;" alt="Logo">
+                                <img src="{{ logoClub }}" style="width: 30px; height: 30px; border-radius: 50%;" loading="lazy" alt="Logo">
                             </div>
                             <i class="fas fa-chevron-right"></i>
                         </a>
@@ -699,6 +994,7 @@
                                 </div>
                                 <img src="{{ planTournoi }}?v={{ random() }}" 
                                      alt="Plan des terrains" 
+                                     loading="lazy"
                                      style="max-width: 120px; border-radius: 10px; cursor: pointer; box-shadow: var(--shadow-sm);"
                                      data-bs-toggle="modal" 
                                      data-bs-target="#planModal">
@@ -718,7 +1014,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                        <img src="{{ planTournoi }}?v={{ random() }}" alt="Plan" class="img-fluid">
+                                        <img src="{{ planTournoi }}?v={{ random() }}" alt="Plan" loading="lazy" class="img-fluid" loading="lazy">
                                     </div>
                                 </div>
                             </div>
@@ -744,7 +1040,7 @@
                                 <!-- Team 1 -->
                                 <div class="team-side">
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true">
-                                        <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}">
+                                        <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
                                     </a>
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe1_nom|upper }}
@@ -786,7 +1082,7 @@
                                 <!-- Team 2 -->
                                 <div class="team-side">
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true">
-                                        <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}">
+                                        <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
                                     </a>
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe2_nom|upper }}
@@ -832,7 +1128,7 @@
                                             Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
                                         </div>
                                         {% if sponsor.logo %}
-                                            <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}">
+                                            <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}" loading="lazy">
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -872,7 +1168,8 @@
                                     <img src="{{ resultat.club_logo }}" 
                                          class="rounded-circle" 
                                          style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;" 
-                                         alt="logo">
+                                         alt="logo"
+                                         loading="lazy">
                                     <span class="fw-semibold">{{ resultat.nom|upper }}</span>
                                 </div>
                             </td>
@@ -895,16 +1192,17 @@
 
             {% endif %}
         {% endif %}
-    <!-- Footer -->
-    <footer>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-            <span>© Brackito {{ "now"|date("Y") }}</span>
-            <span>Gestion de tournois</span>
-        </div>
-    </footer>
+         
+ <!-- Footer -->
+    <footer class="modern-footer">
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        {% include ('footer.twig') %}
+    </footer>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+   
     <script>
+    
+
         var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
 
         setInterval(function () {
@@ -946,7 +1244,15 @@
                     choisirClubDiv.style.display = 'none';
                 }
             }
+            
+                  
+                        
+                
+               
+          
+           
         });
+    
     </script>
 </body>
 </html>
