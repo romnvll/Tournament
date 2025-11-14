@@ -5,6 +5,9 @@ require 'class/rencontreDao.class.php';
 require 'class/equipeDao.class.php';
 
 
+
+
+
 if (isset ($_POST['etatTotal'])) {
    if ($_POST['etatTotal'] == "Avenir") {
      $rencontre = new RencontreDAO();

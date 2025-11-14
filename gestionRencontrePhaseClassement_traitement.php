@@ -3,11 +3,23 @@ require ('security.php');
 //ajout des equipes dans les poules
 require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
-
+require 'class/tournoiDao.class.php';
 
 $pouledao = new PouleManager();
 $rencontreDao = new RencontreDAO();
+$tournoiDao = new tournoiDao();
 
+$idTournoi = isset($_GET['tournoiId']) ? (int) $_GET['tournoiId'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($idTournoi, $userData['id']) === null &&
+    $idTournoi === 0
+) {
+    echo "ici";
+   // header("Location: ajoutTournoi.php");
+    exit;
+}
 
 
 if (isset($_GET['addpoule'])) {
@@ -36,9 +48,9 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1) {
             $pouledao->supprimerLienEquipePoule($equipeId, $pouleId);
 
             // Rediriger vers la page précédente avec l'ancre
-            $referer = $_SERVER['HTTP_REFERER'];
-            $anchor = "#section-" . $equipeId;
-            header("Location: " . $referer . $anchor);
+            
+            //$anchor = "#section-" . $equipeId;
+            header("Location: " . $_SERVER['HTTP_REFERER']);
             exit();
         } catch (Exception $e) {
             // Gérer les exceptions (par exemple, loguer l'erreur)

@@ -487,7 +487,7 @@
                             <td>
                                 {% for poule in equipe.poules %}
                                     {% if poule.is_classement == 1 %}
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
                                             class="btn btn-danger btn-sm d-inline-flex align-items-center"
                                             onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe de la poule ? Cela supprimera également les rencontres associées.')">
                                             <i class="fas fa-trash-alt me-2"></i>
