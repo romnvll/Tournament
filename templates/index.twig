@@ -846,7 +846,7 @@
                 {% endif %}
 
                 <!-- Club Selection -->
-                {% if idTournoi and visibility == 1 and not IdClub and affichageByTerrain is not defined %}
+                {% if idTournoi and visibility == 1 and (not IdClub and not affichageByTerrain)  %}
                     <div class="card-modern choisirClub">
                         <div class="card-header-modern">
                             <i class="fas fa-users"></i>
@@ -976,7 +976,7 @@
                     <div class="card-modern">
                         <div class="card-header-modern">
                             <i class="fas fa-map-marker-alt"></i>
-                            Rencontres par terrain 
+                            Rencontres du terrain: {{ listeDesRencontresByTerrain[0]["terrain_nom"] }}
                         </div>
                     </div>
                 {% endif %}
