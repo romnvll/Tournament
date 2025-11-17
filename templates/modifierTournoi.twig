@@ -9,6 +9,9 @@
     <title>Gestion du tournoi</title>
 
     <style>
+
+
+
         :root {
             --primary-color: #4f46e5;
             --primary-hover: #4338ca;
@@ -501,6 +504,44 @@
         .modern-card {
             animation: fadeIn 0.3s ease;
         }
+
+    
+.qr-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.copy-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    left: 40px;
+    background: #10b981;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.copy-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.copy-toast i {
+    font-size: 20px;
+}
+
     </style>
 </head>
 <body>
@@ -712,18 +753,32 @@
                 <div class="card-body-modern">
                     <div class="row">
                         <div class="col-lg-{% if infotournoi.gestionArbitres == 0 %}12{% else %}6{% endif %}">
-                            <div class="qr-card">
-                                <div class="qr-card-title">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                    {{ t('QrpourLesCoachsetPublic') }}
-                                </div>
+                        <div class="qr-card">
+                            <div class="qr-card-title">
+                                <i class="fa-solid fa-qrcode"></i>
+                                {{ t('QrpourLesCoachsetPublic') }}
+                            </div>
+                            <div class="qr-actions">
                                 <a href="GenerateQrCode.php?idTournoi={{ infotournoi.id }}" 
-                                   class="modern-btn btn-primary-modern">
+                                class="modern-btn btn-primary-modern">
                                     <i class="fa-solid fa-qrcode"></i>
                                     {{ t('qrCode') }}
                                 </a>
+                                <button type="button" 
+                                        class="modern-btn btn-secondary-modern"
+                                        onclick="copyTournamentLink('{{ infotournoi.id }}')"
+                                        title="{{ t('CopierLeLien') }}">
+                                    <i class="fa-solid fa-link"></i>
+                                    {{ t('CopierLeLien') }}
+                                </button>
                             </div>
                         </div>
+                    </div>
+                    <!-- Toast de notification -->
+                            <div id="copy-toast" class="copy-toast">
+                                <i class="fa-solid fa-check-circle"></i>
+                                <span>{{ t('lienCopie') }}</span>
+                            </div>
 
                         {% if infotournoi.gestionArbitres == 1 %}
                         <div class="col-lg-6">
@@ -1204,6 +1259,35 @@
             }
         }
     </script>
+
+    <script>
+function copyTournamentLink(tournoiId) {
+    const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    const link = baseUrl + 'index.php?id_tournoi=' + tournoiId;
+    
+    navigator.clipboard.writeText(link).then(function() {
+        showToast();
+    }, function(err) {
+        // Fallback pour les anciens navigateurs
+        const textArea = document.createElement("textarea");
+        textArea.value = link;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast();
+    });
+}
+
+function showToast() {
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    
+    setTimeout(function() {
+        toast.classList.remove('show');
+    }, 3000); // Disparaît après 3 secondes
+}
+</script>
 
 </body>
 </html>

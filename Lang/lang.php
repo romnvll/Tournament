@@ -189,6 +189,8 @@ $allLangs = [
         'planDuSite' => 'Plan du site',
         'reactivate' => 'Réactiver'  ,
         'reactivateHelp' => ' ce tournoi ( pour pouvoir le supprimer )',
+        'CopierLeLien' => 'Copier le lien',
+        'lienCopie' => 'Lien copié dans le presse-papiers, diffusez le sur les réseaux sociaux !',
 
         
         
@@ -371,6 +373,8 @@ $allLangs = [
         'planDuSite' => 'Site map',
         'reactiver' => 'Reactivate',
         'reactiverHelp' => ' this tournament - (to delete it)',
+        'CopierLeLien' => 'Copy the link',
+        'LienCopie' => 'Link copied to clipboard, share it on social networks!',
                 
 
         
