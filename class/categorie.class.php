@@ -28,7 +28,7 @@ class CategorieDao {
         SELECT DISTINCT c.*
         FROM Equipes e
         INNER JOIN Categorie c ON e.categorie = c.id_categorie
-        WHERE e.tournoi_id = :idTournoi AND e.IsPresent = 1
+        WHERE e.tournoi_id = :idTournoi 
     ");
     $stmt->bindParam(':idTournoi', $idTournoi);
     $stmt->execute();

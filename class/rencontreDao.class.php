@@ -56,7 +56,42 @@ class RencontreDAO
     }
 }
 
-    
+    /**
+ * Retourne l’ID de l’équipe gagnante d’une rencontre.
+ *
+ * @param int $rencontreId
+ * @return int|null  ID de l'équipe gagnante, ou null si pas de gagnant
+ */
+public function getWinner($rencontreId)
+{
+    $sql = "SELECT equipe1_id, equipe2_id, score1, score2
+            FROM Rencontres
+            WHERE id = :id";
+
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->execute([':id' => $rencontreId]);
+    $match = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$match) {
+        return null; // Match inexistant
+    }
+
+    // Si l’un des scores n’est pas encore rempli → pas de gagnant
+    if ($match['score1'] === null || $match['score2'] === null) {
+        return null;
+    }
+
+    // Détermination du gagnant
+    if ($match['score1'] > $match['score2']) {
+        return $match['equipe1_id'];
+    } elseif ($match['score2'] > $match['score1']) {
+        return $match['equipe2_id'];
+    }
+
+    // En cas d’égalité → tu peux changer cette logique
+    return null;
+}
+
 
     private function isRencontreExist($equipe1Id, $equipe2Id, $tour)
 {
