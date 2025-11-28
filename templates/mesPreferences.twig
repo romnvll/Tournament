@@ -119,6 +119,7 @@
     <div class="row g-4">
 
       <!-- 🏢 GESTION DES SPONSORS -->
+      
       <div class="col-lg-8 mx-auto {{ affichageSponsors ? '' : 'd-none' }}">
         <div class="card">
           <div class="card-header">Gestion des sponsors</div>
@@ -171,6 +172,7 @@
                     <tr>
                       <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="{{ sponsor.id }}">
+                        <input type="hidden" name="club_id" value="{{ idClub }}">
                         <input type="hidden" name="modifierSponsor" value="1">
                         <td><input type="text" name="nom" value="{{ sponsor.nom }}" class="form-control" onchange="this.form.submit()"></td>
                         <td><input type="url" name="lien_web" value="{{ sponsor.lien_web }}" class="form-control" onchange="this.form.submit()"></td>

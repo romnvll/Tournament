@@ -67,7 +67,7 @@ if (isset($_POST['modifierSponsor']) && $_POST['modifierSponsor'] == '1') {
             echo "Une erreur est survenue lors du téléchargement du fichier.";
         }
     }
-
+var_dump($_POST);
     // Appeler la méthode modifierSponsor avec le logo approprié
     $sponsorDao->modifierSponsor(
         (int)$_POST['id'],
