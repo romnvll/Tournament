@@ -77,7 +77,7 @@ if (!isset($_GET['id_tournoi'])) {
 $listedestournois = $tournois->afficherLesTournois($userData['id']);
 
  $nbrterrain = $terrain->AfficherTerrains($_GET['id_tournoi']);
- $listdecreneaux = $creneaux->afficherCreneaux($_GET['id_tournoi']);
+ $listdecreneaux = $creneaux->afficherCreneauxOccupes($_GET['id_tournoi']);
  $ToutesPlanification = $planification->afficherPlanifications($_GET['id_tournoi']);
   $planificationSansCreneauNiTerrain = $planification->afficherRencontresSansPlanification($_GET['id_tournoi']);
   $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);

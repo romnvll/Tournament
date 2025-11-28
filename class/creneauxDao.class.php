@@ -423,6 +423,33 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
     }
 
 
+public function afficherCreneauxOccupes(int $tournoi_id): array
+{
+    $sql = "
+        SELECT DISTINCT c.*
+        FROM Creneaux c
+        INNER JOIN Planification p 
+            ON p.creneau_id = c.creneau_id 
+            AND p.tournoi_id = c.tournoi_id
+        WHERE c.tournoi_id = :tournoi_id
+          AND (
+                p.rencontre_id IS NOT NULL 
+                OR p.arbitre_id IS NOT NULL
+                OR p.label_id IS NOT NULL
+              )
+        ORDER BY c.ordre
+    ";
+
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+
     public function existeCreneauPourTournoi($tournoi_id) {
         $sql = "SELECT COUNT(*) FROM Creneaux WHERE tournoi_id = :tournoi_id";
         $stmt = $this->connexion->prepare($sql);

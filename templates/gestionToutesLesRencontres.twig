@@ -664,7 +664,7 @@
 			</div>
 
 			<!-- Panneau de contrôle -->
-			<div class="control-panel">
+			<div class="control-panel no-print">
 				<form method="post" action="PlacementDesRencontresTraitement.php" class="delay-form">
 					<div class="form-group-modern">
 						<label for="modifMinutes">
@@ -673,7 +673,7 @@
 						<input type="number" id="modifMinutes" name="modifMinutes" 
 						       class="modern-input" placeholder="Minutes">
 					</div>
-					<button type="submit" class="modern-btn btn-primary-modern">
+					<button type="submit" class="modern-btn btn-primary-modern ">
 						Appliquer le retard
 					</button>
 					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
@@ -703,17 +703,17 @@
 											{% if tournoiInfo.gestionVoix == 1 %}
 												<div class="audio-controls" data-terrain-id="{{ terrains[i]['terrain_id'] }}" data-tournoi-id="{{ idTournoi }}">
 													{% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}
-														<span class="icon-badge icon-danger">
+														<span class="icon-badge icon-danger no-print">
 															<i class="fas fa-microphone-slash"></i>
 														</span>
 													{% else %}
-														<span class="icon-badge icon-success">
+														<span class="icon-badge icon-success no-print ">
 															<i class="fas fa-microphone"></i>
 														</span>
 													{% endif %}
-													<button class="btn-record audio-btn">🎙️ Enregistrer</button>
-													<button class="btn-stop audio-btn" disabled>⏹️ Arrêter</button>
-													<button class="btn-play audio-btn" {% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}disabled{% endif %}>▶️ Écouter</button>
+													<button class="btn-record audio-btn no-print">🎙️ Enregistrer</button>
+													<button class="btn-stop audio-btn no-print" disabled>⏹️ Arrêter</button>
+													<button class="btn-play audio-btn no-print" {% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}disabled{% endif %}>▶️ Écouter</button>
 													{% if terrains[i]['audio_path'] is not null and terrains[i]['audio_path'] != '' %}
 														<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
 													{% endif %}
