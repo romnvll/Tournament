@@ -407,6 +407,15 @@
             text-align: center;
         }
 
+        .coach-name-input {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-align: center;
+        }
+
         .team-name-input:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -703,7 +712,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-
+                        
                         {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
                         {% set today = "now"|date('Y-m-d')|date %}
 
@@ -834,36 +843,68 @@
                                         </td>
 
                                         <!-- Nom d'équipe -->
-                                        <td>
-                                            <input type="text" 
-                                                   class="team-name-input nomEquipeInput" 
-                                                   size="13"
-                                                   maxlength="13"
-                                                   name="nomEquipe" 
-                                                   value="{{ equipe.nom }}"
-                                                   data-equipe-id="{{ equipe.id }}"
-                                                   hx-post="modifierEquipe.php"
-                                                   hx-vals='{
-                                                       "idEquipe": "{{ equipe.id }}",
-                                                       "tournoi_id": "{{ equipe.tournoi_id }}",
-                                                       "categorie": "{{ equipe.categorie }}",
-                                                       "changeNomEquipe": "true"
-                                                   }'
-                                                   hx-trigger="blur"
-                                                   hx-target="#notif-{{ equipe.id }}"
-                                                   hx-swap="innerHTML"
-                                                   {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-                                                   {% set today = "now"|date('Y-m-d')|date %}
-                                                   {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
-                                                       disabled 
-                                                   {% endif %}>
-                                            
-                                            <small id="charCount-{{ equipe.id }}" class="char-count">
-                                                {{ 13 - equipe.nom|length }} / 13 caractères restants
-                                            </small>
-                                            
-                                            <small id="notif-{{ equipe.id }}" class="text-success"></small>
-                                        </td>
+                                       <td>
+    <!-- Champ nom d'équipe -->
+    <input type="text" 
+           class="team-name-input nomEquipeInput" 
+           size="13"
+           maxlength="13"
+           name="nomEquipe" 
+           value="{{ equipe.nom }}"
+           data-equipe-id="{{ equipe.id }}"
+           hx-post="modifierEquipe.php"
+           hx-vals='{
+               "idEquipe": "{{ equipe.id }}",
+               "tournoi_id": "{{ equipe.tournoi_id }}",
+               "categorie": "{{ equipe.categorie }}",
+               "changeNomEquipe": "true"
+           }'
+           hx-trigger="blur"
+           hx-target="#notif-{{ equipe.id }}"
+           hx-swap="innerHTML"
+           {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+           {% set today = "now"|date('Y-m-d')|date %}
+           {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
+               disabled 
+           {% endif %}>
+
+    <small id="charCount-{{ equipe.id }}" class="char-count">
+        {{ 13 - equipe.nom|length }} / 13 caractères restants
+    </small>
+
+    <!-- Champ nom du coach -->
+    <input type="text"
+           class="coach-name-input"
+           style="margin-top:6px;"
+           size="13"
+           maxlength="20"
+           name="nomCoach"
+           placeholder="Nom du coach"
+           value="{{ equipe.nomCoach ?? '' }}"
+           hx-post="modifierEquipe.php"
+           hx-vals='{
+               "idEquipe": "{{ equipe.id }}",
+               "tournoi_id": "{{ equipe.tournoi_id }}",
+               "categorie": "{{ equipe.categorie }}",
+               "changeNomCoach": "true"
+           }'
+           hx-trigger="blur"
+           hx-target="#notif-coach-{{ equipe.id }}"
+           hx-swap="innerHTML"
+           {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
+               disabled 
+           {% endif %}>
+
+    <small id="notif-coach-{{ equipe.id }}" class="text-success"></small>
+
+    <small id="charCountCoach-{{ equipe.id }}" class="char-count">
+        {{ 20 - (equipe.nomCoach|default('')|length) }} / 20 caractères restants
+
+    </small>
+
+    <small id="notif-{{ equipe.id }}" class="text-success"></small>
+</td>
+
 
                                         <!-- Audio -->
                                         {% if infoTournoi.gestionVoix == 1 %}

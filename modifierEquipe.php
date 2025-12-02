@@ -42,6 +42,18 @@ if (isset($_POST['changeNomEquipe']) && $_POST['changeNomEquipe'] === "true") {
     }
 }
 
+if (isset($_POST['changeNomCoach']) && $_POST['changeNomCoach'] === "true") {
+    if (isset($_SERVER['HTTP_HX_REQUEST'])) {
+        try {
+            $equipe->modifierNomCoach($_POST['idEquipe'], $_POST['nomCoach']);
+            echo "✅ Nom du coach modifié";
+        } catch (Exception $e) {
+            echo "❌ " . htmlspecialchars($e->getMessage());
+        }
+        exit;
+    }
+}
+
 
 
 //header("location: ajoutEquipe.php?idTournoi=".$_POST['tournoi_id']);

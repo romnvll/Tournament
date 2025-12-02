@@ -375,6 +375,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             c.nom AS creneau_nom,
             
             equipe1.id AS equipe1_id,
+            equipe1.nomCoach AS equipe1_coach_nom,
             equipe1.nom AS equipe1_nom,
             club1.id AS club1_id,
             club1.nom AS club1_nom,
@@ -383,6 +384,7 @@ private function generateRoundRobin($equipes, $isMatchRetour = false)
             
             equipe2.id AS equipe2_id,
             equipe2.nom AS equipe2_nom,
+            equipe2.nomCoach AS equipe2_coach_nom,
             club2.id AS club2_id,
             club2.nom AS club2_nom,
             
@@ -910,6 +912,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             
             equipe1.id AS equipe1_id,
             equipe1.nom AS equipe1_nom,
+            equipe1.nomCoach AS equipe1_coach_nom,
             club1.id AS club1_id,
             club1.nom AS club1_nom,
             
@@ -921,6 +924,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             
             equipe2.id AS equipe2_id,
             equipe2.nom AS equipe2_nom,
+            equipe2.nomCoach AS equipe2_coach_nom,
             club2.id AS club2_id,
             club2.nom AS club2_nom,
             
@@ -993,6 +997,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
                 
                 equipe1.id AS equipe1_id,
                 equipe1.nom AS equipe1_nom,
+                equipe1.nomCoach AS equipe1_coach_nom,
                 club1.id AS club1_id,
                 club1.nom AS club1_nom,
                 
@@ -1003,6 +1008,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
                 
                 equipe2.id AS equipe2_id,
                 equipe2.nom AS equipe2_nom,
+                equipe2.nomCoach AS equipe2_coach_nom,
                 club2.id AS club2_id,
                 club2.nom AS club2_nom,
                 

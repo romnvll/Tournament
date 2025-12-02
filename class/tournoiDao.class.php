@@ -571,28 +571,23 @@ public function getClassementParCategorie(int $idTournoi)
     return $classements;
 }
 
-
-
-
-function getNbTerrainsById($id) {
-    // Assurez-vous que $this->connexion est correctement défini, représentant la connexion à la base de données.
-
-    // Éviter les attaques d'injection SQL en utilisant des requêtes préparées
-    $query = "SELECT nb_terrains FROM Tournois WHERE id = :id";
-    $stmt = $this->connexion->prepare($query);
-    $stmt->bindValue(":id", $id);
-
-    // Exécution de la requête
-    $stmt->execute();
-
-    // Associer le résultat de la requête à une variable
-    $stmt->bindColumn('nb_terrains', $nb_terrains);
-    $stmt->fetch();
-    
-    // Retourner la valeur de nb_terrains
-    return $nb_terrains;
-    
+  /**
+ * Active ou désactive les effets sonores pour un utilisateur
+ * @param int $userId ID de l'utilisateur
+ * @param bool $activer true pour activer, false pour désactiver
+ * @return bool true si la mise à jour a réussi
+ */
+public function toggleEffetsSonores(int $tournoiId, bool $activer): bool {
+    $stmt = $this->connexion->prepare("UPDATE Tournois SET effetsSonores = :effetsSonores WHERE id = :id");
+    $stmt->execute([
+        ':effetsSonores' => $activer ? 1 : 0,
+        ':id' => $tournoiId
+    ]);
+    return $stmt->rowCount() > 0;
 }
+
+
+
 
 
 public function modifierTournoi(

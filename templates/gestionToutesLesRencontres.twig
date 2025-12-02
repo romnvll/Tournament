@@ -724,6 +724,7 @@
 								{% endfor %}
 							</tr>
 						</thead>
+						
 						<tbody>
 							{% for creneau in listCreneaux %}
 								<tr>
@@ -735,26 +736,31 @@
 													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
 													<input type="hidden" name="etatTotal" value="Avenir">
 													<button type="submit" class="status-dot red no-print" 
-													        title="Passer les rencontres à 'à venir'"></button>
+													        title="Passer les rencontres à 'à venir '" ></button>
 												</form>
 
-												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
+												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;"
+												{% if tournoiInfo.effetsSonores == 1 %}onsubmit="ouvrirEffetSonore('debut');"{% endif %}> 
+												
 													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
 													<input type="hidden" name="etatTotal" value="enCours">
 													<button type="submit" class="status-dot orange no-print" 
-													        title="Passer les rencontres à 'en cours'"></button>
+													        title="Passer les rencontres à 'en cours'{% if tournoiInfo.effetsSonores == 1 %} et lancer l'effet sonore{% endif %}">{% if tournoiInfo.effetsSonores == 1 %}{% if effetSonoreDebut is null %} 🔇  {% else %} 📢{% endif %} {% endif %}</button>
 												</form>
 
-												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
+												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;"
+												{% if tournoiInfo.effetsSonores == 1 %}onsubmit="ouvrirEffetSonore('fin');"{% endif %}
+												>
 													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
 													<input type="hidden" name="etatTotal" value="terminee">
 													<button type="submit" class="status-dot green no-print" 
-													        title="Passer les rencontres à 'terminée'"></button>
+													        title="Passer les rencontres à 'terminée'{% if tournoiInfo.effetsSonores == 1 %} et lancer l'effet sonore{% endif %}">{% if tournoiInfo.effetsSonores == 1 %} {% if effetSonoreFin is null %} 🔇  {% else %} 📢{% endif %}{% endif %}</button>
 												</form>
 											</div>
+											
 											{% if tournoiInfo.gestionVoix == 1 %}
 												<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" 
-												        class="audio-btn mt-2 no-print">
+												        class="audio-btn mt-2 no-print" {% if (creneau.hasTerminatedRencontre == 1) %}disabled{% endif %}>
 													🎧 Lancer la lecture audio
 												</button>
 											{% endif %}
@@ -1004,6 +1010,19 @@
 				window.open(url, '_blank', options);
 			}
 		</script>
+
+	{% if tournoiInfo.effetsSonores == 1 %}
+<script>
+    function ouvrirEffetSonore(type) {
+        const url = `lectureAudio.php?type=` + type;
+        const options = 'width=400,height=200,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
+        window.open(url, '_blank', options);
+    }
+</script>
+{% endif %}
+
+
+
 
 		<script>
 			function majHorloge() {

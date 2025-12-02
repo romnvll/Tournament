@@ -106,10 +106,66 @@ class UtilisateurDAO {
     return $result ;
 }
 
+/**
+ * Supprime un effet sonore spécifique (début ou fin)
+ * @param int $userId ID de l'utilisateur
+ * @param bool $effetDebut true pour supprimer l'effet de début, false pour celui de fin
+ * @return bool
+ */
+public function supprimerEffetSonore(int $userId, bool $effetDebut): bool {
+    $field = $effetDebut ? 'effetsSonoreDebut' : 'effetsSonoreFin';
+    $stmt = $this->connexion->prepare("UPDATE Utilisateurs SET $field = NULL WHERE id = :id");
+    $stmt->execute([':id' => $userId]);
+    return $stmt->rowCount() > 0;
+}
+
 
     public function getTousLesUtilisateurs(): array {
         $stmt = $this->connexion->prepare("SELECT id, nom, email FROM Utilisateurs ORDER BY nom ASC");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getEffetSonoreByUserId(int $userId): ?array {
+        $stmt = $this->connexion->prepare("SELECT effetsSonoreDebut, effetsSonoreFin FROM Utilisateurs WHERE id = :id");
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+  
+public function ajouterEffetsSonores(int $userId, ?string $effetDebut, ?string $effetFin): bool 
+{
+    $champs = [];
+    $params = [':id' => $userId];
+
+    // Si un effet début est renseigné → on le met à jour
+    if ($effetDebut !== null) {
+        $champs[] = "effetsSonoreDebut = :effetDebut";
+        $params[':effetDebut'] = $effetDebut;
+    }
+
+    // Si un effet fin est renseigné → on le met à jour
+    if ($effetFin !== null) {
+        $champs[] = "effetsSonoreFin = :effetFin";
+        $params[':effetFin'] = $effetFin;
+    }
+
+    // Si rien à mettre à jour → réussite (ou false, selon ta logique)
+    if (empty($champs)) {
+        return false; 
+    }
+
+    // Construction dynamique
+    $sql = "UPDATE Utilisateurs SET " . implode(", ", $champs) . " WHERE id = :id";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->rowCount() > 0;
+}
+
+
+
+
+
 }

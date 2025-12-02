@@ -12,6 +12,7 @@ require 'vendor/autoload.php';
 require 'class/creneauxDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
+require 'class/utilisateurDao.class.php';
 require 'Lang/lang.php';
 
 
@@ -88,6 +89,8 @@ $listedestournois = $tournois->afficherLesTournois($userData['id']);
   
 }
 
+$utilisateurDao = new utilisateurDao();
+$EffetSonoreUtilisateurDebut = $utilisateurDao->getEffetSonoreByUserId($userData['id']);
 
 
 
@@ -111,7 +114,9 @@ echo $template->render([
     'libelleParTournoi' => $libelleParTournoi,
     'listeDesArbitres' => $listeDesArbitres,
     'tournoiInfo'   => $tournoiInfo,
-    'pourcentage' => $pourcentage
+    'pourcentage' => $pourcentage,
+    'effetSonoreDebut' => $EffetSonoreUtilisateurDebut['effetsSonoreDebut'],
+    'effetSonoreFin' => $EffetSonoreUtilisateurDebut['effetsSonoreFin'],
    
 
   

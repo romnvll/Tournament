@@ -223,6 +223,16 @@ $arbitreDao->modifierArbitre($_POST['idArbitre'],$_POST['nomArbitre']);
 exit;
 }
 
+if (isset($_POST['effetsSonores'])) {
+    
+    $tournoiDao = new tournoiDao();
+    $tournoiDao->toggleEffetsSonores($_POST['idTournoi'], 1);
+    
+} else {
+    
+    $tournoiDao = new tournoiDao();
+    $tournoiDao->toggleEffetsSonores($_POST['idTournoi'], 0);
+}
 
 
 

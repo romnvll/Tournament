@@ -426,7 +426,19 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
 public function afficherCreneauxOccupes(int $tournoi_id): array
 {
     $sql = "
-        SELECT DISTINCT c.*
+        SELECT DISTINCT 
+            c.*,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM Planification p2
+                    INNER JOIN Rencontres r ON p2.rencontre_id = r.id
+                    WHERE p2.creneau_id = c.creneau_id 
+                      AND p2.tournoi_id = c.tournoi_id
+                      AND r.isTerminated = 1
+                ) THEN 1 
+                ELSE 0 
+            END as hasTerminatedRencontre
         FROM Creneaux c
         INNER JOIN Planification p 
             ON p.creneau_id = c.creneau_id 
@@ -439,13 +451,13 @@ public function afficherCreneauxOccupes(int $tournoi_id): array
               )
         ORDER BY c.ordre
     ";
-
     $stmt = $this->connexion->prepare($sql);
     $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
     $stmt->execute();
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
 
 
 

@@ -122,6 +122,7 @@ foreach ($listeDesEquipesByClubs as $equipe) {
         'Nom_categorie' => $equipe['Nom_categorie'],
         'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id']),
         'couleurCategorie' => $equipe['Couleur'],
+        'nomCoach' => $equipe['nomCoach'] ?? null,
     ];
 }
 

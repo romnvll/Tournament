@@ -635,17 +635,28 @@
                             </div>
 
                             <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionVoix" 
-                                           name="gestionVoix" value="1" 
-                                           {% if infotournoi.gestionVoix == 1 %}checked{% endif %} 
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="gestionVoix">
-                                        🎙️ {{ t('gestionDesAnnoncesVocales') }}
-                                    </label>
-                                </div>
-                            </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="gestionVoix" 
+               name="gestionVoix" value="1" 
+               {% if infotournoi.gestionVoix == 1 %}checked{% endif %} 
+               onchange="toggleDependencies(),this.form.submit()">
+        <label class="form-check-label" for="gestionVoix">
+            🎙️ {{ t('gestionDesAnnoncesVocales') }}
+        </label>
+    </div>
+</div>
 
+<div class="form-switch-modern nested" id="effetsSonoresContainer">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="effetsSonores" 
+               name="effetsSonores" value="1" 
+               {% if infotournoi.effetsSonores == 1 %}checked{% endif %} 
+               onchange="this.form.submit()">
+        <label class="form-check-label" for="effetsSonores">
+            🔊 {{ t('effetsSonoresMatch') }}
+        </label>
+    </div>
+</div>
                             <div class="form-switch-modern">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="gestionArbitres" 
@@ -1160,11 +1171,14 @@
     <!-- Scripts -->
     <script>
         function toggleDependencies() {
-            const isVisible = document.getElementById('isVisible').checked;
-            document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
-            document.getElementById('IsRankingViewContainer').style.display = isVisible ? 'block' : 'none';
-        }
-        toggleDependencies();
+    const isVisible = document.getElementById('isVisible').checked;
+    document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
+    document.getElementById('IsRankingViewContainer').style.display = isVisible ? 'block' : 'none';
+    
+    const gestionVoix = document.getElementById('gestionVoix').checked;
+    document.getElementById('effetsSonoresContainer').style.display = gestionVoix ? 'block' : 'none';
+}
+toggleDependencies();
     </script>
 
     <script>

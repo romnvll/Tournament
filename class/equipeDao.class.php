@@ -117,6 +117,13 @@ class EquipeDAO {
     $stmt->execute();
 }
 
+public function modifierNomCoach(int $id, string $nomCoach): void
+{
+    $stmt = $this->connexion->prepare("UPDATE Equipes SET nomCoach = :nomCoach WHERE id = :id");
+    $stmt->bindParam(':nomCoach', $nomCoach);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+}
 
     public function mettreAJourAudioEquipe(int $idEquipe, string $audioPath): void
 {

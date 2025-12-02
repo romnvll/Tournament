@@ -191,6 +191,7 @@ $allLangs = [
         'reactivateHelp' => ' ce tournoi ( pour pouvoir le supprimer )',
         'CopierLeLien' => 'Copier le lien',
         'lienCopie' => 'Lien copié dans le presse-papiers, diffusez le sur les réseaux sociaux !',
+        'nomCoach' => 'Nom du coach',
 
         
         
@@ -375,6 +376,7 @@ $allLangs = [
         'reactiverHelp' => ' this tournament - (to delete it)',
         'CopierLeLien' => 'Copy the link',
         'LienCopie' => 'Link copied to clipboard, share it on social networks!',
+        'nomCoach' => 'Coach name',
                 
 
         

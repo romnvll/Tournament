@@ -114,12 +114,12 @@
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true" class="btn-nav {% if affichageSponsors %}active{% endif %}">🏢 Gestion des sponsors</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true" class="btn-nav {% if monMotDePasse %}active{% endif %}">🔐 Mot de passe</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn-nav {% if gestionCategorie %}active{% endif %}">🏷️ Catégories</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionEffetsSonores=true" class="btn-nav {% if gestionEffetsSonores %}active{% endif %}">🔊 Effets sonores</a>
     </div>
 
     <div class="row g-4">
 
       <!-- 🏢 GESTION DES SPONSORS -->
-      
       <div class="col-lg-8 mx-auto {{ affichageSponsors ? '' : 'd-none' }}">
         <div class="card">
           <div class="card-header">Gestion des sponsors</div>
@@ -245,19 +245,14 @@
             </form>
           </div>
 
-
-
-
           <div class="card-body">
-
-  <p>La gestion des catégories permet de configurer les différentes catégories auxquelles une équipe peut appartenir.</p>
-  {% set palette = [
-                            '#BB8FCE', '#FFC300', '#DAF7A6', '#CCFFFF',
-                            '#E57373', '#F5B041', '#FF7F7F', '#F9E79F',
-                            '#FF6F61', '#85C1E9', '#AED6F1', '#48C9B0',
-                            '#73C6B6', '#F39C12', '#E67E22'
-                        ] %}
-
+            <p>La gestion des catégories permet de configurer les différentes catégories auxquelles une équipe peut appartenir.</p>
+            {% set palette = [
+              '#BB8FCE', '#FFC300', '#DAF7A6', '#CCFFFF',
+              '#E57373', '#F5B041', '#FF7F7F', '#F9E79F',
+              '#FF6F61', '#85C1E9', '#AED6F1', '#48C9B0',
+              '#73C6B6', '#F39C12', '#E67E22'
+            ] %}
 
             <form id="preferencesForm" action="mesPreferences_traitement.php" method="post">
               <div class="row g-3">
@@ -289,27 +284,371 @@
           </div>
         </div>
       </div>
+
+      <!-- 🔊 GESTION DES EFFETS SONORES -->
+<div class="col-lg-10 mx-auto {{ gestionEffetsSonores ? '' : 'd-none' }}">
+  <div class="card">
+    <div class="card-header">Gestion des effets sonores</div>
+    <div class="card-body">
+      
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Ajoutez des effets sonores personnalisés pour le début et la fin de vos matchs. Vous pouvez choisir dans la banque de sons, uploader un fichier MP3 ou enregistrer votre voix directement.
+      </div>
+
+      <!-- Effet sonore de DÉBUT -->
+      <div class="card border mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">🎵 Effet sonore de début de match</h5>
+          
+          {% if effetsSonoreDebut %}
+            <div class="mb-3">
+              <label class="form-label fw-bold">Aperçu actuel :</label>
+              <audio controls class="w-100">
+                <source src="{{ effetsSonoreDebut }}" type="audio/mpeg">
+              </audio>
+            </div>
+            <a href="mesPreferences_traitement.php?supprimerEffetDebut=1" class="btn btn-danger" onclick="return confirm('Supprimer cet effet sonore ?');">
+              <i class="bi bi-trash"></i> Supprimer l'effet de début
+            </a>
+          {% else %}
+            <!-- Onglets pour les différentes options -->
+            <ul class="nav nav-tabs mb-3" id="tabsDebut" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="banque-debut-tab" data-bs-toggle="tab" data-bs-target="#banque-debut" type="button">
+                  🎵 Banque de sons
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="upload-debut-tab" data-bs-toggle="tab" data-bs-target="#upload-debut" type="button">
+                  📁 Uploader
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="record-debut-tab" data-bs-toggle="tab" data-bs-target="#record-debut" type="button">
+                  🎙️ Enregistrer
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="tabsDebutContent">
+              <!-- BANQUE DE SONS -->
+              <div class="tab-pane fade show active" id="banque-debut" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST">
+                  <input type="hidden" name="ajouterEffetDebutBanque" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="row g-3">
+                    {% if banqueSonsDebut %}
+                      {% for son in banqueSonsDebut %}
+                        <div class="col-md-6 col-lg-4">
+                          <div class="card h-100 border">
+                            <div class="card-body">
+                              <h6 class="card-title">{{ son.nom }}</h6>
+                              <audio controls class="w-100 mb-2">
+                                <source src="{{ son.chemin }}" type="audio/mpeg">
+                              </audio>
+                              <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-check-circle"></i> Choisir
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <div class="col-12">
+                        <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
+                      </div>
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+
+              <!-- UPLOAD FICHIER -->
+              <div class="tab-pane fade" id="upload-debut" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="ajouterEffetDebut" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="mb-3">
+                    <label for="effetDebutFile" class="form-label">📁 Choisir un fichier MP3</label>
+                    <input type="file" name="effetDebutFile" id="effetDebutFile" class="form-control" accept=".mp3,audio/mpeg" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-upload"></i> Uploader l'effet de début
+                  </button>
+                </form>
+              </div>
+
+              <!-- ENREGISTREMENT VOCAL -->
+              <div class="tab-pane fade" id="record-debut" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetDebut">
+                  <input type="hidden" name="ajouterEffetDebut" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="mb-3">
+                    <label class="form-label">🎙️ Enregistrer votre voix</label>
+                    <div class="d-flex gap-2 align-items-center mb-2">
+                      <button type="button" id="recordDebutBtn" class="btn btn-primary">
+                        <i class="bi bi-mic-fill"></i> Démarrer l'enregistrement
+                      </button>
+                      <button type="button" id="stopDebutBtn" class="btn btn-danger d-none">
+                        <i class="bi bi-stop-fill"></i> Arrêter
+                      </button>
+                      <span id="recordDebutStatus" class="text-muted"></span>
+                    </div>
+                    <audio id="previewDebut" controls class="w-100 d-none mb-2"></audio>
+                    <input type="hidden" name="effetDebutRecorded" id="effetDebutRecorded">
+                  </div>
+
+                  <button type="submit" class="btn btn-success" id="submitDebutRecord" disabled>
+                    <i class="bi bi-save"></i> Enregistrer l'effet de début
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Effet sonore de FIN -->
+      <div class="card border">
+        <div class="card-body">
+          <h5 class="mb-3">🎵 Effet sonore de fin de match</h5>
+          
+          {% if effetsSonoreFin %}
+            <div class="mb-3">
+              <label class="form-label fw-bold">Aperçu actuel :</label>
+              <audio controls class="w-100">
+                <source src="{{ effetsSonoreFin }}" type="audio/mpeg">
+              </audio>
+            </div>
+            <a href="mesPreferences_traitement.php?supprimerEffetFin=1" class="btn btn-danger" onclick="return confirm('Supprimer cet effet sonore ?');">
+              <i class="bi bi-trash"></i> Supprimer l'effet de fin
+            </a>
+          {% else %}
+            <!-- Onglets pour les différentes options -->
+            <ul class="nav nav-tabs mb-3" id="tabsFin" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="banque-fin-tab" data-bs-toggle="tab" data-bs-target="#banque-fin" type="button">
+                  🎵 Banque de sons
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="upload-fin-tab" data-bs-toggle="tab" data-bs-target="#upload-fin" type="button">
+                  📁 Uploader
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="record-fin-tab" data-bs-toggle="tab" data-bs-target="#record-fin" type="button">
+                  🎙️ Enregistrer
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="tabsFinContent">
+              <!-- BANQUE DE SONS -->
+              <div class="tab-pane fade show active" id="banque-fin" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST">
+                  <input type="hidden" name="ajouterEffetFinBanque" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="row g-3">
+                    {% if banqueSonsFin %}
+                      {% for son in banqueSonsFin %}
+                        <div class="col-md-6 col-lg-4">
+                          <div class="card h-100 border">
+                            <div class="card-body">
+                              <h6 class="card-title">{{ son.nom }}</h6>
+                              <audio controls class="w-100 mb-2">
+                                <source src="{{ son.chemin }}" type="audio/mpeg">
+                              </audio>
+                              <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-check-circle"></i> Choisir
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <div class="col-12">
+                        <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
+                      </div>
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+
+              <!-- UPLOAD FICHIER -->
+              <div class="tab-pane fade" id="upload-fin" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="ajouterEffetFin" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="mb-3">
+                    <label for="effetFinFile" class="form-label">📁 Choisir un fichier MP3</label>
+                    <input type="file" name="effetFinFile" id="effetFinFile" class="form-control" accept=".mp3,audio/mpeg" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-upload"></i> Uploader l'effet de fin
+                  </button>
+                </form>
+              </div>
+
+              <!-- ENREGISTREMENT VOCAL -->
+              <div class="tab-pane fade" id="record-fin" role="tabpanel">
+                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetFin">
+                  <input type="hidden" name="ajouterEffetFin" value="1">
+                  <input type="hidden" name="user_id" value="{{ userId }}">
+                  
+                  <div class="mb-3">
+                    <label class="form-label">🎙️ Enregistrer votre voix</label>
+                    <div class="d-flex gap-2 align-items-center mb-2">
+                      <button type="button" id="recordFinBtn" class="btn btn-primary">
+                        <i class="bi bi-mic-fill"></i> Démarrer l'enregistrement
+                      </button>
+                      <button type="button" id="stopFinBtn" class="btn btn-danger d-none">
+                        <i class="bi bi-stop-fill"></i> Arrêter
+                      </button>
+                      <span id="recordFinStatus" class="text-muted"></span>
+                    </div>
+                    <audio id="previewFin" controls class="w-100 d-none mb-2"></audio>
+                    <input type="hidden" name="effetFinRecorded" id="effetFinRecorded">
+                  </div>
+
+                  <button type="submit" class="btn btn-success" id="submitFinRecord" disabled>
+                    <i class="bi bi-save"></i> Enregistrer l'effet de fin
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
 
     {{ include('footerAdmin.twig') }}
   </div>
+
   <script>
-        window.onload = function() {
-            if (typeof(sessionStorage) !== 'undefined') {
-                var scrollPosition = sessionStorage.getItem('scrollPosition');
-                if (scrollPosition !== null) {
-                    window.scrollTo(0, scrollPosition);
-                }
-            }
+    window.onload = function() {
+      if (typeof(sessionStorage) !== 'undefined') {
+        var scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition !== null) {
+          window.scrollTo(0, scrollPosition);
+        }
+      }
+    };
+
+    window.onbeforeunload = function() {
+      if (typeof(sessionStorage) !== 'undefined') {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+      }
+    };
+
+    // ==================== GESTION DE L'ENREGISTREMENT AUDIO ====================
+    let mediaRecorderDebut, audioChunksDebut = [];
+    let mediaRecorderFin, audioChunksFin = [];
+
+    // DÉBUT - Enregistrement
+    document.getElementById('recordDebutBtn')?.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderDebut = new MediaRecorder(stream);
+        audioChunksDebut = [];
+
+        mediaRecorderDebut.ondataavailable = (event) => {
+          audioChunksDebut.push(event.data);
         };
 
-        window.onbeforeunload = function() {
-            if (typeof(sessionStorage) !== 'undefined') {
-                sessionStorage.setItem('scrollPosition', window.scrollY);
-            }
-        };
-    </script>
+        mediaRecorderDebut.onstop = () => {
+          const audioBlob = new Blob(audioChunksDebut, { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          
+          const preview = document.getElementById('previewDebut');
+          preview.src = audioUrl;
+          preview.classList.remove('d-none');
 
+          // Convertir en base64 pour l'envoyer
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = () => {
+            document.getElementById('effetDebutRecorded').value = reader.result;
+          };
+
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorderDebut.start();
+        document.getElementById('recordDebutBtn').classList.add('d-none');
+        document.getElementById('stopDebutBtn').classList.remove('d-none');
+        document.getElementById('recordDebutStatus').textContent = 'Enregistrement en cours...';
+      } catch (err) {
+        alert('Erreur d\'accès au microphone : ' + err.message);
+      }
+    });
+
+    document.getElementById('stopDebutBtn')?.addEventListener('click', () => {
+      mediaRecorderDebut.stop();
+      document.getElementById('recordDebutBtn').classList.remove('d-none');
+      document.getElementById('stopDebutBtn').classList.add('d-none');
+      document.getElementById('recordDebutStatus').textContent = 'Enregistrement terminé';
+       document.getElementById('submitDebutRecord').disabled = false; // Activer le bouton
+    });
+
+    // FIN - Enregistrement
+    document.getElementById('recordFinBtn')?.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderFin = new MediaRecorder(stream);
+        audioChunksFin = [];
+
+        mediaRecorderFin.ondataavailable = (event) => {
+          audioChunksFin.push(event.data);
+        };
+
+        mediaRecorderFin.onstop = () => {
+          const audioBlob = new Blob(audioChunksFin, { type: 'audio/mpeg' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          
+          const preview = document.getElementById('previewFin');
+          preview.src = audioUrl;
+          preview.classList.remove('d-none');
+
+          // Convertir en base64 pour l'envoyer
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = () => {
+            document.getElementById('effetFinRecorded').value = reader.result;
+          };
+
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorderFin.start();
+        document.getElementById('recordFinBtn').classList.add('d-none');
+        document.getElementById('stopFinBtn').classList.remove('d-none');
+        document.getElementById('recordFinStatus').textContent = 'Enregistrement en cours...';
+       
+
+      } catch (err) {
+        alert('Erreur d\'accès au microphone : ' + err.message);
+      }
+    });
+
+    document.getElementById('stopFinBtn')?.addEventListener('click', () => {
+      mediaRecorderFin.stop();
+      document.getElementById('recordFinBtn').classList.remove('d-none');
+      document.getElementById('stopFinBtn').classList.add('d-none');
+      document.getElementById('recordFinStatus').textContent = 'Enregistrement terminé';
+        document.getElementById('submitFinRecord').disabled = false; // Activer le bouton
+
+    });
+  </script>
 
 </body>
 </html>

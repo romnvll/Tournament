@@ -420,6 +420,18 @@
             border-radius: 8px;
             font-weight: 700;
         }
+        .coach-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+    border-radius: 15px;
+    font-size: 0.8rem;
+    color: #4b5563;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    width: fit-content;
+}
 
         /* Sponsor Box */
         .sponsor-box {
@@ -596,6 +608,38 @@
             margin-bottom: 32px;
             text-align: center;
         }
+
+        <style>
+.coach-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #4b5563;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    transition: all 0.3s ease;
+}
+
+.coach-info:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.coach-info i {
+    color: #3b82f6;
+    font-size: 0.9rem;
+}
+
+.coach-info span {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
 
  
 
@@ -892,14 +936,25 @@
                             <i class="fas fa-users"></i>
                             Choisir une équipe
                         </div>
-
+                    
                         {% for equipe in equipesAvecPoule %}
                             {% if equipe.idPoule != null %}
+                             
                                 <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#score" class="selection-item">
                                     <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}; font-size: 1.5rem;"></i>
-                                    <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }}</div>
+                                    <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }} 
+                                    
+                                        <div class="coach-tag">
+                                    <i class="fas fa-clipboard-user"></i>
+                                    <span>Coach : {{ equipe.nomCoach }}</span>
+                                </div>
+
+
+                                    </div>
+                                    
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
+                                
 
                                 {% if partenaires is not empty %}
                                     {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
@@ -1057,6 +1112,13 @@
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe1_nom|upper }}
                                     </a>
+                                    
+                                    {% if equipe.equipe1_coach_nom %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                            <span>Coach {{ equipe.equipe1_coach_nom|upper }}</span>
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Center -->
@@ -1099,6 +1161,12 @@
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe2_nom|upper }}
                                     </a>
+                                    {% if equipe.equipe2_coach_nom %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                            <span>Coach {{ equipe.equipe2_coach_nom|upper }}</span>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
 
