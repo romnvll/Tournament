@@ -4,7 +4,8 @@ updateDB.txt
 security.php
 secureCookies.php
 Audio/*
-!Audio/.gitignore
+!Audio/**/
+!Audio/**/.gitkeep
 Sponsors/*
 !Sponsors/.gitignore
 uploadsAssistance/*
