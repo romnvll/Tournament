@@ -62,7 +62,7 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            padding-bottom: 200px; /* Augmenté pour le footer */
+            padding-bottom: 100px; /* Augmenté pour le footer */
         }
 
         .container-fluid {
@@ -457,7 +457,7 @@
             background: linear-gradient(135deg, var(--bg-dark), #374151);
             color: white;
             padding: 24px 0;
-            margin-top: 40px;
+            margin-top: 20px;
             box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
             position: fixed;
             bottom: 0;
@@ -763,38 +763,36 @@
 
         /* Mobile styles */
         @media (max-width: 767px) {
-            body {
-                padding-bottom: 250px; /* Plus d'espace pour le footer mobile */
-            }
+          
 
-            .modern-footer {
-                padding: 20px 0;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .footer-link {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .footer-actions {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .footer-btn {
-                width: 100%;
-                justify-content: center;
-            }
+             .footer-content {
+        padding: 10px 8px;
+        gap: 5px;
+        overflow-x: auto; /* Permet le scroll horizontal si nécessaire */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .footer-links {
+        gap: 5px;
+    }
+    
+    .footer-actions {
+        gap: 5px;
+    }
+    
+    /* Réduire la taille des boutons sur mobile */
+    .footer-link,
+    .footer-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        gap: 5px;
+    }
+    
+    /* Réduire la taille des icônes */
+    .footer-link i,
+    .footer-btn i {
+        font-size: 12px;
+    }
 
             .pricing-price {
                 font-size: 2rem;
