@@ -181,21 +181,32 @@ public function getIdTournoiParIdParent($idParent) : array {
     return $stmt->fetchAll();
 }
 
-   public function getTournoiById(int $id_tournoi): array {
+  public function getTournoiById(int $id_tournoi): array {
     if ($id_tournoi === null) {
         return [];
     }
     $stmt = $this->connexion->prepare("
-    SELECT 
-        t.*, 
-        tds.nom AS nom_type_sport
-    FROM 
-        Tournois t
-    LEFT JOIN 
-        TypeDeSport tds ON t.type_sport_id = tds.id
-    WHERE 
-        t.id = :id
-");
+        SELECT 
+            t.*, 
+            tds.nom AS nom_type_sport,
+            u.nom AS nom_utilisateur,
+            u.prenom AS prenom_utilisateur,
+            u.email AS email_utilisateur,
+            c.id AS club_id,
+            c.nom AS nom_club,
+            c.logo AS logo_club,
+            c.type_sport_id AS type_sport_club
+        FROM 
+            Tournois t
+        LEFT JOIN 
+            TypeDeSport tds ON t.type_sport_id = tds.id
+        LEFT JOIN
+            Utilisateurs u ON t.utilisateur_id = u.id
+        LEFT JOIN
+            Clubs c ON u.club_id = c.id
+        WHERE 
+            t.id = :id
+    ");
 
     $stmt->bindValue(':id', $id_tournoi, PDO::PARAM_INT);
     $stmt->execute();

@@ -799,6 +799,52 @@
             .pricing-price {
                 font-size: 2rem;
             }
+            .organisateur-info {
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+}
+
+.organisateur-content {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.organisateur-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.organisateur-label i {
+    margin-right: 0.5rem;
+}
+
+.organisateur-club {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.organisateur-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    background: white;
+    border-radius: 50%;
+    padding: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.organisateur-nom {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
         }
 
         /* Desktop */
@@ -820,6 +866,59 @@
             .match-score {
                 font-size: 2.2rem;
             }
+            .organisateur-info {
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+}
+
+.organisateur-content {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.organisateur-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.organisateur-label i {
+    margin-right: 0.5rem;
+}
+
+.organisateur-club {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.organisateur-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    background: white;
+    border-radius: 50%;
+    padding: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.organisateur-nom {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+
+            
         }
     </style>
 </head>
@@ -892,42 +991,64 @@
 
                 <!-- Club Selection -->
                 {% if idTournoi and visibility == 1 and (not IdClub and not affichageByTerrain)  %}
-                    <div class="card-modern choisirClub">
-                        <div class="card-header-modern">
-                            <i class="fas fa-users"></i>
-                            Choisir un club
+        
+    {# Affichage de l'organisateur du tournoi #}
+    {% if infoTournoiEnCours.nom_club %}
+        <div class="card-modern organisateur-info">
+            <div class="organisateur-content">
+                <span class="organisateur-label">
+                    <i class="fas fa-trophy"></i>
+                    Tournoi organisé par
+                </span>
+                <div class="organisateur-club">
+                    {% if infoTournoiEnCours.logo_club %}
+                        <img src="{{ infoTournoiEnCours.logo_club }}" 
+                             alt="{{ infoTournoiEnCours.nom_club }}" 
+                             loading="lazy" 
+                             class="organisateur-logo">
+                    {% endif %}
+                    <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card-modern choisirClub">
+        <div class="card-header-modern">
+            <i class="fas fa-users"></i>
+            Choisir un club
+        </div>
+
+        {% if listeDesCLubs|length == 1 %}
+            <script>
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.get('id_club')) {
+                    window.location.href = "index.php?id_tournoi={{ idTournoi }}&id_club={{ listeDesCLubs[0].id }}";
+                }
+            </script>
+        {% else %}
+            {% for club in listeDesCLubs %}
+                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
+                    <img src="{{ club.logo }}" alt="{{ club.nom }}" loading="lazy" class="selection-logo">
+                    <div class="selection-text">{{ club.nom|upper }}</div>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+
+                {% if partenaires is not empty %}
+                    {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                    <div class="sponsor-box">
+                        <div>
+                            Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
                         </div>
-
-                        {% if listeDesCLubs|length == 1 %}
-                            <script>
-                                const urlParams = new URLSearchParams(window.location.search);
-                                if (!urlParams.get('id_club')) {
-                                    window.location.href = "index.php?id_tournoi={{ idTournoi }}&id_club={{ listeDesCLubs[0].id }}";
-                                }
-                            </script>
-                        {% else %}
-                            {% for club in listeDesCLubs %}
-                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
-                                    <img src="{{ club.logo }}" alt="{{ club.nom }}" loading="lazy" class="selection-logo">
-                                    <div class="selection-text">{{ club.nom|upper }}</div>
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-
-                                {% if partenaires is not empty %}
-                                    {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
-                                    <div class="sponsor-box">
-                                        <div>
-                                            Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
-                                        </div>
-                                        {% if sponsor.logo %}
-                                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
+                        {% if sponsor.logo %}
+                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
                         {% endif %}
                     </div>
                 {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endif %}
 
                 <!-- Team Selection -->
                 {% if idTournoi and IdClub and visibility == 1  %}

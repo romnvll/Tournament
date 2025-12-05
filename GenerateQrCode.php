@@ -4,6 +4,7 @@ require 'class/tournoiDao.class.php';
 require_once 'class/SponsorDAO.class.php';
 require_once 'Lang/lang.php';
 require_once 'class/clubDao.class.php';
+require_once 'class/utilisateurDao.class.php';
 
 $clubDao = new ClubDAO();
 
@@ -23,6 +24,8 @@ $sponsors = $sponsorDao->getSponsorsActifParClub($userData['id']);
 $tournoiDao = new tournoiDao();
 $tournoiDao->getTournoiById($_GET['idTournoi']);
 
+$utilisateurDao = new UtilisateurDAO();
+
 // Détermine le protocole HTTP ou HTTPS
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $domainName = $_SERVER['HTTP_HOST'];
@@ -40,6 +43,10 @@ $formatter = new IntlDateFormatter(
 $dateFormatted = $formatter->format($date);
 
 $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['nom']);
+
+$getClubNom = $utilisateurDao->getClubFromIdUser($userData['id']);
+
+$logoClub = $getClubNom ? $getClubNom['club_logo'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -142,7 +149,7 @@ $tournoiNom = htmlspecialchars($tournoiDao->getTournoiById($_GET['idTournoi'])['
         <img src="logos/Logo.png" alt="Logo Brackito" style="height:60px;" class="me-3 rounded shadow-sm">
 
         <p class="mb-0 text-dark fw-semibold fst-italic">
-            🎯 Simplifiez, organisez et gagnez du temps avec Brackito — l’outil tout-en-un pour vos compétitions sportives.
+            Tournoi organisé  par <?= htmlspecialchars($getClubNom ? $getClubNom['club_nom'] : 'Brackito') ?> <img src="<?= htmlspecialchars($logoClub) ?>" alt="Logo club" style="height:30px; object-fit:contain;" class="ms-2 rounded shadow-sm">
         </p>
 
         <div>

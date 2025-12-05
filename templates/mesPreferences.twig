@@ -7,6 +7,13 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
   <style>
     :root {
@@ -115,6 +122,7 @@
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true" class="btn-nav {% if monMotDePasse %}active{% endif %}">🔐 Mot de passe</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn-nav {% if gestionCategorie %}active{% endif %}">🏷️ Catégories</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionEffetsSonores=true" class="btn-nav {% if gestionEffetsSonores %}active{% endif %}">🔊 Effets sonores</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monClub=true" class="btn-nav {% if monClub %}active{% endif %}">🏠 Mon club</a>
     </div>
 
     <div class="row g-4">
@@ -276,6 +284,9 @@
                           </a>
                         </div>
                       </div>
+
+                       
+
                     </div>
                   </div>
                 {% endfor %}
@@ -284,6 +295,58 @@
           </div>
         </div>
       </div>
+
+
+        <!-- 🏠 MON CLUB --> 
+                        <div class="col-lg-8 mx-auto {{ monClub ? '' : 'd-none' }}">
+                          <div class="card">
+                            <div class="card-header">Mon club 
+                            {% if logoClubChoisit is not null %}
+                             <img src="{{ logoClubChoisit }}" alt="Logo club" width="80" class="rounded">
+                              {% endif %}
+                              </div>
+                            <div class="card-body">
+                              {% if club %}
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                  {% if club.logo %}
+                                    <img src="{{ club.logo }}" alt="Logo club" width="80" class="rounded">
+                                  {% endif %}
+                                  <div>
+                                    <h5 class="mb-0">{{ club.nom }}</h5>
+                                    {% if club.adresse %}<p class="text-muted mb-0">{{ club.adresse }}</p>{% endif %}
+                                  </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                  <a href="modifierClub.php?idclub={{ idClub }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i> Modifier le club</a>
+                                  <a href="modifierClub.php?id_tournoi={{ idTournoi }}" class="btn btn-outline-secondary">Gérer les clubs</a>
+                                </div>
+                              {% else %}
+                                {% if idClubChoisit == null %}
+
+                                <p class="text-muted">Vous n'avez pas encore de club associé.<br>Cette partie va permettre d'afficher les informations du créateur du tournoi sur les affiches et l'application mobile</p>
+                                {% endif %}
+                                <form action="mesPreferences_traitement.php" method="POST">
+                                    <select name="clubToUser" onchange="this.form.submit()">
+                                      
+                                        <option value="">-- Sélectionnez un club --</option>
+                                        {% for club in listeClubs %}
+                                          {% if idClubChoisit == club.id %}
+                                            <option value="{{ club.id }}" selected> 
+                                                {{ club.nom }}
+                                            </option>
+                                          {% else %}
+                                            <option value="{{ club.id }}">
+                                                {{ club.nom }}
+                                            </option>
+                                          {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </form>
+
+                                {% endif %}
+                            </div>
+                          </div>
+                        </div>
 
       <!-- 🔊 GESTION DES EFFETS SONORES -->
 <div class="col-lg-10 mx-auto {{ gestionEffetsSonores ? '' : 'd-none' }}">
@@ -649,6 +712,10 @@
 
     });
   </script>
+
+
+ 
+
 
 </body>
 </html>

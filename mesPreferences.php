@@ -61,6 +61,8 @@ function getBanqueSons($type) {
     return $sons;
 }
 
+$idClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_id'] ?? null;
+$logoClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_logo'] ?? null;    
 
 echo $template->render([
   'email' => $userData['email'],
@@ -69,6 +71,7 @@ echo $template->render([
   'categories' => $categorie,
   'message' => $message,
   'idClub' => $userData['id'],
+  'listeClubs' => $club->afficherClubs(),
   'sponsors' => $sponsorDao->getSponsorsParClub($userData['id']),
   'idTournoi' => $_GET['id_tournoi'],
   'affichageSponsors' => isset($_GET['affichageSponsors']) && $_GET['affichageSponsors'] === 'true',
@@ -80,10 +83,10 @@ echo $template->render([
     'userId' => $userData['id'],
      'banqueSonsDebut' => getBanqueSons('debut'),
     'banqueSonsFin' => getBanqueSons('fin'),
+    'idClubChoisit' => $idClubChoisit,
+    'logoClubChoisit' => $logoClubChoisit,
+    'monClub' => isset($_GET['monClub']) && $_GET['monClub'] === 'true',
    
-//'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
-//'AfficherClub' => $listeClub->afficherClubs(),
-//'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
-//'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
+
 
 ]);

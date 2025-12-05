@@ -5,6 +5,15 @@ require_once 'class/categorie.class.php';
 $categorieDao = new CategorieDao();
 
 
+if (isset ($_POST['clubToUser']))   {
+    require_once ('class/utilisateurDao.class.php');
+    $utilisateurDao = new UtilisateurDAO();
+    $utilisateurDao->lierUtilisateurAClub($userData['id'], (int)$_POST['clubToUser']);
+           header("Location: " . $_SERVER['HTTP_REFERER']);
+
+}
+
+
 if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
     $club_id = $_POST['club_id'];
     require_once 'class/SponsorDAO.class.php';

@@ -164,6 +164,44 @@ public function ajouterEffetsSonores(int $userId, ?string $effetDebut, ?string $
     return $stmt->rowCount() > 0;
 }
 
+    /**
+     * Lie (ou délien si $clubId === null) un utilisateur à un club.
+     * @param int $userId
+     * @param int|null $clubId
+     * @return bool true si la mise à jour a affecté une ligne
+     */
+    public function lierUtilisateurAClub(int $userId, ?int $clubId): bool
+    {
+        $sql = "UPDATE Utilisateurs SET club_id = :club_id WHERE id = :id";
+        $stmt = $this->connexion->prepare($sql);
+
+        // Bind value en tenant compte du NULL possible
+        if ($clubId === null) {
+            $stmt->bindValue(':club_id', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':club_id', $clubId, PDO::PARAM_INT);
+        }
+
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function getClubFromIdUser(int $userId): ?array
+    {
+        $stmt = $this->connexion->prepare("SELECT 
+        Clubs.nom as club_nom, 
+        Clubs.id as club_id,
+        Clubs.logo as club_logo
+        
+         FROM Clubs inner join Utilisateurs on Utilisateurs.club_id = Clubs.id WHERE Utilisateurs.id = :id");
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
 
 
 
