@@ -145,5 +145,96 @@ public function creerCategorie(string $nom, string $couleur, int $fk_id_user): i
 }
 
 
+
+public function afficherClassementParCategorie(int $idTournoi): array
+{
+    $query = "
+    SELECT
+            e.id,
+            e.nom AS equipe_nom,
+            e.categorie,
+            cat.nom_categorie AS categorie_nom,
+            e.tournoi_id,
+            ep.poule_id,
+            p.nom AS poule_nom,  -- Ajout du nom de la poule
+            e.club_id,
+
+            -- Points
+            (
+                (SELECT COUNT(*) FROM Rencontres r 
+                    WHERE (r.equipe1_id = e.id AND r.score1 > r.score2)
+                       OR (r.equipe2_id = e.id AND r.score2 > r.score1)
+                ) * 3
+            ) +
+            (
+                (SELECT COUNT(*) FROM Rencontres r 
+                    WHERE (r.equipe1_id = e.id OR r.equipe2_id = e.id)
+                      AND r.score1 = r.score2
+                ) * 2
+            ) +
+            (
+                (SELECT COUNT(*) FROM Rencontres r 
+                    WHERE (r.equipe1_id = e.id AND r.score1 < r.score2)
+                       OR (r.equipe2_id = e.id AND r.score2 < r.score1)
+                )
+            ) AS TotalDesPoints,
+
+            -- Buts marqués
+            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id), 0) +
+            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id), 0)
+            AS nombreButsMarque,
+
+            -- Buts encaissés
+            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id), 0) +
+            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id), 0)
+            AS nombreButsEncaisse,
+
+            -- Différence
+            (
+                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id), 0) +
+                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id), 0)
+            ) -
+            (
+                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id), 0) +
+                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id), 0)
+            ) AS DifferenceButs
+
+        FROM Equipes e
+        INNER JOIN EquipePoule ep ON ep.equipe_id = e.id
+        INNER JOIN Poules p ON p.id = ep.poule_id  -- Ajout de la jointure
+        INNER JOIN Categorie cat ON cat.id_categorie = e.categorie
+        WHERE e.tournoi_id = :idTournoi
+        ORDER BY cat.nom_categorie ASC, ep.poule_id ASC, TotalDesPoints DESC, nombreButsMarque DESC, DifferenceButs DESC
+        ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Regrouper par catégorie ET par poule
+    $classement = [];
+
+    foreach ($equipes as $equipe) {
+
+        $categorie = $equipe['categorie_nom'];
+        $poule = $equipe['poule_id'];
+
+        if (!isset($classement[$categorie])) {
+            $classement[$categorie] = [];
+        }
+
+        if (!isset($classement[$categorie][$poule])) {
+            $classement[$categorie][$poule] = [];
+        }
+
+        $classement[$categorie][$poule][] = $equipe;
+    }
+
+    return $classement;
+}
+
+
 }
 ?>

@@ -6,5 +6,21 @@
         "endX": 306,
         "endY": 161,
         "color": "#000000"
+    },
+    {
+        "type": "rect",
+        "startX": 152,
+        "startY": 201,
+        "endX": 292,
+        "endY": 283,
+        "color": "#000000"
+    },
+    {
+        "type": "rect",
+        "startX": 347,
+        "startY": 208,
+        "endX": 430,
+        "endY": 268,
+        "color": "#000000"
     }
 ]

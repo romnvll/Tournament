@@ -6,88 +6,147 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css"/>
 
-
-<!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css"/>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-
-
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
    
     <title>Suppression des rencontres</title>
   </head>
   <body>
- {{ include('header.twig') }}
+    {{ include('header.twig') }}
 
-<div class="row">
-    <div class="col">
-   
-            
-              <h1>Choisir le tournoi</h1>
-            
-              
-                 {% for tournoi in ListeDesTournois %}
-                 {% if tournoi.isArchived == 0 %}
-            <a href="suppressionRencontres.php?id_tournoi={{ tournoi.id }}" class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %}" role="button">{{ tournoi.nom }}</a>
-              {% endif %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-3">
+          <h1>Choisir le tournoi</h1>
+          {% for tournoi in ListeDesTournois %}
+            {% if tournoi.isArchived == 0 %}
+              <a href="suppressionRencontres.php?id_tournoi={{ tournoi.id }}" 
+                 class="btn {% if tournoi.id == tournoiEnCours %}btn-danger{% else %}btn-primary{% endif %} mb-2" 
+                 role="button">{{ tournoi.nom }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="col-9">
+          <div class="row">
+            <div class="col-6">
+              <h3 class="text-center">Selection des poules</h3>
+
+              {% set poulesPhaseFinales = [] %}
+              {% set poulesPhasePoule = [] %}
+
+              {% for poule in afficherLesPoules %}
+                {% if poule.is_classement == 1 %}
+                  {% set poulesPhaseFinales = poulesPhaseFinales|merge([poule]) %}
+                {% else %}
+                  {% set poulesPhasePoule = poulesPhasePoule|merge([poule]) %}
+                {% endif %}
               {% endfor %}
 
-             
-    </div>
+              {% if poulesPhasePoule %}
+                <h4>Les poules de phase de poules</h4>
+                <div class="mb-3">
+                  {% for poule in poulesPhasePoule %}
+                    {% set btnClass = "btn btn-primary btn-sm mb-1" %}
+                    {% if pouleEnCours == poule.id %}
+                      {% set btnClass = "btn btn-danger btn-sm mb-1" %}
+                    {% endif %}
+                    <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" 
+                       class="{{ btnClass }}" 
+                       role="button">{{ poule.nom }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
 
-    <div class="col-6">
-        <div class="row">
-            <div class="col-6">
-           
-                 <h3 class="text-center">Selection des poules</h3>
+              {% if poulesPhaseFinales %}
+                <h4>Les poules de phase finales</h4>
+                <div class="mb-3">
+                  {% for poule in poulesPhaseFinales %}
+                    {% set btnClass = "btn btn-primary btn-sm mb-1" %}
+                    {% if pouleEnCours == poule.id %}
+                      {% set btnClass = "btn btn-danger btn-sm mb-1" %}
+                    {% endif %}
+                    <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" 
+                       class="{{ btnClass }}" 
+                       role="button">{{ poule.nom }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
 
-
-             {% set poulesPhaseFinales = [] %}
-{% set poulesPhasePoule = [] %}
-
-{% for poule in afficherLesPoules %}
-    {% if poule.is_classement == 1 %}
-        {% set poulesPhaseFinales = poulesPhaseFinales|merge([poule]) %}
-    {% else %}
-        {% set poulesPhasePoule = poulesPhasePoule|merge([poule]) %}
-    {% endif %}
-{% endfor %}
-
-{% if poulesPhaseFinales %}
-    <h4>Les poules de phase finales</h4>
-    {% for poule in poulesPhaseFinales %}
-        {% set btnClass = "btn btn-primary" %}
-        {% if pouleEnCours == poule.id %}
-            {% set btnClass = "btn btn-danger" %}
-        {% endif %}
-        <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
-    {% endfor %}
-{% endif %}
-
-{% if poulesPhasePoule %}
-    <h4>Les poules de phase de poules</h4>
-    {% for poule in poulesPhasePoule %}
-        {% set btnClass = "btn btn-primary" %}
-        {% if pouleEnCours == poule.id %}
-            {% set btnClass = "btn btn-danger" %}
-        {% endif %}
-        <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
-    {% endfor %}
-{% endif %}
-
-
-             
-            </div>
-            <div class="col-6">
-            
-            {% if pouleEnCours is not empty %}
-               <a href="suppressionRencontres_traitement.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ pouleEnCours }}" class="btn btn-danger" role="button" onclick="return confirm('Êtes-vous sûr de vouloir supprimer toutes les rencontres de cette poule ?')" >Cliquez ici pour supprimer les rencontres de cette poule.Il faudra recreer les rencontres pour cette poule et les replacer</a>
-            {% endif %}
+              {% if pouleEnCours is not empty %}
+                <div class="alert alert-warning">
+                  <a href="suppressionRencontres_traitement.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ pouleEnCours }}" 
+                     class="btn btn-danger" 
+                     role="button" 
+                     onclick="return confirm('Êtes-vous sûr de vouloir supprimer toutes les rencontres de cette poule ?')">
+                    Supprimer les rencontres de cette poule
+                  </a>
+                </div>
+              {% endif %}
             </div>
 
+            <div class="col-6">
+              <h3 class="text-center">Phases finales</h3>
+
+              {% if rencontresParPhase is not empty %}
+                {% for phaseId, phase in rencontresParPhase %}
+                  <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0">{{ phase.libelle }}</h5>
+                      <a href="suppressionRencontres_traitement.php?id_tournoi={{ tournoiEnCours }}&idPhaseFinale={{ phaseId }}" 
+                         class="btn btn-danger btn-sm" 
+                         onclick="return confirm('Êtes-vous sûr de vouloir supprimer toutes les rencontres de {{ phase.libelle }} ?')">
+                        Supprimer toutes
+                      </a>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Équipe 1</th>
+                            <th>Score</th>
+                            <th>Équipe 2</th>
+                            <th>Heure</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for rencontre in phase.rencontres %}
+                            <tr>
+                              <td>{{ rencontre.equipe1_nom|default('TBD') }}</td>
+                              <td class="text-center">
+                                {% if rencontre.isTerminated %}
+                                  {{ rencontre.score1 }} - {{ rencontre.score2 }}
+                                {% else %}
+                                  -
+                                {% endif %}
+                              </td>
+                              <td>{{ rencontre.equipe2_nom|default('TBD') }}</td>
+                              <td>{{ rencontre.heure|default('-') }}</td>
+                              <td>
+                                <a href="suppressionRencontres_traitement.php?id_tournoi={{ tournoiEnCours }}&idRencontre={{ rencontre.id }}" 
+                                   class="btn btn-danger btn-sm" 
+                                   onclick="return confirm('Supprimer cette rencontre ?')">
+                                  Supprimer
+                                </a>
+                              </td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted">Aucune rencontre de phase finale pour ce tournoi.</p>
+              {% endif %}
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-
-</div>
+  </body>
+</html>

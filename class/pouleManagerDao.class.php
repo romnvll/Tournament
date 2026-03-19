@@ -126,6 +126,9 @@ class PouleManager {
     return $poules;
 }
 
+
+
+
 public function supprimerPoulesParTournoi(int $idTournoi): void {
     // Supprimer les relations dans EquipePoule liées aux poules du tournoi
     $queryDeleteEquipePoule = "DELETE FROM EquipePoule 
@@ -446,6 +449,13 @@ WHERE e.tournoi_id = :idTournoi
         // Retourner le tableau des poules
         return $poules;
     }
+
+
+
+
+
+
+    
     
     
     

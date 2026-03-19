@@ -5,7 +5,7 @@ $rencontre = new RencontreDAO();
 
 
 if (isset ($_POST['idPoule'])) {
-    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_POST['idPoule']);
+    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_POST['idPoule'],0);
    }
 
   // $GetResultatDesPoules= $rencontre->GetResultatDesPoules(2);

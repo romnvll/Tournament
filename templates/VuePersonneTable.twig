@@ -22,9 +22,7 @@
             --border-radius: 16px;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -40,7 +38,7 @@
             max-width: 100vw;
         }
 
-        /* Header optimisé mobile */
+        /* Header */
         .welcome-header {
             background: white;
             border-radius: var(--border-radius);
@@ -100,7 +98,48 @@
             gap: 10px;
         }
 
-        /* Teams container - 2 colonnes */
+        /* Swap button */
+        .btn-swap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-swap:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-swap:active {
+            transform: scale(0.95);
+        }
+
+        .btn-swap.is-swapped {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: white;
+        }
+
+        .btn-swap .swap-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-swap.is-swapped .swap-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Teams container */
         .teams-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -264,7 +303,7 @@
             font-size: 0.95rem;
         }
 
-        /* Sponsor section */
+        /* Sponsor */
         .sponsor-box {
             display: flex;
             flex-direction: column;
@@ -319,299 +358,315 @@
 
         /* Animations */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .match-card, .label-card {
             animation: fadeIn 0.4s ease;
         }
 
-        /* Optimisations tactiles */
         button, a {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
 
-        /* Pour très petits écrans */
         @media (max-width: 360px) {
-            .team-logo {
-                width: 70px;
-                height: 70px;
-            }
-
-            .team-name {
-                font-size: 0.95rem;
-                min-height: 38px;
-            }
-
-            .score-display {
-                font-size: 2.5rem;
-            }
-
-            .btn-goal {
-                padding: 12px 16px;
-                font-size: 1rem;
-            }
-
+            .team-logo     { width: 70px; height: 70px; }
+            .team-name     { font-size: 0.95rem; min-height: 38px; }
+            .score-display { font-size: 2.5rem; }
+            .btn-goal      { padding: 12px 16px; font-size: 1rem; }
             .info-label,
-            .info-value {
-                font-size: 0.9rem;
-            }
+            .info-value    { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <!-- Welcome header -->
-        <div class="welcome-header">
-            <h2>
-                <i class="fas fa-user-check" style="color: var(--success-color);"></i>
-                Bonjour {{ prenom }} !
-            </h2>
-            <p>
-                Vous êtes en charge d'insérer les scores pour le terrain
-                <span class="terrain-badge">
-                    <i class="fas fa-map-marker-alt"></i>
-                    {{ terrain }}
-                </span>
-            </p>
-        </div>
+<div class="container-fluid">
 
-        <!-- Matches -->
-        <div id="scoreRefresh">
-            {% for planification in AffichagePlanification %}
-                {% if planification.rencontre_id is not null %}
-                    <!-- Match Card -->
-                    <div class="match-card" id="planification-{{ planification.rencontre_id }}">
-                        <!-- Time header -->
-                        <div class="time-header">
-                            <div class="time-display">
-                                <i class="fas fa-clock"></i>
-                                <span>{{ planification.creneau_nom|slice(0, -3) }}</span>
-                            </div>
-                        </div>
-
-                        <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ planification.rencontre_id }}">
-                            <input type="hidden" name="return_id" value="row-{{ planification.rencontre_id }}">
-                            
-                            <!-- Teams Grid -->
-                            <div class="teams-grid">
-                                <!-- Team 1 -->
-                                <div class="team-column">
-                                    <img src="{{ planification.club1_logo }}" class="team-logo" alt="{{ planification.equipe1_nom }}">
-                                    <div class="team-name">{{ planification.equipe1_nom }}</div>
-                                    <input type="hidden" name="scoreEquipe1" value="{{ planification.score1 }}" id="scoreEquipe1{{ planification.rencontre_id }}">
-                                    <div class="score-display" id="displayScoreEquipe1{{ planification.rencontre_id }}">
-                                        {{ planification.score1 }}
-                                    </div>
-                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                        <div class="score-buttons">
-                                            <button type="button" 
-                                                    class="btn-goal add" 
-                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" 
-                                                    hx-trigger="click" 
-                                                    hx-on::after-request="vibrate(50)" 
-                                                    hx-swap="innerHTML" 
-                                                    hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" 
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-plus"></i>
-                                                But
-                                            </button>
-                                            <button type="button" 
-                                                    class="btn-goal remove" 
-                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" 
-                                                    hx-on::after-request="vibrate(200)" 
-                                                    hx-trigger="click" 
-                                                    hx-swap="innerHTML" 
-                                                    hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" 
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                <!-- Team 2 -->
-                                <div class="team-column">
-                                    <img src="{{ planification.club2_logo }}" class="team-logo" alt="{{ planification.equipe2_nom }}">
-                                    <div class="team-name">{{ planification.equipe2_nom }}</div>
-                                    <input type="hidden" name="scoreEquipe2" value="{{ planification.score2 }}" id="scoreEquipe2{{ planification.rencontre_id }}">
-                                    <div class="score-display" id="displayScoreEquipe2{{ planification.rencontre_id }}">
-                                        {{ planification.score2 }}
-                                    </div>
-                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                        <div class="score-buttons">
-                                            <button type="button" 
-                                                    class="btn-goal add" 
-                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" 
-                                                    hx-trigger="click" 
-                                                    hx-on::after-request="vibrate(50)" 
-                                                    hx-swap="innerHTML" 
-                                                    hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" 
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-plus"></i>
-                                                But
-                                            </button>
-                                            <button type="button" 
-                                                    class="btn-goal remove" 
-                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" 
-                                                    hx-trigger="click" 
-                                                    hx-on::after-request="vibrate(200)" 
-                                                    hx-swap="innerHTML" 
-                                                    hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" 
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Info section -->
-                            <div class="info-section">
-                                <div class="info-row">
-                                    <div class="info-label">
-                                        <i class="fas fa-flag"></i>
-                                        Status
-                                    </div>
-                                    <div class="info-value">
-                                        {% if planification.isTerminated == 1 %}
-                                            <span class="status-badge danger">
-                                                <i class="fas fa-check-circle"></i>
-                                                Rencontre terminée
-                                            </span>
-                                        {% else %}
-                                            {% if planification.est_premier_zero == true %}
-                                                {% if planification.isTerminated == 0 %}
-                                                    <span class="status-badge danger">
-                                                        <i class="fas fa-exclamation-circle"></i>
-                                                        Saisir le score
-                                                    </span>
-                                                {% elseif planification.isTerminated == 2 %}
-                                                    <a class="status-badge primary" 
-                                                       id="State{{ planification.rencontre_id }}" 
-                                                       role="button" 
-                                                       onclick="updateStatus({{ planification.rencontre_id }})">
-                                                        <i class="fas fa-sync-alt"></i>
-                                                        En cours
-                                                    </a>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <div class="info-row">
-                                    <div class="info-label">
-                                        <i class="fas fa-tag"></i>
-                                        Catégorie
-                                    </div>
-                                    <div class="info-value">
-                                        <span class="category-badge" style="background-color: {{ planification.Couleur }};">
-                                            <i class="fas fa-layer-group"></i>
-                                            {{ planification.categorie_equipe1_nom }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="info-row">
-                                    <div class="info-label">
-                                        <i class="fas fa-user-tie"></i>
-                                        Arbitre
-                                    </div>
-                                    <div class="info-value">
-                                        {{ planification.arbitre_nom }} {{ planification.arbitre_club_nom }}
-                                    </div>
-                                </div>
-
-                                <!-- Sponsor -->
-                                {% if partenaires is not empty %}
-                                    {% set randIndex = random(0, partenaires|length - 1) %}
-                                    {% set sponsor = partenaires[randIndex] %}
-                                    <div class="sponsor-box">
-                                        <div class="sponsor-info">
-                                            <i class="fas fa-handshake" style="color: var(--primary-color);"></i>
-                                            Sponsorisé par 
-                                            <strong>
-                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                    {{ sponsor.nom }}
-                                                </a>
-                                            </strong>
-                                            {% if sponsor.description %}
-                                                <br><em>{{ sponsor.description }}</em>
-                                            {% endif %}
-                                        </div>
-                                        {% if sponsor.logo %}
-                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </form>
-                    </div>
-
-                {% elseif planification.label_description is not null %}
-                    <!-- Label Card -->
-                    <div class="label-card">
-                        <div class="time-header">
-                            <div class="time-display">
-                                <i class="fas fa-clock"></i>
-                                <span>{{ planification.creneau_nom }}</span>
-                            </div>
-                        </div>
-                        <div class="label-content">
-                            <div class="label-text">
-                                <i class="fas fa-info-circle"></i>
-                                {{ planification.label_description }}
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+    <!-- Welcome header -->
+    <div class="welcome-header">
+        <h2>
+            <i class="fas fa-user-check" style="color: var(--success-color);"></i>
+            Bonjour {{ prenom }} !
+        </h2>
+        <p>
+            Vous êtes en charge d'insérer les scores pour le terrain
+            <span class="terrain-badge">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ terrain }}
+            </span>
+        </p>
     </div>
 
-    <script>
-        function updateStatus(idRencontre) {
-            if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
-                const target = `#State${idRencontre}`;
+    <!-- Matches -->
+    <div id="scoreRefresh">
+        {% for planification in AffichagePlanification %}
 
-                const handler = function(evt) {
-                    if (evt.target.id === `State${idRencontre}`) {
-                        document.body.removeEventListener('htmx:afterSwap', handler);
-                        location.reload();
-                    }
-                };
+            {% if planification.rencontre_id is not null %}
 
-                document.body.addEventListener('htmx:afterSwap', handler);
+                {# ── Swap logic ─────────────────────────────────────────── #}
+                {% set rid       = planification.rencontre_id %}
+                {% set isSwapped = rid in swappedIds %}
 
-                htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
-                    target: target,
-                    swap: 'outerHTML'
-                });
-            }
+                {# Nouvelle liste après toggle de cet ID #}
+                {% if isSwapped %}
+                    {% set newSwaps = swappedIds | filter(id => id != rid) %}
+                {% else %}
+                    {% set newSwaps = swappedIds | merge([rid]) %}
+                {% endif %}
+
+                {# Construire ?swap[]=x&swap[]=y pour le lien du bouton #}
+                {% set swapQuery = '' %}
+                {% for id in newSwaps %}
+                    {% set swapQuery = swapQuery ~ 'swap[]=' ~ id ~ '&' %}
+                {% endfor %}
+
+                {# Équipes gauche / droite selon l'état du swap #}
+                {% if isSwapped %}
+                    {% set gauche = {
+                        nom:     planification.equipe2_nom,
+                        logo:    planification.club2_logo,
+                        score:   planification.score2,
+                        dispId:  'displayScoreEquipe2' ~ rid,
+                        hidId:   'scoreEquipe2' ~ rid,
+                        hidName: 'scoreEquipe2',
+                        team:    2
+                    } %}
+                    {% set droite = {
+                        nom:     planification.equipe1_nom,
+                        logo:    planification.club1_logo,
+                        score:   planification.score1,
+                        dispId:  'displayScoreEquipe1' ~ rid,
+                        hidId:   'scoreEquipe1' ~ rid,
+                        hidName: 'scoreEquipe1',
+                        team:    1
+                    } %}
+                {% else %}
+                    {% set gauche = {
+                        nom:     planification.equipe1_nom,
+                        logo:    planification.club1_logo,
+                        score:   planification.score1,
+                        dispId:  'displayScoreEquipe1' ~ rid,
+                        hidId:   'scoreEquipe1' ~ rid,
+                        hidName: 'scoreEquipe1',
+                        team:    1
+                    } %}
+                    {% set droite = {
+                        nom:     planification.equipe2_nom,
+                        logo:    planification.club2_logo,
+                        score:   planification.score2,
+                        dispId:  'displayScoreEquipe2' ~ rid,
+                        hidId:   'scoreEquipe2' ~ rid,
+                        hidName: 'scoreEquipe2',
+                        team:    2
+                    } %}
+                {% endif %}
+                {# ────────────────────────────────────────────────────────── #}
+
+                <!-- Match Card -->
+                <div class="match-card" id="planification-{{ rid }}">
+
+                    <!-- Time header -->
+                    <div class="time-header">
+                        <div class="time-display">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ planification.creneau_nom|slice(0, -3) }}</span>
+                        </div>
+                        <a href="?{{ swapQuery }}#planification-{{ rid }}" class="btn-swap {{ isSwapped ? 'is-swapped' : '' }}">
+                            <i class="fas fa-exchange-alt swap-icon"></i>
+                            Inverser
+                        </a>
+                    </div>
+
+                    <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ rid }}">
+                        <input type="hidden" name="return_id" value="row-{{ rid }}">
+
+                        <!-- Teams Grid -->
+                        <div class="teams-grid">
+
+                            {% for equipe in [gauche, droite] %}
+                                <div class="team-column">
+                                    <img src="{{ equipe.logo }}" class="team-logo" alt="{{ equipe.nom }}">
+                                    <div class="team-name">{{ equipe.nom }}</div>
+                                    <input type="hidden"
+                                           name="{{ equipe.hidName }}"
+                                           value="{{ equipe.score }}"
+                                           id="{{ equipe.hidId }}">
+                                    <div class="score-display" id="{{ equipe.dispId }}">
+                                        {{ equipe.score }}
+                                    </div>
+                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                        <div class="score-buttons">
+                                            <button type="button"
+                                                    class="btn-goal add"
+                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ equipe.team }}"
+                                                    hx-trigger="click"
+                                                    hx-on::after-request="vibrate(50)"
+                                                    hx-swap="innerHTML"
+                                                    hx-target="#{{ equipe.dispId }}"
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-plus"></i>
+                                                But
+                                            </button>
+                                            <button type="button"
+                                                    class="btn-goal remove"
+                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ equipe.team }}"
+                                                    hx-on::after-request="vibrate(200)"
+                                                    hx-trigger="click"
+                                                    hx-swap="innerHTML"
+                                                    hx-target="#{{ equipe.dispId }}"
+                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                        </div>{# /teams-grid #}
+
+                        <!-- Info section -->
+                        <div class="info-section">
+
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-flag"></i>
+                                    Status
+                                </div>
+                                <div class="info-value">
+                                    {% if planification.isTerminated == 1 %}
+                                        <span class="status-badge danger">
+                                            <i class="fas fa-check-circle"></i>
+                                            Rencontre terminée
+                                        </span>
+                                    {% else %}
+                                        {% if planification.est_premier_zero == true %}
+                                            {% if planification.isTerminated == 0 %}
+                                                <span class="status-badge danger">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    Saisir le score
+                                                </span>
+                                            {% elseif planification.isTerminated == 2 %}
+                                                <a class="status-badge primary"
+                                                   id="State{{ rid }}"
+                                                   role="button"
+                                                   onclick="updateStatus({{ rid }})">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                    En cours
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-tag"></i>
+                                    Catégorie
+                                </div>
+                                <div class="info-value">
+                                    <span class="category-badge" style="background-color: {{ planification.Couleur }};">
+                                        <i class="fas fa-layer-group"></i>
+                                        {{ planification.categorie_equipe1_nom }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-user-tie"></i>
+                                    Arbitre
+                                </div>
+                                <div class="info-value">
+                                    {{ planification.arbitre_nom }} {{ planification.arbitre_club_nom }}
+                                </div>
+                            </div>
+
+                            {% if partenaires is not empty %}
+                                {% set randIndex = random(0, partenaires|length - 1) %}
+                                {% set sponsor = partenaires[randIndex] %}
+                                <div class="sponsor-box">
+                                    <div class="sponsor-info">
+                                        <i class="fas fa-handshake" style="color: var(--primary-color);"></i>
+                                        Sponsorisé par
+                                        <strong>
+                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                                {{ sponsor.nom }}
+                                            </a>
+                                        </strong>
+                                        {% if sponsor.description %}
+                                            <br><em>{{ sponsor.description }}</em>
+                                        {% endif %}
+                                    </div>
+                                    {% if sponsor.logo %}
+                                        <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                        </div>{# /info-section #}
+                    </form>
+                </div>{# /match-card #}
+
+            {% elseif planification.label_description is not null %}
+
+                <!-- Label Card -->
+                <div class="label-card">
+                    <div class="time-header">
+                        <div class="time-display">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ planification.creneau_nom }}</span>
+                        </div>
+                    </div>
+                    <div class="label-content">
+                        <div class="label-text">
+                            <i class="fas fa-info-circle"></i>
+                            {{ planification.label_description }}
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function updateStatus(idRencontre) {
+        if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
+            const target = `#State${idRencontre}`;
+
+            const handler = function(evt) {
+                if (evt.target.id === `State${idRencontre}`) {
+                    document.body.removeEventListener('htmx:afterSwap', handler);
+                    location.reload();
+                }
+            };
+
+            document.body.addEventListener('htmx:afterSwap', handler);
+
+            htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
+                target: target,
+                swap: 'outerHTML'
+            });
         }
+    }
 
-        function vibrate(temps) {
-            if (navigator.vibrate) {
-                navigator.vibrate(temps);
-            }
+    function vibrate(temps) {
+        if (navigator.vibrate) {
+            navigator.vibrate(temps);
         }
+    }
 
-        $(document).ready(function () {
-            setTimeout(function () {
-                location.reload(true);
-            }, 30000);
-        });
-    </script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            location.reload(true);
+        }, 30000);
+    });
+</script>
 </body>
 </html>

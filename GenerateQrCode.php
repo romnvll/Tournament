@@ -182,45 +182,48 @@ $logoClub = $getClubNom ? $getClubNom['club_logo'] : null;
     </div>-->
 
     <!-- QR Code -->
-    <div class="col-md-6">
+    <div class="col-md-8">
         
        
-    <div class="card p-3 text-center position-relative">
+    <?php 
+    $clubs = $clubDao->clubsParticipatingInTournoi($_GET['idTournoi']);
+    $totalClubs = count($clubs);
+    $midpoint = (int) ceil($totalClubs / 2);
+    $clubsLeft  = array_slice($clubs, 0, $midpoint);
+    $clubsRight = array_slice($clubs, $midpoint);
+?>
+<div class="card p-3 text-center position-relative">
     <div class="d-flex justify-content-center align-items-center">
+
         <!-- Colonne gauche -->
-        <div class="d-flex flex-column align-items-center me-3" style="max-height:250px; overflow-y:auto;">
-            <?php foreach ($clubDao->clubsParticipatingInTournoi($_GET['idTournoi']) as $i => $club): ?>
-                <?php if ($i % 2 == 0): // Clubs pairs à gauche ?>
-                    <img src="<?= htmlspecialchars($club['logo']) ?>" 
-                         alt="<?= htmlspecialchars($club['nom']) ?>" 
-                         class="mb-2"
-                         style="max-height:40px; max-width:100px; object-fit:contain;">
-                <?php endif; ?>
+        <div class="d-flex flex-column align-items-center justify-content-around me-3" style="height:350px; min-width:80px;">
+            <?php foreach ($clubsLeft as $club): ?>
+                <img src="<?= htmlspecialchars($club['logo']) ?>" 
+                     alt="<?= htmlspecialchars($club['nom']) ?>" 
+                     title="<?= htmlspecialchars($club['nom']) ?>"
+                     style="max-height:<?= max(30, min(60, (int)(320 / max($midpoint, 1)))) ?>px; max-width:80px; object-fit:contain;">
             <?php endforeach; ?>
         </div>
 
         <!-- QR Code -->
         <div>
-            <img src="<?= $qrcode ?>" alt="QR Code" style="max-height:250px;">
+            <img src="<?= $qrcode ?>" alt="QR Code" style="max-height:350px;">
             <p class="mt-2">
                 <i class="fas fa-mobile-alt"></i> <?= t('ScannezPourVoirLesHorairesEtLieuxDeVosRencontres') ?>
             </p>
         </div>
 
         <!-- Colonne droite -->
-        <div class="d-flex flex-column align-items-center ms-3" style="max-height:250px; overflow-y:auto;">
-            <?php foreach ($clubDao->clubsParticipatingInTournoi($_GET['idTournoi']) as $i => $club): ?>
-                <?php if ($i % 2 == 1): // Clubs impairs à droite ?>
-                    <img src="<?= htmlspecialchars($club['logo']) ?>" 
-                         alt="<?= htmlspecialchars($club['nom']) ?>" 
-                         class="mb-2"
-                         style="max-height:40px; max-width:60px; object-fit:contain;">
-                <?php endif; ?>
+        <div class="d-flex flex-column align-items-center justify-content-around ms-3" style="height:350px; min-width:80px;">
+            <?php foreach ($clubsRight as $club): ?>
+                <img src="<?= htmlspecialchars($club['logo']) ?>" 
+                     alt="<?= htmlspecialchars($club['nom']) ?>" 
+                     title="<?= htmlspecialchars($club['nom']) ?>"
+                     style="max-height:<?= max(30, min(60, (int)(320 / max(count($clubsRight), 1)))) ?>px; max-width:80px; object-fit:contain;">
             <?php endforeach; ?>
         </div>
     </div>
 </div>
-
 
 
 

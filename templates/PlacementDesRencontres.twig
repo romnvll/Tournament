@@ -922,7 +922,15 @@
                                                         </div>
 
                                                         <div class="match-text">
-                                                            {% if planification.isClassement == 0 %}
+                                                               
+                                                            {% if planification.phase_finale_id is not null %}
+                                                            
+                                                                <strong>Elimination-Direct</strong> {{planification.phase_finale_libelle}}- {{planification.equipe1_categorie_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+                                                            
+
+                                                            {% elseif planification.isClassement == 0 %}
                                                                 <strong>Tour {{planification.tour}}</strong> - {{planification.equipe1_categorie_nom}}<br>
                                                                 {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
                                                                 <small class="text-muted">{{ planification.poule_nom }}</small>
@@ -968,17 +976,25 @@
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
-
+                
                                     <!-- Sélecteur vide -->
                                     {% if creneauOqp == false %}
                                         <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
+                                        
                                             <select class="empty-select" name="Addevent">
                                                 <option value="">{{t('choisirRencontreOuLabel')}}</option>
                                                 {% for planif in planificationSansCreneauNiTerrain %}
-                                                    {% if planif.isClassement == 0 %}
+                                                    {% if planif.phase_finale_id is not null %}
+                                                        {# Option pour phase finale à élimination directe #}
+                                                        <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
+                                                            Elimination-Direct - {{ planif.phase_finale_libelle }} - {{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}}
+                                                        </option>
+
+                                                    {% elseif planif.isClassement == 0 %}
                                                         <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
                                                             tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom|split(' - ')[1] }}
                                                         </option>
+
                                                     {% elseif planif.isClassement == 1 %}
                                                         <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
                                                             PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom }}

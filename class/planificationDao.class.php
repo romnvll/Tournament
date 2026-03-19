@@ -152,6 +152,77 @@ class planificationDao {
         $stmt->execute();
     }
     
+public function convertLabelsToRencontres(int $tournoi_id): void {
+    // Récupérer toutes les planifications avec des labels de phases finales
+    $stmt = $this->connexion->prepare("
+        SELECT p.planification_id, l.description, l.label_id, l.categorie_id, pf.id as phase_finale_id, pf.libelle
+        FROM Planification p
+        INNER JOIN Labels l ON p.label_id = l.label_id
+        INNER JOIN phases_finales pf ON l.description LIKE CONCAT('%', pf.libelle, '%')
+        WHERE p.tournoi_id = :tournoi_id 
+        AND p.label_id IS NOT NULL
+        AND pf.tournoi_id = :tournoi_id
+        ORDER BY p.creneau_id, p.terrain_id
+    ");
+    $stmt->bindParam(':tournoi_id', $tournoi_id);
+    $stmt->execute();
+    $planifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Préparer la requête pour récupérer les rencontres d'une phase finale ET catégorie données
+    $rencontre_stmt = $this->connexion->prepare("
+        SELECT r.id as rencontre_id
+        FROM Rencontres r
+        INNER JOIN Equipes e1 ON r.equipe1_id = e1.id
+        WHERE r.tournoi_id = :tournoi_id 
+        AND r.phase_finale_id = :phase_finale_id
+        AND e1.categorie = :categorie_id
+        ORDER BY r.id
+        LIMIT 1 OFFSET :offset
+    ");
+    
+    // Préparer la requête de mise à jour
+    $update_stmt = $this->connexion->prepare("
+        UPDATE Planification 
+        SET rencontre_id = :rencontre_id, label_id = NULL
+        WHERE planification_id = :planification_id AND tournoi_id = :tournoi_id
+    ");
+    
+    // Compteur pour chaque combinaison phase finale + catégorie
+    $phase_counters = [];
+    
+    foreach ($planifications as $planification) {
+        $phase_finale_id = $planification['phase_finale_id'];
+        $categorie_id = $planification['categorie_id'];
+        
+        // Créer une clé unique pour la combinaison phase + catégorie
+        $counter_key = $phase_finale_id . '_' . $categorie_id;
+        
+        // Initialiser le compteur pour cette combinaison si nécessaire
+        if (!isset($phase_counters[$counter_key])) {
+            $phase_counters[$counter_key] = 0;
+        }
+        
+        // Récupérer la rencontre correspondante pour cette phase et catégorie
+        $rencontre_stmt->bindParam(':tournoi_id', $tournoi_id);
+        $rencontre_stmt->bindParam(':phase_finale_id', $phase_finale_id);
+        $rencontre_stmt->bindParam(':categorie_id', $categorie_id);
+        $rencontre_stmt->bindParam(':offset', $phase_counters[$counter_key], PDO::PARAM_INT);
+        $rencontre_stmt->execute();
+        
+        $rencontre = $rencontre_stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($rencontre) {
+            // Mettre à jour la planification
+            $update_stmt->bindParam(':rencontre_id', $rencontre['rencontre_id']);
+            $update_stmt->bindParam(':planification_id', $planification['planification_id']);
+            $update_stmt->bindParam(':tournoi_id', $tournoi_id);
+            $update_stmt->execute();
+            
+            // Incrémenter le compteur pour cette combinaison
+            $phase_counters[$counter_key]++;
+        }
+    }
+}
     
 
    public function afficherPlanifications(int $tournoi_id): array {
@@ -165,6 +236,9 @@ class planificationDao {
             p.rencontre_id,
             r.isClassement,
             r.isTerminated,
+            r.phase_finale_id,
+            pf.libelle AS phase_finale_libelle,
+            pf.ordre AS phase_finale_ordre,
             r.equipe1_id,
             e1.nom AS equipe1_nom,
             e1.categorie AS equipe1_categorie,
@@ -194,8 +268,8 @@ class planificationDao {
             r.terrain AS rencontre_terrain,
             r.Arbitre AS rencontre_arbitre,
             r.tournoi_id AS rencontre_tournoi_id,
-            r.poule_id AS poule_id,       -- 👈 Ajout de l'ID de la poule
-            pl.nom AS poule_nom,         -- 👈 Ajout du nom de la poule
+            r.poule_id,
+            pl.nom AS poule_nom,
             p.tournoi_id,
             p.arbitre_id,
             a.nom AS arbitre_nom,
@@ -209,7 +283,8 @@ class planificationDao {
         LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
         LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN Rencontres r ON p.rencontre_id = r.id
-        LEFT JOIN Poules pl ON r.poule_id = pl.id   -- 👈 Jointure directe sur la poule
+        LEFT JOIN phases_finales pf ON r.phase_finale_id = pf.id
+        LEFT JOIN Poules pl ON r.poule_id = pl.id
         LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
         LEFT JOIN Categorie cat1 ON e1.categorie = cat1.id_categorie
         LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
@@ -305,19 +380,27 @@ ORDER BY
         
         $stmt = $this->connexion->prepare("
      SELECT r.*, 
+       pf.libelle AS phase_finale_libelle,
+
        e1.nom AS equipe1_nom, 
        e1.IsPresent AS equipe1_IsPresent, 
        e1.club_id AS equipe1_club_id, 
        e1.categorie AS equipe1_categorie_id,
        e1_cat.Nom_categorie AS equipe1_categorie_nom,
+
        e2.id AS equipe2_id,
        e2.nom AS equipe2_nom, 
        e2.IsPresent AS equipe2_IsPresent, 
        e2.club_id AS equipe2_club_id, 
        e2.categorie AS equipe2_categorie_id,
        e2_cat.Nom_categorie AS equipe2_categorie_nom,
-       MIN(p1.nom) AS equipe1_poule_nom  -- Sélectionne une seule poule
+
+       MIN(p1.nom) AS equipe1_poule_nom
+
 FROM Rencontres r
+LEFT JOIN phases_finales pf 
+       ON r.phase_finale_id = pf.id
+
 LEFT JOIN Planification pl ON r.id = pl.rencontre_id
 LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
 LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
@@ -325,8 +408,10 @@ LEFT JOIN Categorie e1_cat ON e1.categorie = e1_cat.id_categorie
 LEFT JOIN Categorie e2_cat ON e2.categorie = e2_cat.id_categorie
 LEFT JOIN EquipePoule ep1 ON e1.id = ep1.equipe_id
 LEFT JOIN Poules p1 ON ep1.poule_id = p1.id
+
 WHERE pl.rencontre_id IS NULL
 AND r.tournoi_id = :tournoi_id
+
 GROUP BY r.id
 ORDER BY r.tour ASC;
 

@@ -187,12 +187,12 @@ if (isset ($_GET['idPoule'])) {
  
   if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
     
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,$_GET['id_tournoi'],1);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1);
    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 
   }
    else {
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,$_GET['id_tournoi'],0);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,0);
    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],0);
 
    }
@@ -204,6 +204,7 @@ if (isset ($_GET['idPoule'])) {
 
  else {
   $GetResultatDesPoules = null;
+  $PouleHasPhasefinal = null;
  }
 
 

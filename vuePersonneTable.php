@@ -114,12 +114,13 @@ else {
 
 
 
-
+// Récupère les rencontres dont les équipes sont inversées (ex: ?swap[]=12&swap[]=34)
+$swappedIds = isset($_GET['swap']) ? array_map('intval', $_GET['swap']) : [];
 
 echo $template->render([
   
   
- 
+ 'swappedIds' => $swappedIds,
   'AfficherCodePin' => $afficherCodePin,
   'AffichagePlanification' => $affichagePlanification,
   'tournoiId' => $tournoiId,

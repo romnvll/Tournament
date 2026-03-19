@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3NFVPTP2MY"></script>
     <script>
@@ -14,11 +15,12 @@
     <meta charset="UTF-8">
     <meta name="description" content="Brackito est un logiciel français pour gérer vos tournois sportifs : création automatique des poules, planification des matchs, suivi des scores en direct.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <!--<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>-->
     <title>
         {% if IdPoules %}
             Vue par poule - Brackito
@@ -609,7 +611,7 @@
             text-align: center;
         }
 
-        <style>
+       
 .coach-info {
     display: flex;
     align-items: center;
@@ -767,7 +769,7 @@
 
              .footer-content {
         padding: 3px 8px;
-        gap: 5px;
+        gap: 5px;       
         overflow-x: auto; /* Permet le scroll horizontal si nécessaire */
         -webkit-overflow-scrolling: touch;
     }
@@ -1063,12 +1065,12 @@
                                 <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}#score" class="selection-item">
                                     <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}; font-size: 1.5rem;"></i>
                                     <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }} 
-                                    
+                                    {% if equipe.nomCoach %}
                                         <div class="coach-tag">
                                     <i class="fas fa-clipboard-user"></i>
                                     <span>Coach : {{ equipe.nomCoach }}</span>
                                 </div>
-
+                                    {% endif %}
 
                                     </div>
                                     
@@ -1190,6 +1192,24 @@
                                 </div>
                             </div>
                         {% endif %}
+                       
+                        {% if RencontreByPoule[0].equipe2_has_phase_finale or RencontreByPoule[0].equipe1_has_phase_finale %}
+                            <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+                                <i class="fas fa-trophy me-3 fs-4"></i>
+
+                                <div>
+                                    <strong>Phase finale disponible</strong><br>
+                                    Votre catégorie comporte une phase finale.
+
+                                    <div class="mt-2">
+                                        <a class="btn btn-sm btn-primary"
+                                        href="suiviArbreTournoiPublic.php?categorie_id={{ RencontreByPoule[0].equipe2_categorie_id }}&id_tournoi={{ idTournoi }}&affichageByTeam=true">
+                                            Voir le tableau final
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
 
                     {% if planTournoi is defined and planTournoi is not null %}
@@ -1208,7 +1228,7 @@
                         </div>
                     {% endif %}
                 {% endif %}
-
+                
                 <!-- Matches List -->
                 <div id="score">
                     {% if affichageByClubs %}
@@ -1220,8 +1240,9 @@
                     {% elseif IdPoules %}
                         {% set rencontres = RencontreByPoule %}
                     {% endif %}
-
+                     
                     {% for equipe in rencontres %}
+                       
                         <div class="match-card {% if equipe.score1 != 0 or equipe.score2 != 0 %}finished{% endif %}">
                             <div class="match-header">
                                 <!-- Team 1 -->
@@ -1403,7 +1424,7 @@
     <script>
     
 
-        var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
+      var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
 
         setInterval(function () {
             $('#score').load(location.href + ' #score > *');

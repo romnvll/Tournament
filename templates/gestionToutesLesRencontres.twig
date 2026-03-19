@@ -783,12 +783,14 @@
 																	{% endif %}
 																</div>
 															{% endif %}
-
+																
 															{% if planification.rencontre_id is not null %}
 																<div class="match-header" style="background: {{ planification.equipe1_categorie_couleur }};">
-																	{% if planification.isClassement == 1 %}
+																	{% if planification.isClassement == 1 and planification.phase_finale_id is null %}
 																		<i class="fa fa-trophy me-1"></i>
 																		Phase finale – Tour {{ planification.tour }} – {{planification.poule_nom }} – {{ planification.equipe1_categorie_nom }}
+																	{% elseif planification.phase_finale_id is not null %}
+																		{{ planification.phase_finale_libelle }} {{ planification.equipe1_categorie_nom }} {{planification.equipe1_nom}} vs {{planification.equipe2_nom}}
 																	{% else %}
 																		Tour {{ planification.tour }} – {{planification.poule_nom }}
 																	{% endif %}

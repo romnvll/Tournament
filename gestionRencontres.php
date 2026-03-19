@@ -83,7 +83,6 @@ echo $template->render([
   'tournoiEnCours' => $_SESSION['idTournoi'],
   'resultatRencontres' => $GetResultatDesPoules,
   'NombreEquipeParPoules' => $equipeDao->countEquipesPresentesInPoule($_GET['idPoule']),
-  'NombreTerrain' => $tournoi->getNbTerrainsById($_GET['idTournoi']),
   'InfoPoule' => $poulemanager->getInfoPoule($_GET['idPoule']),
 
 ]);

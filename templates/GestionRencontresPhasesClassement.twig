@@ -530,9 +530,10 @@
                         <div class="team-mobile-actions">
                             <div class="action-label">
                                 <i class="fas fa-plus-circle"></i>
-                                Ajouter dans une poule
+                                
                             </div>
                             <div class="action-buttons">
+                          
                                 {% for poule in afficherLespoulesFinales %}
                                     {% if equipe.categorie == poule.fk_idcategorie %}
                                         <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="badge rounded-pill bg-success">
@@ -549,7 +550,9 @@
                                     Retirer de la poule
                                 </div>
                                 <div class="action-buttons">
+                                
                                     {% for poule in equipe.poules %}
+                                    
                                         {% if poule.is_classement == 1 %}
                                             <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
                                                class="btn btn-danger btn-sm"
@@ -596,8 +599,18 @@
                                         <span class="text-success fw-bold me-2">Rencontres créées</span>
                                         <i class="fas fa-check-circle text-success fs-4"></i>
                                     {% else %}
-                                        <span class="text-danger fw-bold me-2">Aucune rencontre créée</span>
-                                        <i class="fas fa-times-circle text-danger fs-4"></i>
+                                        <div style="display:inline-flex; align-items:center; gap:10px; padding:10px 16px; background:#fef2f2; border:1px solid #fca5a5; border-radius:12px;">
+                                        <i class="fas fa-exclamation-circle" style="font-size:16px; color:#ef4444; flex-shrink:0;"></i>
+                                        <span style="font-size:14px; font-weight:500; color:#b91c1c;">Aucune rencontre créée</span>
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
+                                        style="display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; font-size:13px; font-weight:500; color:#b91c1c; text-decoration:none; margin-left:4px;">
+                                            <i class="bi bi-trash" style="font-size:13px;"></i>
+                                            Supprimer la poule
+                                        </a>
+                                    </div>
+
+                                       
+
                                     {% endif %}
                                 </div>
                             </div>

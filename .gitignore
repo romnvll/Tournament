@@ -7,6 +7,7 @@ Audio/*
 !Audio/**/
 !Audio/**/.gitkeep
 Sponsors/*
+img/planTournoi/*
 !Sponsors/.gitignore
 uploadsAssistance/*
 !uploadsAssistance/.gitignore

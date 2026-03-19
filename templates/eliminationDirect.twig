@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Gestion des phases finales</title>
+</head>
+<body>
+
+<style>
+:root {
+    --page-primary-color: #4f46e5;
+    --page-primary-hover: #4338ca;
+    --page-danger-color: #ef4444;
+    --page-warning-color: #f59e0b;
+    --page-success-color: #10b981;
+    --page-info-color: #06b6d4;
+    --page-bg-dark: #1f2937;
+    --page-bg-light: #f9fafb;
+    --page-text-light: #6b7280;
+    --page-shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --page-shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --page-shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --page-shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+    --page-border-radius: 12px;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    padding-top: 10px;
+}
+
+.container:not(.container-fluid) {
+    background: white;
+    border-radius: var(--page-border-radius);
+    box-shadow: var(--page-shadow-xl);
+    padding: 40px;
+    max-width: 1400px;
+    margin: 20px auto;
+}
+
+.container h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--page-bg-dark);
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid var(--page-primary-color);
+    text-align: center;
+}
+
+.container .card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: var(--page-border-radius);
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: var(--page-shadow-md);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease;
+}
+
+.container .card:hover {
+    box-shadow: var(--page-shadow-lg);
+    transform: translateY(-3px);
+}
+
+.container .card-header {
+    background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
+    color: white;
+    padding: 20px 30px;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.container .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.container .card:hover .card-header::before {
+    left: 100%;
+}
+
+.container .card-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.container .card-header .badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.container .card-header.bg-warning {
+    background: linear-gradient(135deg, var(--page-warning-color), #d97706);
+}
+
+.container .card-header.bg-success {
+    background: linear-gradient(135deg, var(--page-success-color), #059669);
+}
+
+.container .card-body {
+    padding: 30px;
+    background: white;
+}
+
+.container .card.border-warning {
+    border: 3px solid var(--page-warning-color);
+}
+
+.container .btn-info {
+    background: linear-gradient(135deg, var(--page-info-color), #0891b2);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    box-shadow: var(--page-shadow-sm);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.container .btn-info:hover {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    transform: translateY(-2px);
+    box-shadow: var(--page-shadow-md);
+    color: white;
+}
+
+.container h3 {
+    color: var(--page-bg-dark);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.container h4 {
+    color: var(--page-text-light);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+.container ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+.container ul li {
+    background: var(--page-bg-light);
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border-left: 4px solid var(--page-primary-color);
+    box-shadow: var(--page-shadow-sm);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: var(--page-bg-dark);
+}
+
+.container ul li:hover {
+    border-left-color: var(--page-primary-hover);
+    transform: translateX(5px);
+    box-shadow: var(--page-shadow-md);
+    background: white;
+}
+
+.container .alert {
+    border-radius: var(--page-border-radius);
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--page-shadow-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    border: none;
+    animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.container .alert-info {
+    background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05));
+    border: 2px solid var(--page-info-color);
+    border-left: 4px solid var(--page-info-color);
+    color: var(--page-bg-dark);
+}
+
+.container .alert-danger {
+    background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.05));
+    border: 2px solid var(--page-danger-color);
+    border-left: 4px solid var(--page-danger-color);
+    color: #7a3a3a;
+}
+
+.container .alert-warning {
+    background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05));
+    border: 2px solid var(--page-warning-color);
+    border-left: 4px solid var(--page-warning-color);
+    color: var(--page-bg-dark);
+}
+
+.container .alert strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.container .alert i {
+    font-size: 1.3rem;
+    margin-right: 10px;
+}
+
+.container .alert-info i  { color: var(--page-info-color); }
+.container .alert-danger i { color: var(--page-danger-color); }
+.container .alert-warning i { color: var(--page-warning-color); }
+
+.container .alert ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.container .alert ul li {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 5px 0;
+    list-style: disc;
+    margin-bottom: 5px;
+}
+
+.container .alert ul li:hover {
+    transform: none;
+    background: transparent;
+}
+
+.container .alert label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.container .form-select {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: var(--page-bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.container .form-select:focus {
+    outline: none;
+    border-color: var(--page-primary-color);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+
+.container .form-select:hover {
+    border-color: var(--page-primary-hover);
+}
+
+.container .form-select option:disabled {
+    color: var(--page-text-light);
+    font-style: italic;
+}
+
+.container .btn-primary {
+    background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: var(--page-shadow-md);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.container .btn-primary:hover {
+    background: linear-gradient(135deg, var(--page-primary-hover), var(--page-primary-color));
+    transform: translateY(-3px);
+    box-shadow: var(--page-shadow-lg);
+}
+
+.container .btn-lg {
+    font-size: 1.2rem;
+    padding: 18px 40px;
+}
+
+.container .fas,
+.container .fa {
+    margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        padding-top: 70px;
+    }
+
+    .container:not(.container-fluid) {
+        padding: 20px;
+    }
+
+    .container h1 {
+        font-size: 1.6rem;
+    }
+
+    .container .card-header h2 {
+        font-size: 1.3rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .container .btn-primary {
+        font-size: 1rem;
+        padding: 12px 25px;
+    }
+
+    .container .alert {
+        flex-direction: column;
+    }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.container input[type="hidden"] { display: none; }
+.container form { margin: 0; }
+.container .mb-0 { margin-bottom: 0 !important; }
+.container .mb-3 { margin-bottom: 1rem !important; }
+.container .mb-4 { margin-bottom: 1.5rem !important; }
+.container .mt-3 { margin-top: 1rem !important; }
+.container .mt-4 { margin-top: 1.5rem !important; }
+.container .d-inline-block { display: inline-block !important; }
+.container .text-white { color: white !important; }
+.container .text-dark  { color: var(--page-bg-dark) !important; }
+.container .bg-light   { background-color: var(--page-bg-light) !important; }
+
+.container button:focus,
+.container input:focus,
+.container select:focus { outline: none; }
+</style>
+
+<div class="header">
+    {{ include('header.twig') }}
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h1>Classement des Équipes par Catégorie et Poule</h1>
+        </div>
+    </div>
+
+    <p style="font-weight: 600; color: var(--page-text-light); margin-bottom: 20px;">Choisir une catégorie</p>
+
+    {% for categorieNom, poules in classement %}
+
+        {# ── Nombre de poules ───────────────────────────────────────────── #}
+        {% set nbPoules = poules|length %}
+
+        {# ── Équipes uniques (sans doublons inter-poules) ───────────────── #}
+        {% set equipesUniques = [] %}
+        {% for pouleId, equipes in poules %}
+            {% for equipe in equipes %}
+                {% if equipe.id not in equipesUniques %}
+                    {% set equipesUniques = equipesUniques|merge([equipe.id]) %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        {% set nbEquipesTotal = equipesUniques|length %}
+
+        {# ── Détection de doublons ──────────────────────────────────────── #}
+        {% set nbEquipesTotalAvecDoublons = 0 %}
+        {% for pouleId, equipes in poules %}
+            {% set nbEquipesTotalAvecDoublons = nbEquipesTotalAvecDoublons + equipes|length %}
+        {% endfor %}
+        {% set hasDoublons = nbEquipesTotalAvecDoublons != nbEquipesTotal %}
+
+        {# ── Nombre max d'équipes dans une poule ───────────────────────── #}
+        {% set maxEquipesParPoule = 0 %}
+        {% for pouleId, equipes in poules %}
+            {% if equipes|length > maxEquipesParPoule %}
+                {% set maxEquipesParPoule = equipes|length %}
+            {% endif %}
+        {% endfor %}
+
+        {# ── Valeurs valides : X qualifiés/poule tel que X × nbPoules      #}
+        {#    soit une puissance de 2, et X ≤ maxEquipesParPoule ──────────  #}
+        {% set valeursValides = [] %}
+        {% for i in 1..maxEquipesParPoule %}
+            {% set totalQualifies = i * nbPoules %}
+            {% if totalQualifies in [2, 4, 8, 16, 32, 64] %}
+                {% set valeursValides = valeursValides|merge([i]) %}
+            {% endif %}
+        {% endfor %}
+
+        {# ── Compatible = il existe au moins une option valide ET pas de   #}
+        {#    doublons ─────────────────────────────────────────────────── #}
+        {% set isCompatible = valeursValides|length > 0 and not hasDoublons %}
+
+        {# ════════════════════════════════════════════════════════════════ #}
+        {# CAS 1 — Compatible : afficher le formulaire                     #}
+        {# ════════════════════════════════════════════════════════════════ #}
+        {% if isCompatible %}
+
+            {% set firstPoule = poules|first %}
+            {% set firstTeam  = firstPoule|first %}
+            {% set categorieId = firstTeam.categorie %}
+
+            <form method="post" action="EliminationDirect_traitement.php?id_tournoi={{ idTournoi }}">
+
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="mb-0">
+                            {{ categorieNom }}
+                            <span class="badge bg-light text-dark">
+                                {{ nbPoules }} poule{{ nbPoules > 1 ? 's' : '' }} — {{ nbEquipesTotal }} équipe{{ nbEquipesTotal > 1 ? 's' : '' }}
+                            </span>
+                            <input type="hidden" name="categorieId" value="{{ categorieId }}" />
+                        </h2>
+                    </div>
+
+                    <div class="card-body">
+
+                        <a href="gestionArbreTournoi.php?categorie_id={{ categorieId }}&id_tournoi={{ idTournoi }}" class="btn btn-info mb-3">
+                            <i class="fas fa-sitemap"></i> Voir l'arbre de {{ categorieNom }}
+                        </a>
+
+                        {# ── Liste des poules ──────────────────────────── #}
+                        {% for pouleId, equipes in poules %}
+
+                            <h3>Poule {{ equipes[0].poule_nom }} ({{ equipes|length }} équipe{{ equipes|length > 1 ? 's' : '' }})</h3>
+
+                            <input type="hidden" name="pouleIds[]" value="{{ pouleId }}" />
+
+                            <ul>
+                                {% for equipe in equipes %}
+                                    <input type="hidden" name="equipes[{{ pouleId }}][]" value="{{ equipe.id }}" />
+                                    <input type="hidden" name="equipes_positions[{{ equipe.id }}]" value="{{ loop.index }}" />
+                                    <li>{{ loop.index }}. {{ equipe.equipe_nom }} ({{ equipe.id }})</li>
+                                {% endfor %}
+                            </ul>
+
+                        {% endfor %}
+
+                        {# ── Sélecteur de qualifiés ────────────────────── #}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i>
+                            <div style="flex: 1;">
+                                <label for="qualifiesNombre_{{ categorieId }}">
+                                    <strong>Nombre de qualifiés par poule :</strong>
+                                </label>
+                                <select name="qualifiesNombre"
+                                        id="qualifiesNombre_{{ categorieId }}"
+                                        class="form-select d-inline-block"
+                                        style="width: auto;"
+                                        required>
+                                    <option value="" disabled selected>— Choisir —</option>
+                                    {% for valeur in valeursValides %}
+                                        {% set totalAvecCetteValeur = valeur * nbPoules %}
+                                        <option value="{{ valeur }}">
+                                            {{ valeur }} par poule → {{ totalAvecCetteValeur }} équipes qualifiées
+                                            {% if totalAvecCetteValeur == 2 %}(Finale)
+                                            {% elseif totalAvecCetteValeur == 4 %}(Demi-finales)
+                                            {% elseif totalAvecCetteValeur == 8 %}(Quarts de finale)
+                                            {% elseif totalAvecCetteValeur == 16 %}(8èmes de finale)
+                                            {% elseif totalAvecCetteValeur == 32 %}(16èmes de finale)
+                                            {% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <input type="submit"
+                               value="Créer les matchs d'élimination pour {{ categorieNom }}"
+                               class="btn btn-primary btn-lg" />
+
+                    </div>
+                </div>
+
+            </form>
+
+        {# ════════════════════════════════════════════════════════════════ #}
+        {# CAS 2 — Non compatible : afficher l'avertissement               #}
+        {# ════════════════════════════════════════════════════════════════ #}
+        {% else %}
+
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="mb-0">
+                        {{ categorieNom }}
+                        <span class="badge bg-light text-dark">
+                            {{ nbPoules }} poule{{ nbPoules > 1 ? 's' : '' }} — {{ nbEquipesTotal }} équipe{{ nbEquipesTotal > 1 ? 's' : '' }} unique{{ nbEquipesTotal > 1 ? 's' : '' }}
+                        </span>
+                    </h2>
+                </div>
+
+                <div class="card-body">
+
+                    {# Doublons inter-poules #}
+                    {% if hasDoublons %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Équipes en doublon détectées !</strong>
+                                <p style="margin: 10px 0 0 0;">
+                                    Cette catégorie contient des équipes présentes dans plusieurs poules.<br>
+                                    <strong>{{ nbEquipesTotalAvecDoublons }} inscriptions</strong> pour seulement <strong>{{ nbEquipesTotal }} équipes uniques</strong>.
+                                </p>
+                                <p style="margin: 10px 0 0 0;">Chaque équipe doit être dans une seule poule pour l'élimination directe.</p>
+                            </div>
+                        </div>
+
+                    {# Aucune combinaison valide #}
+                    {% elseif valeursValides|length == 0 %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Configuration non compatible avec l'élimination directe.</strong>
+                                <p style="margin: 10px 0;">
+                                    Cette catégorie compte <strong>{{ nbPoules }} poule{{ nbPoules > 1 ? 's' : '' }}</strong>
+                                    avec au maximum <strong>{{ maxEquipesParPoule }} équipe{{ maxEquipesParPoule > 1 ? 's' : '' }}</strong> par poule.
+                                    Aucune combinaison de qualifiés par poule ne produit un total en puissance de 2 (2, 4, 8, 16, 32…).
+                                </p>
+                                <strong>Suggestions :</strong>
+                                <ul>
+                                    <li>Modifiez le nombre de poules ou le nombre d'équipes par poule afin qu'une valeur X × {{ nbPoules }} soit égale à 2, 4, 8, 16 ou 32.</li>
+                                    {% if (2 % nbPoules) == 0 %}<li>Prenez {{ 2 / nbPoules }} qualifié{{ (2 / nbPoules) > 1 ? 's' : '' }} par poule → 2 équipes (Finale)</li>{% endif %}
+                                    {% if (4 % nbPoules) == 0 %}<li>Prenez {{ 4 / nbPoules }} qualifié{{ (4 / nbPoules) > 1 ? 's' : '' }} par poule → 4 équipes (Demi-finales)</li>{% endif %}
+                                    {% if (8 % nbPoules) == 0 %}<li>Prenez {{ 8 / nbPoules }} qualifié{{ (8 / nbPoules) > 1 ? 's' : '' }} par poule → 8 équipes (Quarts de finale)</li>{% endif %}
+                                    {% if (16 % nbPoules) == 0 %}<li>Prenez {{ 16 / nbPoules }} qualifié{{ (16 / nbPoules) > 1 ? 's' : '' }} par poule → 16 équipes (8èmes de finale)</li>{% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {# Affichage informatif des poules même en cas d'erreur #}
+                    {% for pouleId, equipes in poules %}
+                        <h4>Poule {{ equipes[0].poule_nom }} ({{ equipes|length }} équipe{{ equipes|length > 1 ? 's' : '' }})</h4>
+                        <ul>
+                            {% for equipe in equipes %}
+                                <li>{{ loop.index }}. {{ equipe.equipe_nom }} ({{ equipe.id }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

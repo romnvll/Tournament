@@ -1,0 +1,24 @@
+CREATE TABLE phases_finales (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tournoi_id INT NOT NULL,
+    libelle VARCHAR(50) NOT NULL,  -- "1/8 Finale", "Quart", etc.
+    ordre INT NOT NULL              -- pour tri si nécessaire
+);
+
+
+
+ALTER TABLE Rencontres
+ADD COLUMN phase_finale_id INT NULL,
+ADD CONSTRAINT fk_phase_finale
+    FOREIGN KEY (phase_finale_id) REFERENCES phases_finales(id)
+    ON DELETE SET NULL;
+
+
+ALTER TABLE Labels
+ADD categorie_id INT NULL,
+ADD CONSTRAINT fk_labels_categorie
+FOREIGN KEY (categorie_id)
+REFERENCES Categorie(id_categorie)
+ON DELETE SET NULL;
+
+
