@@ -461,20 +461,25 @@
         <span class="step-badge">5</span>
         <i class="fa-solid fa-chevron-right ms-auto"></i>
     </a>
-    <ul class="dropdown-menu">
-        <li>
-            <a class="dropdown-item" 
-               href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}">
-                <span>Phase de classement</span>
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item" 
-               href="EliminationDirect.php?id_tournoi={{idTournoi}}">
-                <span>Élimination directe ( ATTENTION EN BETA )</span>
-            </a>
-        </li>
-    </ul>
+    <ul class="dropdown-menu dropdown-menu-modern">
+    <li>
+        <a class="dropdown-item dropdown-item-modern" 
+           href="gestionRencontresPhaseClassement.php?idTournoiBase={{idTournoi}}">
+            <i class="fa-solid fa-medal"></i>
+            <span>Phase de classement</span>
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item dropdown-item-modern" 
+           href="EliminationDirect.php?id_tournoi={{idTournoi}}">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Élimination directe</span>
+            <span class="ms-auto badge" style="background: #f97316; color: white; font-size: 0.7rem; padding: 3px 8px; border-radius: 10px;">
+                BETA
+            </span>
+        </a>
+    </li>
+</ul>
 </li>
                         <li><hr class="dropdown-divider dropdown-divider-modern"/></li>
                         <li>
