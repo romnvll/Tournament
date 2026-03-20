@@ -574,7 +574,7 @@
                                     </span>
                                 </div>
                             </div>
-
+                            {% if   planification.arbitre_nom  %}
                             <div class="info-row">
                                 <div class="info-label">
                                     <i class="fas fa-user-tie"></i>
@@ -584,7 +584,7 @@
                                     {{ planification.arbitre_nom }} {{ planification.arbitre_club_nom }}
                                 </div>
                             </div>
-
+                            {% endif %}
                             {% if partenaires is not empty %}
                                 {% set randIndex = random(0, partenaires|length - 1) %}
                                 {% set sponsor = partenaires[randIndex] %}
