@@ -500,6 +500,7 @@
                                         <div class="score-buttons">
                                             <button type="button"
                                                     class="btn-goal add"
+                                                    
                                                     hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ equipe.team }}"
                                                     hx-trigger="click"
                                                     hx-on::after-request="vibrate(50)"
@@ -657,16 +658,30 @@
     }
 
     function vibrate(temps) {
+       
+
         if (navigator.vibrate) {
             navigator.vibrate(temps);
+           
         }
+        
+
     }
 
-    $(document).ready(function () {
-        setTimeout(function () {
-            location.reload(true);
-        }, 30000);
-    });
+$(document).ready(function () {
+    // Restaure la position si elle a été sauvegardée
+    const savedScroll = sessionStorage.getItem('scrollPos');
+    if (savedScroll) {
+        window.scrollTo(0, parseInt(savedScroll));
+        sessionStorage.removeItem('scrollPos');
+    }
+
+    setTimeout(function () {
+        // Sauvegarde la position avant de recharger
+        sessionStorage.setItem('scrollPos', window.scrollY);
+        window.location.replace(window.location.pathname);
+    }, 30000);
+});
 </script>
 </body>
 </html>
