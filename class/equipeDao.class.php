@@ -125,11 +125,11 @@ public function modifierNomCoach(int $id, string $nomCoach): void
     $stmt->execute();
 }
 
-    public function mettreAJourAudioEquipe(int $idEquipe, string $audioPath): void
+public function mettreAJourAudioEquipe(int $idEquipe, ?string $audioPath): void
 {
     $stmt = $this->connexion->prepare("UPDATE Equipes SET audio_path = :audio_path WHERE id = :id");
-    $stmt->bindParam(':audio_path', $audioPath);
-    $stmt->bindParam(':id', $idEquipe);
+    $stmt->bindParam(':audio_path', $audioPath, $audioPath === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $stmt->bindParam(':id', $idEquipe, PDO::PARAM_INT);
     $stmt->execute();
 }
 

@@ -440,6 +440,8 @@
         .audio-btn-group {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .audio-btn {
@@ -461,6 +463,24 @@
             background: linear-gradient(135deg, var(--danger-color), #dc2626);
             color: white;
         }
+
+        /* ===== NOUVEAU : bouton supprimer audio ===== */
+        .audio-btn.delete-audio {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .audio-btn.delete-audio:hover:not(:disabled) {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .audio-btn.delete-audio:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        /* ============================================ */
 
         .audio-btn:disabled {
             opacity: 0.5;
@@ -800,7 +820,8 @@
                                     <th style="display:none">Id</th>
                                     <th>{{t('Club')}}</th>
                                     <th>{{t('nomEquipe')}}</th>
-                                    {% if infotournoi.gestionVoix == 1 %}
+                                    
+                                    {% if infoTournoi.gestionVoix == 1 %}
                                         <th>Son de l'équipe</th>
                                     {% endif %}
                                     <th>{{t('categorie')}}</th>
@@ -905,8 +926,7 @@
     <small id="notif-{{ equipe.id }}" class="text-success"></small>
 </td>
 
-
-                                        <!-- Audio -->
+                                    <!-- Audio -->
                                         {% if infoTournoi.gestionVoix == 1 %}
                                             <td class="text-center" data-id-tournoi="{{tournoiEnCours}}" data-id-equipe="{{ equipe.id }}">
                                                 <div class="audio-controls">
@@ -917,10 +937,18 @@
                                                         <button onclick="stopRecording(this)" class="audio-btn stop" disabled>
                                                             ⏹️ {{t('stop')}}
                                                         </button>
+                                                        {# ===== NOUVEAU : bouton supprimer l'enregistrement ===== #}
+                                                        <button onclick="deleteAudio(this)" 
+                                                                class="audio-btn delete-audio"
+                                                                {% if equipe.audio_path == null %}disabled{% endif %}
+                                                                title="Supprimer l'enregistrement">
+                                                            🗑️ Supprimer
+                                                        </button>
+                                                        {# ===================================================== #}
                                                     </div>
                                                     <audio controls class="audio-player" preload="none" 
                                                            src="Audio/{{idTournoi}}/Equipe/{{ equipe.id }}.wav"></audio>
-                                                    <div class="audio-status">
+                                                    <div class="audio-status" id="audio-status-{{ equipe.id }}">
                                                         {% if equipe.audio_path == null %}
                                                             <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);"></i>
                                                         {% else %}
@@ -1088,6 +1116,16 @@
                         const baseSrc = audioElement.src.split('?')[0];
                         audioElement.src = baseSrc + '?t=' + new Date().getTime();
                         audioElement.load();
+
+                        // Mettre à jour le statut et activer le bouton supprimer
+                        const statusDiv = td.querySelector('.audio-status');
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '<i class="fa-solid fa-volume-high" style="color: var(--success-color);"></i>';
+                        }
+                        const deleteBtn = td.querySelector('button.delete-audio');
+                        if (deleteBtn) {
+                            deleteBtn.disabled = false;
+                        }
                     } else {
                         alert('Erreur lors de l\'envoi');
                     }
@@ -1111,21 +1149,92 @@
         }
     }
 
+    // ===== NOUVEAU : Supprimer l'enregistrement audio =====
+    function deleteAudio(btn) {
+        if (!confirm('Voulez-vous vraiment supprimer cet enregistrement ?')) {
+            return;
+        }
+
+        const td = btn.closest('td');
+        const idTournoi = td.dataset.idTournoi;
+        const idEquipe = td.dataset.idEquipe;
+
+        const formData = new FormData();
+        formData.append('idTournoi', idTournoi);
+        formData.append('idEquipe', idEquipe);
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Suppression...';
+
+        fetch('delete_audio.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Vider le lecteur audio
+                const audioElement = td.querySelector('audio');
+                if (audioElement) {
+                    audioElement.pause();
+                    audioElement.src = '';
+                    audioElement.load();
+                }
+
+                // Mettre à jour l'icône de statut
+                const statusDiv = td.querySelector('.audio-status');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '<i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);"></i>';
+                }
+
+                // Garder le bouton désactivé (plus rien à supprimer)
+                btn.textContent = '🗑️ Supprimer';
+                btn.disabled = true;
+
+                alert('Enregistrement supprimé avec succès');
+            } else {
+                alert('Erreur : ' + (data.message || 'Impossible de supprimer le fichier'));
+                btn.disabled = false;
+                btn.textContent = '🗑️ Supprimer';
+            }
+        })
+        .catch(err => {
+            console.error('Erreur réseau :', err);
+            alert('Erreur réseau lors de la suppression');
+            btn.disabled = false;
+            btn.textContent = '🗑️ Supprimer';
+        });
+    }
+    // ======================================================
+
     // Charger les fichiers audio
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll("td[data-id-tournoi][data-id-equipe]").forEach(td => {
             const idTournoi = td.dataset.idTournoi;
             const idEquipe = td.dataset.idEquipe;
             const audioTag = td.querySelector("audio");
+            const deleteBtn = td.querySelector("button.delete-audio");
 
             const url = `Audio/${idTournoi}/Equipe/${idEquipe}.wav`;
 
             fetch(url, { method: 'HEAD' }).then(resp => {
                 if (resp.ok) {
                     audioTag.src = url;
+                    // Activer le bouton supprimer si le fichier existe
+                    if (deleteBtn) {
+                        deleteBtn.disabled = false;
+                    }
+                } else {
+                    // Désactiver le bouton supprimer si pas de fichier
+                    if (deleteBtn) {
+                        deleteBtn.disabled = true;
+                    }
                 }
             }).catch(e => {
                 console.warn("Audio introuvable :", url);
+                if (deleteBtn) {
+                    deleteBtn.disabled = true;
+                }
             });
         });
     });

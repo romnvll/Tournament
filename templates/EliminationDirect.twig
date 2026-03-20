@@ -614,47 +614,17 @@ body {
                                 <a href="gestionArbreTournoi.php?categorie_id={{ categorieId }}&id_tournoi={{ idTournoi }}" class="btn btn-info mb-3">
                                     <i class="fas fa-sitemap"></i> Voir l'arbre de {{ categorieNom }}
                                 </a>
-                               <span class="badge bg-info text-white">Résultats des phases de poules</span>
 
                                 {% for pouleId, equipes in poules %}
                                     <h3>Poule {{ equipes[0].poule_nom }} ({{ equipes|length }} équipe{{ equipes|length > 1 ? 's' : '' }})</h3>
                                     <input type="hidden" name="pouleIds[]" value="{{ pouleId }}" />
-                                    <ul class="list-unstyled mb-0">
-    {% for equipe in equipes %}
-        <input type="hidden" name="equipes[{{ pouleId }}][]" value="{{ equipe.id }}" />
-        <input type="hidden" name="equipes_positions[{{ equipe.id }}]" value="{{ loop.index }}" />
-        
-        <li class="d-flex align-items-center justify-content-between py-2 px-3 mb-1 rounded"
-            style="background: {% if loop.index == 1 %}rgba(245,158,11,0.15){% else %}var(--bg-light){% endif %};">
-            
-            <!-- Rang + Nom -->
-            <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold" style="
-                    width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                    font-size: 0.8rem;
-                    background: {% if loop.index == 1 %}#f59e0b{% elseif loop.index == 2 %}#9ca3af{% elseif loop.index == 3 %}#b45309{% else %}#e5e7eb{% endif %};
-                    color: {% if loop.index <= 3 %}white{% else %}var(--bg-dark){% endif %};">
-                    {{ loop.index }}
-                </span>
-                <span class="fw-semibold" style="font-size: 0.9rem;">{{ equipe.equipe_nom }}</span>
-            </div>
-
-            <!-- Stats -->
-            <div class="d-flex align-items-center gap-2" style="font-size: 0.8rem; color: #6b7280;">
-                <span class="badge rounded-pill" style="background: var(--warning-color); color: black;">
-                    {{ equipe.TotalDesPoints }} pts
-                </span>
-                <span title="Buts marqués" style="color: var(--success-color);">+{{ equipe.nombreButsMarque }}</span>
-                <span>|</span>
-                <span title="Buts encaissés" style="color: var(--danger-color);">-{{ equipe.nombreButsEncaisse }}</span>
-                <span>|</span>
-                <span title="Différence" class="fw-bold" style="color: {% if equipe.DifferenceButs >= 0 %}var(--success-color){% else %}var(--danger-color){% endif %};">
-                    {% if equipe.DifferenceButs > 0 %}+{% endif %}{{ equipe.DifferenceButs }}
-                </span>
-            </div>
-        </li>
-    {% endfor %}
-</ul>
+                                    <ul>
+                                        {% for equipe in equipes %}
+                                            <input type="hidden" name="equipes[{{ pouleId }}][]" value="{{ equipe.id }}" />
+                                            <input type="hidden" name="equipes_positions[{{ equipe.id }}]" value="{{ loop.index }}" />
+                                            <li>{{ loop.index }}. {{ equipe.equipe_nom }} ({{ equipe.id }})</li>
+                                        {% endfor %}
+                                    </ul>
                                 {% endfor %}
 
                                 <div class="alert alert-info mt-3">
