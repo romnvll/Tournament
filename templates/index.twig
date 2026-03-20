@@ -240,21 +240,20 @@
         }
 
         .team-name {
-            font-size: 0.9rem;
-            font-weight: 400;
-            text-align: center;
-            background: var(--bg-dark);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 8px;
-            text-decoration: none;
-             /* Ajouts pour gérer les noms longs */
-    word-break: break-word;
-    overflow-wrap: break-word;
-    max-width: 100px;        /* limite la largeur */
+    font-size: clamp(0.6rem, 2vw, 0.9rem); /* réduit automatiquement selon la longueur */
+    font-weight: 400;
+    text-align: center;
+    background: var(--bg-dark);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    max-width: 110px;
+    word-break: keep-all;
+    overflow-wrap: normal;
     line-height: 1.2;
     display: inline-block;
-        }
+}
 
         .match-center {
             display: flex;
@@ -1286,6 +1285,10 @@
                                             <i class="fas fa-clipboard-user"></i>
                                             <span>{{ equipe.equipe1_coach_nom|upper }}</span>
                                         </div>
+                                    {% else %}
+                                    <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                    </div>
                                     {% endif %}
                                 </div>
 
@@ -1334,6 +1337,12 @@
                                             <i class="fas fa-clipboard-user"></i>
                                             <span>{{ equipe.equipe2_coach_nom|upper }}</span>
                                         </div>
+                                        {% else %}
+                                    <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                            
+                                        </div>
+                                    
                                     {% endif %}
                                 </div>
                             </div>
