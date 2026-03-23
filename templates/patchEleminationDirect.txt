@@ -21,4 +21,11 @@ FOREIGN KEY (categorie_id)
 REFERENCES Categorie(id_categorie)
 ON DELETE SET NULL;
 
+ALTER TABLE PersonneTable 
+DROP FOREIGN KEY PersonneTable_ibfk_1;
+
+ALTER TABLE PersonneTable 
+ADD CONSTRAINT PersonneTable_ibfk_1 
+FOREIGN KEY (personne_id) REFERENCES Personne(id) 
+ON DELETE CASCADE;
 

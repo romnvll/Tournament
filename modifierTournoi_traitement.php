@@ -63,7 +63,7 @@ if ($_GET['action'] == "sendMail") {
 }
 
 
-if ($_GET['addPersonne'] == "true") {
+if (isset($_GET['addPersonne']) && $_GET['addPersonne'] == "true") {
 
    $nom=$_GET['nom'];
    $prenom=$_GET['prenom'];
@@ -77,7 +77,7 @@ if ($_GET['addPersonne'] == "true") {
 
 }
 
-if ($_GET['action'] == "delPersonne") {
+if (isset($_GET['action']) && $_GET['action'] == "delPersonne") {
 
     $idPersonne=$_GET['idPersonne'];
     (int)$idTournoi = $_GET['tournoiId'];
@@ -89,7 +89,7 @@ if ($_GET['action'] == "delPersonne") {
  }
  
 
-if ($_GET['addArbitre'] == true) {
+if (isset($_GET['addArbitre']) && $_GET['addArbitre'] == "true") {
     (int)$idTournoi = $_GET['tournoiId'];
     require 'class/arbitreDao.class.php';
     $arbitre=new arbitreDao();
