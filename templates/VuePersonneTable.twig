@@ -667,7 +667,12 @@
         
 
     }
-
+  $(document).ready(function () {
+            setTimeout(function () {
+                location.reload(true);
+            }, 30000);
+    });
+    
 $(document).ready(function () {
     // Restaure la position si elle a été sauvegardée
     const savedScroll = sessionStorage.getItem('scrollPos');
@@ -676,11 +681,7 @@ $(document).ready(function () {
         sessionStorage.removeItem('scrollPos');
     }
 
-    setTimeout(function () {
-        // Sauvegarde la position avant de recharger
-        sessionStorage.setItem('scrollPos', window.scrollY);
-        window.location.replace(window.location.pathname);
-    }, 30000);
+  
 });
 </script>
 </body>

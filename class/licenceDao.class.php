@@ -117,7 +117,7 @@ public function creerLicenceParDefaut(int $utilisateurId): void {
         VALUES (:utilisateur_id, 1)
     ");
     $stmt->bindParam(':utilisateur_id', $utilisateurId, PDO::PARAM_INT);
-    $stmt->bindParam(':tournoi_id', $tournoiId, PDO::PARAM_INT);
+    
     $stmt->execute();
 }
 

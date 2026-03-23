@@ -77,7 +77,7 @@ echo $template->render([
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_SESSION['idTournoi']),
   'idTournoi'=> $_SESSION['idTournoi'],
   'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule'],),
-  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],$_SESSION['idTournoi'],0,'tour'),
+  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],0,'tour'),
   'idPoule' => $_GET['idPoule'],
   'pouleEnCours' => $_GET['idPoule'],
   'tournoiEnCours' => $_SESSION['idTournoi'],

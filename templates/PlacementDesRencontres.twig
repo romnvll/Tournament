@@ -675,10 +675,10 @@
                 {% endif %}
             {% endfor %}
         </div>
-
-        {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+        
+        {% set dateFin = licence[0]['date_fin']|date('Y-m-d')|date %}
         {% set today = "now"|date('Y-m-d')|date %}
-
+        
         <!-- Card de contrôle -->
         {% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
         <div class="control-card">
@@ -1041,7 +1041,7 @@
                 </div>
             </div>
         {% endif %}
-    
+   
         {% if dateFin <= today %}
             <div class="modern-alert warning">
                 <div class="alert-icon warning">

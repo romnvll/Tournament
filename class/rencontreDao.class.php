@@ -974,7 +974,7 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
 
 
 
-   public function getRencontreByPoule($pouleid, $isClassement = 0, $from = 'index', $tournoiId = null)
+   public function getRencontreByPoule($pouleid, $isClassement = 0, $from = 'index')
 {
     $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
 
@@ -1076,13 +1076,14 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
         ORDER BY 
             $orderBy;
     ";
-
+    
     // Exécution de la requête
     $stmt = $this->connexion->prepare($query);
     $stmt->bindParam(':pouleid', $pouleid, PDO::PARAM_INT);
     $stmt->bindParam(':isClassement', $isClassement, PDO::PARAM_INT);
+    
     $stmt->execute();
-
+    
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
