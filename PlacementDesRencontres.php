@@ -15,7 +15,7 @@ require 'Lang/lang.php';
 
 
 $licenceDao = new LicenceDao();
-var_dump($userData['id']);
+
 $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
