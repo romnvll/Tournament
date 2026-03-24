@@ -534,9 +534,11 @@
                                         <tr>
                                             <th>
                                                 <div class="team-name">
-                                                    <i class="fa-solid fa-shield-alt"></i>
-                                                    {{ equipe.nom }}
-                                                </div>
+                                                    <img src="{{ equipe.club_logo }}" 
+                                                        alt="{{ equipe.club_nom }}"
+                                                        style="width: 35px; height: 35px; object-fit: contain; border-radius: 4px;">
+                                                    <span>{{ equipe.nom }}</span>
+<small style="color: #374151; font-weight: 500;">{{ equipe.club_nom }}</small>                                                </div>
                                             </th>
                                             <td>
                                                 <select class="modern-select" name="dstpoule" required>

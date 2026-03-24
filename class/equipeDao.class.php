@@ -273,11 +273,12 @@ public function mettreAJourAudioEquipe(int $idEquipe, ?string $audioPath): void
 
     public function getAllEquipesByPouleId(int $pouleId): array {
         $stmt = $this->connexion->prepare(
-            "SELECT e.*, c.Nom_categorie 
+            "SELECT e.*, c.Nom_categorie, cl.id AS club_id, cl.nom AS club_nom, cl.logo AS club_logo
              FROM Equipes e
              JOIN EquipePoule ep ON e.id = ep.equipe_id
              JOIN Poules p ON ep.poule_id = p.id
              JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
+             JOIN Clubs cl ON e.club_id = cl.id
              WHERE ep.poule_id = :pouleId"
         );
     
