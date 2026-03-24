@@ -759,6 +759,7 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
     }
 
     public function insertRencontrePhaseFinale($equipe1Id, $equipe2Id, $tournoi_id, $phaseId)
+    
 {
     // Vérifie si la rencontre existe déjà pour cette phase et ce tournoi
     $checkQuery = "SELECT * FROM Rencontres 
@@ -901,6 +902,42 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
         $stmt->bindValue(':idtournoi', $idtournoi, PDO::PARAM_INT);
         $stmt->execute();
     }
+
+
+
+    public function phasesFinalesExistent($tournoi_id, $ordre)
+{
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(*) FROM phases_finales 
+        WHERE tournoi_id = :tournoi_id AND ordre = :ordre
+    ");
+    $stmt->execute([':tournoi_id' => $tournoi_id, ':ordre' => $ordre]);
+    return $stmt->fetchColumn() > 0;
+}
+
+public function insertPhaseFinale($tournoi_id, $libelle, $ordre)
+{
+    $stmt = $this->connexion->prepare("
+        INSERT INTO phases_finales (tournoi_id, libelle, ordre) 
+        VALUES (:tournoi_id, :libelle, :ordre)
+    ");
+    $stmt->execute([
+        ':tournoi_id' => $tournoi_id,
+        ':libelle'    => $libelle,
+        ':ordre'      => $ordre,
+    ]);
+}
+
+public function getPhaseFinaleId($tournoi_id, $ordre)
+{
+    $stmt = $this->connexion->prepare("
+        SELECT id FROM phases_finales 
+        WHERE tournoi_id = :tournoi_id AND ordre = :ordre
+        LIMIT 1
+    ");
+    $stmt->execute([':tournoi_id' => $tournoi_id, ':ordre' => $ordre]);
+    return $stmt->fetchColumn();
+}
 
 
     public function getProchainesRencontres($tournoiId)

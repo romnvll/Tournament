@@ -43,6 +43,29 @@ $nombreTotalEquipes = count($toutesEquipesQualifiees);
 
 // Créer les matchs
 $matchs = [];
+// Créer les phases finales pour ce tournoi si elles n'existent pas encore
+$phasesACreer = [
+    ['libelle' => '8ème de finale',          'ordre' => 1],
+    ['libelle' => 'Quart de finale',          'ordre' => 2],
+    ['libelle' => 'Demi-finale',              'ordre' => 3],
+    ['libelle' => 'Finale',                   'ordre' => 4],
+    ['libelle' => 'Match pour la 3ème place', 'ordre' => 5],
+];
+
+foreach ($phasesACreer as $phase) {
+    if (!$rencontre->phasesFinalesExistent($idTournoi, $phase['ordre'])) {
+        $rencontre->insertPhaseFinale($idTournoi, $phase['libelle'], $phase['ordre']);
+    }
+}
+
+$ordrePhases = [16 => 1, 8 => 2, 4 => 3, 2 => 4];
+$phaseId = $rencontre->getPhaseFinaleId($idTournoi, $ordrePhases[$nombreTotalEquipes] ?? 2);
+
+//fin création des phases finales pour un tournoi donné
+
+
+
+
 $nbPoules = count($poules);
 
 if ($qualifiesNombre == 1) {
@@ -101,15 +124,7 @@ echo "Nombre d'équipes qualifiées : " . $nombreTotalEquipes . "<br>";
 echo "Nombre de matchs créés : " . count($matchs) . "<br>";
 echo "Phase ID sélectionnée : ";
 
-// Déterminer la phase selon le nombre total d'équipes qualifiées
-$phases = [
-    16 => 1, // 8ème de finale
-    8 => 2,  // Quart de finale
-    4 => 3,  // Demi-finale
-    2 => 4,  // Finale
-];
 
-$phaseId = $phases[$nombreTotalEquipes] ?? 2;
 echo $phaseId;
 echo "</div>";
 
