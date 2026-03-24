@@ -99,7 +99,7 @@ if (isset($_GET['addArbitre']) && $_GET['addArbitre'] == "true") {
    exit();
 }
 
-if ($_GET['delArbitre'] == true) {
+if (isset($_GET['delArbitre']) && $_GET['delArbitre'] == "true") {
     (int)$idTournoi = $_GET['tournoiId'];
     require 'class/arbitreDao.class.php';
     $arbitre=new arbitreDao();

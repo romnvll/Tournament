@@ -645,6 +645,29 @@
             padding-top: 12px;
             border-top: 1px solid #e5e7eb;
         }
+        .audio-announce {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: var(--info-color, #e8f4fd);
+    border-left: 3px solid var(--primary-color, #3498db);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--text-color, #333);
+    font-style: italic;
+}
+
+.audio-announce i {
+    color: var(--primary-color, #3498db);
+    flex-shrink: 0;
+}
+
+.audio-announce strong {
+    font-style: normal;
+    font-weight: 600;
+}
 
     </style>
 </head>
@@ -1050,21 +1073,31 @@
 
                                                 {% if infotournoi.gestionVoix == 1 %}
                                                 <div class="audio-controls">
-                                                    <button class="audio-btn record" 
-                                                            onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-                                                        🎤 {{ t('enregistrer') }}
-                                                    </button>
-                                                    <button id="stopButton_{{ arbitre.arbitre_id }}" 
-                                                            class="audio-btn stop" 
-                                                            onclick="stopRecording()" disabled>
-                                                        ⏹️ {{ t('stop') }}
-                                                    </button>
-                                                    {% if arbitre.audio_path == null %}
-                                                        <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);"></i>
-                                                    {% else %}
-                                                        <i class="fa-solid fa-volume-high" style="color: var(--success-color);"></i>
-                                                    {% endif %}
-                                                </div>
+    <button class="audio-btn record" 
+            onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
+        🎤 {{ t('enregistrer') }}
+    </button>
+    <button id="stopButton_{{ arbitre.arbitre_id }}" 
+            class="audio-btn stop" 
+            onclick="stopRecording()" disabled>
+        ⏹️ {{ t('stop') }}
+    </button>
+
+    {% if arbitre.audio_path == null %}
+        <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);"></i>
+    {% else %}
+        <i class="fa-solid fa-volume-high" style="color: var(--success-color);"></i>
+    {% endif %}
+
+    <div class="audio-announce">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <span>
+            {{ t('il faut annoncer') }} : 
+            <strong>{{ t('arbitrée par') }} {{ arbitre.nom }}</strong> 
+            {{ t('du club') }} <strong>{{ arbitre.club_nom }}</strong>
+        </span>
+    </div>
+</div>
                                                 {% endif %}
                                             </div>
                                         </td>
