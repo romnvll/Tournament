@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement automatique – {{ tournoiInfo.nom }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #374151;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin: 20px;
+            padding: 30px;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .tournament-btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .tournament-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+
+        .back-link {
+            margin-left: auto;
+            color: #1f2937;
+            text-decoration: none;
+            font-size: .85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+
+        .back-link:hover { color: var(--bg-dark); }
+
+        /* ── Stats ── */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .stat-icon {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+        .stat-icon.accent  { background: rgba(79,70,229,.15);  color: var(--primary-color); }
+        .stat-icon.success { background: rgba(16,185,129,.15); color: var(--success-color); }
+        .stat-icon.warn    { background: rgba(245,158,11,.15); color: var(--warning-color); }
+        .stat-icon.info    { background: rgba(6,182,212,.15);  color: var(--info-color); }
+
+        .stat-text { display: flex; flex-direction: column; }
+        .stat-label { font-size: .82rem; color: var(--success-color); }
+        .stat-value { font-size: 1.15rem; font-weight: 700; color: var(--bg-dark); }
+
+        /* ── Control card ── */
+        .control-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .hint {
+            margin-left: auto;
+            font-family: inherit;
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: .78rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* ── Contraintes ── */
+        .contrainte-row {
+            display: grid;
+            grid-template-columns: 200px 1fr auto;
+            align-items: center;
+            gap: 20px;
+            padding: 14px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .contrainte-row:last-of-type { border-bottom: none; }
+
+        .cat-label { font-size: .9rem; font-weight: 600; color: var(--bg-dark); }
+        .cat-label small { display: block; color: var(--text-light); font-size: .72rem; margin-top: 2px; font-family: monospace; }
+
+        .terrains-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .terrain-toggle { position: relative; }
+        .terrain-toggle input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .terrain-toggle label {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            background: var(--bg-light);
+            color: var(--text-light);
+            font-size: .82rem; cursor: pointer;
+            transition: all .2s; user-select: none;
+        }
+        .terrain-toggle input:checked + label {
+            background: rgba(79,70,229,.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .terrain-toggle label:hover { border-color: var(--primary-color); color: var(--bg-dark); }
+
+        .btn-tous-aucun {
+            background: none;
+            border: 2px dashed #d1d5db;
+            color: var(--text-light);
+            border-radius: 8px; padding: 6px 14px;
+            font-size: .72rem; cursor: pointer;
+            transition: all .2s; white-space: nowrap;
+        }
+        .btn-tous-aucun:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        .contraintes-footer {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            margin-top: 20px; padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .contraintes-footer p {  font-size: .83rem; flex: 1; margin: 0; }
+
+        /* ── Ordre de placement ── */
+        .order-steps {
+            display: flex; align-items: center; flex-wrap: wrap;
+            gap: 6px; margin-bottom: 24px;
+        }
+        .order-step {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 16px;
+            background: var(--bg-light);
+            border-radius: 8px; font-size: .83rem;
+            border: 1px solid #e5e7eb;
+        }
+        .order-step.final {
+            background: rgba(245,158,11,.08);
+            border-color: rgba(245,158,11,.4);
+        }
+        .step-num {
+            width: 22px; height: 22px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .7rem; font-weight: 700;
+            color: white; flex-shrink: 0;
+        }
+        .step-num.warn { background: var(--warning-color); }
+        .order-arrow { color: var(--text-light); font-size: 1.1rem; }
+
+        /* ── Contraintes chips ── */
+        .contraintes-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .contrainte-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 20px;
+            background: rgba(79,70,229,.08);
+            border: 1px solid rgba(79,70,229,.2);
+            font-size: .8rem;
+        }
+        .chip-cat { color: var(--primary-color); font-weight: 700; font-size: .75rem; }
+        .chip-sep { color: var(--text-light); }
+
+        /* ── Action bar ── */
+        .action-bar {
+            background: #fff5f5;
+            border: 2px solid rgba(239,68,68,.25);
+            border-radius: var(--border-radius);
+            padding: 24px 28px;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
+        .action-bar-left { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+        .action-bar-left p {  font-size: .85rem; margin: 0; }
+
+        .confirm-label {
+            display: inline-flex; align-items: center; gap: 10px;
+            cursor: pointer; user-select: none;
+        }
+        .confirm-label input[type="checkbox"] {
+            width: 18px; height: 18px; accent-color: var(--danger-color);
+            cursor: pointer; flex-shrink: 0;
+        }
+        .confirm-label span { font-size: .9rem; color: var(--bg-dark); }
+
+        /* ── Buttons ── */
+        .modern-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 10px 24px; border-radius: 8px;
+            font-weight: 700; font-size: .92rem;
+            border: none; cursor: pointer; transition: all .25s;
+            box-shadow: var(--shadow-sm);
+        }
+        .modern-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+        .btn-save:hover { box-shadow: 0 8px 24px rgba(16,185,129,.35); }
+
+        .btn-execute {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
+        .btn-execute:hover { box-shadow: 0 8px 24px rgba(239,68,68,.4); }
+        .btn-execute:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ── Alerts ── */
+        .alert-box {
+            border-radius: 10px; padding: 16px 20px;
+            display: flex; align-items: flex-start; gap: 14px;
+            margin-bottom: 18px; font-size: .9rem;
+        }
+        .alert-danger  { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.3); }
+        .alert-success { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.3); }
+        .alert-info    { background: rgba(79,70,229,.08);  border: 1px solid rgba(79,70,229,.2); }
+        .alert-box i { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+        .alert-danger  i { color: var(--danger-color); }
+        .alert-success i { color: var(--success-color); }
+        .alert-info    i { color: var(--primary-color); }
+
+        @media (max-width: 700px) {
+            .contrainte-row { grid-template-columns: 1fr; gap: 10px; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .main-container { margin: 10px; padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    <div class="main-container">
+
+        {# ── Header ── #}
+        <div class="page-header">
+            <a class="tournament-btn">
+                <i class="fas fa-robot"></i> Placement auto
+            </a>
+            <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}" class="back-link">
+                <i class="bi bi-arrow-left"></i> Retour au placement manuel
+            </a>
+        </div>
+
+        {# ── Erreurs ── #}
+        {% for err in erreurs %}
+            <div class="alert-box alert-danger">
+                <i class="bi bi-x-circle-fill"></i><span>{{ err }}</span>
+            </div>
+        {% endfor %}
+
+        {% if contraintes_ok %}
+            <div class="alert-box alert-success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Contraintes enregistrées.</span>
+            </div>
+        {% endif %}
+
+        {# ── Stats ── #}
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-icon accent"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-text">
+                    <span class="stat-label">Rencontres à placer</span>
+                    <span class="stat-value">{{ rencontresAP | length }}</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon success"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="stat-text">
+                    <span class="stat-label">Terrains</span>
+                    <span class="stat-value">{{ terrains | length }}</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon warn"><i class="bi bi-clock"></i></div>
+                <div class="stat-text">
+                    <span class="stat-label">Créneaux existants</span>
+                    <span class="stat-value">{{ listCreneaux | length }}</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon info"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-text">
+                    <span class="stat-label">Pas horaire</span>
+                    <span class="stat-value">{{ tournoiInfo.pasHoraire }} min</span>
+                </div>
+            </div>
+        </div>
+
+
+        {# ══════════════════════════════════════════
+           FORMULAIRE 1 — Contraintes terrains
+        ══════════════════════════════════════════ #}
+        <form method="post" action="PlacementAutomatique.php?id_tournoi={{ idTournoi }}">
+            <input type="hidden" name="action" value="sauvegarder_contraintes">
+
+            <div class="control-card">
+                <div class="section-title">
+                    <i class="bi bi-sliders2"></i> Contraintes terrains par catégorie
+                    <span class="hint">Aucune sélection = tous les terrains autorisés</span>
+                </div>
+
+                {% for cat in categories %}
+                    <div class="contrainte-row">
+                        <div class="cat-label">
+                            {{ cat.Nom_categorie }}
+                            
+                        </div>
+                        <div class="terrains-checkboxes" id="group-{{ cat.id_categorie }}">
+                            {% for terrain in terrains %}
+                                <div class="terrain-toggle">
+                                    <input type="checkbox"
+                                           id="c{{ cat.id_categorie }}_t{{ terrain.terrain_id }}"
+                                           name="contraintes[{{ cat.id_categorie }}][]"
+                                           value="{{ terrain.terrain_id }}"
+                                           {% if contraintesTerrain[cat.id_categorie] is defined
+                                              and terrain.terrain_id in contraintesTerrain[cat.id_categorie] %}checked{% endif %}>
+                                    <label for="c{{ cat.id_categorie }}_t{{ terrain.terrain_id }}">
+                                        <i class="bi bi-geo-alt-fill" style="font-size:.7rem"></i>
+                                        {{ terrain.nom }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn-tous-aucun" data-group="group-{{ cat.id_categorie }}">
+                            Tous / Aucun
+                        </button>
+                    </div>
+                {% endfor %}
+
+                <div class="contraintes-footer">
+                    <p><i class="bi bi-info-circle" style="color:var(--primary-color)"></i>&nbsp;Mémorisées en session pour ce tournoi.</p>
+                    <button type="submit" class="modern-btn btn-save">
+                        <i class="bi bi-floppy"></i> Enregistrer les contraintes
+                    </button>
+                </div>
+            </div>
+        </form>
+
+
+        {# ══════════════════════════════════════════
+           FORMULAIRE 2 — Lancement du placement
+        ══════════════════════════════════════════ #}
+        <form method="post" action="PlacementAutomatique.php?id_tournoi={{ idTournoi }}">
+            <input type="hidden" name="action" value="placer">
+
+            <div class="control-card">
+                <div class="section-title"><i class="bi bi-sort-down"></i> Ordre de placement</div>
+
+                <div class="order-steps">
+                    <div class="order-step"><span class="step-num">1</span> Tour 1 – toutes catégories</div>
+                    <span class="order-arrow">›</span>
+                    <div class="order-step"><span class="step-num">2</span> Alphabétique (U11 → U13 → U15…)</div>
+                    <span class="order-arrow">›</span>
+                    <div class="order-step"><span class="step-num">3</span> Tour 2 – toutes catégories…</div>
+                    <span class="order-arrow">›</span>
+                    <div class="order-step final">
+                        <span class="step-num warn">★</span> Phases finales en dernier
+                    </div>
+                </div>
+
+                {# Résumé contraintes actives #}
+                {% if contraintesTerrain is not empty %}
+                    <div class="contraintes-summary">
+                        {% for cat in categories %}
+                            {% if contraintesTerrain[cat.id_categorie] is defined %}
+                                <div class="contrainte-chip">
+                                    <span class="chip-cat">{{ cat.Nom_categorie }}</span>
+                                    <span class="chip-sep">→</span>
+                                    {% for terrain in terrains %}
+                                        {% if terrain.terrain_id in contraintesTerrain[cat.id_categorie] %}
+                                            {{ terrain.nom }}{% if not loop.last %},&nbsp;{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert-box alert-info" style="margin-bottom:0">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Aucune contrainte terrain active — toutes les catégories peuvent jouer sur tous les terrains.</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Action bar #}
+            <div class="action-bar">
+                <div class="action-bar-left">
+                    <p>
+                        <i class="bi bi-exclamation-triangle-fill" style="color:var(--warning-color)"></i>
+                        Les créneaux existants (sauf le premier) seront supprimés et toutes les rencontres replacées depuis zéro.
+                    </p>
+                    <label class="confirm-label">
+                        <input type="checkbox" id="confirmCheck">
+                        <span>Je confirme le placement automatique de <strong>{{ rencontresAP | length }} rencontres</strong></span>
+                    </label>
+                </div>
+                <button type="submit" class="modern-btn btn-execute" id="btnExecute" disabled>
+                    <i class="bi bi-rocket-takeoff"></i>
+                    Lancer le placement
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script>
+        document.getElementById('confirmCheck').addEventListener('change', function() {
+            document.getElementById('btnExecute').disabled = !this.checked;
+        });
+
+        document.querySelectorAll('.btn-tous-aucun').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const group = document.getElementById(this.dataset.group);
+                const boxes = group.querySelectorAll('input[type="checkbox"]');
+                const allChecked = Array.from(boxes).every(cb => cb.checked);
+                boxes.forEach(cb => cb.checked = !allChecked);
+            });
+        });
+    </script>
+</body>
+</html>

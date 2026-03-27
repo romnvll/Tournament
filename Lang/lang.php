@@ -124,7 +124,7 @@ $allLangs = [
         'titreIndex'=> 'Gérez vos tournois comme un pro !',
         'sousTitreIndex' => 'Simplifiez l\'organisation de vos compétitions avec notre outil tout-en-un pensé pour les clubs de sport.',
         'indexCreationDePoules' => 'Création automatique des poules',
-        'indexPlanification'=>' Planification optimisée des rencontres',
+        'indexPlanification'=>' Planification manuelle des rencontres',
         'indexSuivi'=>'Suivi en temps réel des scores et classements pour les coachs et la famille',
         'indexGestionDesAbsences'=> 'Gestion des absences d\'équipes',
         'indexInterfaceMobile'=>'Interface mobile pour les bénévoles, arbitres et gestionnaires des tables',
@@ -192,6 +192,7 @@ $allLangs = [
         'CopierLeLien' => 'Copier le lien',
         'lienCopie' => 'Lien copié dans le presse-papiers, diffusez le sur les réseaux sociaux !',
         'nomCoach' => 'Nom du coach',
+        'indexPlacementAutomatique' => 'Placement automatique des rencontres',
 
         
         
@@ -307,7 +308,7 @@ $allLangs = [
         'titreIndex'=> 'Manage your tournaments like a pro!',
         'sousTitreIndex' => 'Simplify the organization of your competitions with our all-in-one tool designed for sports clubs.',
         'indexCreationDePoules' => 'Automatic pool creation',
-        'indexPlanification'=>' Optimized match scheduling',
+        'indexPlanification'=>' Manual match scheduling',
         'indexSuivi'=>'Real-time tracking of scores and rankings for coaches and family',
         'indexGestionDesAbsences'=> 'Management of team absences',
         'indexInterfaceMobile'=>'Mobile interface for volunteers, referees, and table managers',
@@ -377,6 +378,7 @@ $allLangs = [
         'CopierLeLien' => 'Copy the link',
         'LienCopie' => 'Link copied to clipboard, share it on social networks!',
         'nomCoach' => 'Coach name',
+        'indexPlacementAutomatique' => 'Automatic scheduling of matches',
                 
 
         

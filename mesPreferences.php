@@ -86,6 +86,7 @@ echo $template->render([
     'idClubChoisit' => $idClubChoisit,
     'logoClubChoisit' => $logoClubChoisit,
     'monClub' => isset($_GET['monClub']) && $_GET['monClub'] === 'true',
+    'affichageFlyer' => isset($_GET['affichageFlyer']),
    
 
 

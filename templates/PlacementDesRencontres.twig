@@ -675,10 +675,12 @@
                 {% endif %}
             {% endfor %}
         </div>
-        
-        {% set dateFin = licence[0]['date_fin']|date('Y-m-d')|date %}
-        {% set today = "now"|date('Y-m-d')|date %}
-        
+        <a href="PlacementAutomatique.php?id_tournoi={{ idTournoi }}" class="tournament-btn">
+    <i class="fas fa-robot"></i> Placement auto
+</a>
+        {% set dateFin = licence['date_fin']|date('Y-m-d') %}
+        {% set today = "now"|date('Y-m-d') %}
+      
         <!-- Card de contrôle -->
         {% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
         <div class="control-card">
@@ -694,6 +696,11 @@
                         <option value="" disabled selected>{{t('actionGroupee')}}</option>
                         <option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
                     </select>
+                   <button type="button" class="modern-btn" id="btnToutCocher"
+                            style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
+                            onclick="toggleToutCocher(this)">
+                        <i class="bi bi-check2-all"></i> Tout cocher
+                    </button>
                     <button type="submit" class="modern-btn btn-primary-modern">
                         <i class="bi bi-check-lg"></i> {{t('valider')}}
                     </button>
@@ -1184,6 +1191,17 @@
             });
         }
     </script>
+
+    <script>
+    function toggleToutCocher(btn) {
+        const checkboxes = document.querySelectorAll('input[name="rencontreCheck[]"]');
+        const toutCoche = Array.from(checkboxes).every(cb => cb.checked);
+        checkboxes.forEach(cb => cb.checked = !toutCoche);
+        btn.innerHTML = toutCoche
+            ? '<i class="bi bi-check2-all"></i> Tout cocher'
+            : '<i class="bi bi-x-square"></i> Tout décocher';
+    }
+</script>
 
 </body>
 </html>

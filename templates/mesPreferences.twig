@@ -123,6 +123,7 @@
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn-nav {% if gestionCategorie %}active{% endif %}">🏷️ Catégories</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionEffetsSonores=true" class="btn-nav {% if gestionEffetsSonores %}active{% endif %}">🔊 Effets sonores</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monClub=true" class="btn-nav {% if monClub %}active{% endif %}">🏠 Mon club</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageFlyer=true" class="btn-nav {% if affichageFlyer %}active{% endif %}">🖼️ Flyer</a>
     </div>
 
     <div class="row g-4">
@@ -593,7 +594,22 @@
     </div>
   </div>
 </div>
-
+<!-- 🖼️ FLYER -->
+<div class="col-lg-10 mx-auto {{ affichageFlyer ? '' : 'd-none' }}">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>🖼️ Flyer du tournoi</span>
+            <a href="Flyers/FlyerBrackito.html" target="_blank" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-box-arrow-up-right"></i> Ouvrir en plein écran
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <iframe src="Flyers/FlyerBrackito.html"
+                    style="width:100%; height:80vh; border:none; border-radius: 0 0 16px 16px;">
+            </iframe>
+        </div>
+    </div>
+</div>
     {{ include('footerAdmin.twig') }}
   </div>
 

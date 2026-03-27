@@ -26,6 +26,39 @@
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
             --border-radius: 12px;
         }
+        .club-logo-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.club-logo-wrapper .edit-hint {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: rgba(31, 41, 55, 0.85);
+    color: white;
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+
+.club-logo-wrapper:hover .edit-hint {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.club-logo-wrapper .club-logo {
+    display: block;
+}
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -838,10 +871,12 @@
                                         <td>
                                             <div class="club-cell">
                                                 <span class="club-badge">{{ equipe.nom_club }}</span>
-                                                <img class="club-logo" 
-                                                     src="{{ equipe.logo }}" 
-                                                     alt="{{ equipe.nom_club }}"
-                                                     ondblclick="toggleSelect(this)">
+                                              <div class="club-logo-wrapper" ondblclick="toggleSelect(this.querySelector('img'))">
+                                                    <img class="club-logo"
+                                                        src="{{ equipe.logo }}"
+                                                        alt="{{ equipe.nom_club }}">
+                                                    <span class="edit-hint ms-3">⊕ double-clic pour modifier le club</span>
+                                               </div>
                                                 
                                                 <form action="modifierEquipe.php" method="POST" class="d-inline">
                                                     <input type="hidden" name="idEquipe" value="{{ equipe.id }}">
