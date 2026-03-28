@@ -59,6 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
             $contraintesTerrain[(int)$catId] = $filtered;
         }
     }
+    $contraintesTerrain['garder_arbitres'] = isset($_POST['garder_arbitres']);
+
     $_SESSION[$sessionKey] = $contraintesTerrain;
     header("Location: PlacementAutomatique.php?id_tournoi={$idTournoi}&contraintes_ok=1");
     exit();
@@ -92,7 +94,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');
         });
 
-        // ── 2. Supprimer tous les créneaux sauf le premier ───────────────────
+        // ── 2. Sauvegarder les arbitres, puis supprimer les créneaux sauf le premier ──
+        // supprimerCreneau() efface aussi les lignes arbitres (rencontre_id IS NULL
+        // AND label_id IS NULL), on les sauvegarde donc pour les recréer ensuite.
+        // Remplace le bloc "Sauvegarder les arbitres avant suppression"
+                $garderArbitres = !empty($contraintesTerrain['garder_arbitres']);
+
+                $arbitresSauvegardes = [];
+                if ($garderArbitres) {
+                    $toutesLesPlanifs = $planificationDao->afficherPlanifications($idTournoi);
+                    foreach ($toutesLesPlanifs as $p) {
+                        if (!empty($p['arbitre_id']) && empty($p['rencontre_id']) && empty($p['label_id'])) {
+                            $creneauNom = '00:00:00';
+                            foreach ($listCreneaux as $cr) {
+                                if ((int)$cr['creneau_id'] === (int)$p['creneau_id']) {
+                                    $creneauNom = $cr['nom'];
+                                    break;
+                                }
+                            }
+                            $arbitresSauvegardes[] = [
+                                'arbitre_id'  => (int)$p['arbitre_id'],
+                                'terrain_id'  => (int)$p['terrain_id'],
+                                'creneau_id'  => (int)$p['creneau_id'],
+                                'creneau_nom' => $creneauNom,
+                            ];
+                        }
+                    }
+                }
+
         $premierCreneau = $listCreneaux[0];
         foreach ($listCreneaux as $cr) {
             if ($cr['creneau_id'] !== $premierCreneau['creneau_id']) {
@@ -103,10 +132,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         // Recharger avec uniquement le premier créneau
         $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
 
-        // ── 3. Initialiser la grille vide ────────────────────────────────────
+        // ── 3. Supprimer les labels existants, lire les arbitres ─────────────
+        // Les labels sont supprimés pour libérer les terrains.
+        // Les arbitres restent : leur terrain n'est PAS bloqué (une rencontre
+        // peut coexister avec un arbitre sur le même créneau/terrain).
+        $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
+
+        foreach ($planificationsRestantes as $p) {
+            if (!empty($p['label_id'])) {
+                // Supprimer la ligne de planification du label
+                $planificationDao->supprimerPlanification($p['planification_id']);
+            }
+        }
+
+        // Recharger après suppression des labels
+        $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
+
+        // ── 4. Initialiser la grille ─────────────────────────────────────────
+        // Seuls les arbitres sont pris en compte : ils bloquent d'autres arbitres
+        // sur le même créneau, mais PAS le terrain (une rencontre peut s'y placer).
         $grid              = [];
         $equipesByCreneau  = [];
         $arbitresByCreneau = [];
+
         foreach ($listCreneaux as $cr) {
             $cid = $cr['creneau_id'];
             $grid[$cid]              = [];
@@ -115,6 +163,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             foreach ($terrains as $t) {
                 $grid[$cid][$t['terrain_id']] = false;
             }
+        }
+
+        // Enregistrer les arbitres déjà présents pour contrainte d'unicité
+        foreach ($planificationsRestantes as $p) {
+            $cid = $p['creneau_id'];
+            if (!isset($arbitresByCreneau[$cid])) $arbitresByCreneau[$cid] = [];
+            if (!empty($p['arbitre_id'])) {
+                $arbitresByCreneau[$cid][] = (int)$p['arbitre_id'];
+            }
+        }
+
+        // Recréer les arbitres sauvegardés sur leurs créneaux d'origine.
+        // Si le créneau a été supprimé, on le recrée avec son heure d'origine.
+        foreach ($arbitresSauvegardes as $arb) {
+            $cid = $arb['creneau_id'];
+            $tid = $arb['terrain_id'];
+            $aid = $arb['arbitre_id'];
+            $nom = $arb['creneau_nom'];
+
+            // Vérifier si le créneau existe encore dans $listCreneaux
+            $creneauExiste = false;
+            foreach ($listCreneaux as $cr) {
+                if ((int)$cr['creneau_id'] === $cid) { $creneauExiste = true; break; }
+            }
+
+            // Si le créneau a été supprimé, le recréer avec son heure d'origine
+            if (!$creneauExiste) {
+                $heureFormatee = substr($nom, 0, 5); // "H:i:s" → "H:i"
+                $creneauxDao->ajouterCreneau($heureFormatee, $idTournoi);
+                $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
+                $newCreneau   = end($listCreneaux);
+                $cid          = $newCreneau['creneau_id'];
+
+                // Initialiser la grille pour ce nouveau créneau
+                $grid[$cid]              = [];
+                $equipesByCreneau[$cid]  = [];
+                $arbitresByCreneau[$cid] = [];
+                foreach ($terrains as $t) {
+                    $grid[$cid][$t['terrain_id']] = false;
+                }
+            }
+
+            // Réinsérer l'arbitre en base
+            $planificationDao->ajouterOuModifierPlanification($tid, $cid, null, $idTournoi, $aid);
+
+            if (!isset($arbitresByCreneau[$cid])) $arbitresByCreneau[$cid] = [];
+            $arbitresByCreneau[$cid][] = $aid;
         }
 
         $lastCreneau = $listCreneaux[array_key_last($listCreneaux)];
@@ -136,9 +231,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 $creneau = $listCreneaux[$ci];
                 $cid     = $creneau['creneau_id'];
 
-                if ($eq1 && in_array($eq1, $equipesByCreneau[$cid], true)) continue;
-                if ($eq2 && in_array($eq2, $equipesByCreneau[$cid], true)) continue;
-                if ($arb && in_array($arb, $arbitresByCreneau[$cid], true)) continue;
+                if ($eq1 && in_array($eq1, $equipesByCreneau[$cid] ?? [], true)) continue;
+                if ($eq2 && in_array($eq2, $equipesByCreneau[$cid] ?? [], true)) continue;
+                if ($arb && in_array($arb, $arbitresByCreneau[$cid] ?? [], true)) continue;
 
                 foreach ($terrains as $terrain) {
                     $tid = $terrain['terrain_id'];
