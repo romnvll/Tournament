@@ -1,66 +1,169 @@
+<!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link
-		href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"/>
-		<!-- Inclure la bibliothèque htmx via CDN -->
-		<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Créer un compte</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            min-height: 100%;
+            height: 100%;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .register-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 1.5rem 1.75rem;
+            width: 100%;
+            max-width: 460px;
+        }
+        @media (max-width: 500px) {
+            body { padding: 0; align-items: flex-start; }
+            .register-card {
+                border-radius: 0;
+                box-shadow: none;
+                min-height: 100vh;
+                padding: 1.5rem 1.25rem;
+            }
+        }
+        .field-label {
+            display: block; font-size: .78rem; font-weight: 600;
+            color: #374151; margin-bottom: .3rem;
+            text-transform: uppercase; letter-spacing: .05em;
+        }
+        .modern-input {
+            width: 100%; padding: 10px 13px; border: 2px solid #e5e7eb;
+            border-radius: 8px; font-size: 1rem; color: #1f2937;
+            outline: none; transition: border-color .2s; background: white;
+        }
+        .modern-input:focus { border-color: #4f46e5; }
+        .icon-input { padding-left: 38px; }
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute; left: 12px; top: 50%;
+            transform: translateY(-50%); color: #9ca3af; pointer-events: none;
+        }
+        .btn-submit {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #4f46e5, #764ba2);
+            color: white; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity .2s;
+        }
+        .btn-submit:hover { opacity: .9; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        @media (max-width: 360px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
 
-		<title>Créer un compte</title>
-	</head>
+<div class="register-card">
 
-
-{% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-    <div class="text-center mb-3">
-<a href="index.php"><img src="logos/Logo.png" alt="Logo Brackito" style="max-height: 80px;"></a>
-    <div style="color: grey; font-size: 0.9em; font-style: italic;">The french software bracket</div>
-</div>
-
-        <div class="col-md-6">
-            <h2 class="mb-4 text-center">Créer un compte</h2>
-            {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endif %}
-            {% if success %}
-                <div class="alert alert-success">{{ success }}</div>
-            {% endif %}
-            <form method="POST" action="">
-                <div class="form-group mb-3">
-                    <label for="prenom">Prénom</label>
-                    <input type="text" name="prenom" id="prenom" class="form-control" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="nom">Nom</label>
-                    <input type="text" name="nom" id="nom" class="form-control" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="email">Adresse email</label>
-                    <input type="email" name="email" id="email" class="form-control" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="confirm_password">Confirmer le mot de passe</label>
-                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
-                </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="cgu" id="cgu" required>
-                    <label class="form-check-label" for="cgu">
-                        J'accepte les <a href="#">conditions générales d'utilisation</a>.
-                    </label>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="captcha">Captcha : {{ captcha_question }}</label>
-                    <input type="text" name="captcha" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Créer mon compte</button>
-            </form>
-        </div>
+    <div style="text-align:center; margin-bottom:1.25rem;">
+        <a href="index.php">
+            <img src="logos/Logo.png" alt="Logo Brackito" style="max-height:56px; display:block; margin:0 auto .4rem;">
+        </a>
+        <div style="font-size:1.3rem; font-weight:700; color:#1f2937; letter-spacing:-.02em;">Créer un compte</div>
+        <div style="color:#6b7280; font-size:.83rem; margin-top:.2rem; font-style:italic;">The french software bracket</div>
     </div>
+
+    {% if error %}
+        <div style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:10px; padding:11px 14px; font-size:.88rem; color:#b91c1c; margin-bottom:.9rem; line-height:1.5;">
+            {{ error|raw }}
+        </div>
+    {% endif %}
+    {% if success %}
+        <div style="background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.3); border-radius:10px; padding:11px 14px; font-size:.88rem; color:#065f46; margin-bottom:.9rem;">
+            {{ success }}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="" style="display:flex; flex-direction:column; gap:.8rem;">
+
+        <div class="form-grid">
+            <div>
+                <label class="field-label" for="prenom">Prénom</label>
+                <input type="text" name="prenom" id="prenom" class="modern-input" required placeholder="Jean">
+            </div>
+            <div>
+                <label class="field-label" for="nom">Nom</label>
+                <input type="text" name="nom" id="nom" class="modern-input" required placeholder="Dupont">
+            </div>
+        </div>
+
+        <div>
+            <label class="field-label" for="email">Adresse email</label>
+            <div class="input-wrap">
+                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" name="email" id="email" class="modern-input icon-input" required placeholder="jean.dupont@email.com" autocomplete="email">
+            </div>
+        </div>
+
+        <div>
+            <label class="field-label" for="password">Mot de passe</label>
+            <div class="input-wrap">
+                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" name="password" id="password" class="modern-input icon-input" required placeholder="••••••••" autocomplete="new-password">
+            </div>
+        </div>
+
+        <div>
+            <label class="field-label" for="confirm_password">Confirmer le mot de passe</label>
+            <div class="input-wrap">
+                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" name="confirm_password" id="confirm_password" class="modern-input icon-input" required placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <div id="pwMatch" style="font-size:.78rem; margin-top:.3rem; min-height:1rem;"></div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:10px; background:#f9fafb; border-radius:8px; padding:12px 14px; border:1px solid #e5e7eb;">
+            <input type="checkbox" name="cgu" id="cgu" required style="width:17px; height:17px; accent-color:#4f46e5; cursor:pointer; flex-shrink:0; margin-top:2px;">
+            <label for="cgu" style="font-size:.85rem; color:#374151; cursor:pointer; line-height:1.5;">
+                J'accepte les <a href="mentions-legales.php" style="color:#4f46e5; font-weight:600;">mentions légales</a>
+                et les <a href="cgv.php" style="color:#4f46e5; font-weight:600;">CGV</a>.
+            </label>
+        </div>
+
+        <div style="background:#f9fafb; border-radius:8px; padding:12px 14px; border:1px solid #e5e7eb;">
+            <label class="field-label" for="captcha">Captcha : {{ captcha_question }}</label>
+            <input type="text" name="captcha" id="captcha" class="modern-input" required placeholder="Votre réponse" inputmode="numeric">
+        </div>
+
+        <button type="submit" class="btn-submit">Créer mon compte</button>
+    </form>
+
+    <div style="text-align:center; margin-top:1rem; font-size:.85rem; color:#6b7280;">
+        Déjà un compte ? <a href="Auth/login.php" style="color:#4f46e5; font-weight:600; text-decoration:none;">Se connecter</a>
+    </div>
+
 </div>
-{% endblock %}
+
+<script>
+    const p1 = document.getElementById('password');
+    const p2 = document.getElementById('confirm_password');
+    const msg = document.getElementById('pwMatch');
+    function checkPw() {
+        if (!p2.value) { msg.textContent = ''; return; }
+        if (p1.value === p2.value) {
+            msg.textContent = '✓ Mots de passe identiques';
+            msg.style.color = '#10b981';
+        } else {
+            msg.textContent = '✗ Les mots de passe ne correspondent pas';
+            msg.style.color = '#ef4444';
+        }
+    }
+    p1.addEventListener('input', checkPw);
+    p2.addEventListener('input', checkPw);
+</script>
+
+</body>
+</html>

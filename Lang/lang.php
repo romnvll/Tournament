@@ -193,6 +193,7 @@ $allLangs = [
         'lienCopie' => 'Lien copié dans le presse-papiers, diffusez le sur les réseaux sociaux !',
         'nomCoach' => 'Nom du coach',
         'indexPlacementAutomatique' => 'Placement automatique des rencontres',
+        'effetsSonoresMatch' => 'Effets sonores start/stop pour les rencontres',
 
         
         
@@ -379,6 +380,7 @@ $allLangs = [
         'LienCopie' => 'Link copied to clipboard, share it on social networks!',
         'nomCoach' => 'Coach name',
         'indexPlacementAutomatique' => 'Automatic scheduling of matches',
+        'effetsSonoresMatch' => 'Sound effects start/stop for matches',
                 
 
         
