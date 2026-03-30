@@ -1146,7 +1146,7 @@
                     body: formData
                 }).then(response => {
                     if (response.ok) {
-                        alert('Audio envoyé avec succès');
+                        
                         const audioElement = td.querySelector('audio');
                         const baseSrc = audioElement.src.split('?')[0];
                         audioElement.src = baseSrc + '?t=' + new Date().getTime();
