@@ -184,7 +184,7 @@ else {
 
 if (isset ($_GET['idPoule'])) {
   //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
-  
+ 
  
   if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
     

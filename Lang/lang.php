@@ -194,6 +194,7 @@ $allLangs = [
         'nomCoach' => 'Nom du coach',
         'indexPlacementAutomatique' => 'Placement automatique des rencontres',
         'effetsSonoresMatch' => 'Effets sonores start/stop pour les rencontres',
+        'supprimerArbitre' => 'Supprimer cet arbitre',
 
         
         
@@ -381,6 +382,7 @@ $allLangs = [
         'nomCoach' => 'Coach name',
         'indexPlacementAutomatique' => 'Automatic scheduling of matches',
         'effetsSonoresMatch' => 'Sound effects start/stop for matches',
+        'supprimerArbitre' => 'Delete this referee',
                 
 
         

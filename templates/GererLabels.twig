@@ -6,139 +6,545 @@
   <title>Gérer les Labels</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
-</head>
-<body class="container py-4">
-  <h1 class="mb-4">Gérer les Labels</h1>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --bg-dark: #1f2937;
+      --bg-light: #f9fafb;
+      --text-muted: #6b7280;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+      --radius: 12px;
+    }
 
-  <!-- Affichage des messages -->
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+
+    .page-wrapper {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      padding: 40px;
+      max-width: 1100px;
+      margin: 20px auto;
+    }
+
+    /* ── Titre ── */
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--bg-dark);
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid var(--primary);
+      text-align: center;
+    }
+
+    /* ── Alertes ── */
+    .alert-custom {
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border: none;
+      animation: slideInDown 0.3s ease;
+    }
+    .alert-custom.danger {
+      background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(220,38,38,0.04));
+      border: 2px solid var(--danger);
+      border-left: 4px solid var(--danger);
+      color: #7a3a3a;
+    }
+    .alert-custom.success {
+      background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.04));
+      border: 2px solid var(--success);
+      border-left: 4px solid var(--success);
+      color: #065f46;
+    }
+    .alert-custom .alert-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .alert-custom strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+    /* ── Card ── */
+    .brackito-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: var(--radius);
+      margin-bottom: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      animation: fadeInUp 0.5s ease;
+    }
+    .brackito-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+    }
+
+    .brackito-card-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      padding: 20px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .brackito-card-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s;
+    }
+    .brackito-card:hover .brackito-card-header::before { left: 100%; }
+
+    .brackito-card-header h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brackito-card-header h2 .header-icon { font-size: 1.3rem; }
+
+    .brackito-card-body { padding: 28px 30px; }
+
+    /* ── Formulaire ajout ── */
+    .form-label-custom {
+      font-weight: 600;
+      color: var(--bg-dark);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .form-input-custom {
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      color: var(--bg-dark);
+      font-weight: 500;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input-custom:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+
+    /* ── Sélecteur couleurs ── */
+    .color-picker-label {
+      font-weight: 600;
+      color: var(--bg-dark);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .color-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .color-swatch-wrapper input[type="radio"] { display: none; }
+    .color-swatch-wrapper .swatch {
+      display: block;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    }
+    .color-swatch-wrapper input[type="radio"]:checked + .swatch {
+      border-color: #000;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.25);
+      transform: scale(1.15);
+    }
+    .color-swatch-wrapper .swatch:hover {
+      transform: scale(1.1);
+      border-color: #555;
+    }
+
+    /* ── Bouton submit ── */
+    .btn-primary-brackito {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary-brackito:hover {
+      background: linear-gradient(135deg, var(--primary-hover), var(--primary));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      color: white;
+    }
+
+    .btn-danger-brackito {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-danger-brackito:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      color: white;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    /* ── Tableau ── */
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--bg-dark);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .labels-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+
+    .labels-table thead th {
+      background: var(--bg-dark);
+      color: white;
+      padding: 13px 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .labels-table thead th:first-child { border-radius: 8px 0 0 8px; }
+    .labels-table thead th:last-child  { border-radius: 0 8px 8px 0; }
+
+    .labels-table tbody tr {
+      background: white;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
+      animation: fadeInUp 0.4s ease both;
+    }
+    .labels-table tbody tr:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateX(3px);
+    }
+
+    .labels-table tbody td {
+      padding: 14px 20px;
+      vertical-align: middle;
+      border-top: 1px solid #f3f4f6;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .labels-table tbody td:first-child {
+      border-left: 1px solid #f3f4f6;
+      border-radius: 8px 0 0 8px;
+    }
+    .labels-table tbody td:last-child {
+      border-right: 1px solid #f3f4f6;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .td-label-color { border-left: 4px solid transparent; }
+
+    .table-input {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.93rem;
+      font-weight: 500;
+      color: var(--bg-dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+      max-width: 300px;
+      background: var(--bg-light);
+    }
+    .table-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+      background: white;
+    }
+
+    /* ── Couleurs inline table ── */
+    .table-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .table-swatch-wrap input[type="radio"] { display: none; }
+    .table-swatch-wrap .swatch-sm {
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    }
+    .table-swatch-wrap input[type="radio"]:checked + .swatch-sm {
+      border-color: #000;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
+      transform: scale(1.2);
+    }
+    .table-swatch-wrap .swatch-sm:hover {
+      transform: scale(1.15);
+      border-color: #555;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 1rem; font-weight: 500; }
+
+    /* ── Bouton retour ── */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: 2px solid #e5e7eb;
+      border-radius: 30px;
+      padding: 10px 22px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      text-decoration: none;
+      margin-top: 10px;
+    }
+    .btn-back:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(79,70,229,0.05);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .page-wrapper { padding: 20px; }
+      .page-title { font-size: 1.6rem; }
+      .brackito-card-body { padding: 20px; }
+      .labels-table thead { display: none; }
+      .labels-table tbody td { display: block; border: none; padding: 8px 14px; }
+      .labels-table tbody tr { display: block; border: 1px solid #e5e7eb; border-radius: var(--radius); margin-bottom: 12px; padding: 8px 0; }
+      .labels-table tbody td:first-child,
+      .labels-table tbody td:last-child { border-radius: 0; border: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <h1 class="page-title">🏷️ Gérer les Labels</h1>
+
   {% if error is not null %}
-    <div class="alert alert-danger" role="alert">
-      {{ error }}
+    <div class="alert-custom danger">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>Erreur</strong>{{ error }}</div>
     </div>
   {% endif %}
 
   {% if message is not null %}
-    <div class="alert alert-success" role="alert">
-      {{ message }}
+    <div class="alert-custom success">
+      <span class="alert-icon">✅</span>
+      <div><strong>Succès</strong>{{ message }}</div>
     </div>
   {% endif %}
 
-  <!-- Formulaire pour ajouter un label -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <h2 class="card-title">Ajouter un Label</h2>
+  <!-- ── Carte : Ajouter un label ── -->
+  <div class="brackito-card">
+    <div class="brackito-card-header">
+      <h2><span class="header-icon">➕</span> Ajouter un Label</h2>
+    </div>
+    <div class="brackito-card-body">
       <form method="GET" action="GererLabels.php">
-        <div class="mb-3">
-          <label for="description" class="form-label">Description : (touche windows + ; pour une icône)</label>
-          <input type="text" id="description" name="description" class="form-control" required>
+
+        <div style="margin-bottom: 20px;">
+          <label for="description" class="form-label-custom">Description</label>
+          <p class="form-hint">Astuce : touche <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:0.85rem;">⊞ Win</kbd> + <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:0.85rem;">;</kbd> pour insérer une icône</p>
+          <input type="text" id="description" name="description" class="form-input-custom" placeholder="Ex : 🔥 Priorité haute" required>
         </div>
-        <div class="mb-3">
-  <label for="couleur" class="form-label">Couleur :</label>
-  <div class="d-flex flex-wrap gap-2">
-    <label>
-      <input type="radio" name="couleur" value="#000000" required checked>
-      <span class="d-inline-block rounded-circle" style="background-color:rgb(0, 0, 0); width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-    <label>
-      <input type="radio" name="couleur" value="#FFB3BA" required>
-      <span class="d-inline-block rounded-circle" style="background-color: #FFB3BA; width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-    <label>
-      <input type="radio" name="couleur" value="#FFDFBA" required>
-      <span class="d-inline-block rounded-circle" style="background-color: #FFDFBA; width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-    <label>
-      <input type="radio" name="couleur" value="#FFFFBA" required>
-      <span class="d-inline-block rounded-circle" style="background-color: #FFFFBA; width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-    <label>
-      <input type="radio" name="couleur" value="#BAFFC9" required>
-      <span class="d-inline-block rounded-circle" style="background-color: #BAFFC9; width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-    <label>
-      <input type="radio" name="couleur" value="#BAE1FF" required>
-      <span class="d-inline-block rounded-circle" style="background-color: #BAE1FF; width: 30px; height: 30px; border: 1px solid #ccc;"></span>
-    </label>
-  </div>
-</div>
+
+        <div style="margin-bottom: 24px;">
+          <label class="color-picker-label">Couleur</label>
+          <div class="color-swatches">
+            {% set addColors = ['#000000','#FFB3BA','#FFDFBA','#FFFFBA','#BAFFC9','#BAE1FF'] %}
+            {% for c in addColors %}
+              <label class="color-swatch-wrapper">
+                <input type="radio" name="couleur" value="{{ c }}" {% if loop.first %}checked{% endif %} required>
+                <span class="swatch" style="background-color:{{ c }};"></span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
 
         <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
         <input type="hidden" name="action" value="addLabel">
-        <button type="submit" class="btn btn-primary">Ajouter</button>
+        <button type="submit" class="btn-primary-brackito">
+          <span>➕</span> Ajouter le label
+        </button>
+
       </form>
     </div>
   </div>
 
-  <!-- Liste des labels -->
-  <h2>Liste des Labels</h2>
-  <table class="table table-striped table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th scope="col">Description</th>
-        <th scope="col">Couleur</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for label in labels %}
-        <tr>
-          <td>
-          <input 
-            type="text" 
-            name="description" 
-            value="{{ label.description }}" 
-            hx-post="GererLabels.php" 
-            hx-trigger="change"
-            hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "couleur": "{{ label.couleur }}"}'
-          >
-        </td>
-       <td>
-           <div class="d-flex flex-wrap gap-1">
-  {% set couleurs = ['#000000', '#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF'] %}
-  {% for couleur in couleurs %}
-    {% set isSelected = couleur == label.couleur %}
-    <label>
-      <input 
-        type="radio" 
-        name="couleur_{{ label.label_id }}" 
-        value="{{ couleur }}" 
-        {% if isSelected %}checked{% endif %}
-        hx-post="GererLabels.php"
-        hx-trigger="change"
-        hx-on::after-request="location.reload()"
-        hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "description": "{{ label.description }}", "couleur": "{{ couleur }}"}'
-        style="display:none;"
-      >
-      <span 
-        class="d-inline-block rounded-circle"
-        style="
-          background-color: {{ couleur }};
-          width: 20px;
-          height: 20px;
-          border: 2px solid {% if isSelected %}#000{% else %}#ccc{% endif %};
-          box-shadow: {% if isSelected %}0 0 5px 2px rgba(0,0,0,0.3){% else %}none{% endif %};
-          cursor: pointer;
-        "
-        onclick="this.previousElementSibling.checked = true; this.previousElementSibling.dispatchEvent(new Event('change', { bubbles: true }))"
-      ></span>
-    </label>
-  {% endfor %}
+  <!-- ── Liste des labels ── -->
+  <div class="section-title">
+    <span>📋</span> Labels existants
+    {% if labels|length > 0 %}
+      <span style="background:rgba(79,70,229,0.1);color:var(--primary);font-size:0.82rem;padding:3px 12px;border-radius:20px;border:1px solid var(--primary);font-weight:700;">
+        {{ labels|length }} label{% if labels|length > 1 %}s{% endif %}
+      </span>
+    {% endif %}
+  </div>
+
+  {% if labels|length == 0 %}
+    <div class="empty-state">
+      <div class="empty-icon">🏷️</div>
+      <p>Aucun label créé pour ce tournoi.<br>Utilisez le formulaire ci-dessus pour en ajouter.</p>
+    </div>
+  {% else %}
+    <div style="overflow-x:auto;">
+      <table class="labels-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Couleur</th>
+            <th style="text-align:center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for label in labels %}
+            <tr style="animation-delay: {{ loop.index0 * 0.05 }}s;">
+
+              <td class="td-label-color" style="border-left-color: {{ label.couleur }};">
+                <input
+                  type="text"
+                  name="description"
+                  value="{{ label.description }}"
+                  class="table-input"
+                  hx-post="GererLabels.php"
+                  hx-trigger="change"
+                  hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "couleur": "{{ label.couleur }}"}'
+                >
+              </td>
+
+              <td>
+                <div class="table-swatches">
+                  {% set couleurs = ['#000000','#FFB3BA','#FFDFBA','#FFFFBA','#BAFFC9','#BAE1FF'] %}
+                  {% for couleur in couleurs %}
+                    <label class="table-swatch-wrap">
+                      <input
+                        type="radio"
+                        name="couleur_{{ label.label_id }}"
+                        value="{{ couleur }}"
+                        {% if couleur == label.couleur %}checked{% endif %}
+                        hx-post="GererLabels.php"
+                        hx-trigger="change"
+                        hx-on::after-request="location.reload()"
+                        hx-vals='{"labelId": "{{ label.label_id }}", "labelModif": true, "description": "{{ label.description }}", "couleur": "{{ couleur }}"}'
+                        style="display:none;"
+                      >
+                      <span
+                        class="swatch-sm"
+                        style="background-color:{{ couleur }};"
+                        onclick="this.previousElementSibling.checked = true; this.previousElementSibling.dispatchEvent(new Event('change', { bubbles: true }))"
+                      ></span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </td>
+
+              <td style="text-align:center;">
+                <a
+                  href="GererLabels.php?action=delLabel&labelId={{ label.label_id }}"
+                  class="btn-danger-brackito"
+                  onclick="return confirm('Supprimer ce label ?');"
+                >
+                  🗑️ Supprimer
+                </a>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <!-- ── Retour ── -->
+  <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+    <a href="{{ urlRetour }}" class="btn-back">← Retour au placement des rencontres</a>
+  </div>
+
 </div>
 
-      </td>
-
-          <td>
-            <a href="GererLabels.php?action=delLabel&labelId={{ label.label_id }}" 
-               class="btn btn-danger btn-sm" 
-               onclick="return confirm('Supprimer ce label ?');">
-              Supprimer
-            </a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-<a href="{{urlRetour}}">Retour</a>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

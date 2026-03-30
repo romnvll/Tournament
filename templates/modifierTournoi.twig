@@ -438,6 +438,11 @@
             color: white;
         }
 
+        .audio-btn.play {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+}
+
         .audio-btn.stop {
             background: linear-gradient(135deg, var(--danger-color), #dc2626);
             color: white;
@@ -1068,26 +1073,40 @@
                                                 <a href="modifierTournoi_traitement.php?delArbitre=true&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{ infotournoi.id }}" 
                                                    class="modern-btn btn-danger-modern btn-sm">
                                                     <i class="fa fa-trash-o"></i>
-                                                    {{ t('supprimer') }}
+                                                    {{ t('supprimerArbitre') }}
                                                 </a>
 
                                                 {% if infotournoi.gestionVoix == 1 %}
                                                 <div class="audio-controls">
-    <button class="audio-btn record" 
-            onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-        🎤 {{ t('enregistrer') }}
-    </button>
-    <button id="stopButton_{{ arbitre.arbitre_id }}" 
-            class="audio-btn stop" 
-            onclick="stopRecording()" disabled>
-        ⏹️ {{ t('stop') }}
-    </button>
+                                                    <button class="audio-btn record" 
+                                                            onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
+                                                        🎤 {{ t('enregistrer') }}
+                                                    </button>
+                                                    <button id="stopButton_{{ arbitre.arbitre_id }}" 
+                                                            class="audio-btn stop" 
+                                                            onclick="stopRecording()" disabled>
+                                                        ⏹️ {{ t('stop') }}
+                                                    </button>
 
     {% if arbitre.audio_path == null %}
-        <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);"></i>
-    {% else %}
-        <i class="fa-solid fa-volume-high" style="color: var(--success-color);"></i>
-    {% endif %}
+    <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);" title="Aucun enregistrement"></i>
+{% else %}
+    <i class="fa-solid fa-volume-high" style="color: var(--success-color);" title="Enregistrement disponible"></i>
+    <button 
+        class="audio-btn play" 
+        id="playButton_{{ arbitre.arbitre_id }}"
+        onclick="playArbitreAudio({{ arbitre.arbitre_id }}, '{{ arbitre.audio_path }}')"
+        title="Écouter l'enregistrement">
+        ▶️ Écouter
+    </button>
+    <button 
+        class="audio-btn stop" 
+        id="stopPlayButton_{{ arbitre.arbitre_id }}"
+        onclick="stopArbitreAudio({{ arbitre.arbitre_id }})"
+        style="display:none;">
+        ⏹️ Stop
+    </button>
+{% endif %}
 
     <div class="audio-announce">
         <i class="fa-solid fa-microphone-lines"></i>
@@ -1544,6 +1563,42 @@
                 mediaRecorder.stop();
             }
         }
+
+        // --- Lecture des enregistrements arbitres ---
+const arbitreAudios = {};
+
+function playArbitreAudio(arbitreId, audioPath) {
+    // Arrêter tout autre audio en cours
+    Object.keys(arbitreAudios).forEach(id => {
+        if (arbitreAudios[id] && !arbitreAudios[id].paused) {
+            arbitreAudios[id].pause();
+            arbitreAudios[id].currentTime = 0;
+            document.getElementById('playButton_' + id).style.display = '';
+            document.getElementById('stopPlayButton_' + id).style.display = 'none';
+        }
+    });
+
+    if (!arbitreAudios[arbitreId]) {
+        arbitreAudios[arbitreId] = new Audio(audioPath);
+        arbitreAudios[arbitreId].onended = () => {
+            document.getElementById('playButton_' + arbitreId).style.display = '';
+            document.getElementById('stopPlayButton_' + arbitreId).style.display = 'none';
+        };
+    }
+
+    arbitreAudios[arbitreId].play();
+    document.getElementById('playButton_' + arbitreId).style.display = 'none';
+    document.getElementById('stopPlayButton_' + arbitreId).style.display = '';
+}
+
+function stopArbitreAudio(arbitreId) {
+    if (arbitreAudios[arbitreId]) {
+        arbitreAudios[arbitreId].pause();
+        arbitreAudios[arbitreId].currentTime = 0;
+    }
+    document.getElementById('playButton_' + arbitreId).style.display = '';
+    document.getElementById('stopPlayButton_' + arbitreId).style.display = 'none';
+}
     </script>
 
     <script>

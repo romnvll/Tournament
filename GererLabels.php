@@ -18,7 +18,8 @@ if (($_SESSION['id_tournoi']) == null) {
 
 $labels = new LabelDao();
 
-if ($_POST['labelModif'] == true) {
+// FIX 1: Fusionné isset() et la condition en une seule ligne
+if (isset($_POST['labelModif']) && $_POST['labelModif'] == true) {
     $labels->updateLabel($_POST['labelId'], $_POST['description'], $_POST['couleur']);
 }
 
@@ -37,7 +38,8 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:/
        
 //
 
-if ($_POST['labelModif'] == true) {
+
+if (isset($_POST['labelModif']) && $_POST['labelModif'] == true) {
     $labelId = $_POST['labelId'];
     $description = $_POST['description'];
     $couleur = $_POST['couleur'];
@@ -51,7 +53,8 @@ if ($_POST['labelModif'] == true) {
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['action'] === 'addLabel') {
+// FIX 2: Ajout de isset() sur $_GET['action']
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'addLabel') {
     $description = $_GET['description'];
     $couleur = $_GET['couleur'];
     $tournoi_id = $_SESSION['id_tournoi'];
@@ -75,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['action'] === 'addLabel') {
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['action'] === 'delLabel') {
+// FIX 3: Ajout de isset() sur $_GET['action']
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'delLabel') {
     $labelId = $_GET['labelId'];
 
 
@@ -131,7 +135,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 $message = isset($_GET['message']) ? $_GET['message'] : null;
 
 echo $template->render([
-    'email' => $_COOKIE['email'],
+    // FIX 4: Utilisation de l'opérateur null coalescent pour éviter le warning si le cookie n'existe pas
+    'email' => $_COOKIE['email'] ?? null,
     'pageEnCours' => 'GestionDesRencontres',
     'idTournoi' => $_GET['id_tournoi'],
     'labels' => $listeDesLabels,
