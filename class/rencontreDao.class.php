@@ -915,17 +915,51 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
     return $stmt->fetchColumn() > 0;
 }
 
-public function insertPhaseFinale($tournoi_id, $libelle, $ordre)
+public function insertPhaseFinale($tournoi_id, $libelle, $ordre,)
 {
     $stmt = $this->connexion->prepare("
         INSERT INTO phases_finales (tournoi_id, libelle, ordre) 
-        VALUES (:tournoi_id, :libelle, :ordre)
+        VALUES (:tournoi_id, :libelle, :ordre, :id_categorie)
     ");
     $stmt->execute([
         ':tournoi_id' => $tournoi_id,
         ':libelle'    => $libelle,
         ':ordre'      => $ordre,
+        
     ]);
+}
+
+
+public function sauvegarderQualifiesParPoule(int $idTournoi, int $categorieId, int $qualifiesNombre): void
+{
+    $stmt = $this->connexion->prepare("
+        INSERT INTO elimination_config (tournoi_id, categorie_id, qualifies_par_poule)
+        VALUES (:tournoi_id, :categorie_id, :qualifies)
+        ON DUPLICATE KEY UPDATE qualifies_par_poule = VALUES(qualifies_par_poule)
+    ");
+    $stmt->execute([
+        ':tournoi_id'   => $idTournoi,
+        ':categorie_id' => $categorieId,
+        ':qualifies'    => $qualifiesNombre,
+    ]);
+}
+
+public function getInfoQualifiesParPoule(int $idTournoi, int $categorieId): ?int
+{
+    $stmt = $this->connexion->prepare("
+        SELECT qualifies_par_poule
+        FROM elimination_config
+        WHERE tournoi_id = :tournoi_id
+        AND categorie_id = :categorie_id
+    ");
+    $stmt->execute([
+        ':tournoi_id'   => $idTournoi,
+        ':categorie_id' => $categorieId,
+    ]);
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result ? (int)$result['qualifies_par_poule'] : null;
 }
 
 public function getPhaseFinaleId($tournoi_id, $ordre)

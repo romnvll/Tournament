@@ -29,3 +29,11 @@ ADD CONSTRAINT PersonneTable_ibfk_1
 FOREIGN KEY (personne_id) REFERENCES Personne(id) 
 ON DELETE CASCADE;
 
+CREATE TABLE elimination_config (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    tournoi_id          INT(11) NOT NULL,
+    categorie_id        INT(11) NOT NULL,
+    qualifies_par_poule INT(11) NOT NULL,
+    UNIQUE KEY uq_config (tournoi_id, categorie_id)
+);
+

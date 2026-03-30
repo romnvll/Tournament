@@ -165,6 +165,7 @@ if (isset ($_GET['id_tournoi'])) {
   $idTournoi= $_GET['id_tournoi'];
   $listeClubsParticipants = $clubdao->clubsParticipatingInTournoi($_GET['id_tournoi']);
   $Labels = $Labels->getLabelsWithCreneauxByTournoiId($_GET['id_tournoi']);
+  
 
 }
 

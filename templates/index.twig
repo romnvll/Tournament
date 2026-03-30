@@ -1186,8 +1186,11 @@
                 {% endif %}
 
                 <!-- Info Labels -->
+                
                 {% set current_time = "now"|date("H:i") %}
+                
                 {% set labels_to_display = labels|filter(label => label['creneau_horaire'] > current_time) %}
+                
                 {% if labels_to_display|length > 0 or planTournoi is not null %}
                     <div class="info-alert {% if IdEquipe is null %}d-none{% endif %}" id="labels">
                         <div class="info-header">
@@ -1219,24 +1222,9 @@
                             </div>
                         {% endif %}
                        
-                        {% if RencontreByPoule[0].equipe2_has_phase_finale or RencontreByPoule[0].equipe1_has_phase_finale %}
-                            <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
-                                <i class="fas fa-trophy me-3 fs-4"></i>
-
-                                <div>
-                                    <strong>Phase finale disponible</strong><br>
-                                    Votre catégorie comporte une phase finale.
-
-                                    <div class="mt-2">
-                                        <a class="btn btn-sm btn-primary"
-                                        href="suiviArbreTournoiPublic.php?categorie_id={{ RencontreByPoule[0].equipe2_categorie_id }}&id_tournoi={{ idTournoi }}&affichageByTeam=true">
-                                            Voir le tableau final
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
+                        
                     </div>
+                    
 
                     {% if planTournoi is defined and planTournoi is not null %}
                         <div class="modal fade" id="planModal" tabindex="-1">
@@ -1254,7 +1242,23 @@
                         </div>
                     {% endif %}
                 {% endif %}
-                
+                {% if RencontreByPoule[0].equipe2_has_phase_finale or RencontreByPoule[0].equipe1_has_phase_finale %}
+                            <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+                                <i class="fas fa-trophy me-3 fs-4"></i>
+
+                                <div>
+                                    <strong>Phase finale disponible</strong><br>
+                                    Votre catégorie comporte une phase finale.
+
+                                    <div class="mt-2">
+                                        <a class="btn btn-sm btn-primary"
+                                        href="suiviArbreTournoiPublic.php?categorie_id={{ RencontreByPoule[0].equipe2_categorie_id }}&id_tournoi={{ idTournoi }}&affichageByTeam=true">
+                                            Voir le tableau final
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                 <!-- Matches List -->
                 <div id="score">
                     {% if affichageByClubs %}

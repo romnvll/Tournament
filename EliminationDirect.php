@@ -59,17 +59,18 @@ if (
 
 
     $Poules = $categorie->afficherClassementParCategorie($_GET['id_tournoi']);
-  
-
+$infoArbre = null; 
 if (isset($_GET['idCategorie'])) {
     $rencontreDao = new RencontreDAO();
+    $infoArbre = $rencontreDao->getInfoQualifiesParPoule($_GET['id_tournoi'],$_GET['idCategorie']);
+    
     $rencontreDao->afficherArbreTournoi($_GET['id_tournoi'],$_GET['idCategorie']);
     $planification->convertLabelsToRencontres($_GET['id_tournoi'],$_GET['idCategorie']);
+    
 }
 $template = $twig->load('eliminationDirect.twig');
-
 echo $template->render([
-  
+  'nbrTour'=> $infoArbre,
   'email' => $userData['email'],
   'pageEnCours' => 'GestionDesRencontres',
 
@@ -77,6 +78,7 @@ echo $template->render([
   
   'idTournoi'=> $_GET['id_tournoi'],
  'classement' => $Poules,
+ 
  
 
  

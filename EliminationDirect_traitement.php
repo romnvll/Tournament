@@ -1,35 +1,48 @@
 <?php
-require ('security.php');
+
+require('security.php');
 require 'class/rencontreDao.class.php';
 require 'class/labelsDao.class.php';
-require ('class/categorie.class.php');
+require('class/categorie.class.php');
 
-$rencontre = new RencontreDAO();
-$categorieId = $_POST['categorieId'];
-$qualifiesNombre = intval($_POST['qualifiesNombre']);
-$equipes = $_POST['equipes']; // Tableau organisé par poule
-$idTournoi = $_GET['id_tournoi'];
+/* ══════════════════════════════════════════════════════════════════
+   Récupération des données communes (POST + GET)
+══════════════════════════════════════════════════════════════════ */
+$action          = $_POST['action']               ?? 'creer_matchs';
+$categorieId     = $_POST['categorieId']          ?? null;
+$qualifiesNombre = intval($_POST['qualifiesNombre'] ?? 0);
+$equipes         = $_POST['equipes']              ?? [];
+$idTournoi       = $_GET['id_tournoi']            ?? null;
 
-// Organiser les équipes par position dans chaque poule
+// Validation minimale
+if (!$categorieId || !$qualifiesNombre || !$idTournoi) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Paramètres manquants.']);
+    exit;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Calculs communs aux deux actions
+══════════════════════════════════════════════════════════════════ */
+$poules   = array_keys($equipes);
+$nbPoules = count($poules);
+
+// Organiser les équipes qualifiées par position dans chaque poule
 $equipesParPosition = [];
-$poules = array_keys($equipes);
-
 foreach ($equipes as $pouleId => $equipeIds) {
     foreach ($equipeIds as $index => $equipeId) {
-        $position = $index + 1; // Position dans la poule (1, 2, 3, etc.)
-        
-        // Ne garder que les X premiers
+        $position = $index + 1;
         if ($position <= $qualifiesNombre) {
             $equipesParPosition[$position][$pouleId] = [
-                'id' => $equipeId,
-                'poule' => $pouleId,
-                'position' => $position
+                'id'       => $equipeId,
+                'poule'    => $pouleId,
+                'position' => $position,
             ];
         }
     }
 }
 
-// Rassembler toutes les équipes qualifiées dans un seul tableau
+// Rassembler toutes les équipes qualifiées dans l'ordre des positions
 $toutesEquipesQualifiees = [];
 for ($pos = 1; $pos <= $qualifiesNombre; $pos++) {
     if (isset($equipesParPosition[$pos])) {
@@ -41,9 +54,11 @@ for ($pos = 1; $pos <= $qualifiesNombre; $pos++) {
 
 $nombreTotalEquipes = count($toutesEquipesQualifiees);
 
-// Créer les matchs
-$matchs = [];
-// Créer les phases finales pour ce tournoi si elles n'existent pas encore
+/* ══════════════════════════════════════════════════════════════════
+   Phases finales
+══════════════════════════════════════════════════════════════════ */
+$rencontre = new RencontreDAO();
+
 $phasesACreer = [
     ['libelle' => '8ème de finale',          'ordre' => 1],
     ['libelle' => 'Quart de finale',          'ordre' => 2],
@@ -52,115 +67,151 @@ $phasesACreer = [
     ['libelle' => 'Match pour la 3ème place', 'ordre' => 5],
 ];
 
-foreach ($phasesACreer as $phase) {
-    if (!$rencontre->phasesFinalesExistent($idTournoi, $phase['ordre'])) {
-        $rencontre->insertPhaseFinale($idTournoi, $phase['libelle'], $phase['ordre']);
+/**
+ * Crée les phases finales manquantes pour un tournoi.
+ */
+function creerPhasesFinalesSiAbsentes(RencontreDAO $rencontre, int $idTournoi, array $phasesACreer): void
+{
+    foreach ($phasesACreer as $phase) {
+        if (!$rencontre->phasesFinalesExistent($idTournoi, $phase['ordre'])) {
+            $rencontre->insertPhaseFinale($idTournoi, $phase['libelle'], $phase['ordre']);
+        }
     }
 }
 
-$ordrePhases = [16 => 1, 8 => 2, 4 => 3, 2 => 4];
-$phaseId = $rencontre->getPhaseFinaleId($idTournoi, $ordrePhases[$nombreTotalEquipes] ?? 2);
+$ordrePhases    = [16 => 1, 8 => 2, 4 => 3, 2 => 4];
+$phaseOrdre     = $ordrePhases[$nombreTotalEquipes] ?? 2;
+$phasesLibelles = [
+    1 => '8ème de finale',
+    2 => 'Quart de finale',
+    3 => 'Demi-finale',
+    4 => 'Finale',
+];
 
-//fin création des phases finales pour un tournoi donné
+/* ══════════════════════════════════════════════════════════════════
+   Nom de catégorie
+══════════════════════════════════════════════════════════════════ */
+$categorieDao = new CategorieDao();
+$nomCategorie = $categorieDao->obtenirCategorie($categorieId)['Nom_categorie'];
+
+/* ══════════════════════════════════════════════════════════════════
+   Sauvegarde du nombre de qualifiés dans elimination_config.
+   INSERT … ON DUPLICATE KEY UPDATE : jamais de doublon grâce à
+   la contrainte UNIQUE KEY uq_config (tournoi_id, categorie_id).
+══════════════════════════════════════════════════════════════════ */
 
 
+/* ══════════════════════════════════════════════════════════════════
+   ACTION 1 — preparer_arbre
+   Crée les phases finales + les labels uniquement.
+   Répond en JSON (appelé en AJAX depuis le Twig).
+══════════════════════════════════════════════════════════════════ */
+if ($action === 'preparer_arbre') {
 
+    try {
+        creerPhasesFinalesSiAbsentes($rencontre, (int)$idTournoi, $phasesACreer);
 
-$nbPoules = count($poules);
+        $labelsDao = new LabelDao();
+        $labelsDao->creerLabelsEliminationDirecte(
+            $nomCategorie,
+            $nombreTotalEquipes,
+            $idTournoi,
+            $categorieId
+        );
 
-if ($qualifiesNombre == 1) {
-    // Si on prend 1 seul par poule : 1er vs 1er entre poules différentes
+        $rencontre->sauvegarderQualifiesParPoule((int)$idTournoi, (int)$categorieId, $qualifiesNombre);
+
+        header('Location: EliminationDirect.php?id_tournoi=' . $idTournoi . '&idCategorie=' . $categorieId . '&success=arbre_prepare');
+        exit;
+
+    } catch (Exception $e) {
+       // header('Location: EliminationDirect.php?id_tournoi=' . $idTournoi . '&idCategorie=' . $categorieId . '&error=' . urlencode($e->getMessage()));
+        exit;
+    }
+}
+/* ══════════════════════════════════════════════════════════════════
+   ACTION 2 — creer_matchs
+   Crée les phases, les labels, ET les rencontres.
+   Redirection classique après traitement.
+══════════════════════════════════════════════════════════════════ */
+
+// 1. Phases finales
+creerPhasesFinalesSiAbsentes($rencontre, (int)$idTournoi, $phasesACreer);
+
+// 2. Identifiant de la phase correspondant au nombre d'équipes qualifiées
+$phaseId = $rencontre->getPhaseFinaleId($idTournoi, $phaseOrdre);
+
+// 3. Labels (au cas où "Préparer l'arbre" n'aurait pas été appelé avant)
+$labelsDao = new LabelDao();
+$labelsDao->creerLabelsEliminationDirecte(
+    $nomCategorie,
+    $nombreTotalEquipes,
+    $idTournoi,
+    $categorieId
+);
+
+// 4. Mémoriser le choix en base
+$rencontre->sauvegarderQualifiesParPoule((int)$idTournoi, (int)$categorieId, $qualifiesNombre);
+// 5. Construire les matchs selon la logique de croisement des poules
+$matchs = [];
+
+if ($qualifiesNombre === 1) {
+
+    // 1 qualifié par poule : 1er de poule A vs 1er de poule B, etc.
     for ($i = 0; $i < count($toutesEquipesQualifiees); $i += 2) {
-        if (isset($toutesEquipesQualifiees[$i]) && isset($toutesEquipesQualifiees[$i + 1])) {
+        if (isset($toutesEquipesQualifiees[$i], $toutesEquipesQualifiees[$i + 1])) {
+            $e1 = $toutesEquipesQualifiees[$i];
+            $e2 = $toutesEquipesQualifiees[$i + 1];
             $matchs[] = [
-                'equipe1' => $toutesEquipesQualifiees[$i],
-                'equipe2' => $toutesEquipesQualifiees[$i + 1],
-                'type' => '1er de poule ' . $toutesEquipesQualifiees[$i]['poule'] . 
-                          ' vs 1er de poule ' . $toutesEquipesQualifiees[$i + 1]['poule']
+                'equipe1' => $e1,
+                'equipe2' => $e2,
+                'type'    => '1er de poule ' . $e1['poule'] . ' vs 1er de poule ' . $e2['poule'],
             ];
         }
     }
+
 } else {
-    
-    // Pour chaque poule
+
+    // Plusieurs qualifiés : croisement position impaire (poule actuelle)
+    // vs position+1 (poule suivante, rotation circulaire)
     for ($i = 0; $i < $nbPoules; $i++) {
         $pouleActuelle = $poules[$i];
-        
-        // Trouver la poule suivante (rotation circulaire)
         $pouleSuivante = $poules[($i + 1) % $nbPoules];
-        
-        // Pour chaque position : 1er de poule actuelle vs 2ème de poule suivante
+
         for ($pos = 1; $pos <= $qualifiesNombre; $pos++) {
-            // Position adverse : si pos=1 on cherche pos=2, si pos=2 on cherche pos=1, etc.
-            // On alterne pour croiser
-            if ($pos % 2 == 1) {
-                // Position impaire (1, 3, 5...) : chercher position+1 dans poule suivante
-                $positionAdverse = $pos + 1;
-                if ($positionAdverse > $qualifiesNombre) continue; // Pas de position suivante
-            } else {
-                // Position paire (2, 4, 6...) : on a déjà créé ce match avec la position précédente
+
+            // Les positions paires sont déjà traitées avec la position précédente
+            if ($pos % 2 === 0) {
                 continue;
             }
-            
-            if (isset($equipesParPosition[$pos][$pouleActuelle]) && 
-                isset($equipesParPosition[$positionAdverse][$pouleSuivante])) {
-                
-                $equipe1 = $equipesParPosition[$pos][$pouleActuelle];
-                $equipe2 = $equipesParPosition[$positionAdverse][$pouleSuivante];
-                
+
+            $positionAdverse = $pos + 1;
+
+            // Pas de position adverse au-delà du nombre de qualifiés
+            if ($positionAdverse > $qualifiesNombre) {
+                continue;
+            }
+
+            if (
+                isset($equipesParPosition[$pos][$pouleActuelle]) &&
+                isset($equipesParPosition[$positionAdverse][$pouleSuivante])
+            ) {
+                $e1 = $equipesParPosition[$pos][$pouleActuelle];
+                $e2 = $equipesParPosition[$positionAdverse][$pouleSuivante];
+
                 $matchs[] = [
-                    'equipe1' => $equipe1,
-                    'equipe2' => $equipe2,
-                    'type' => $pos . 'er de poule ' . $equipe1['poule'] . 
-                              ' vs ' . $positionAdverse . 'ème de poule ' . $equipe2['poule']
+                    'equipe1' => $e1,
+                    'equipe2' => $e2,
+                    'type'    => $pos . 'er de poule ' . $e1['poule']
+                              . ' vs ' . $positionAdverse . 'ème de poule ' . $e2['poule'],
                 ];
             }
         }
     }
 }
 
-echo "<div class='alert alert-info'>";
-echo "Nombre d'équipes qualifiées : " . $nombreTotalEquipes . "<br>";
-echo "Nombre de matchs créés : " . count($matchs) . "<br>";
-echo "Phase ID sélectionnée : ";
-
-
-echo $phaseId;
-echo "</div>";
-
-// Affichage des matchs
-echo "<h2>Matchs de la phase éliminatoire - Catégorie ID: $categorieId</h2>";
-echo "<p><strong>Phase : ";
-$phasesLibelles = [1 => "8ème de finale", 2 => "Quart de finale", 3 => "Demi-finale", 4 => "Finale"];
-echo $phasesLibelles[$phaseId] ?? "Phase inconnue";
-echo "</strong> ($nombreTotalEquipes équipes qualifiées)</p>";
-echo "<div class='container'>";
-
-
-//getNomCategorieById
-$categorieDao = new CategorieDao();
-$nomCategorie = $categorieDao->obtenirCategorie($categorieId)['Nom_categorie'];
-
-
-//création des labels pour la phase d'élimination directe
-$labelsDao = new LabelDao();
-$labelsCrees = $labelsDao->creerLabelsEliminationDirecte($nomCategorie, $nombreTotalEquipes, $idTournoi, $categorieId);
-
-
-
-
+// 6. Insérer les rencontres en base
 foreach ($matchs as $match) {
-    echo "<div class='card mb-3'>";
-    echo "<div class='card-body'>";
-    echo "<h5 class='card-title'>" . $match['type'] . "</h5>";
-    echo "<p class='card-text'>";
-    echo "Équipe " . $match['equipe1']['id'] . " (Position " . $match['equipe1']['position'] . " - Poule " . $match['equipe1']['poule'] . ")";
-    echo " <strong>VS</strong> ";
-    echo "Équipe " . $match['equipe2']['id'] . " (Position " . $match['equipe2']['position'] . " - Poule " . $match['equipe2']['poule'] . ")";
-    echo "</p>";
-    echo "</div>";
-    echo "</div>";
-    
     $rencontre->insertRencontrePhaseFinale(
         $match['equipe1']['id'],
         $match['equipe2']['id'],
@@ -169,11 +220,6 @@ foreach ($matchs as $match) {
     );
 }
 
-echo "</div>";
-
-echo "<div class='alert alert-success mt-3'>";
-echo count($matchs) . " matchs créés avec succès pour la phase " . ($phasesLibelles[$phaseId] ?? "");
-echo "</div>";
-
- header('Location: EliminationDirect.php?id_tournoi=' . $idTournoi.'&idCategorie=' . $categorieId);
-?>
+// 7. Redirection vers la page de gestion
+header('Location: EliminationDirect.php?id_tournoi=' . $idTournoi . '&idCategorie=' . $categorieId);
+exit;

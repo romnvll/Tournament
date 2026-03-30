@@ -9,6 +9,21 @@
 </head>
 <body>
 
+{#
+    ════════════════════════════════════════════════════════════════════
+    VARIABLES ATTENDUES DU CONTRÔLEUR
+    ════════════════════════════════════════════════════════════════════
+    - classement      : tableau [categorieNom => [pouleId => [equipe, ...]]]
+    - idTournoi       : int
+    - qualifiesConfig : tableau [categorieId => qualifiesParPoule]
+                        Exemple de requête dans le contrôleur :
+                          SELECT categorie_id, qualifies_par_poule
+                          FROM elimination_config
+                          WHERE tournoi_id = :tournoi_id
+                        → indexé par categorie_id
+    ════════════════════════════════════════════════════════════════════
+#}
+
 <style>
 :root {
     --page-primary-color: #4f46e5;
@@ -110,15 +125,6 @@ body {
     user-select: none;
 }
 
-.categorie-tile::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
 .categorie-tile:hover {
     border-color: var(--page-primary-color);
     transform: translateY(-4px);
@@ -136,6 +142,29 @@ body {
     color: var(--page-warning-color);
 }
 
+/* Tuile déjà configurée */
+.categorie-tile.configured {
+    border-color: var(--page-success-color);
+    background: rgba(16,185,129,0.04);
+}
+
+.categorie-tile.configured:hover {
+    border-color: #059669;
+    color: #059669;
+}
+
+.tile-configured-badge {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--page-success-color);
+    background: rgba(16,185,129,0.12);
+    border: 1px solid var(--page-success-color);
+    border-radius: 20px;
+    padding: 2px 10px;
+}
+
 .categorie-tile .tile-icon {
     font-size: 1.8rem;
     margin-bottom: 10px;
@@ -149,9 +178,7 @@ body {
     margin-top: 6px;
 }
 
-.categorie-tile.incompatible .tile-meta {
-    color: #b45309;
-}
+.categorie-tile.incompatible .tile-meta { color: #b45309; }
 
 /* ══════════════════════════════════════════════
    ÉTAPE 2 — Contenu de la catégorie
@@ -161,9 +188,7 @@ body {
     animation: fadeInUp 0.4s ease;
 }
 
-#step-categorie-content.visible {
-    display: block;
-}
+#step-categorie-content.visible { display: block; }
 
 .back-btn {
     display: inline-flex;
@@ -188,7 +213,7 @@ body {
 }
 
 /* ══════════════════════════════════════════════
-   Cards, alertes, table — identique à l'original
+   Cards, alertes
 ══════════════════════════════════════════════ */
 .container .card {
     background: white;
@@ -201,10 +226,7 @@ body {
     animation: fadeInUp 0.5s ease;
 }
 
-.container .card:hover {
-    box-shadow: var(--page-shadow-lg);
-    transform: translateY(-3px);
-}
+.container .card:hover { box-shadow: var(--page-shadow-lg); transform: translateY(-3px); }
 
 .container .card-header {
     background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
@@ -247,16 +269,10 @@ body {
     border: 2px solid rgba(255,255,255,0.5);
 }
 
-.container .card-header.bg-warning {
-    background: linear-gradient(135deg, var(--page-warning-color), #d97706);
-}
-
-.container .card-header.bg-success {
-    background: linear-gradient(135deg, var(--page-success-color), #059669);
-}
+.container .card-header.bg-warning { background: linear-gradient(135deg, var(--page-warning-color), #d97706); }
+.container .card-header.bg-success { background: linear-gradient(135deg, var(--page-success-color), #059669); }
 
 .container .card-body { padding: 30px; background: white; }
-
 .container .card.border-warning { border: 3px solid var(--page-warning-color); }
 
 .container .btn-info {
@@ -299,11 +315,7 @@ body {
     margin-bottom: 12px;
 }
 
-.container ul {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 20px;
-}
+.container ul { list-style: none; padding-left: 0; margin-bottom: 20px; }
 
 .container ul li {
     background: var(--page-bg-light);
@@ -365,8 +377,8 @@ body {
 
 .container .alert strong { display: block; margin-bottom: 8px; font-size: 1.1rem; font-weight: 700; }
 .container .alert i { font-size: 1.3rem; margin-right: 10px; }
-.container .alert-info i  { color: var(--page-info-color); }
-.container .alert-danger i { color: var(--page-danger-color); }
+.container .alert-info i    { color: var(--page-info-color); }
+.container .alert-danger i  { color: var(--page-danger-color); }
 .container .alert-warning i { color: var(--page-warning-color); }
 
 .container .alert ul { margin-top: 15px; padding-left: 20px; }
@@ -376,6 +388,21 @@ body {
 }
 .container .alert ul li:hover { transform: none; background: transparent; }
 .container .alert label { display: block; margin-bottom: 10px; font-weight: 600; }
+
+/* Notice "valeur mémorisée" */
+.select-saved-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--page-success-color);
+    background: rgba(16,185,129,0.1);
+    border: 1px solid var(--page-success-color);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 8px;
+}
 
 .container .form-select {
     background: white;
@@ -398,19 +425,35 @@ body {
 .container .form-select:hover { border-color: var(--page-primary-hover); }
 .container .form-select option:disabled { color: var(--page-text-light); font-style: italic; }
 
-.container .btn-primary {
-    background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
+/* Select pré-rempli : bordure verte */
+.form-select.is-saved {
+    border-color: var(--page-success-color) !important;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.15) !important;
+}
+
+/* ══════════════════════════════════════════════
+   BOUTONS D'ACTION
+══════════════════════════════════════════════ */
+.actions-container {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.container .btn-prepare-arbre {
+    flex: 1;
+    min-width: 220px;
+    background: linear-gradient(135deg, var(--page-success-color), #059669);
     color: white;
     border: none;
-    padding: 15px 35px;
+    padding: 15px 25px;
     border-radius: 30px;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     box-shadow: var(--page-shadow-md);
     transition: all 0.3s ease;
     cursor: pointer;
-    margin-top: 20px;
-    width: 100%;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: inline-flex;
@@ -419,22 +462,137 @@ body {
     gap: 10px;
 }
 
-.container .btn-primary:hover {
+.container .btn-prepare-arbre:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-3px);
+    box-shadow: var(--page-shadow-lg);
+    color: white;
+}
+
+.container .btn-prepare-arbre:disabled,
+.container .btn-creer-matchs:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.container .btn-creer-matchs {
+    flex: 1;
+    min-width: 220px;
+    background: linear-gradient(135deg, var(--page-primary-color), var(--page-primary-hover));
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: var(--page-shadow-md);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.container .btn-creer-matchs:hover {
     background: linear-gradient(135deg, var(--page-primary-hover), var(--page-primary-color));
     transform: translateY(-3px);
     box-shadow: var(--page-shadow-lg);
+    color: white;
 }
 
-.container .btn-lg { font-size: 1.2rem; padding: 18px 40px; }
+.actions-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--page-text-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
 
-.container .fas, .container .fa { margin-right: 8px; }
+.actions-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.action-legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--page-text-light);
+    flex: 1;
+    min-width: 180px;
+}
+
+.action-legend-item .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.action-legend-item.legend-prepare .legend-dot { background: var(--page-success-color); }
+.action-legend-item.legend-creer   .legend-dot { background: var(--page-primary-color); }
+
+/* Feedback AJAX inline */
+.ajax-feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    align-items: center;
+    gap: 10px;
+    animation: slideInDown 0.3s ease;
+}
+
+.ajax-feedback.show    { display: flex; }
+.ajax-feedback.success {
+    background: rgba(16,185,129,0.12);
+    border: 2px solid var(--page-success-color);
+    color: #065f46;
+}
+.ajax-feedback.error {
+    background: rgba(239,68,68,0.1);
+    border: 2px solid var(--page-danger-color);
+    color: #7f1d1d;
+}
+.ajax-feedback.loading {
+    background: rgba(79,70,229,0.08);
+    border: 2px solid var(--page-primary-color);
+    color: var(--page-primary-color);
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(79,70,229,0.2);
+    border-top-color: var(--page-primary-color);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
     body { padding: 10px; padding-top: 70px; }
     .container:not(.container-fluid) { padding: 20px; }
     .container h1 { font-size: 1.6rem; }
     .container .card-header h2 { font-size: 1.3rem; flex-direction: column; align-items: flex-start; }
-    .container .btn-primary { font-size: 1rem; padding: 12px 25px; }
+    .actions-container { flex-direction: column; }
+    .actions-separator { display: none; }
     .container .alert { flex-direction: column; }
     .categories-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
@@ -482,7 +640,6 @@ body {
         <div class="categories-grid">
             {% for categorieNom, poules in classement %}
 
-                {# Recalcul des méta-données pour la tuile #}
                 {% set nbPoules = poules|length %}
 
                 {% set equipesUniques = [] %}
@@ -518,17 +675,40 @@ body {
 
                 {% set isCompatible = valeursValides|length > 0 and not hasDoublons %}
 
-                <div class="categorie-tile {% if not isCompatible %}incompatible{% endif %}"
+                {# Récupérer l'ID de catégorie et la valeur mémorisée #}
+                {% set firstPoule      = poules|first %}
+                {% set firstTeam       = firstPoule|first %}
+                {% set categorieId     = firstTeam.categorie %}
+                {% set valeurMemorisee = qualifiesConfig[categorieId] is defined ? qualifiesConfig[categorieId] : null %}
+                {% set isConfigured    = valeurMemorisee is not null %}
+
+                <div class="categorie-tile
+                        {% if not isCompatible %}incompatible
+                        {% elseif isConfigured %}configured
+                        {% endif %}"
                      data-categorie="{{ categorieNom|e('html_attr') }}"
                      onclick="showCategorie('{{ categorieNom|e('js') }}')">
+
                     <span class="tile-icon">
-                        {% if isCompatible %}🏆{% else %}⚠️{% endif %}
+                        {% if not isCompatible %}⚠️
+                        {% elseif isConfigured %}✅
+                        {% else %}🏆
+                        {% endif %}
                     </span>
+
                     {{ categorieNom }}
+
                     <div class="tile-meta">
                         {{ nbPoules }} poule{{ nbPoules > 1 ? 's' : '' }} · {{ nbEquipesTotal }} équipe{{ nbEquipesTotal > 1 ? 's' : '' }}
                         {% if not isCompatible %}<br>⚠ configuration à vérifier{% endif %}
                     </div>
+
+                    {% if isConfigured %}
+                        <div class="tile-configured-badge">
+                            ✓ {{ valeurMemorisee }} qualifié{{ valeurMemorisee > 1 ? 's' : '' }} / poule
+                        </div>
+                    {% endif %}
+
                 </div>
 
             {% endfor %}
@@ -549,7 +729,6 @@ body {
             <span id="step2-label-text">Configurer l'élimination directe</span>
         </div>
 
-        {# Toutes les cartes sont rendues, une seule est visible via JS #}
         {% for categorieNom, poules in classement %}
 
             {% set nbPoules = poules|length %}
@@ -585,18 +764,19 @@ body {
                 {% endif %}
             {% endfor %}
 
-            {% set isCompatible = valeursValides|length > 0 and not hasDoublons %}
+            {% set isCompatible    = valeursValides|length > 0 and not hasDoublons %}
+            {% set firstPoule      = poules|first %}
+            {% set firstTeam       = firstPoule|first %}
+            {% set categorieId     = firstTeam.categorie %}
+            {% set valeurMemorisee = qualifiesConfig[categorieId] is defined ? qualifiesConfig[categorieId] : null %}
 
-            {# Chaque bloc est masqué par défaut, data-categorie sert de clé JS #}
             <div class="categorie-block" data-categorie="{{ categorieNom|e('html_attr') }}" style="display:none;">
 
                 {% if isCompatible %}
 
-                    {% set firstPoule = poules|first %}
-                    {% set firstTeam  = firstPoule|first %}
-                    {% set categorieId = firstTeam.categorie %}
-
-                    <form method="post" action="EliminationDirect_traitement.php?id_tournoi={{ idTournoi }}">
+                    <form method="post"
+                          id="form-{{ categorieId }}"
+                          action="EliminationDirect_traitement.php?id_tournoi={{ idTournoi }}">
 
                         <div class="card mb-4">
                             <div class="card-header bg-success text-white">
@@ -614,64 +794,78 @@ body {
                                 <a href="gestionArbreTournoi.php?categorie_id={{ categorieId }}&id_tournoi={{ idTournoi }}" class="btn btn-info mb-3">
                                     <i class="fas fa-sitemap"></i> Voir l'arbre de {{ categorieNom }}
                                 </a>
-                               <span class="badge bg-info text-white">Résultats des phases de poules</span>
+                                <span class="badge bg-info text-white">Résultats des phases de poules</span>
 
                                 {% for pouleId, equipes in poules %}
                                     <h3>Poule {{ equipes[0].poule_nom }} ({{ equipes|length }} équipe{{ equipes|length > 1 ? 's' : '' }})</h3>
                                     <input type="hidden" name="pouleIds[]" value="{{ pouleId }}" />
                                     <ul class="list-unstyled mb-0">
-    {% for equipe in equipes %}
-        <input type="hidden" name="equipes[{{ pouleId }}][]" value="{{ equipe.id }}" />
-        <input type="hidden" name="equipes_positions[{{ equipe.id }}]" value="{{ loop.index }}" />
-        
-        <li class="d-flex align-items-center justify-content-between py-2 px-3 mb-1 rounded"
-            style="background: {% if loop.index == 1 %}rgba(245,158,11,0.15){% else %}var(--bg-light){% endif %};">
-            
-            <!-- Rang + Nom -->
-            <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold" style="
-                    width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                    font-size: 0.8rem;
-                    background: {% if loop.index == 1 %}#f59e0b{% elseif loop.index == 2 %}#9ca3af{% elseif loop.index == 3 %}#b45309{% else %}#e5e7eb{% endif %};
-                    color: {% if loop.index <= 3 %}white{% else %}var(--bg-dark){% endif %};">
-                    {{ loop.index }}
-                </span>
-                <span class="fw-semibold" style="font-size: 0.9rem;">{{ equipe.equipe_nom }}</span>
-            </div>
+                                        {% for equipe in equipes %}
+                                            <input type="hidden" name="equipes[{{ pouleId }}][]" value="{{ equipe.id }}" />
+                                            <input type="hidden" name="equipes_positions[{{ equipe.id }}]" value="{{ loop.index }}" />
 
-            <!-- Stats -->
-            <div class="d-flex align-items-center gap-2" style="font-size: 0.8rem; color: #6b7280;">
-                <span class="badge rounded-pill" style="background: var(--warning-color); color: black;">
-                    {{ equipe.TotalDesPoints }} pts
-                </span>
-                <span title="Buts marqués" style="color: var(--success-color);">+{{ equipe.nombreButsMarque }}</span>
-                <span>|</span>
-                <span title="Buts encaissés" style="color: var(--danger-color);">-{{ equipe.nombreButsEncaisse }}</span>
-                <span>|</span>
-                <span title="Différence" class="fw-bold" style="color: {% if equipe.DifferenceButs >= 0 %}var(--success-color){% else %}var(--danger-color){% endif %};">
-                    {% if equipe.DifferenceButs > 0 %}+{% endif %}{{ equipe.DifferenceButs }}
-                </span>
-            </div>
-        </li>
-    {% endfor %}
-</ul>
+                                            <li class="d-flex align-items-center justify-content-between py-2 px-3 mb-1 rounded"
+                                                style="background: {% if loop.index == 1 %}rgba(245,158,11,0.15){% else %}var(--bg-light){% endif %};">
+
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="fw-bold" style="
+                                                        width: 24px; height: 24px; border-radius: 50%;
+                                                        display: flex; align-items: center; justify-content: center;
+                                                        font-size: 0.8rem;
+                                                        background: {% if loop.index == 1 %}#f59e0b{% elseif loop.index == 2 %}#9ca3af{% elseif loop.index == 3 %}#b45309{% else %}#e5e7eb{% endif %};
+                                                        color: {% if loop.index <= 3 %}white{% else %}var(--bg-dark){% endif %};">
+                                                        {{ loop.index }}
+                                                    </span>
+                                                    <span class="fw-semibold" style="font-size: 0.9rem;">{{ equipe.equipe_nom }}</span>
+                                                </div>
+
+                                                <div class="d-flex align-items-center gap-2" style="font-size: 0.8rem; color: #6b7280;">
+                                                    <span class="badge rounded-pill" style="background: var(--warning-color); color: black;">
+                                                        {{ equipe.TotalDesPoints }} pts
+                                                    </span>
+                                                    <span title="Buts marqués"   style="color: var(--success-color);">+{{ equipe.nombreButsMarque }}</span>
+                                                    <span>|</span>
+                                                    <span title="Buts encaissés" style="color: var(--danger-color);">-{{ equipe.nombreButsEncaisse }}</span>
+                                                    <span>|</span>
+                                                    <span title="Différence" class="fw-bold"
+                                                          style="color: {% if equipe.DifferenceButs >= 0 %}var(--success-color){% else %}var(--danger-color){% endif %};">
+                                                        {% if equipe.DifferenceButs > 0 %}+{% endif %}{{ equipe.DifferenceButs }}
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 {% endfor %}
-
+                                   
+                                {# ── Sélecteur de qualifiés ── #}
                                 <div class="alert alert-info mt-3">
                                     <i class="fas fa-info-circle"></i>
                                     <div style="flex: 1;">
                                         <label for="qualifiesNombre_{{ categorieId }}">
                                             <strong>Nombre de qualifiés par poule :</strong>
                                         </label>
+                                       
+                                        {# Afficher la notice si une valeur est mémorisée #}
+                                        {% if nbrTour is not null %}
+                                            <div>
+                                                <span class="select-saved-notice">
+                                                    <i class="fas fa-check-circle" style="margin-right:0"></i>
+                                                    Valeur enregistrée : {{ nbrTour }} qualifié{{ nbrTour > 1 ? 's' : '' }} par poule
+                                                </span>
+                                            </div>
+                                        {% endif %}
+
                                         <select name="qualifiesNombre"
                                                 id="qualifiesNombre_{{ categorieId }}"
-                                                class="form-select d-inline-block"
+                                                class="form-select d-inline-block {% if nbrTour is not null %}is-saved{% endif %}"
                                                 style="width: auto;"
-                                                required>
-                                            <option value="" disabled selected>— Choisir —</option>
+                                                required
+                                                onchange="onQualifiesChange(this, '{{ categorieId }}')">
+                                            <option value="" disabled {% if nbrTour is null %}selected{% endif %}>— Choisir —</option>
                                             {% for valeur in valeursValides %}
                                                 {% set totalAvecCetteValeur = valeur * nbPoules %}
-                                                <option value="{{ valeur }}">
+                                                <option value="{{ valeur }}"
+                                                        {% if nbrTour is not null and nbrTour == valeur %}selected{% endif %}>
                                                     {{ valeur }} par poule → {{ totalAvecCetteValeur }} équipes qualifiées
                                                     {% if totalAvecCetteValeur == 2 %}(Finale)
                                                     {% elseif totalAvecCetteValeur == 4 %}(Demi-finales)
@@ -685,10 +879,52 @@ body {
                                     </div>
                                 </div>
 
-                                <input type="submit"
-                                       value="Créer les matchs d'élimination pour {{ categorieNom }}"
-                                       class="btn btn-primary btn-lg" />
+                                {# Champ caché pour l'action #}
+                                <input type="hidden" name="action" id="action-{{ categorieId }}" value="" />
 
+                                {# ════════════════════════════════════════
+                                   LES DEUX BOUTONS D'ACTION
+                                ════════════════════════════════════════ #}
+                            {# Remplacer les deux boutons et la légende par ceci #}
+<div class="actions-container">
+
+    {# BOUTON 1 — Préparer l'arbre (submit classique) #}
+    <button type="submit"
+            id="btn-prepare-{{ categorieId }}"
+            class="btn-prepare-arbre"
+            {% if valeurMemorisee is null %}disabled{% endif %}
+            onclick="document.getElementById('action-{{ categorieId }}').value='preparer_arbre'">
+        <i class="fas fa-sitemap"></i>
+        Préparer l'arbre
+    </button>
+
+    <div class="actions-separator">puis</div>
+
+    {# BOUTON 2 — Créer les matchs (submit classique) #}
+    <button type="submit"
+            id="btn-creer-{{ categorieId }}"
+            class="btn-creer-matchs"
+            {% if nbrTour is null %}disabled{% endif %}
+            onclick="document.getElementById('action-{{ categorieId }}').value='creer_matchs'">
+        <i class="fas fa-trophy"></i>
+        Créer les matchs
+    </button>
+
+</div>
+
+                                {# Légende #}
+                                <div class="actions-legend">
+                                    <div class="action-legend-item legend-prepare">
+                                        <span class="legend-dot"></span>
+                                        <span>Prépare les emplacements du bracket sans créer les rencontres — utile pour afficher l'arbre à l'avance.</span>
+                                    </div>
+                                    <div class="action-legend-item legend-creer">
+                                        <span class="legend-dot"></span>
+                                        <span>Crée les rencontres et les associe aux emplacements du bracket. À faire quand les poules sont terminées.</span>
+                                    </div>
+                                </div>
+
+                               
                             </div>
                         </div>
 
@@ -734,9 +970,9 @@ body {
                                         <strong>Suggestions :</strong>
                                         <ul>
                                             <li>Modifiez le nombre de poules ou le nombre d'équipes par poule afin qu'une valeur X × {{ nbPoules }} soit égale à 2, 4, 8, 16 ou 32.</li>
-                                            {% if (2 % nbPoules) == 0 %}<li>Prenez {{ 2 / nbPoules }} qualifié{{ (2 / nbPoules) > 1 ? 's' : '' }} par poule → 2 équipes (Finale)</li>{% endif %}
-                                            {% if (4 % nbPoules) == 0 %}<li>Prenez {{ 4 / nbPoules }} qualifié{{ (4 / nbPoules) > 1 ? 's' : '' }} par poule → 4 équipes (Demi-finales)</li>{% endif %}
-                                            {% if (8 % nbPoules) == 0 %}<li>Prenez {{ 8 / nbPoules }} qualifié{{ (8 / nbPoules) > 1 ? 's' : '' }} par poule → 8 équipes (Quarts de finale)</li>{% endif %}
+                                            {% if (2  % nbPoules) == 0 %}<li>Prenez {{ 2  / nbPoules }} qualifié{{ (2  / nbPoules) > 1 ? 's' : '' }} par poule → 2  équipes (Finale)</li>{% endif %}
+                                            {% if (4  % nbPoules) == 0 %}<li>Prenez {{ 4  / nbPoules }} qualifié{{ (4  / nbPoules) > 1 ? 's' : '' }} par poule → 4  équipes (Demi-finales)</li>{% endif %}
+                                            {% if (8  % nbPoules) == 0 %}<li>Prenez {{ 8  / nbPoules }} qualifié{{ (8  / nbPoules) > 1 ? 's' : '' }} par poule → 8  équipes (Quarts de finale)</li>{% endif %}
                                             {% if (16 % nbPoules) == 0 %}<li>Prenez {{ 16 / nbPoules }} qualifié{{ (16 / nbPoules) > 1 ? 's' : '' }} par poule → 16 équipes (8èmes de finale)</li>{% endif %}
                                         </ul>
                                     </div>
@@ -765,21 +1001,17 @@ body {
 </div>
 
 <script>
+/* ══════════════════════════════════════════════════════════════════
+   Navigation entre étapes
+══════════════════════════════════════════════════════════════════ */
 function showCategorie(nom) {
-    // Masquer l'étape 1
     document.getElementById('step-select-categorie').style.display = 'none';
 
-    // Afficher l'étape 2
     const step2 = document.getElementById('step-categorie-content');
     step2.classList.add('visible');
-
-    // Mettre à jour le label
     document.getElementById('step2-label-text').textContent = nom;
 
-    // Masquer tous les blocs, puis afficher le bon
-    document.querySelectorAll('.categorie-block').forEach(el => {
-        el.style.display = 'none';
-    });
+    document.querySelectorAll('.categorie-block').forEach(el => el.style.display = 'none');
 
     const target = document.querySelector(`.categorie-block[data-categorie="${CSS.escape(nom)}"]`);
     if (target) {
@@ -787,27 +1019,40 @@ function showCategorie(nom) {
         target.style.animation = 'fadeInUp 0.4s ease';
     }
 
-    // Scroll vers le haut de la section
     document.getElementById('step-categorie-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function goBack() {
-    // Masquer l'étape 2
     const step2 = document.getElementById('step-categorie-content');
     step2.classList.remove('visible');
+    document.querySelectorAll('.categorie-block').forEach(el => el.style.display = 'none');
 
-    // Masquer tous les blocs catégorie
-    document.querySelectorAll('.categorie-block').forEach(el => {
-        el.style.display = 'none';
-    });
-
-    // Réafficher l'étape 1
     const step1 = document.getElementById('step-select-categorie');
     step1.style.display = 'block';
     step1.style.animation = 'fadeInUp 0.4s ease';
-
     step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Activation des boutons + retrait de la classe "is-saved"
+   quand l'utilisateur change manuellement la valeur du select
+══════════════════════════════════════════════════════════════════ */
+function onQualifiesChange(selectEl, categorieId) {
+    const hasValue = selectEl.value !== '';
+
+    document.getElementById('btn-prepare-' + categorieId).disabled = !hasValue;
+    document.getElementById('btn-creer-'   + categorieId).disabled = !hasValue;
+
+    // Si l'utilisateur change la valeur, retirer la mise en évidence "mémorisée"
+    selectEl.classList.remove('is-saved');
+
+    // Réinitialiser le feedback
+    const fb = document.getElementById('feedback-' + categorieId);
+    fb.className = 'ajax-feedback';
+    fb.innerHTML = '';
+}
+
+
 </script>
 
 </body>
