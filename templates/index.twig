@@ -363,9 +363,13 @@
 
         /* Ranking */
         .ranking-card {
-            margin-left: -5%;
-            padding: 0;
-        }
+    margin-left: 0;
+    padding: 0;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 16px;
+}
 
         .ranking-header {
             font-size: 1.2rem;
@@ -1401,7 +1405,7 @@
 
                <!-- Ranking -->
 {% if IsRankingView == 1 and IdPoules != null %}
-    <div class="ranking-card" id="classementTableau">
+    <div class="card-modern ranking-card" id="classementTableau">
         <div class="ranking-header">
             <i class="fas fa-trophy"></i>
             Classement
