@@ -144,13 +144,7 @@
 <div class="footer-content">
     <!-- Left Links -->
     <ul class="footer-links">
-        <li>
-            <a href="index.php" class="footer-link primary">
-                <i class="fas fa-home"></i>
-                {{t('footerFonctionnalités')}}
-            </a>
-        </li>
-
+       
         <!-- CGV -->
         <li>
             <a href="cgv.php" class="footer-link">
@@ -176,13 +170,18 @@
             {{t('footerTarifs')}}
         </button>
 
-        {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
+      
+    </div>
+
+<div class="footer-actions">
+  {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
             <a href="affichagePlanningArbitre.php?idTournoi={{infoTournoiEnCours['id']}}" class="footer-btn arbitrage">
                 <i class="fas fa-user-tie"></i>
                 Arbitrage
             </a>
         {% endif %}
-    </div>
+</div>
+
 </div>
 
 
