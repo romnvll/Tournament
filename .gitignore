@@ -3,6 +3,7 @@ config.php
 updateDB.txt
 security.php
 secureCookies.php
+Audio
 Audio/*
 !Audio/**/
 !Audio/**/.gitkeep
