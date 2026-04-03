@@ -56,7 +56,7 @@ public function getAudiosPourCreneau(int $creneau_id): array {
         LEFT JOIN Equipes E1 ON E1.id = R.equipe1_id
         LEFT JOIN Equipes E2 ON E2.id = R.equipe2_id
         LEFT JOIN Arbitres A ON A.arbitre_id = P.arbitre_id
-        WHERE P.creneau_id = :creneau_id
+        WHERE P.creneau_id = :creneau_id order by T.terrain_id;
     ");
     $stmt->bindParam(':creneau_id', $creneau_id, PDO::PARAM_INT);
     $stmt->execute();
