@@ -1,4 +1,10 @@
 <?php
+  const TYPE_RENCONTRE_POULE        = 1;
+const TYPE_RENCONTRE_PHASE_FINALE = 2;
+const TYPE_RENCONTRE_CLASSEMENT   = 3;
+const TYPE_RENCONTRE_AMICAL       = 4;
+
+
 class PouleManager {
     private $connexion;
 
@@ -45,17 +51,17 @@ class PouleManager {
     }
 
 
-    public function checkRencontresInPoule($idPoule, $isClassement = 0) {
-        $query = "SELECT COUNT(*) as count FROM Rencontres r
-                  JOIN EquipePoule ep ON r.equipe1_id = ep.equipe_id OR r.equipe2_id = ep.equipe_id
-                  WHERE ep.poule_id = :id AND r.isClassement = :isClassement";
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':id', $idPoule, PDO::PARAM_INT);
-        $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['count'] / 2 > 0;
-    }
+  public function checkRencontresInPoule($idPoule, $typeRencontreId = TYPE_RENCONTRE_POULE) {
+    $query = "SELECT COUNT(*) as count FROM Rencontres r
+              JOIN EquipePoule ep ON r.equipe1_id = ep.equipe_id OR r.equipe2_id = ep.equipe_id
+              WHERE ep.poule_id = :id AND r.type_rencontre_id = :typeRencontreId";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':id', $idPoule, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['count'] / 2 > 0;
+}
     
     
 
@@ -226,42 +232,43 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
 }
 
 
-    public function getEquipesInPoule($idPoule) {
-        $query = "SELECT
-                    e.id,
-                    e.nom,
-                    e.categorie,                    
-                    e.tournoi_id,
-                    ep.poule_id,
-                    e.club_id,
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id AND r.score1 > r.score2 and r.isClassement = 1) OR (r.equipe2_id = e.id AND r.score2 > r.score1 and r.isClassement = 1)) * 3) +
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id OR r.equipe2_id = e.id) and r.isClassement = 1 AND r.score1 = r.score2 and r.isClassement = 1) * 2) +
-                    ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id AND r.score1 < r.score2 and r.isClassement = 1) OR (r.equipe2_id = e.id AND r.score2 < r.score1 and r.isClassement = 1))) AS TotalDesPoints,
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id and r.isClassement = 1), 0) +
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id and r.isClassement = 1), 0) AS nombreButsMarque,
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id and r.isClassement = 1), 0) +
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id and r.isClassement = 1), 0) AS nombreButsEncaisse,
-                    (COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id and r.isClassement = 1), 0) +
-                    COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id and r.isClassement = 1), 0)) -
-                    (COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id and r.isClassement = 1), 0) +
-                    COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id and r.isClassement = 1), 0)) AS DifferenceButs
-                  FROM
-                    Equipes e
-                  JOIN EquipePoule ep ON e.id = ep.equipe_id
-                  WHERE
-                    ep.poule_id = :pouleId
-                   
-                  ORDER BY
-                    TotalDesPoints DESC,
-                    nombreButsMarque DESC,
-                    DifferenceButs DESC";
-    
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':pouleId', $idPoule);
-        
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+   public function getEquipesInPoule($idPoule) {
+  
+    $query = "SELECT
+                e.id,
+                e.nom,
+                e.categorie,                    
+                e.tournoi_id,
+                ep.poule_id,
+                e.club_id,
+                ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id AND r.score1 > r.score2 AND r.type_rencontre_id = :typeClassement) OR (r.equipe2_id = e.id AND r.score2 > r.score1 AND r.type_rencontre_id = :typeClassement)) * 3) +
+                ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id OR r.equipe2_id = e.id) AND r.type_rencontre_id = :typeClassement AND r.score1 = r.score2) * 2) +
+                ((SELECT COUNT(*) FROM Rencontres r WHERE (r.equipe1_id = e.id AND r.score1 < r.score2 AND r.type_rencontre_id = :typeClassement) OR (r.equipe2_id = e.id AND r.score2 < r.score1 AND r.type_rencontre_id = :typeClassement))) AS TotalDesPoints,
+                COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeClassement), 0) +
+                COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeClassement), 0) AS nombreButsMarque,
+                COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeClassement), 0) +
+                COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeClassement), 0) AS nombreButsEncaisse,
+                (COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeClassement), 0) +
+                COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeClassement), 0)) -
+                (COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeClassement), 0) +
+                COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeClassement), 0)) AS DifferenceButs
+              FROM
+                Equipes e
+              JOIN EquipePoule ep ON e.id = ep.equipe_id
+              WHERE
+                ep.poule_id = :pouleId
+              ORDER BY
+                TotalDesPoints DESC,
+                nombreButsMarque DESC,
+                DifferenceButs DESC";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $idPoule, PDO::PARAM_INT);
+    $stmt->bindValue(':typeClassement', TYPE_RENCONTRE_CLASSEMENT, PDO::PARAM_INT);
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
     
     
     public function creerPoulesPourCategorie(int $idTournoi, int $idCategorie, int $nombreEquipesParPoule)
@@ -391,7 +398,8 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
         // Étape 1 : Récupérer toutes les équipes de la catégorie et du tournoi
         $stmt = $this->connexion->prepare("
            SELECT 
-    e.id, 
+    e.id,
+    e.isPresent, 
     e.nom AS equipe_nom, 
     c.nom AS club_nom, 
     c.logo AS club_logo

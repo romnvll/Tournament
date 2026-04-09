@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
         }
     }
     $contraintesTerrain['garder_arbitres'] = isset($_POST['garder_arbitres']);
+    $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']); // ← ajouter
 
     $_SESSION[$sessionKey] = $contraintesTerrain;
     header("Location: PlacementAutomatique.php?id_tournoi={$idTournoi}&contraintes_ok=1");
@@ -67,6 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
 }
 
 $contraintesTerrain = $_SESSION[$sessionKey] ?? [];
+
+$rencontresAP = $planificationDao->afficherRencontresSansPlanification(
+    $idTournoi,
+    !empty($contraintesTerrain['pas_de_placement_pour_les_absents'])
+);
+
+
 
 // ── POST : lancement du placement ───────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'placer') {
@@ -79,20 +87,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
 
         // ── 1. Trier les rencontres ──────────────────────────────────────────
         // Tour ASC → catégorie alphabétique → poule | phases finales en dernier
-        usort($rencontresAP, function ($a, $b) {
-            $afinal = ($a['phase_finale_id'] !== null) ? 1 : 0;
-            $bfinal = ($b['phase_finale_id'] !== null) ? 1 : 0;
-            if ($afinal !== $bfinal) return $afinal - $bfinal;
+      
+           usort($rencontresAP, function ($a, $b) {
+    $afinal = ($a['phase_finale_id'] !== null) ? 1 : 0;
+    $bfinal = ($b['phase_finale_id'] !== null) ? 1 : 0;
+    if ($afinal !== $bfinal) return $afinal - $bfinal;
 
-            $tourA = (int)($a['tour'] ?? 999);
-            $tourB = (int)($b['tour'] ?? 999);
-            if ($tourA !== $tourB) return $tourA - $tourB;
+    $tourA = (int)($a['tour'] ?? 999);
+    $tourB = (int)($b['tour'] ?? 999);
+    if ($tourA !== $tourB) return $tourA - $tourB;
 
-            $catCmp = strcmp($a['equipe1_categorie_nom'] ?? '', $b['equipe1_categorie_nom'] ?? '');
-            if ($catCmp !== 0) return $catCmp;
+    $catCmp = strcmp($a['equipe1_categorie_nom'] ?? '', $b['equipe1_categorie_nom'] ?? '');
+    if ($catCmp !== 0) return $catCmp;
 
-            return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');
-        });
+    return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');
+});
 
         // ── 2. Sauvegarder les arbitres, puis supprimer les créneaux sauf le premier ──
         // supprimerCreneau() efface aussi les lignes arbitres (rencontre_id IS NULL

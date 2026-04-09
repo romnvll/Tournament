@@ -529,24 +529,60 @@
                                 </td>
                                 
                                 <td>
-                                    <div class="team-cell">
-                                        <img src="{{ equipe.club1_logo }}" alt="{{ equipe.equipe1_nom }}" class="team-logo">
-                                        <span>{{ equipe.equipe1_nom }}</span>
-                                    </div>
-                                </td>
-                                
-                                <td>
-                                    <span class="score-display">
-                                        {{equipe.score1}} - {{equipe.score2}}
+    <div class="team-cell" style="display: flex; align-items: center; gap: 8px;">
+        <img src="{{ equipe.club1_logo }}" alt="{{ equipe.equipe1_nom }}" class="team-logo"
+             style="width: 32px; height: 32px; object-fit: contain; border-radius: 4px; flex-shrink: 0;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-weight: 500; font-size: 14px;">{{ equipe.equipe1_nom }}</span>
+            {% if equipe.equipe1_isPresent == 1 %}
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 999px; background-color: #d1fae5; color: #065f46; width: fit-content;">
+                    <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+                    Présente
+                </span>
+            {% else %}
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 999px; background-color: #fee2e2; color: #991b1b; width: fit-content;">
+                    <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #ef4444; display: inline-block;"></span>
+                    Absente
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</td>
+
+<td style="text-align: center;">
+    <span class="score-display" style="
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        background: #f3f4f6;
+        color: #111827;
+    ">
+        {{ equipe.score1 }} - {{ equipe.score2 }}
+    </span>
+</td>
+
+                        <td>
+                        <div class="team-cell" style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
+                            <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end;">
+                                <span style="font-weight: 500; font-size: 14px;">{{ equipe.equipe2_nom }}</span>
+                                {% if equipe.equipe2_isPresent == 1 %}
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 999px; background-color: #d1fae5; color: #065f46; width: fit-content;">
+                                        <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+                                        Présente
                                     </span>
-                                </td>
-                                
-                                <td>
-                                    <div class="team-cell">
-                                        <span>{{ equipe.equipe2_nom }}</span>
-                                        <img src="{{ equipe.club2_logo }}" alt="{{ equipe.equipe2_nom }}" class="team-logo">
-                                    </div>
-                                </td>
+                                {% else %}
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 999px; background-color: #fee2e2; color: #991b1b; width: fit-content;">
+                                        <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #ef4444; display: inline-block;"></span>
+                                        Absente
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <img src="{{ equipe.club2_logo }}" alt="{{ equipe.equipe2_nom }}" class="team-logo"
+                                style="width: 32px; height: 32px; object-fit: contain; border-radius: 4px; flex-shrink: 0;">
+                        </div>
+                        </td>
                                 
                                 <td>
                                     <span class="terrain-badge">

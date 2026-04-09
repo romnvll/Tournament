@@ -414,22 +414,35 @@
     <p><i class="bi bi-info-circle" style="color:var(--primary-color)"></i>&nbsp;Mémorisées en session pour ce tournoi.</p>
 
     <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg-light); border-radius:8px; border:1px solid #e5e7eb;">
-        <input type="checkbox"
-               id="garderArbitres"
-               name="garder_arbitres"
-               value="1"
-               style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer; flex-shrink:0;"
-               {% if contraintesTerrain.garder_arbitres is defined and contraintesTerrain.garder_arbitres %}checked{% endif %}>
-        <label for="garderArbitres" style="cursor:pointer; font-size:.88rem; color:var(--bg-dark); margin:0">
-            <i class="fas fa-user-tie" style="color:var(--primary-color)"></i>
-            Conserver les arbitres déjà placés
-        </label>
+                <input type="checkbox"
+                    id="garderArbitres"
+                    name="garder_arbitres"
+                    value="1"
+                    style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer; flex-shrink:0;" 
+                    {% if contraintesTerrain.garder_arbitres is defined and contraintesTerrain.garder_arbitres %}checked{% endif %}>
+                <label for="garderArbitres" style="cursor:pointer; font-size:.88rem; color:var(--bg-dark); margin:0">
+                    <i class="fas fa-user-tie" style="color:var(--primary-color)"></i>
+                    Conserver les arbitres déjà placés
+                </label>
     </div>
-
-    <button type="submit" class="modern-btn btn-save">
-        <i class="bi bi-floppy"></i> Enregistrer les contraintes
-    </button>
+    
+ <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg-light); border-radius:8px; border:1px solid #e5e7eb;">
+    <input type="checkbox"
+           id="pasDePLacementPourLesAbsents"
+           name="pas_de_placement_pour_les_absents"
+           value="1"
+           style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer; flex-shrink:0;"
+           {% if contraintesTerrain.pas_de_placement_pour_les_absents is defined and contraintesTerrain.pas_de_placement_pour_les_absents %}checked{% endif %}>
+    <label for="pasDePLacementPourLesAbsents" style="cursor:pointer; font-size:.88rem; color:var(--bg-dark); margin:0">
+        <i class="bi bi-sign-stop" style="color:var(--warning-color)"></i>
+        Ne pas placer les équipes absentes/en retard
+    </label>
 </div>
+
+            <button type="submit" class="modern-btn btn-save">
+                <i class="bi bi-floppy"></i> Enregistrer les contraintes
+            </button>
+        </div>
             </div>
         </form>
 

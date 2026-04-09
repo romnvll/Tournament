@@ -492,6 +492,7 @@ public function GetPremiersDesPoules(int $idTournoi) {
 
 public function getClassementParCategorie(int $idTournoi)
 {
+    // Récupération des catégories
     $query = "SELECT DISTINCT c.id_categorie, c.Nom_categorie
               FROM Categorie c 
               JOIN Equipes e ON e.categorie = c.id_categorie
@@ -505,65 +506,69 @@ public function getClassementParCategorie(int $idTournoi)
     $classements = [];
 
     foreach ($categories as $categorie) {
-        $query = "SELECT
+
+        $query = "
+        SELECT
             e.id,
             e.nom,
-             -- Matchs joués
-    (SELECT COUNT(*) 
-     FROM Rencontres r 
-     WHERE r.isClassement = 0 
-     AND (r.equipe1_id = e.id OR r.equipe2_id = e.id)) AS matchsJoues,
 
-    -- Matchs gagnés
-    (SELECT COUNT(*) 
-     FROM Rencontres r 
-     WHERE r.isClassement = 0 
-     AND ((r.equipe1_id = e.id AND r.score1 > r.score2) 
-       OR  (r.equipe2_id = e.id AND r.score2 > r.score1))) AS rencontresGagnees,
+            COUNT(r.id) AS matchsJoues,
 
-    -- Matchs nuls
-    (SELECT COUNT(*) 
-     FROM Rencontres r 
-     WHERE r.isClassement = 0 
-     AND (r.equipe1_id = e.id OR r.equipe2_id = e.id) 
-     AND r.score1 = r.score2) AS matchsNuls,
+            SUM(CASE 
+                WHEN (e.id = r.equipe1_id AND r.score1 > r.score2)
+                  OR (e.id = r.equipe2_id AND r.score2 > r.score1)
+                THEN 1 ELSE 0 END) AS rencontresGagnees,
 
-    -- Matchs perdus = joués - gagnés - nuls
-    (
-        (SELECT COUNT(*) 
-         FROM Rencontres r 
-         WHERE r.isClassement = 0 
-         AND (r.equipe1_id = e.id OR r.equipe2_id = e.id))
-        -
-        (
-            (SELECT COUNT(*) 
-             FROM Rencontres r 
-             WHERE r.isClassement = 0 
-             AND ((r.equipe1_id = e.id AND r.score1 > r.score2) 
-               OR  (r.equipe2_id = e.id AND r.score2 > r.score1)))
-            +
-            (SELECT COUNT(*) 
-             FROM Rencontres r 
-             WHERE r.isClassement = 0 
-             AND (r.equipe1_id = e.id OR r.equipe2_id = e.id) 
-             AND r.score1 = r.score2)
-        )
-    ) AS matchsPerdus,
-            (SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = 0 AND (r.equipe1_id = e.id OR r.equipe2_id = e.id)) AS matchsJoues,
-            (SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = 0 AND ((r.equipe1_id = e.id AND r.score1 > r.score2) OR (r.equipe2_id = e.id AND r.score2 > r.score1))) AS rencontresGagnees,
-            COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = 0), 0) +
-            COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = 0), 0) AS nombreButsEncaisse,
-            COALESCE((SELECT SUM(r.score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = 0), 0) +
-            COALESCE((SELECT SUM(r.score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = 0), 0) AS nombreButsMarque,
-            ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = 0 AND ((r.equipe1_id = e.id AND r.score1 > r.score2) OR (r.equipe2_id = e.id AND r.score2 > r.score1))) * 3) +
-            ((SELECT COUNT(*) FROM Rencontres r WHERE r.isClassement = 0 AND (r.equipe1_id = e.id OR r.equipe2_id = e.id) AND r.score1 = r.score2) * 2) AS TotalDesPoints
-        FROM
-            Equipes e
+            SUM(CASE 
+                WHEN r.score1 = r.score2 THEN 1 ELSE 0 END) AS matchsNuls,
+
+            SUM(CASE 
+                WHEN (e.id = r.equipe1_id AND r.score1 < r.score2)
+                  OR (e.id = r.equipe2_id AND r.score2 < r.score1)
+                THEN 1 ELSE 0 END) AS matchsPerdus,
+
+            SUM(CASE 
+                WHEN e.id = r.equipe1_id THEN r.score1
+                WHEN e.id = r.equipe2_id THEN r.score2
+                ELSE 0 END) AS nombreButsMarque,
+
+            SUM(CASE 
+                WHEN e.id = r.equipe1_id THEN r.score2
+                WHEN e.id = r.equipe2_id THEN r.score1
+                ELSE 0 END) AS nombreButsEncaisse,
+
+            (
+                -- 1 point par match joué
+                COUNT(r.id)
+                -- bonus victoire (+2)
+                + SUM(CASE 
+                    WHEN (e.id = r.equipe1_id AND r.score1 > r.score2)
+                      OR (e.id = r.equipe2_id AND r.score2 > r.score1)
+                    THEN 2 ELSE 0 END)
+                -- bonus nul (+1)
+                + SUM(CASE 
+                    WHEN r.score1 = r.score2 THEN 1 ELSE 0 END)
+            ) AS TotalDesPoints
+
+        FROM Equipes e
+
+        LEFT JOIN Rencontres r 
+            ON (e.id = r.equipe1_id OR e.id = r.equipe2_id)
+            AND r.type_rencontre_id = 1
+            AND r.isTerminated = 1
+
         WHERE
-            e.tournoi_id = :idTournoi AND
-            e.categorie = :categorieId
+            e.tournoi_id = :idTournoi
+            AND e.categorie = :categorieId
+
+        GROUP BY e.id, e.nom
+
         ORDER BY
-            TotalDesPoints DESC, rencontresGagnees DESC, nombreButsMarque DESC, nombreButsEncaisse ASC";
+            TotalDesPoints DESC,
+            rencontresGagnees DESC,
+            nombreButsMarque DESC,
+            nombreButsEncaisse ASC
+        ";
 
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
@@ -581,7 +586,6 @@ public function getClassementParCategorie(int $idTournoi)
 
     return $classements;
 }
-
   /**
  * Active ou désactive les effets sonores pour un utilisateur
  * @param int $userId ID de l'utilisateur

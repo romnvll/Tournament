@@ -71,7 +71,7 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1) {
 
 if (isset($_GET['CreerRencontre'])) {
         if ($_GET['CreerRencontre'] == 1) {
-        $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],1);
+        $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3);
         header("Location: " . $_SERVER['HTTP_REFERER']);
 
       //header("Location:  PlacementDesRencontres.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);

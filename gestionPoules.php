@@ -65,6 +65,7 @@ if (isset($_GET['categorie'])) {
 
     $rencontre = new RencontreDAO();
     $poule =  $poules->afficherPoulesPourCategorie($_GET['id_tournoi'], $nbrEquipeEnCours, $idCategorie);
+   
     $pouleHasRencontre = new PouleManager();
    
     
@@ -102,7 +103,7 @@ if (isset($_GET['categorie'])) {
                        foreach ($poule as $idpoule) {
                         $rencontres->supprimerRencontresParPoule($idpoule);
                         
-                        $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],0,false);
+                        $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],1,false);
                         
                         }
                                        

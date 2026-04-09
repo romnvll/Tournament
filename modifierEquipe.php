@@ -13,6 +13,20 @@ if (isset ($_POST['changeClub']) && $_POST['changeClub'] == "true") {
 }
 
 
+if (isset($_POST['changePresence']) && $_POST['changePresence'] === "true") {
+    if (isset($_SERVER['HTTP_HX_REQUEST'])) {
+        try {
+            // La checkbox envoie sa valeur "on" si cochée, rien si décochée
+            $etat = isset($_POST['etatPresence']) ? "presente" : "absente";
+            $equipe->confirmerEquipe((int)$_POST['idEquipe'], $etat);
+        } catch (Exception $e) {
+            echo "❌ " . htmlspecialchars($e->getMessage());
+        }
+        exit;
+    }
+}
+
+
 if (isset($_POST['changeCategorie']) && $_POST['changeCategorie'] == "true") {
 
 //    $dejaplanifie = $equipe->equipeAUneRencontrePlanifiee($_POST['idEquipe'], $_POST['tournoi_id']);

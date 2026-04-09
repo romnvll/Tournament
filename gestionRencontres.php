@@ -50,12 +50,12 @@ if (
 
 
 if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
-  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],0,true);
+  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],1,true);
   
 }
 
 else {
-  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi']);
+  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],1);
  
 }
 
@@ -63,7 +63,7 @@ else {
 
 //si on ne test pas le parametre idPoule --> erreur 500
 if (isset ($_GET['idPoule'])) {
- $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
+ $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 }
 
 
@@ -71,13 +71,13 @@ $template = $twig->load('GestionRencontres.twig');
 echo $template->render([
   'email' => $userData['email'],
 
-  'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
+  'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule'],1),
   'pageEnCours' => 'GestionDesRencontres',
   'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_SESSION['idTournoi']),
   'idTournoi'=> $_SESSION['idTournoi'],
-  'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule'],),
-  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],0,'tour'),
+  'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule']),
+  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],1,'tour'),
   'idPoule' => $_GET['idPoule'],
   'pouleEnCours' => $_GET['idPoule'],
   'tournoiEnCours' => $_SESSION['idTournoi'],

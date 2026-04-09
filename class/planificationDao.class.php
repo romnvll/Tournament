@@ -234,7 +234,9 @@ public function convertLabelsToRencontres(int $tournoi_id): void {
             p.creneau_id,
             c.nom AS creneau_nom,
             p.rencontre_id,
-            r.isClassement,
+            r.type_rencontre_id,
+            tr.code AS type_rencontre_code,
+            tr.libelle AS type_rencontre_libelle,
             r.isTerminated,
             r.phase_finale_id,
             pf.libelle AS phase_finale_libelle,
@@ -283,6 +285,7 @@ public function convertLabelsToRencontres(int $tournoi_id): void {
         LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
         LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN Rencontres r ON p.rencontre_id = r.id
+        LEFT JOIN typeDeRencontres tr ON r.type_rencontre_id = tr.id
         LEFT JOIN phases_finales pf ON r.phase_finale_id = pf.id
         LEFT JOIN Poules pl ON r.poule_id = pl.id
         LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
@@ -376,58 +379,61 @@ ORDER BY
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function afficherRencontresSansPlanification(int $tournoi_id): array {
-        
-        $stmt = $this->connexion->prepare("
-     SELECT r.*, 
-       pf.libelle AS phase_finale_libelle,
+    
+public function afficherRencontresSansPlanification(int $tournoi_id, bool $onlyPresent = false): array {
 
+    $sql = "
+    SELECT r.*, 
+       pf.libelle AS phase_finale_libelle,
        e1.nom AS equipe1_nom, 
        e1.IsPresent AS equipe1_IsPresent, 
        e1.club_id AS equipe1_club_id, 
        e1.categorie AS equipe1_categorie_id,
        e1_cat.Nom_categorie AS equipe1_categorie_nom,
-
        e2.id AS equipe2_id,
        e2.nom AS equipe2_nom, 
        e2.IsPresent AS equipe2_IsPresent, 
        e2.club_id AS equipe2_club_id, 
        e2.categorie AS equipe2_categorie_id,
        e2_cat.Nom_categorie AS equipe2_categorie_nom,
-
+       c1.nom AS club1_nom, 
+       c1.logo AS club1_logo,
+       c2.nom AS club2_nom, 
+       c2.logo AS club2_logo,
        MIN(p1.nom) AS equipe1_poule_nom
 
 FROM Rencontres r
-LEFT JOIN phases_finales pf 
-       ON r.phase_finale_id = pf.id
-
-LEFT JOIN Planification pl ON r.id = pl.rencontre_id
+LEFT JOIN phases_finales pf ON r.phase_finale_id = pf.id
 LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
 LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
 LEFT JOIN Categorie e1_cat ON e1.categorie = e1_cat.id_categorie
 LEFT JOIN Categorie e2_cat ON e2.categorie = e2_cat.id_categorie
 LEFT JOIN EquipePoule ep1 ON e1.id = ep1.equipe_id
 LEFT JOIN Poules p1 ON ep1.poule_id = p1.id
+LEFT JOIN Clubs c1 ON e1.club_id = c1.id
+LEFT JOIN Clubs c2 ON e2.club_id = c2.id
+LEFT JOIN Planification pl ON r.id = pl.rencontre_id
 
 WHERE pl.rencontre_id IS NULL
-AND r.tournoi_id = :tournoi_id
+AND r.tournoi_id = :tournoi_id";
 
-GROUP BY r.id
-ORDER BY r.tour ASC;
-
-
-
-
-
-
-
-        ");
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 👉 Ajout du filtre conditionnel
+    if ($onlyPresent) {
+        $sql .= " AND e1.IsPresent = 1 AND e2.IsPresent = 1 ";
     }
-    
-    
+
+    $sql .= "
+    GROUP BY r.id
+    ORDER BY r.tour ASC, r.type_rencontre_id ASC;
+    ";
+
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindParam(':tournoi_id', $tournoi_id);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 public function listerLabelsParTournoi(int $tournoi_id): array {
     $stmt = $this->connexion->prepare("

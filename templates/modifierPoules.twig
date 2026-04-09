@@ -533,12 +533,51 @@
                                     <form action="modifierPoules_traitement.php" method="post">
                                         <tr>
                                             <th>
-                                                <div class="team-name">
-                                                    <img src="{{ equipe.club_logo }}" 
-                                                        alt="{{ equipe.club_nom }}"
-                                                        style="width: 35px; height: 35px; object-fit: contain; border-radius: 4px;">
-                                                    <span>{{ equipe.nom }}</span>
-<small style="color: #374151; font-weight: 500;">{{ equipe.club_nom }}</small>                                                </div>
+                                                <div class="team-name" style="display: flex; align-items: center; gap: 10px;">
+    <img src="{{ equipe.club_logo }}" 
+         alt="{{ equipe.club_nom }}"
+         style="width: 35px; height: 35px; object-fit: contain; border-radius: 4px; flex-shrink: 0;">
+    
+    <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 500;">{{ equipe.nom }}</span>
+            
+            {% if equipe.IsPresent == 1 %}
+                <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    padding: 2px 8px;
+                    border-radius: 999px;
+                    background-color: #d1fae5;
+                    color: #065f46;
+                ">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+                    Présente
+                </span>
+            {% else %}
+                <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    padding: 2px 8px;
+                    border-radius: 999px;
+                    background-color: #fee2e2;
+                    color: #991b1b;
+                ">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #ef4444; display: inline-block;"></span>
+                    Absente / Retard
+                </span>
+            {% endif %}
+        </div>
+        
+        <small style="color: #6b7280; font-size: 12px;">{{ equipe.club_nom }}</small>
+    </div>
+</div>
                                             </th>
                                             <td>
                                                 <select class="modern-select" name="dstpoule" required>

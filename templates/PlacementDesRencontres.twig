@@ -33,6 +33,37 @@
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        /* Clignotement si équipe absente */
+@keyframes pulseWarning {
+    0%, 100% { 
+        background-color: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.4);
+    }
+    50% { 
+        background-color: rgba(239, 68, 68, 0.22);
+        border-color: rgba(239, 68, 68, 0.9);
+    }
+}
+
+.match-not-ready {
+    animation: pulseWarning 1.4s ease-in-out infinite;
+    border: 2px solid rgba(239, 68, 68, 0.6);
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.absent-warning {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+}
+.team-absent {
+    color: #dc2626;
+    font-weight: 700;
+    text-decoration: underline wavy #dc2626;
+}
 
         .main-container {
             background: white;
@@ -714,7 +745,8 @@
                         </label>
                         <input type="number" id="modifMinutes" name="modifMinutes" 
                                placeholder="Minutes" class="modern-input" 
-                               onfocusout="this.form.submit()">
+                               >
+                               <input type="submit" value="{{t('Appliquerleretard')}}" class="modern-btn btn-primary-modern">
                     </div>
 
                     <div class="control-group">
@@ -918,33 +950,68 @@
                                                 {% endif %}
 
                                                 <!-- Rencontre -->
+                                               
                                                 {% if planification.rencontre_id is not null %}
                                                     <div class="match-card">
+                                                                                                                
                                                         <div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
-                                                            {% if planification.isClassement == 1 %}
+                                                       
+                                                            {% if planification.type_rencontre_id == 4 %}
+                                                                <span><i class="fa fa-star"></i> Match amical</span>
+                                                            {% elseif planification.type_rencontre_id == 3 %}
                                                                 <span><i class="fa fa-trophy"></i> Phase finale</span>
                                                             {% else %}
                                                                 <span>{{ planification.poule_nom }}</span>
                                                             {% endif %}
+                                                           
                                                         </div>
+                                                            
+                                                        <div class="match-text {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}match-not-ready{% endif %}">
+    
+                                                            {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
+                                                                <div class="absent-warning">
+                                                                    ⚠️ 
+                                                                    {% if planification.equipe1_isPresent == 0 and planification.equipe2_isPresent == 0 %}
+                                                                        Les deux équipes sont absentes / en retard
+                                                                    {% elseif planification.equipe1_isPresent == 0 %}
+                                                                        {{ planification.equipe1_nom }} est absente / en retard
+                                                                    {% else %}
+                                                                        {{ planification.equipe2_nom }} est absente / en retard
+                                                                    {% endif %}
+                                                                </div>
+                                                            {% endif %}
 
-                                                        <div class="match-text">
-                                                               
                                                             {% if planification.phase_finale_id is not null %}
-                                                            
-                                                                <strong>Elimination-Direct</strong> {{planification.phase_finale_libelle}}- {{planification.equipe1_categorie_nom}}<br>
-                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                <strong>Elimination-Direct</strong> {{planification.phase_finale_libelle}} - {{planification.equipe1_categorie_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span> 
+                                                                <strong>vs</strong> 
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
                                                                 <small class="text-muted">{{ planification.poule_nom }}</small>
-                                                            
 
-                                                            {% elseif planification.isClassement == 0 %}
+                                                            {% elseif planification.type_rencontre_id == 1 %}
                                                                 <strong>Tour {{planification.tour}}</strong> - {{planification.equipe1_categorie_nom}}<br>
-                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span> 
+                                                                <strong>vs</strong> 
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
                                                                 <small class="text-muted">{{ planification.poule_nom }}</small>
-                                                            {% elseif planification.isClassement == 1 %}
+
+                                                            {% elseif planification.type_rencontre_id == 3 %}
                                                                 <strong>PF Tour {{planification.tour}}</strong> - {{planification.equipe1_categorie_nom}}<br>
-                                                                {{planification.equipe1_nom_categorie}}{{planification.equipe1_nom}} <strong>vs</strong> {{planification.equipe2_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span> 
+                                                                <strong>vs</strong> 
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
                                                                 <small class="text-muted">{{ planification.poule_nom }}</small>
+
+                                                            {% elseif planification.type_rencontre_id == 4 %}
+                                                                <strong>Rencontre amicale</strong> - {{planification.equipe1_categorie_nom}}<br>
+                                                                {{planification.equipe1_nom_categorie}}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span> 
+                                                                <strong>vs</strong> 
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
+                                                                
                                                             {% endif %}
                                                         </div>
 
@@ -991,22 +1058,29 @@
                                             <select class="empty-select" name="Addevent">
                                                 <option value="">{{t('choisirRencontreOuLabel')}}</option>
                                                 {% for planif in planificationSansCreneauNiTerrain %}
+                                                
                                                     {% if planif.phase_finale_id is not null %}
                                                         {# Option pour phase finale à élimination directe #}
                                                         <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
                                                             Elimination-Direct - {{ planif.phase_finale_libelle }} - {{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}}
                                                         </option>
 
-                                                    {% elseif planif.isClassement == 0 %}
+                                                    {% elseif planif.type_rencontre_id == 1 %}
                                                         <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
                                                             tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom|split(' - ')[1] }}
                                                         </option>
 
-                                                    {% elseif planif.isClassement == 1 %}
+                                                    {% elseif planif.type_rencontre_id == 3 %}
                                                         <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
                                                             PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} {{ planif.equipe1_poule_nom }}
                                                         </option>
+                                                    {% elseif planif.type_rencontre_id == 4 %} 
+                                                    <option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
+                                                        ⭐ Match amical - {{ planif.equipe1_categorie_nom }} {{planif.equipe1_nom}} vs {{planif.equipe2_nom}} 
+                                                        </option>
+                                                
                                                     {% endif %}
+
                                                 {% endfor %}
                                                 {% for label in libelleParTournoi %}
                                                     <option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>

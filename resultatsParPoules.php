@@ -5,10 +5,10 @@ $rencontre = new RencontreDAO();
 
 
 if (isset ($_POST['idPoule'])) {
-    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_POST['idPoule'],0);
+    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_POST['idPoule'],1);
    }
 
-  // $GetResultatDesPoules= $rencontre->GetResultatDesPoules(2);
+  
 ?>
 <?php  foreach ($GetResultatDesPoules as $resultat )  ?>
 <table class="table" id="classementTableau">

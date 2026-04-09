@@ -56,9 +56,9 @@ else {
 
    //var_dump($_POST['id_poule']);
     
-    $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi']);
+    $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi'],1);
    
-    $rencontres->createRencontreByPoule($_POST['dstpoule'],$_POST['id_tournoi']);
+    //$rencontres->createRencontreByPoule($_POST['dstpoule'],$_POST['id_tournoi']);
     
    
   

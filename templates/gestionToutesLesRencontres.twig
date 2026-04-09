@@ -674,7 +674,7 @@
 						       class="modern-input" placeholder="Minutes">
 					</div>
 					<button type="submit" class="modern-btn btn-primary-modern ">
-						Appliquer le retard
+						{{t('Appliquerleretard')}}
 					</button>
 					<input type="hidden" name="idTournoi" value="{{idTournoi}}">
 				</form>
@@ -786,11 +786,16 @@
 																
 															{% if planification.rencontre_id is not null %}
 																<div class="match-header" style="background: {{ planification.equipe1_categorie_couleur }};">
-																	{% if planification.isClassement == 1 and planification.phase_finale_id is null %}
+																	{% if planification.type_rencontre_id == 3 and planification.phase_finale_id is null %}
 																		<i class="fa fa-trophy me-1"></i>
 																		Phase finale – Tour {{ planification.tour }} – {{planification.poule_nom }} – {{ planification.equipe1_categorie_nom }}
 																	{% elseif planification.phase_finale_id is not null %}
 																		{{ planification.phase_finale_libelle }} {{ planification.equipe1_categorie_nom }} {{planification.equipe1_nom}} vs {{planification.equipe2_nom}}
+																	
+																	{% elseif planification.type_rencontre_id == 4 %}
+																		<span class="match-category" style="background-color: #ffc107; color: #212529;">
+																			<i class="fa fa-star"></i>Rencontre amicale
+																		</span>
 																	{% else %}
 																		Tour {{ planification.tour }} – {{planification.poule_nom }}
 																	{% endif %}

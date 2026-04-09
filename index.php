@@ -186,15 +186,15 @@ if (isset ($_GET['idPoule'])) {
   //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
  
  
-  if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
+  if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 3 ) {
     
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1);
-   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,3);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],3);
 
   }
    else {
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,0);
-   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],0);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 
    }
 
@@ -209,7 +209,12 @@ if (isset ($_GET['idPoule'])) {
  }
 
 
-
+if (isset ($_GET['id_equipe'])) {
+  $equipeAsRencontreAmicale = $rencontre->equipeAsRencontreAmicale($_GET['id_equipe']);
+}
+else {
+  $equipeAsRencontreAmicale = null;
+}
  
 //gestion des sponsor
 if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
@@ -256,6 +261,7 @@ echo $template->render([
     'idTournoi' => $idTournoi,
     'licence' =>$licenceDao->getTousLesTypesDeLicence(),
     'planTournoi' => $planTournoi,
+    'equipeAsRencontreAmicale' => $equipeAsRencontreAmicale,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

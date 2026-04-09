@@ -859,6 +859,7 @@
                                     {% endif %}
                                     <th>{{t('categorie')}}</th>
                                     <th>{{t('changerVersCategorie')}}</th>
+                                    <th>{{t('presence')}}</th>
                                     <th>{{t('action')}}</th>
                                 </tr>
                             </thead>
@@ -1025,6 +1026,24 @@
 
                                             <div id="message-{{ equipe.id }}" class="small mt-1 text-muted"></div>
                                         </td>
+                                        <!-- Présence -->
+                                        
+                                            <td class="text-center">
+                                           
+                                                <input type="checkbox"
+                                                    class="form-check-input presence-checkbox"
+                                                    style="width: 1.4rem; height: 1.4rem; cursor: pointer;"
+                                                    {% if equipe.IsPresent == 1  %}checked{% endif %}
+                                                    hx-post="modifierEquipe.php"
+                                                    hx-vals='{
+                                                        "idEquipe": "{{ equipe.id }}",
+                                                        "changePresence": "true"
+                                                    }'
+                                                    hx-trigger="change"
+                                                    hx-swap="innerHTML"
+                                                    hx-include="this"
+                                                    name="etatPresence">
+                                            </td>
 
                                         <!-- Action -->
                                         <td>
@@ -1037,6 +1056,7 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        
                                     </tr>
                                 {% endfor %}
                             </tbody>

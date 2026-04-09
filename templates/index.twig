@@ -995,14 +995,23 @@
 
                 <!-- Header Logo -->
                 {% if idclub is not null or idIdPoules is not null or IdEquipe is not null %}
-                    <div class="card-modern" style="text-align: center;">
-                        <a href="index.php">
-                            <img src="logos/Logo.png" loading="lazy" alt="Brackito" style="max-height: 60px;">
-                        </a>
-                        <p style="color: #6b7280; font-size: 0.9rem; margin-top: 8px;">
-                            Simplifiez l'organisation de vos compétitions
-                        </p>
-                    </div>
+                     <div class="card-modern organisateur-info">
+            <div class="organisateur-content">
+                <span class="organisateur-label">
+                    <i class="fas fa-trophy"></i>
+                    Tournoi organisé par
+                </span>
+                <div class="organisateur-club">
+                    {% if infoTournoiEnCours.logo_club %}
+                        <img src="{{ infoTournoiEnCours.logo_club }}" 
+                             alt="{{ infoTournoiEnCours.nom_club }}" 
+                             loading="lazy" 
+                             class="organisateur-logo">
+                    {% endif %}
+                    <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+                </div>
+            </div>
+        </div>
                 {% endif %}
 
                 <!-- Club Selection -->
@@ -1246,8 +1255,26 @@
                         </div>
                     {% endif %}
                 {% endif %}
+
+            {% if equipeAsRencontreAmicale %}
+                <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+                                <i class="fas fa-star me-3 fs-4"></i>
+
+                                <div>
+                                    <strong>Rencontres amicales</strong><br>
+                                    Votre équipe participe à des rencontres amicales.
+
+                                    <div class="mt-2">
+                                        <a class="btn btn-sm btn-primary"
+                                        href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}&id_club={{ IdClub }}&affichageByTeam=true">
+                                            Voir les rencontres de mon équipe
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+            {% endif %}
                 
-                {% if RencontreByPoule[0].equipe2_has_phase_finale or RencontreByPoule[0].equipe1_has_phase_finale %}
+                {% if RencontreByPoule[0].equipe2_has_phase_finale ==2 or RencontreByPoule[0].equipe1_has_phase_finale ==2 %}
                             <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
                                 <i class="fas fa-trophy me-3 fs-4"></i>
 
@@ -1275,7 +1302,7 @@
                     {% elseif IdPoules %}
                         {% set rencontres = RencontreByPoule %}
                     {% endif %}
-                     
+                    
                     {% for equipe in rencontres %}
                        
                         <div class="match-card {% if equipe.score1 != 0 or equipe.score2 != 0 %}finished{% endif %}">
@@ -1358,10 +1385,17 @@
 
                             <div class="match-details">
                                 <div class="detail-row">
+                                    
+                                    {% if equipe.type_rencontre_id == 4 %}
+                                        <span class="match-category" style="background-color: #ffc107; color: #212529;">
+                                            <i class="fa fa-star"></i>Rencontre amicale
+                                        </span>
+                                    {% else %}
+                                    
                                     <span class="match-category" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
                                         {{ equipe.equipe2_categorie_nom }}
                                     </span>
-
+                                        {% endif %}
                                     {% if equipe.isTerminated == 0 %}
                                         <span class="match-status status-pending">
                                             <i class="fas fa-clock"></i>

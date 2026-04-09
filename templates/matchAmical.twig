@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matchs Amicaux – {{ tournoiInfo.nom }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary:       #4f46e5;
+            --primary-light: rgba(79,70,229,.08);
+            --primary-glow:  rgba(79,70,229,.18);
+            --danger:        #ef4444;
+            --success:       #10b981;
+            --info:          #06b6d4;
+            --bg:            #f4f3ff;
+            --surface:       #ffffff;
+            --surface-2:     #f9f8ff;
+            --border:        #e8e6fb;
+            --text:          #1e1b4b;
+            --text-muted:    #6b7280;
+            --radius:        14px;
+            --radius-sm:     8px;
+            --shadow:        0 2px 12px rgba(79,70,229,.07);
+            --shadow-md:     0 6px 24px rgba(79,70,229,.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        /* ─── Layout ─────────────────────────────── */
+        .page-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ─── Header ─────────────────────────────── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 22px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: .92rem;
+            background: var(--primary);
+            color: #fff;
+            letter-spacing: .01em;
+        }
+
+        .back-link {
+            margin-left: auto;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: .84rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color .2s;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        /* ─── Stats row ───────────────────────────── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .stat-label { font-size: .75rem; color: var(--text-muted); margin-bottom: 2px; }
+        .stat-value { font-size: 1.3rem; font-weight: 700; }
+
+        /* ─── Cards ───────────────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--primary);
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        /* ─── Alerts ──────────────────────────────── */
+        .alert {
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: .9rem;
+        }
+        .alert-success { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25); }
+        .alert-danger  { background: rgba(239,68,68,.07);  border: 1px solid rgba(239,68,68,.25); }
+        .alert-success i { color: var(--success); font-size: 1.1rem; margin-top: 1px; }
+        .alert-danger  i { color: var(--danger);  font-size: 1.1rem; margin-top: 1px; }
+
+        /* ─── Form row ────────────────────────────── */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+        .form-label {
+            font-size: .84rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-label i { color: var(--primary); font-size: .9rem; }
+
+        /* ─── Custom Select ───────────────────────── */
+        .cs-wrapper {
+            position: relative;
+        }
+
+        /* Hide native select */
+        .cs-wrapper select { display: none; }
+
+        .cs-trigger {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            cursor: pointer;
+            min-height: 52px;
+            transition: border-color .18s, box-shadow .18s;
+            user-select: none;
+            font-family: inherit;
+        }
+        .cs-trigger:hover { border-color: var(--primary); }
+        .cs-trigger.open {
+            border-color: var(--primary);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            box-shadow: 0 -0px 0 3px var(--primary-glow);
+        }
+
+        .cs-trigger-chevron {
+            margin-left: auto;
+            color: var(--text-muted);
+            font-size: .8rem;
+            transition: transform .2s;
+            flex-shrink: 0;
+        }
+        .cs-trigger.open .cs-trigger-chevron { transform: rotate(180deg); }
+
+        .cs-trigger-placeholder { color: var(--text-muted); font-size: .9rem; }
+
+        .cs-trigger-logo {
+            width: 36px; height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .cs-trigger-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .cs-trigger-name { font-size: .9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cs-trigger-meta { font-size: .75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        /* Dropdown */
+        .cs-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0; right: 0;
+            background: var(--surface);
+            border: 1.5px solid var(--primary);
+            border-top: none;
+            border-bottom-left-radius: var(--radius-sm);
+            border-bottom-right-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            z-index: 500;
+            display: none;
+            overflow: hidden;
+        }
+        .cs-dropdown.open { display: block; }
+
+        /* Search inside dropdown */
+        .cs-search-wrap {
+            padding: 10px 10px 8px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+            position: relative;
+        }
+
+        .cs-search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: .86rem;
+            font-family: inherit;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .cs-search-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        .cs-search-wrap input::placeholder { color: var(--text-muted); }
+
+        .cs-search-icon {
+            position: absolute;
+            left: 21px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: .88rem;
+            pointer-events: none;
+        }
+
+        /* Options list */
+        .cs-list {
+            max-height: 280px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .cs-option {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background .12s;
+        }
+        .cs-option:last-child { border-bottom: none; }
+        .cs-option:hover { background: var(--primary-light); }
+        .cs-option.selected {
+            background: var(--primary-light);
+        }
+
+        .cs-option-logo {
+            width: 34px; height: 34px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .cs-option-body { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+        .cs-option-name { font-size: .88rem; font-weight: 600; color: var(--text); }
+        .cs-option-name mark {
+            background: rgba(79,70,229,.18);
+            color: var(--primary);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+        .cs-option-meta { font-size: .73rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+        .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: .68rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: .03em;
+        }
+
+        .cs-empty {
+            padding: 22px 16px;
+            text-align: center;
+            font-size: .86rem;
+            color: var(--text-muted);
+        }
+        .cs-empty i { display: block; font-size: 1.5rem; margin-bottom: 6px; opacity: .4; }
+
+        /* ─── Buttons ─────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 26px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: .9rem;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+            letter-spacing: .01em;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(79,70,229,.3);
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+            box-shadow: 0 6px 20px rgba(79,70,229,.4);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: rgba(239,68,68,.09);
+            color: var(--danger);
+            border: 1px solid rgba(239,68,68,.25);
+            padding: 7px 14px;
+            font-size: .8rem;
+            box-shadow: none;
+        }
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(239,68,68,.35);
+        }
+
+        /* ─── Table ───────────────────────────────── */
+        .matches-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .matches-table thead tr {
+            background: var(--surface-2);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .matches-table th {
+            padding: 13px 16px;
+            text-align: left;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text-muted);
+        }
+
+        .matches-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .matches-table tbody tr { transition: background .12s; }
+        .matches-table tbody tr:hover { background: var(--primary-light); }
+        .matches-table tbody tr:last-child td { border-bottom: none; }
+
+        .team-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--primary-light);
+            border: 1px solid rgba(79,70,229,.15);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--primary);
+            font-size: .84rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+        .status-done    { background: rgba(16,185,129,.1); color: var(--success); }
+        .status-pending { background: rgba(6,182,212,.1);  color: var(--info); }
+
+        .score-display {
+            font-family: 'DM Mono', monospace;
+            font-weight: 500;
+            font-size: .95rem;
+            color: var(--text);
+        }
+
+        .score-dash { color: var(--text-muted); font-size: .85rem; }
+
+        /* ─── Empty state ─────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 2.5rem; opacity: .25; display: block; margin-bottom: 12px; }
+        .empty-state p { font-size: .92rem; }
+
+        /* ─── Responsive ──────────────────────────── */
+        @media (max-width: 640px) {
+            .form-row { grid-template-columns: 1fr; }
+            .card { padding: 20px 18px; }
+            .matches-table th:nth-child(3),
+            .matches-table td:nth-child(3) { display: none; }
+        }
+    </style>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    <div class="page-wrap">
+
+        <!-- Page header -->
+        <div class="page-header">
+            <span class="header-badge">
+                <i class="fas fa-handshake"></i> Matchs Amicaux
+            </span>
+            <a href="GestionDesRencontres.php?id_tournoi={{ idTournoi }}" class="back-link">
+                <i class="bi bi-arrow-left"></i> Retour à la gestion
+            </a>
+        </div>
+
+        <!-- Alerts -->
+        {% for msg in messages %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ msg }}</span>
+            </div>
+        {% endfor %}
+        {% for err in erreurs %}
+            <div class="alert alert-danger">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ err }}</span>
+            </div>
+        {% endfor %}
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="stat-label">Équipes</div>
+                    <div class="stat-value">{{ equipes | length }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                <div>
+                    <div class="stat-label">Matchs amicaux</div>
+                    <div class="stat-value">{{ rencontresAmicales | length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create match form -->
+        <div class="card">
+            <div class="card-title">
+                <i class="bi bi-plus-circle"></i> Créer un match amical
+            </div>
+
+            <form method="POST" action="matchAmical.php?id_tournoi={{ idTournoi }}" id="formMatch">
+                <input type="hidden" name="action" value="creer_match_amical">
+                <input type="hidden" id="equipe1_hidden" name="equipe1_id" value="">
+                <input type="hidden" id="equipe2_hidden" name="equipe2_id" value="">
+
+                <div class="form-row">
+                    <!-- Équipe 1 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="bi bi-person-badge"></i> Équipe 1
+                        </label>
+                        <div class="cs-wrapper" id="csw1">
+                            <select id="equipe1_select">
+                                <option value="">-- Sélectionner --</option>
+                                {% for equipe in equipes %}
+                                    <option value="{{ equipe.id }}"
+                                            data-logo="{{ equipe.logo }}"
+                                            data-club="{{ equipe.nom_club }}"
+                                            data-categorie="{{ equipe.nom_categorie }}"
+                                            data-couleur="{{ equipe.cat_couleur }}"
+                                            data-nom="{{ equipe.nom }}">{{ equipe.nom }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="cs-trigger" id="cst1" tabindex="0">
+                                <span class="cs-trigger-placeholder">-- Sélectionner une équipe --</span>
+                                <i class="bi bi-chevron-down cs-trigger-chevron"></i>
+                            </div>
+                            <div class="cs-dropdown" id="csd1">
+                                <div class="cs-search-wrap">
+                                    <i class="bi bi-search cs-search-icon"></i>
+                                    <input type="text" placeholder="Rechercher par nom, club, catégorie…" id="css1" autocomplete="off">
+                                </div>
+                                <div class="cs-list" id="csl1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Équipe 2 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="bi bi-person-badge"></i> Équipe 2
+                        </label>
+                        <div class="cs-wrapper" id="csw2">
+                            <select id="equipe2_select">
+                                <option value="">-- Sélectionner --</option>
+                                {% for equipe in equipes %}
+                                    <option value="{{ equipe.id }}"
+                                            data-logo="{{ equipe.logo }}"
+                                            data-club="{{ equipe.nom_club }}"
+                                            data-categorie="{{ equipe.nom_categorie }}"
+                                            data-couleur="{{ equipe.cat_couleur }}"
+                                            data-nom="{{ equipe.nom }}">{{ equipe.nom }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="cs-trigger" id="cst2" tabindex="0">
+                                <span class="cs-trigger-placeholder">-- Sélectionner une équipe --</span>
+                                <i class="bi bi-chevron-down cs-trigger-chevron"></i>
+                            </div>
+                            <div class="cs-dropdown" id="csd2">
+                                <div class="cs-search-wrap">
+                                    <i class="bi bi-search cs-search-icon"></i>
+                                    <input type="text" placeholder="Rechercher par nom, club, catégorie…" id="css2" autocomplete="off">
+                                </div>
+                                <div class="cs-list" id="csl2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Créer le match
+                </button>
+            </form>
+        </div>
+
+        <!-- Match list -->
+        <div class="card">
+            <div class="card-title">
+                <i class="bi bi-calendar-event"></i> Matchs amicaux programmés
+            </div>
+
+            {% if rencontresAmicales | length > 0 %}
+                <table class="matches-table">
+                    <thead>
+                        <tr>
+                            <th>Équipe 1</th>
+                            <th>Équipe 2</th>
+                            <th>Score</th>
+                            <th>État</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in rencontresAmicales %}
+                            <tr>
+                                <td>
+                                    <span class="team-chip">
+                                        <i class="bi bi-people"></i>
+                                        {{ match.equipe1_nom }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="team-chip">
+                                        <i class="bi bi-people"></i>
+                                        {{ match.equipe2_nom }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if match.isTerminated %}
+                                        <span class="score-display">{{ match.score1 }} – {{ match.score2 }}</span>
+                                    {% else %}
+                                        <span class="score-dash">–</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if match.isTerminated %}
+                                        <span class="status-badge status-done">
+                                            <i class="bi bi-check-circle-fill"></i> Terminé
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-pending">
+                                            <i class="bi bi-hourglass-split"></i> En attente
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" action="matchAmical.php?id_tournoi={{ idTournoi }}" style="display:inline;">
+                                        <input type="hidden" name="action" value="supprimer_match">
+                                        <input type="hidden" name="rencontre_id" value="{{ match.id }}">
+                                        <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Confirmer la suppression ?')">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Aucun match amical pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div><!-- /.page-wrap -->
+
+    <script>
+    class CustomSelect {
+        /**
+         * @param {string} selectId      – id of the native <select>
+         * @param {string} triggerId     – id of the visible trigger div
+         * @param {string} dropdownId    – id of the dropdown container
+         * @param {string} searchId      – id of the search <input>
+         * @param {string} listId        – id of the options list container
+         * @param {string} hiddenInputId – id of the hidden <input> for form submission
+         */
+        constructor(selectId, triggerId, dropdownId, searchId, listId, hiddenInputId) {
+            this.select      = document.getElementById(selectId);
+            this.trigger     = document.getElementById(triggerId);
+            this.dropdown    = document.getElementById(dropdownId);
+            this.searchInput = document.getElementById(searchId);
+            this.list        = document.getElementById(listId);
+            this.hidden      = document.getElementById(hiddenInputId);
+
+            this.options = Array.from(this.select.options).slice(1).map(o => ({
+                value:     o.value,
+                nom:       o.dataset.nom,
+                logo:      o.dataset.logo,
+                club:      o.dataset.club,
+                categorie: o.dataset.categorie,
+                couleur:   o.dataset.couleur,
+            }));
+
+            this.selected = null;
+            this.isOpen   = false;
+
+            this._bindEvents();
+            this._renderList(this.options, '');
+        }
+
+        /* ── Events ──────────────────────────────── */
+        _bindEvents() {
+            this.trigger.addEventListener('click', () => this.toggle());
+
+            this.trigger.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(); }
+                if (e.key === 'Escape') this.close();
+            });
+
+            this.searchInput.addEventListener('input', () => {
+                this._renderList(this.options, this.searchInput.value.trim());
+            });
+
+            // Prevent dropdown click from closing immediately
+            this.dropdown.addEventListener('click', e => e.stopPropagation());
+
+            document.addEventListener('click', e => {
+                if (!this.trigger.contains(e.target) && !this.dropdown.contains(e.target)) {
+                    this.close();
+                }
+            });
+        }
+
+        /* ── Render list ─────────────────────────── */
+        _renderList(options, query) {
+            const q = query.toLowerCase();
+
+            const filtered = q
+                ? options.filter(o =>
+                    o.nom.toLowerCase().includes(q) ||
+                    o.club.toLowerCase().includes(q) ||
+                    o.categorie.toLowerCase().includes(q)
+                  )
+                : options;
+
+            this.list.innerHTML = '';
+
+            if (!filtered.length) {
+                this.list.innerHTML = `
+                    <div class="cs-empty">
+                        <i class="bi bi-search"></i>
+                        Aucune équipe ne correspond à « ${this._esc(query)} »
+                    </div>`;
+                return;
+            }
+
+            filtered.forEach(o => {
+                const el = document.createElement('div');
+                el.className = 'cs-option' + (this.selected?.value === o.value ? ' selected' : '');
+
+                const highlightedNom = q
+                    ? o.nom.replace(
+                        new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                        '<mark>$1</mark>'
+                      )
+                    : this._esc(o.nom);
+
+                el.innerHTML = `
+                    <img src="${this._esc(o.logo)}" alt="${this._esc(o.club)}" class="cs-option-logo"
+                         onerror="this.style.display='none'">
+                    <div class="cs-option-body">
+                        <div class="cs-option-name">${highlightedNom}</div>
+                        <div class="cs-option-meta">
+                            <span>${this._esc(o.club)}</span>
+                            <span class="cat-pill" style="background:${this._esc(o.couleur)}">${this._esc(o.categorie)}</span>
+                        </div>
+                    </div>`;
+
+                el.addEventListener('click', () => this._select(o));
+                this.list.appendChild(el);
+            });
+        }
+
+        /* ── Select an option ────────────────────── */
+        _select(o) {
+            this.selected     = o;
+            this.hidden.value = o.value;
+            this.select.value = o.value;
+
+            this.trigger.innerHTML = `
+                <img src="${this._esc(o.logo)}" alt="${this._esc(o.club)}" class="cs-trigger-logo"
+                     onerror="this.style.display='none'">
+                <div class="cs-trigger-info">
+                    <span class="cs-trigger-name">${this._esc(o.nom)}</span>
+                    <span class="cs-trigger-meta">
+                        ${this._esc(o.club)}
+                        <span class="cat-pill" style="background:${this._esc(o.couleur)}">${this._esc(o.categorie)}</span>
+                    </span>
+                </div>
+                <i class="bi bi-chevron-down cs-trigger-chevron"></i>`;
+
+            this.close();
+            this._renderList(this.options, '');
+        }
+
+        /* ── Open / Close ────────────────────────── */
+        toggle() { this.isOpen ? this.close() : this.open(); }
+
+        open() {
+            this.isOpen = true;
+            this.trigger.classList.add('open');
+            this.dropdown.classList.add('open');
+            this.searchInput.value = '';
+            this._renderList(this.options, '');
+            setTimeout(() => this.searchInput.focus(), 40);
+        }
+
+        close() {
+            this.isOpen = false;
+            this.trigger.classList.remove('open');
+            this.dropdown.classList.remove('open');
+        }
+
+        /* ── Utility ─────────────────────────────── */
+        _esc(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    }
+
+    // Init both selects
+    new CustomSelect('equipe1_select', 'cst1', 'csd1', 'css1', 'csl1', 'equipe1_hidden');
+    new CustomSelect('equipe2_select', 'cst2', 'csd2', 'css2', 'csl2', 'equipe2_hidden');
+
+    // Form validation
+    document.getElementById('formMatch').addEventListener('submit', function(e) {
+        const eq1 = document.getElementById('equipe1_hidden').value;
+        const eq2 = document.getElementById('equipe2_hidden').value;
+        if (!eq1 || !eq2) {
+            e.preventDefault();
+            alert('Veuillez sélectionner deux équipes.');
+            return;
+        }
+        if (eq1 === eq2) {
+            e.preventDefault();
+            alert('Les deux équipes doivent être différentes.');
+        }
+    });
+    </script>
+</body>
+</html>

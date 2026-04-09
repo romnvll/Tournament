@@ -195,7 +195,8 @@ $allLangs = [
         'indexPlacementAutomatique' => 'Placement automatique des rencontres',
         'effetsSonoresMatch' => 'Effets sonores start/stop pour les rencontres',
         'supprimerArbitre' => 'Supprimer cet arbitre',
-
+        'Appliquerleretard' => 'Appliquer le retard',
+        'presence' => 'Présence'
         
         
         
@@ -383,6 +384,8 @@ $allLangs = [
         'indexPlacementAutomatique' => 'Automatic scheduling of matches',
         'effetsSonoresMatch' => 'Sound effects start/stop for matches',
         'supprimerArbitre' => 'Delete this referee',
+        'Appliquerleretard' => 'Apply the delay',
+        'presence' => 'Presence'
                 
 
         
