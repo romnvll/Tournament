@@ -59,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
             $contraintesTerrain[(int)$catId] = $filtered;
         }
     }
-    $contraintesTerrain['garder_arbitres'] = isset($_POST['garder_arbitres']);
-    $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']); // ← ajouter
+$contraintesTerrain['garder_arbitres'] = isset($_POST['garder_arbitres']) ? 1 : 0;    $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']); // ← ajouter
 
     $_SESSION[$sessionKey] = $contraintesTerrain;
     header("Location: PlacementAutomatique.php?id_tournoi={$idTournoi}&contraintes_ok=1");
