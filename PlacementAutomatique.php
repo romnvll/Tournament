@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
     $tourB = (int)($b['tour'] ?? 999);
     if ($tourA !== $tourB) return $tourA - $tourB;
 
-    $catCmp = strcmp($a['equipe1_categorie_nom'] ?? '', $b['equipe1_categorie_nom'] ?? '');
+    $catCmp = strcmp($b['equipe1_categorie_nom'] ?? '', $a['equipe1_categorie_nom'] ?? '');
     if ($catCmp !== 0) return $catCmp;
 
     return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');

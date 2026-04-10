@@ -49,8 +49,8 @@ INSERT INTO typeDeRencontres (code, libelle) VALUES
     ('POULE',        'Phase de poule'),
     ('PHASE_FINALE', 'Phase finale'),
     ('CLASSEMENT',   'Match de classement'),
-    ('AMICAL',       'Match amical');
-    ('POULE-A/R',    'Phase de poule Aller - retour')
+    ('AMICAL',       'Match amical'),
+    ('POULE-A/R',    'Phase de poule Aller - retour');
 
     ALTER TABLE Rencontres
         ADD COLUMN type_rencontre_id INT(11) NULL AFTER id;

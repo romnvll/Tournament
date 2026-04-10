@@ -830,10 +830,27 @@
                         </div>
 
                         <div class="search-info">
+                       <div class="info-badge">
+                            <span>🔢 {{ t('nombre') }} :</span>
+                            <strong>{{ AfficherLesEquipes.nombre }}</strong>
+                        </div>
+
+                        {% set categoriesCount = {} %}
+                        {% for equipe in AfficherLesEquipes.resultats %}
+                            {% set cat = equipe.nom_categorie %}
+                            {% if categoriesCount[cat] is defined %}
+                                {% set categoriesCount = categoriesCount|merge({(cat): categoriesCount[cat] + 1}) %}
+                            {% else %}
+                                {% set categoriesCount = categoriesCount|merge({(cat): 1}) %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for categorie, count in categoriesCount %}
                             <div class="info-badge">
-                                <span>🔢 {{t('nombre')}} :</span>
-                                <strong>{{ AfficherLesEquipes.nombre }}</strong>
+                                <span>📂 {{ categorie }} :</span>
+                                <strong>{{ count }} équipe{{ count > 1 ? 's' : '' }}</strong>
                             </div>
+                        {% endfor %}
                             {% if query is defined and query != '' %}
                                 <div class="info-badge">
                                     <span>🔎 {{t('filtreActif')}} :</span>
