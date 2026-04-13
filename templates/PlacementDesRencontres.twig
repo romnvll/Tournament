@@ -45,6 +45,16 @@
     }
 }
 
+.match-card[draggable] { cursor: grab; }
+.match-card[draggable]:active { cursor: grabbing; }
+.match-card.dragging { opacity: 0.4; pointer-events: none; }
+
+.drop-zone.drag-over {
+    background: rgba(55, 138, 221, 0.08);
+    border: 2px dashed #378ADD;
+    border-radius: 8px;
+}
+
 .match-not-ready {
     animation: pulseWarning 1.4s ease-in-out infinite;
     border: 2px solid rgba(239, 68, 68, 0.6);
@@ -952,7 +962,11 @@
                                                 <!-- Rencontre -->
                                                
                                                 {% if planification.rencontre_id is not null %}
-                                                    <div class="match-card">
+                                                    <div class="match-card"
+                                                        draggable="true"
+                                                        data-planif-id="{{ planification.planification_id }}"
+                                                        data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                                        data-creneau-id="{{ creneau.creneau_id }}">
                                                                                                                 
                                                         <div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
                                                        
@@ -1053,6 +1067,11 @@
                 
                                     <!-- Sélecteur vide -->
                                     {% if creneauOqp == false %}
+
+                                        <div class="drop-zone"
+                                            data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                           data-creneau-id="{{ creneau.creneau_id }}">
+
                                         <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
                                         
                                             <select class="empty-select" name="Addevent">
@@ -1089,6 +1108,8 @@
                                                 {% endfor %}
                                             </select>
                                         </form>
+
+                                        </div>
                                     {% endif %}
                                 </td>
                             {% endfor %}
@@ -1275,6 +1296,61 @@
             ? '<i class="bi bi-check2-all"></i> Tout cocher'
             : '<i class="bi bi-x-square"></i> Tout décocher';
     }
+</script>
+
+<script>
+(function() {
+    let dragged = null;
+
+    // Rendre les cartes draggables
+    document.querySelectorAll('.match-card[draggable]').forEach(card => {
+        card.addEventListener('dragstart', e => {
+            dragged = card;
+            setTimeout(() => card.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            dragged = null;
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+        });
+    });
+
+    // Gérer les zones de dépôt
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault();
+            zone.classList.add('drag-over');
+            e.dataTransfer.dropEffect = 'move';
+        });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            if (!dragged) return;
+
+            const planifId  = dragged.dataset.planifId;
+            const newTerrain = zone.dataset.terrainId;
+            const newCreneau = zone.dataset.creneauId;
+
+            // Appel POST vers votre traitement
+            fetch('PlacementDesRencontresTraitement.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action:      'deplacerPlanification',
+                    planifId:    planifId,
+                    newTerrain:  newTerrain,
+                    newCreneau:  newCreneau,
+                    idTournoi:   '{{ idTournoi }}'
+                })
+            }).then(r => {
+                if (r.ok) location.reload();
+                else alert('Erreur lors du déplacement.');
+            });
+        });
+    });
+})();
 </script>
 
 </body>

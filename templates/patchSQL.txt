@@ -68,3 +68,5 @@ ALTER TABLE Rencontres
     MODIFY COLUMN type_rencontre_id INT(11) NOT NULL,
     ADD CONSTRAINT fk_type_rencontre FOREIGN KEY (type_rencontre_id) REFERENCES typeDeRencontres(id),
     DROP COLUMN isClassement;
+
+    

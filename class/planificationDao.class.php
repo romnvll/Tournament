@@ -15,6 +15,19 @@ class planificationDao {
         }
     }
 
+    public function deplacerPlanification(int $planifId, int $terrainId, int $creneauId): void {
+    $stmt = $this->connexion->prepare(
+        "UPDATE Planification 
+         SET terrain_id = :terrain, creneau_id = :creneau 
+         WHERE planification_id = :id"
+    );
+    $stmt->execute([
+        ':terrain' => $terrainId,
+        ':creneau' => $creneauId,
+        ':id'      => $planifId,
+    ]);
+}
+
     public function ajouterOuModifierPlanification(int $terrain_id, int $creneau_id, ?int $rencontre_id, int $tournoi_id, ?int $arbitre_id = null, ?int $label_id = null): void {
         // Vérifier si la planification avec ce couple terrain_id et creneau_id existe déjà
         $checkStmt = $this->connexion->prepare("SELECT COUNT(*) FROM Planification WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id");

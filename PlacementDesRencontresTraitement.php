@@ -15,7 +15,19 @@ if (isset ($_POST['nomTerrain'])) {
     $terrain->modifierNomTerrain($_POST['terrain_id'],$_POST['nomTerrain']);
     
 }
-
+ if (isset($_POST['action']) && $_POST['action'] === 'deplacerPlanification') {
+    require 'class/planificationDao.class.php';
+    $planification = new planificationDao();
+    
+    $planifId    = (int) $_POST['planifId'];
+    $newTerrain  = (int) $_POST['newTerrain'];
+    $newCreneau  = (int) $_POST['newCreneau'];
+    
+    $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    
+    http_response_code(200);
+    exit;
+}
 
 if ($_POST['action'] == "deplanifier") {
   require ('class/planificationDao.class.php');
@@ -31,6 +43,7 @@ if ($_POST['action'] == "deplanifier") {
 
     }
 
+   
 
  
 
