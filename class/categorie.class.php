@@ -155,7 +155,7 @@ public function mettreAJourOrdrePlacement(int $catId, int $ordre): void
 
 
 
-public function afficherClassementParCategorie(int $idTournoi, int $isClassement = 0): array
+public function afficherClassementParCategorie(int $idTournoi, int $typeRencontreId = TYPE_RENCONTRE_POULE): array
 {
     $query = "
     SELECT
@@ -171,44 +171,44 @@ public function afficherClassementParCategorie(int $idTournoi, int $isClassement
             -- Points
             (
                 (SELECT COUNT(*) FROM Rencontres r 
-                    WHERE r.isClassement = :isClassement AND r.phase_finale_id IS NULL
+                    WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL
                       AND ((r.equipe1_id = e.id AND r.score1 > r.score2)
                        OR (r.equipe2_id = e.id AND r.score2 > r.score1))
                 ) * 3
             ) +
             (
                 (SELECT COUNT(*) FROM Rencontres r 
-                    WHERE r.isClassement = :isClassement AND r.phase_finale_id IS NULL
+                    WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL
                       AND (r.equipe1_id = e.id OR r.equipe2_id = e.id)
                       AND r.score1 = r.score2
                 ) * 2
             ) +
             (
                 (SELECT COUNT(*) FROM Rencontres r 
-                    WHERE r.isClassement = :isClassement AND r.phase_finale_id IS NULL
+                    WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL
                       AND ((r.equipe1_id = e.id AND r.score1 < r.score2)
                        OR (r.equipe2_id = e.id AND r.score2 < r.score1))
                 )
             ) AS TotalDesPoints,
 
             -- Buts marqués
-            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0) +
-            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0)
+            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0) +
+            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0)
             AS nombreButsMarque,
 
             -- Buts encaissés
-            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0) +
-            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0)
+            COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0) +
+            COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0)
             AS nombreButsEncaisse,
 
             -- Différence
             (
-                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0) +
-                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0)
+                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0) +
+                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0)
             ) -
             (
-                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0) +
-                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.isClassement = :isClassement AND r.phase_finale_id IS NULL), 0)
+                COALESCE((SELECT SUM(score2) FROM Rencontres r WHERE r.equipe1_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0) +
+                COALESCE((SELECT SUM(score1) FROM Rencontres r WHERE r.equipe2_id = e.id AND r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL), 0)
             ) AS DifferenceButs
 
         FROM Equipes e
@@ -221,7 +221,7 @@ public function afficherClassementParCategorie(int $idTournoi, int $isClassement
 
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
-    $stmt->bindValue(':isClassement', $isClassement, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
     $stmt->execute();
 
     $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);

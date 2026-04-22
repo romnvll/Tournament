@@ -974,6 +974,8 @@
                                                                 <span><i class="fa fa-star"></i> Match amical</span>
                                                             {% elseif planification.type_rencontre_id == 3 %}
                                                                 <span><i class="fa fa-trophy"></i> Phase finale</span>
+                                                             {% elseif planification.type_rencontre_id == 2 %}
+                                                                <span><i class="fa fa-trophy"></i> Phase finale Eliminatoire</span>
                                                             {% else %}
                                                                 <span>{{ planification.poule_nom }}</span>
                                                             {% endif %}
@@ -994,7 +996,8 @@
                                                                     {% endif %}
                                                                 </div>
                                                             {% endif %}
-
+                                                          
+                                                            
                                                             {% if planification.phase_finale_id is not null %}
                                                                 <strong>Elimination-Direct</strong> {{planification.phase_finale_libelle}} - {{planification.equipe1_categorie_nom}}<br>
                                                                 {{planification.equipe1_nom_categorie}}

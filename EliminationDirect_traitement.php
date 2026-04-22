@@ -1,6 +1,7 @@
 <?php
 
 require('security.php');
+require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/labelsDao.class.php';
 require('class/categorie.class.php');

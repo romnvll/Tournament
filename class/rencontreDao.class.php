@@ -757,8 +757,9 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function insertRencontrePhaseFinale($equipe1Id, $equipe2Id, $tournoi_id, $phaseId)
-    
+
+
+   public function insertRencontrePhaseFinale($equipe1Id, $equipe2Id, $tournoi_id, $phaseId)
 {
     // Vérifie si la rencontre existe déjà pour cette phase et ce tournoi
     $checkQuery = "SELECT * FROM Rencontres 
@@ -780,15 +781,16 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
 
     // Insertion de la nouvelle rencontre de phase finale
     $query = "INSERT INTO Rencontres 
-              (equipe1_id, equipe2_id, tournoi_id, phase_finale_id, isClassement) 
+              (equipe1_id, equipe2_id, tournoi_id, phase_finale_id, type_rencontre_id) 
               VALUES 
-              (:equipe1Id, :equipe2Id, :tournoi_id, :phaseId, 0)";
+              (:equipe1Id, :equipe2Id, :tournoi_id, :phaseId, :typeRencontreId)";
     
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
     $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
     $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
     $stmt->bindValue(':phaseId', $phaseId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', TYPE_RENCONTRE_PHASE_FINALE, PDO::PARAM_INT);
     $stmt->execute();
 
     return true;
