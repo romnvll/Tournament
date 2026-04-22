@@ -117,15 +117,16 @@ public function existePlanificationPourCategorie(int $idCategorie): bool
     /**
  * Insère une nouvelle catégorie et renvoie l’ID créé.
  */
-public function creerCategorie(string $nom, string $couleur, int $fk_id_user): int
+public function creerCategorie(string $nom, string $couleur, int $fk_id_user, int $ordrePlacementAuto): int
 {
     $stmt = $this->connexion->prepare("
-        INSERT INTO Categorie (Nom_categorie, Couleur, utilisateur_id)
-        VALUES (:nom, :couleur, :utilisateur_id)
+        INSERT INTO Categorie (Nom_categorie, Couleur, utilisateur_id, ordrePlacementAuto)
+        VALUES (:nom, :couleur, :utilisateur_id, :ordrePlacementAuto)
     ");
-    $stmt->bindParam(':nom',        $nom);
-    $stmt->bindParam(':couleur',    $couleur);
+    $stmt->bindParam(':nom',        $nom, PDO::PARAM_STR);
+    $stmt->bindParam(':couleur',    $couleur, PDO::PARAM_STR);
     $stmt->bindParam(':utilisateur_id', $fk_id_user, PDO::PARAM_INT);
+    $stmt->bindParam(':ordrePlacementAuto', $ordrePlacementAuto, PDO::PARAM_INT);
     $stmt->execute();
 
     // Renvoie l'ID auto-incrementé pour d’éventuels traitements
@@ -142,6 +143,14 @@ public function creerCategorie(string $nom, string $couleur, int $fk_id_user): i
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
     $stmt->execute();
+}
+
+public function mettreAJourOrdrePlacement(int $catId, int $ordre): void
+{
+    $stmt = $this->connexion->prepare(
+        "UPDATE Categorie SET ordrePlacementAuto = :ordre WHERE id_categorie = :id"
+    );
+    $stmt->execute([':ordre' => $ordre, ':id' => $catId]);
 }
 
 

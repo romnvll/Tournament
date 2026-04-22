@@ -49,22 +49,22 @@ if (isset($_GET['token'])) {
 
     if ($userInfos['email_confirme'] == 0) {
 
-        $categorie->creerCategorie('MiniDebutants',     '#FFC300', $userId);
-        $categorie->creerCategorie('MiniDebrouillards', '#DAF7A6', $userId);
-        $categorie->creerCategorie('MiniConfirmés',     '#FFC300', $userId);
-        $categorie->creerCategorie('U11Mixte',          '#FF6F61', $userId);
-        $categorie->creerCategorie('U11F',              '#FF7F7F', $userId);
-        $categorie->creerCategorie('U11M',              '#F9E79F', $userId);
-        $categorie->creerCategorie('U13M',              '#AED6F1', $userId);
-        $categorie->creerCategorie('U13F',              '#85C1E9', $userId);
-        $categorie->creerCategorie('U13Mixte',          '#AED6F1', $userId);
-        $categorie->creerCategorie('U15F',              '#48C9B0', $userId);
-        $categorie->creerCategorie('U15M',              '#73C6B6', $userId);
-        $categorie->creerCategorie('U17F',              '#F39C12', $userId);
-        $categorie->creerCategorie('U17M',              '#E67E22', $userId);
-        $categorie->creerCategorie('Seniors M',         '#F5B041', $userId);
-        $categorie->creerCategorie('Seniors F',         '#E57373', $userId);
-        $categorie->creerCategorie('Loisirs',           '#FF7F7F', $userId);
+        $categorie->creerCategorie('MiniDebutants',     '#FFC300', $userId, 16);
+        $categorie->creerCategorie('MiniDebrouillards', '#DAF7A6', $userId, 15);
+        $categorie->creerCategorie('MiniConfirmés',     '#FFC300', $userId, 14);
+        $categorie->creerCategorie('U11Mixte',          '#FF6F61', $userId, 13);
+        $categorie->creerCategorie('U11F',              '#FF7F7F', $userId, 12);
+        $categorie->creerCategorie('U11M',              '#F9E79F', $userId, 11);
+        $categorie->creerCategorie('U13M',              '#AED6F1', $userId, 10);
+        $categorie->creerCategorie('U13F',              '#85C1E9', $userId, 9);
+        $categorie->creerCategorie('U13Mixte',          '#AED6F1', $userId, 8);
+        $categorie->creerCategorie('U15F',              '#48C9B0', $userId, 7);
+        $categorie->creerCategorie('U15M',              '#73C6B6', $userId, 6);
+        $categorie->creerCategorie('U17F',              '#F39C12', $userId, 5);
+        $categorie->creerCategorie('U17M',              '#E67E22', $userId, 4);
+        $categorie->creerCategorie('Seniors M',         '#F5B041', $userId, 2);
+        $categorie->creerCategorie('Seniors F',         '#E57373', $userId, 1);
+        $categorie->creerCategorie('Loisirs',           '#FF7F7F', $userId, 3);
     
 
 

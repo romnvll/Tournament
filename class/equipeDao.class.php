@@ -30,7 +30,7 @@ class EquipeDAO {
         return $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
-    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void
+    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id, ?string $nomCoach = null): void
 {
     // Vérifie si le nom d'équipe existe déjà dans ce tournoi (insensible à la casse)
     $verifStmt = $this->connexion->prepare("
@@ -48,13 +48,14 @@ class EquipeDAO {
 
     // Insertion de l'équipe
     $stmt = $this->connexion->prepare("
-        INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) 
-        VALUES (:nom, :categorie, :tournoi_id, :club_id)
+        INSERT INTO Equipes (nom, categorie, tournoi_id, club_id, nomCoach) 
+        VALUES (:nom, :categorie, :tournoi_id, :club_id, :nomCoach)
     ");
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':categorie', $categorie);
     $stmt->bindParam(':tournoi_id', $tournoi_id);
     $stmt->bindParam(':club_id', $club_id);
+    $stmt->bindParam(':nomCoach', $nomCoach);
     $stmt->execute();
 
     // Récupérer l'ID de l'équipe insérée

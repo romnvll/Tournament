@@ -65,7 +65,6 @@
             color: white;
             font-size: 1rem;
         }
-
         .tournament-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
@@ -82,7 +81,6 @@
             gap: 6px;
             transition: color .2s;
         }
-
         .back-link:hover { color: var(--bg-dark); }
 
         /* ── Stats ── */
@@ -103,7 +101,6 @@
             box-shadow: var(--shadow-sm);
             transition: all 0.3s;
         }
-
         .stat-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
         .stat-icon {
@@ -141,7 +138,6 @@
             align-items: center;
             gap: 8px;
         }
-
         .section-title .hint {
             margin-left: auto;
             font-family: inherit;
@@ -152,7 +148,7 @@
             font-weight: 400;
         }
 
-        /* ── Contraintes ── */
+        /* ── Contraintes terrains ── */
         .contrainte-row {
             display: grid;
             grid-template-columns: 200px 1fr auto;
@@ -164,7 +160,6 @@
         .contrainte-row:last-of-type { border-bottom: none; }
 
         .cat-label { font-size: .9rem; font-weight: 600; color: var(--bg-dark); }
-        .cat-label small { display: block; color: var(--text-light); font-size: .72rem; margin-top: 2px; font-family: monospace; }
 
         .terrains-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -197,14 +192,96 @@
         }
         .btn-tous-aucun:hover { border-color: var(--primary-color); color: var(--primary-color); }
 
+        /* ── Ordre drag & drop ── */
+        .ordre-section {
+            margin-top: 28px;
+            border-top: 2px dashed #e5e7eb;
+            padding-top: 24px;
+        }
+
+        #sortable-categories {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sort-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 18px;
+            background: var(--bg-light);
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: grab;
+            user-select: none;
+            transition: box-shadow .2s, border-color .2s, background .2s;
+        }
+        .sort-item:active { cursor: grabbing; }
+        .sort-item.dragging {
+            opacity: .45;
+            border-color: var(--primary-color);
+        }
+        .sort-item.drag-over {
+            background: rgba(79,70,229,.06);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+        }
+
+        .sort-item .grip {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .sort-item .cat-name {
+            font-weight: 700;
+            color: var(--bg-dark);
+            font-size: .92rem;
+            flex: 1;
+        }
+
+        .order-badge {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            padding: 3px 13px;
+            font-size: .78rem;
+            font-weight: 700;
+            min-width: 36px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: background .2s;
+        }
+
+        /* ── Options contraintes footer ── */
         .contraintes-footer {
             display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
             margin-top: 20px; padding-top: 20px;
             border-top: 1px solid #e5e7eb;
         }
-        .contraintes-footer p {  font-size: .83rem; flex: 1; margin: 0; }
+        .contraintes-footer p { font-size: .83rem; flex: 1; margin: 0; }
 
-        /* ── Ordre de placement ── */
+        .option-checkbox-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .option-checkbox-row input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer; flex-shrink: 0;
+        }
+        .option-checkbox-row label {
+            cursor: pointer; font-size: .88rem;
+            color: var(--bg-dark); margin: 0;
+        }
+
+        /* ── Ordre de placement (résumé formulaire 2) ── */
         .order-steps {
             display: flex; align-items: center; flex-wrap: wrap;
             gap: 6px; margin-bottom: 24px;
@@ -252,7 +329,7 @@
             display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
         }
         .action-bar-left { flex: 1; display: flex; flex-direction: column; gap: 14px; }
-        .action-bar-left p {  font-size: .85rem; margin: 0; }
+        .action-bar-left p { font-size: .85rem; margin: 0; }
 
         .confirm-label {
             display: inline-flex; align-items: center; gap: 10px;
@@ -305,6 +382,7 @@
             .contrainte-row { grid-template-columns: 1fr; gap: 10px; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .main-container { margin: 10px; padding: 18px; }
+            .contraintes-footer { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -333,7 +411,7 @@
         {% if contraintes_ok %}
             <div class="alert-box alert-success">
                 <i class="bi bi-check-circle-fill"></i>
-                <span>Contraintes enregistrées.</span>
+                <span>Contraintes et ordre de placement enregistrés.</span>
             </div>
         {% endif %}
 
@@ -371,12 +449,14 @@
 
 
         {# ══════════════════════════════════════════
-           FORMULAIRE 1 — Contraintes terrains
+           FORMULAIRE 1 — Contraintes + Ordre
         ══════════════════════════════════════════ #}
         <form method="post" action="PlacementAutomatique.php?id_tournoi={{ idTournoi }}">
             <input type="hidden" name="action" value="sauvegarder_contraintes">
 
             <div class="control-card">
+
+                {# ── Contraintes terrains par catégorie ── #}
                 <div class="section-title">
                     <i class="bi bi-sliders2"></i> Contraintes terrains par catégorie
                     <span class="hint">Aucune sélection = tous les terrains autorisés</span>
@@ -384,10 +464,7 @@
 
                 {% for cat in categories %}
                     <div class="contrainte-row">
-                        <div class="cat-label">
-                            {{ cat.Nom_categorie }}
-                            
-                        </div>
+                        <div class="cat-label">{{ cat.Nom_categorie }}</div>
                         <div class="terrains-checkboxes" id="group-{{ cat.id_categorie }}">
                             {% for terrain in terrains %}
                                 <div class="terrain-toggle">
@@ -410,39 +487,64 @@
                     </div>
                 {% endfor %}
 
+                {# ── Ordre de placement drag & drop ── #}
+                <div class="ordre-section">
+                    <div class="section-title">
+                        <i class="bi bi-list-ol"></i> Ordre de placement des catégories
+                        <span class="hint">Glissez-déposez · 1 = placé en premier à chaque tour</span>
+                    </div>
+
+                    <ul id="sortable-categories">
+                        {% for cat in categories %}
+                        <li class="sort-item" data-id="{{ cat.id_categorie }}">
+                            <i class="bi bi-grip-vertical grip"></i>
+                            <span class="cat-name">{{ cat.Nom_categorie }}</span>
+                            <span class="order-badge">#<span class="badge-num">{{ loop.index }}</span></span>
+                            <input type="hidden"
+                                   name="ordre_categories[{{ cat.id_categorie }}]"
+                                   class="ordre-input"
+                                   value="{{ loop.index }}">
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {# ── Options globales + bouton sauvegarde ── #}
                 <div class="contraintes-footer">
-    <p><i class="bi bi-info-circle" style="color:var(--primary-color)"></i>&nbsp;Mémorisées en session pour ce tournoi.</p>
+                    <p>
+                        <i class="bi bi-info-circle" style="color:var(--primary-color)"></i>&nbsp;
+                        L'ordre et les contraintes sont mémorisés en session et sauvegardés en base.
+                    </p>
 
-    <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg-light); border-radius:8px; border:1px solid #e5e7eb;">
-    <input type="checkbox"
-        id="garderArbitres"
-        name="garder_arbitres"
-        value="1"
-        style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer; flex-shrink:0;"
-        {% if contraintesTerrain.garder_arbitres is not defined or contraintesTerrain.garder_arbitres == 1 %}checked{% endif %}>
-    <label for="garderArbitres" style="cursor:pointer; font-size:.88rem; color:var(--bg-dark); margin:0">
-        <i class="fas fa-user-tie" style="color:var(--primary-color)"></i>
-        Conserver les arbitres déjà placés
-    </label>
-</div>
-    
- <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg-light); border-radius:8px; border:1px solid #e5e7eb;">
-    <input type="checkbox"
-           id="pasDePLacementPourLesAbsents"
-           name="pas_de_placement_pour_les_absents"
-           value="1"
-           style="width:18px; height:18px; accent-color:var(--primary-color); cursor:pointer; flex-shrink:0;"
-           {% if contraintesTerrain.pas_de_placement_pour_les_absents is defined and contraintesTerrain.pas_de_placement_pour_les_absents %}checked{% endif %}>
-    <label for="pasDePLacementPourLesAbsents" style="cursor:pointer; font-size:.88rem; color:var(--bg-dark); margin:0">
-        <i class="bi bi-sign-stop" style="color:var(--warning-color)"></i>
-        Ne pas placer les équipes absentes/en retard
-    </label>
-</div>
+                    <div class="option-checkbox-row">
+                        <input type="checkbox"
+                               id="garderArbitres"
+                               name="garder_arbitres"
+                               value="1"
+                               {% if contraintesTerrain.garder_arbitres is not defined or contraintesTerrain.garder_arbitres == 1 %}checked{% endif %}>
+                        <label for="garderArbitres">
+                            <i class="fas fa-user-tie" style="color:var(--primary-color)"></i>
+                            Conserver les arbitres déjà placés
+                        </label>
+                    </div>
 
-            <button type="submit" class="modern-btn btn-save">
-                <i class="bi bi-floppy"></i> Enregistrer les contraintes
-            </button>
-        </div>
+                    <div class="option-checkbox-row">
+                        <input type="checkbox"
+                               id="pasDePLacementPourLesAbsents"
+                               name="pas_de_placement_pour_les_absents"
+                               value="1"
+                               {% if contraintesTerrain.pas_de_placement_pour_les_absents is defined and contraintesTerrain.pas_de_placement_pour_les_absents %}checked{% endif %}>
+                        <label for="pasDePLacementPourLesAbsents">
+                            <i class="bi bi-sign-stop" style="color:var(--warning-color)"></i>
+                            Ne pas placer les équipes absentes/en retard
+                        </label>
+                    </div>
+
+                    <button type="submit" class="modern-btn btn-save">
+                        <i class="bi bi-floppy"></i> Enregistrer les contraintes
+                    </button>
+                </div>
+
             </div>
         </form>
 
@@ -454,22 +556,37 @@
             <input type="hidden" name="action" value="placer">
 
             <div class="control-card">
-                <div class="section-title"><i class="bi bi-sort-down"></i> Ordre de placement</div>
+                <div class="section-title"><i class="bi bi-sort-down"></i> Ordre de placement actuel</div>
 
+                {# Résumé dynamique basé sur ordrePlacementAuto (categories déjà triées côté PHP) #}
                 <div class="order-steps">
-                    <div class="order-step"><span class="step-num">1</span> Tour 1 – toutes catégories</div>
-                    <span class="order-arrow">›</span>
-                    <div class="order-step"><span class="step-num">2</span> Alphabétique inversé (U15 → U13 → U11…)</div>
-                    <span class="order-arrow">›</span>
-                    <div class="order-step"><span class="step-num">3</span> Tour 2 – toutes catégories…</div>
+                    {% for cat in categories %}
+                        <div class="order-step">
+                            <span class="step-num">{{ loop.index }}</span>
+                            {{ cat.Nom_categorie }}
+                        </div>
+                        {% if not loop.last %}<span class="order-arrow">›</span>{% endif %}
+                    {% endfor %}
                     <span class="order-arrow">›</span>
                     <div class="order-step final">
                         <span class="step-num warn">★</span> Phases finales en dernier
                     </div>
                 </div>
 
-                {# Résumé contraintes actives #}
-                {% if contraintesTerrain is not empty %}
+                <p style="font-size:.8rem; color:var(--text-light); margin-bottom:20px;">
+                    <i class="bi bi-info-circle"></i>
+                    Pour chaque tour, les catégories sont placées dans cet ordre. Modifiez l'ordre dans le formulaire ci-dessus.
+                </p>
+
+                {# Résumé contraintes terrains actives #}
+                {% set hasContraintes = false %}
+                {% for cat in categories %}
+                    {% if contraintesTerrain[cat.id_categorie] is defined %}
+                        {% set hasContraintes = true %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if hasContraintes %}
                     <div class="contraintes-summary">
                         {% for cat in categories %}
                             {% if contraintesTerrain[cat.id_categorie] is defined %}
@@ -513,21 +630,82 @@
 
         </form>
 
-    </div>
+    </div>{# /.main-container #}
 
     <script>
-        document.getElementById('confirmCheck').addEventListener('change', function() {
+        // ── Confirmation avant lancement ──────────────────────────────────────
+        document.getElementById('confirmCheck').addEventListener('change', function () {
             document.getElementById('btnExecute').disabled = !this.checked;
         });
 
+        // ── Tous / Aucun par groupe ───────────────────────────────────────────
         document.querySelectorAll('.btn-tous-aucun').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const group = document.getElementById(this.dataset.group);
                 const boxes = group.querySelectorAll('input[type="checkbox"]');
                 const allChecked = Array.from(boxes).every(cb => cb.checked);
                 boxes.forEach(cb => cb.checked = !allChecked);
             });
         });
+
+        // ── Drag & drop natif pour l'ordre des catégories ────────────────────
+        (function () {
+            const list = document.getElementById('sortable-categories');
+            if (!list) return;
+
+            let dragged = null;
+
+            // Rendre les items draggables
+            list.querySelectorAll('.sort-item').forEach(item => {
+                item.setAttribute('draggable', 'true');
+            });
+
+            list.addEventListener('dragstart', e => {
+                dragged = e.target.closest('.sort-item');
+                if (!dragged) return;
+                dragged.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            list.addEventListener('dragend', () => {
+                if (dragged) {
+                    dragged.classList.remove('dragging');
+                    dragged = null;
+                }
+                list.querySelectorAll('.sort-item').forEach(i => i.classList.remove('drag-over'));
+                reindex();
+            });
+
+            list.addEventListener('dragover', e => {
+                e.preventDefault();
+                const target = e.target.closest('.sort-item');
+                if (!target || target === dragged) return;
+
+                // Retirer drag-over de tous les autres items
+                list.querySelectorAll('.sort-item').forEach(i => i.classList.remove('drag-over'));
+                target.classList.add('drag-over');
+
+                const rect   = target.getBoundingClientRect();
+                const after  = e.clientY > rect.top + rect.height / 2;
+                list.insertBefore(dragged, after ? target.nextSibling : target);
+            });
+
+            list.addEventListener('dragleave', e => {
+                const target = e.target.closest('.sort-item');
+                if (target) target.classList.remove('drag-over');
+            });
+
+            list.addEventListener('drop', e => {
+                e.preventDefault();
+            });
+
+            function reindex() {
+                list.querySelectorAll('.sort-item').forEach((item, i) => {
+                    item.querySelector('.badge-num').textContent  = i + 1;
+                    item.querySelector('.ordre-input').value      = i + 1;
+                });
+            }
+        })();
     </script>
 </body>
 </html>

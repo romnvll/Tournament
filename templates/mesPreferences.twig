@@ -272,7 +272,7 @@
                         <label>Nom</label>
                         <input type="text" class="form-control mb-2" name="nomCategorie" value="{{ cat.Nom_categorie }}">
                         <label>Couleur</label>
-                        <div class="d-flex flex-wrap gap-2">
+                         <div class="d-flex flex-wrap gap-2">
                           {% for color in palette %}
                           <input type="hidden" name="ChangeColor" value="true">
                             <input class="form-check-input" type="radio" name="{{ cat.id_categorie }}" value="{{ color }}" {% if cat.Couleur == color %}checked{% endif %} onchange="document.getElementById('preferencesForm').submit();">

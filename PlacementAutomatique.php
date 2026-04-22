@@ -50,8 +50,19 @@ $erreurs = [];
 if (session_status() === PHP_SESSION_NONE) session_start();
 $sessionKey = 'contraintes_tournoi_' . $idTournoi;
 
-// ── POST : sauvegarde des contraintes ───────────────────────────────────────
+// ── POST : sauvegarde des contraintes + ordre ───────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauvegarder_contraintes') {
+
+    // Sauvegarde de l'ordre de placement des catégories en base
+    if (!empty($_POST['ordre_categories'])) {
+        foreach ($_POST['ordre_categories'] as $catId => $ordre) {
+            $categorieDao->mettreAJourOrdrePlacement((int)$catId, (int)$ordre);
+        }
+        // Recharger les catégories avec le nouvel ordre
+        $categories = $categorieDao->obtenirCategoriesDuTournoi($idTournoi);
+    }
+
+    // Sauvegarde des contraintes terrains
     $contraintesTerrain = [];
     foreach ($_POST['contraintes'] ?? [] as $catId => $terrainIds) {
         $filtered = array_filter(array_map('intval', (array)$terrainIds));
@@ -59,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
             $contraintesTerrain[(int)$catId] = $filtered;
         }
     }
-$contraintesTerrain['garder_arbitres'] = isset($_POST['garder_arbitres']) ? 1 : 0;    $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']); // ← ajouter
+
+    $contraintesTerrain['garder_arbitres']                   = isset($_POST['garder_arbitres']) ? 1 : 0;
+    $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']);
 
     $_SESSION[$sessionKey] = $contraintesTerrain;
     header("Location: PlacementAutomatique.php?id_tournoi={$idTournoi}&contraintes_ok=1");
@@ -73,8 +86,6 @@ $rencontresAP = $planificationDao->afficherRencontresSansPlanification(
     !empty($contraintesTerrain['pas_de_placement_pour_les_absents'])
 );
 
-
-
 // ── POST : lancement du placement ───────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'placer') {
 
@@ -85,51 +96,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
     } else {
 
         // ── 1. Trier les rencontres ──────────────────────────────────────────
-        // Tour ASC → catégorie alphabétique → poule | phases finales en dernier
-      
-           usort($rencontresAP, function ($a, $b) {
-    $afinal = ($a['phase_finale_id'] !== null) ? 1 : 0;
-    $bfinal = ($b['phase_finale_id'] !== null) ? 1 : 0;
-    if ($afinal !== $bfinal) return $afinal - $bfinal;
+        // Tour ASC → ordrePlacementAuto ASC (NULL en dernier) → poule
+        // Les phases finales sont toujours placées en tout dernier.
+        usort($rencontresAP, function ($a, $b) {
+            // Phases finales en dernier
+            $afinal = ($a['phase_finale_id'] !== null) ? 1 : 0;
+            $bfinal = ($b['phase_finale_id'] !== null) ? 1 : 0;
+            if ($afinal !== $bfinal) return $afinal - $bfinal;
 
-    $tourA = (int)($a['tour'] ?? 999);
-    $tourB = (int)($b['tour'] ?? 999);
-    if ($tourA !== $tourB) return $tourA - $tourB;
+            // Tour ASC
+            $tourA = (int)($a['tour'] ?? 999);
+            $tourB = (int)($b['tour'] ?? 999);
+            if ($tourA !== $tourB) return $tourA - $tourB;
 
-    $catCmp = strcmp($b['equipe1_categorie_nom'] ?? '', $a['equipe1_categorie_nom'] ?? '');
-    if ($catCmp !== 0) return $catCmp;
+            // Ordre personnalisé via ordrePlacementAuto (NULL = en dernier)
+            $ordreA = isset($a['equipe1_categorie_ordre']) && $a['equipe1_categorie_ordre'] !== null
+                ? (int)$a['equipe1_categorie_ordre'] : null;
+            $ordreB = isset($b['equipe1_categorie_ordre']) && $b['equipe1_categorie_ordre'] !== null
+                ? (int)$b['equipe1_categorie_ordre'] : null;
 
-    return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');
-});
+            if ($ordreA === null && $ordreB === null) {
+                // Fallback alphabétique si aucun ordre défini
+                return strcmp($a['equipe1_categorie_nom'] ?? '', $b['equipe1_categorie_nom'] ?? '');
+            }
+            if ($ordreA === null) return 1;
+            if ($ordreB === null) return -1;
 
-        // ── 2. Sauvegarder les arbitres, puis supprimer les créneaux sauf le premier ──
-        // supprimerCreneau() efface aussi les lignes arbitres (rencontre_id IS NULL
-        // AND label_id IS NULL), on les sauvegarde donc pour les recréer ensuite.
-        // Remplace le bloc "Sauvegarder les arbitres avant suppression"
-                $garderArbitres = !empty($contraintesTerrain['garder_arbitres']);
+            if ($ordreA !== $ordreB) return $ordreA - $ordreB;
 
-                $arbitresSauvegardes = [];
-                if ($garderArbitres) {
-                    $toutesLesPlanifs = $planificationDao->afficherPlanifications($idTournoi);
-                    foreach ($toutesLesPlanifs as $p) {
-                        if (!empty($p['arbitre_id']) && empty($p['rencontre_id']) && empty($p['label_id'])) {
-                            $creneauNom = '00:00:00';
-                            foreach ($listCreneaux as $cr) {
-                                if ((int)$cr['creneau_id'] === (int)$p['creneau_id']) {
-                                    $creneauNom = $cr['nom'];
-                                    break;
-                                }
-                            }
-                            $arbitresSauvegardes[] = [
-                                'arbitre_id'  => (int)$p['arbitre_id'],
-                                'terrain_id'  => (int)$p['terrain_id'],
-                                'creneau_id'  => (int)$p['creneau_id'],
-                                'creneau_nom' => $creneauNom,
-                            ];
+            // À même ordre et même tour : trier par poule
+            return strcmp($a['equipe1_poule_nom'] ?? '', $b['equipe1_poule_nom'] ?? '');
+        });
+
+        // ── 2. Sauvegarder les arbitres avant suppression des créneaux ───────
+        $garderArbitres = !empty($contraintesTerrain['garder_arbitres']);
+
+        $arbitresSauvegardes = [];
+        if ($garderArbitres) {
+            $toutesLesPlanifs = $planificationDao->afficherPlanifications($idTournoi);
+            foreach ($toutesLesPlanifs as $p) {
+                if (!empty($p['arbitre_id']) && empty($p['rencontre_id']) && empty($p['label_id'])) {
+                    $creneauNom = '00:00:00';
+                    foreach ($listCreneaux as $cr) {
+                        if ((int)$cr['creneau_id'] === (int)$p['creneau_id']) {
+                            $creneauNom = $cr['nom'];
+                            break;
                         }
                     }
+                    $arbitresSauvegardes[] = [
+                        'arbitre_id'  => (int)$p['arbitre_id'],
+                        'terrain_id'  => (int)$p['terrain_id'],
+                        'creneau_id'  => (int)$p['creneau_id'],
+                        'creneau_nom' => $creneauNom,
+                    ];
                 }
+            }
+        }
 
+        // Supprimer tous les créneaux sauf le premier
         $premierCreneau = $listCreneaux[0];
         foreach ($listCreneaux as $cr) {
             if ($cr['creneau_id'] !== $premierCreneau['creneau_id']) {
@@ -140,15 +164,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         // Recharger avec uniquement le premier créneau
         $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
 
-        // ── 3. Supprimer les labels existants, lire les arbitres ─────────────
-        // Les labels sont supprimés pour libérer les terrains.
-        // Les arbitres restent : leur terrain n'est PAS bloqué (une rencontre
-        // peut coexister avec un arbitre sur le même créneau/terrain).
+        // ── 3. Supprimer les labels existants ────────────────────────────────
         $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
-
         foreach ($planificationsRestantes as $p) {
             if (!empty($p['label_id'])) {
-                // Supprimer la ligne de planification du label
                 $planificationDao->supprimerPlanification($p['planification_id']);
             }
         }
@@ -157,8 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
 
         // ── 4. Initialiser la grille ─────────────────────────────────────────
-        // Seuls les arbitres sont pris en compte : ils bloquent d'autres arbitres
-        // sur le même créneau, mais PAS le terrain (une rencontre peut s'y placer).
         $grid              = [];
         $equipesByCreneau  = [];
         $arbitresByCreneau = [];
@@ -182,29 +199,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             }
         }
 
-        // Recréer les arbitres sauvegardés sur leurs créneaux d'origine.
-        // Si le créneau a été supprimé, on le recrée avec son heure d'origine.
+        // Recréer les arbitres sauvegardés sur leurs créneaux d'origine
         foreach ($arbitresSauvegardes as $arb) {
             $cid = $arb['creneau_id'];
             $tid = $arb['terrain_id'];
             $aid = $arb['arbitre_id'];
             $nom = $arb['creneau_nom'];
 
-            // Vérifier si le créneau existe encore dans $listCreneaux
             $creneauExiste = false;
             foreach ($listCreneaux as $cr) {
                 if ((int)$cr['creneau_id'] === $cid) { $creneauExiste = true; break; }
             }
 
-            // Si le créneau a été supprimé, le recréer avec son heure d'origine
             if (!$creneauExiste) {
-                $heureFormatee = substr($nom, 0, 5); // "H:i:s" → "H:i"
+                $heureFormatee = substr($nom, 0, 5);
                 $creneauxDao->ajouterCreneau($heureFormatee, $idTournoi);
                 $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
                 $newCreneau   = end($listCreneaux);
                 $cid          = $newCreneau['creneau_id'];
 
-                // Initialiser la grille pour ce nouveau créneau
                 $grid[$cid]              = [];
                 $equipesByCreneau[$cid]  = [];
                 $arbitresByCreneau[$cid] = [];
@@ -213,7 +226,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 }
             }
 
-            // Réinsérer l'arbitre en base
             $planificationDao->ajouterOuModifierPlanification($tid, $cid, null, $idTournoi, $aid);
 
             if (!isset($arbitresByCreneau[$cid])) $arbitresByCreneau[$cid] = [];
@@ -223,12 +235,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         $lastCreneau = $listCreneaux[array_key_last($listCreneaux)];
         $pasHoraire  = (int)($tournoiInfo['pasHoraire'] ?? 30);
 
-        // ── 4. Placer chaque rencontre ───────────────────────────────────────
+        // ── 5. Placer chaque rencontre ───────────────────────────────────────
         foreach ($rencontresAP as $rencontre) {
             $placed = false;
-            $eq1    = isset($rencontre['equipe1_id'])        ? (int)$rencontre['equipe1_id']        : null;
-            $eq2    = isset($rencontre['equipe2_id'])        ? (int)$rencontre['equipe2_id']        : null;
-            $arb    = isset($rencontre['Arbitre'])           ? (int)$rencontre['Arbitre']           : null;
+            $eq1    = isset($rencontre['equipe1_id'])           ? (int)$rencontre['equipe1_id']           : null;
+            $eq2    = isset($rencontre['equipe2_id'])           ? (int)$rencontre['equipe2_id']           : null;
+            $arb    = isset($rencontre['Arbitre'])              ? (int)$rencontre['Arbitre']              : null;
             $catId  = isset($rencontre['equipe1_categorie_id']) ? (int)$rencontre['equipe1_categorie_id'] : null;
 
             $terrainsAutorises = ($catId !== null && isset($contraintesTerrain[$catId]))
@@ -301,6 +313,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         exit();
     }
 }
+
+// ── Trier les catégories par ordrePlacementAuto pour l'affichage ─────────────
+usort($categories, function ($a, $b) {
+    $ordreA = isset($a['ordrePlacementAuto']) && $a['ordrePlacementAuto'] !== null
+        ? (int)$a['ordrePlacementAuto'] : PHP_INT_MAX;
+    $ordreB = isset($b['ordrePlacementAuto']) && $b['ordrePlacementAuto'] !== null
+        ? (int)$b['ordrePlacementAuto'] : PHP_INT_MAX;
+    if ($ordreA !== $ordreB) return $ordreA - $ordreB;
+    return strcmp($a['Nom_categorie'] ?? '', $b['Nom_categorie'] ?? '');
+});
 
 // ── Rendu Twig ───────────────────────────────────────────────────────────────
 echo $template->render([

@@ -411,7 +411,8 @@ public function afficherRencontresSansPlanification(int $tournoi_id, bool $onlyP
        e2_cat.Nom_categorie AS equipe2_categorie_nom,
        c1.nom AS club1_nom, 
        c1.logo AS club1_logo,
-       c2.nom AS club2_nom, 
+       c2.nom AS club2_nom,
+       e1_cat.ordrePlacementAuto AS equipe1_categorie_ordre, 
        c2.logo AS club2_logo,
        MIN(p1.nom) AS equipe1_poule_nom
 

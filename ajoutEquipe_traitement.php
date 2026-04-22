@@ -32,8 +32,10 @@ $equipeDao = new EquipeDAO();
     $nomEquipe = $_POST['nomEquipe'];
     $nomEquipe = strtoupper($nomEquipe);
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
+
+    var_dump($_POST);
     try {
-            $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);            } catch (Exception $e) {
+            $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs'], $_POST['Coach']);            } catch (Exception $e) {
                 // Redirige avec message d'erreur
                 header("Location: ajoutEquipe.php?error=" . urlencode($e->getMessage())."&idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);
                 exit;
