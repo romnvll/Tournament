@@ -873,7 +873,16 @@ body {
                     <div style="color: var(--danger-color);">
                         <i class="bi bi-arrow-up-circle"></i>
                         <strong>Plus longue attente :</strong>
-                        {{ stats.maxEquipe }}
+                        
+						
+
+						{% if stats.maxAttente == tournoiInfo.pasHoraire %}
+						pas d'anomalie detectée
+
+						{% else %}
+						{{ stats.maxEquipe }}
+						
+
                         (
                         {% if stats.maxAttente >= 60 %}
                             {{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
@@ -881,26 +890,29 @@ body {
                             {{ stats.maxAttente }} min
                         {% endif %}
                         )
+						
                         
                         {% if stats.maxEquipeDe is not empty %}
                             <span style="color: var(--text-light); font-size: 0.8rem;">
                                 — entre {{ stats.maxEquipeDe }} et {{ stats.maxEquipeA }}
                             </span>
                         {% endif %}
+					{% endif %}
                     </div>
+						
+                
 
-                    <div style="color: var(--success-color);">
-                        <i class="bi bi-arrow-down-circle"></i>
-                        <strong>Plus courte attente :</strong>
-                        {{ stats.minEquipe }}
-                        (
-                        {% if stats.minAttente >= 60 %}
-                            {{ (stats.minAttente / 60)|round }}h{{ stats.minAttente % 60 }}min
-                        {% else %}
-                            {{ stats.minAttente }} min
-                        {% endif %}
-                        )
-                    </div>
+					{% if stats.enchaînements is not empty %}
+						<div style="color: var(--warning-color); margin-top: 6px;">
+							<i class="bi bi-lightning-fill"></i>
+							<strong>Enchaînements détectés :</strong>
+							{% for e in stats.enchaînements %}
+								<div style="font-size: 0.8rem; margin-left: 20px;">
+									{{ e.equipe }} — à {{ e.horaires|join(', ') }}
+								</div>
+							{% endfor %}
+						</div>
+					{% endif %}
 
                 </div>
             </div>
