@@ -138,7 +138,94 @@ $timeNextCreneauFormatted = $timeNextCreneau->format('H:i');
 }
 
 
+$statsParCategorie = [];
+$equipeMatchs = [];
 
+foreach ($ToutesPlanification as $p) {
+    if ($p['rencontre_id'] !== null) {
+
+        // Convertir heure en minutes
+        [$h, $m] = explode(':', $p['creneau_nom']);
+        $heureMin = ((int)$h * 60) + (int)$m;
+
+        $key1 = $p['equipe1_id'].'|'.$p['equipe1_nom'].'|'.$p['equipe1_categorie_nom'];
+        $key2 = $p['equipe2_id'].'|'.$p['equipe2_nom'].'|'.$p['equipe2_categorie_nom'];
+
+        $equipeMatchs[$key1][] = $heureMin;
+        $equipeMatchs[$key2][] = $heureMin;
+    }
+}
+
+foreach ($equipeMatchs as $key => $creneaux) {
+
+    if (count($creneaux) < 2) continue;
+
+    [$id, $equipeNom, $categorieNom] = explode('|', $key);
+
+    sort($creneaux); // 🔥 beaucoup plus performant que ton tri Twig
+
+    $maxEcart = 0;
+    $maxDe = 0;
+    $maxA = 0;
+    $total = 0;
+    $count = 0;
+
+    for ($i = 0; $i < count($creneaux) - 1; $i++) {
+
+        $finMatch = $creneaux[$i] + $tournoiInfo['pasHoraire'];
+        $ecart = $creneaux[$i + 1] - $finMatch;
+
+        if ($ecart < 0) $ecart = 0;
+
+        $total += $ecart;
+        $count++;
+
+        if ($ecart > $maxEcart) {
+            $maxEcart = $ecart;
+            $maxDe = $creneaux[$i];
+            $maxA = $creneaux[$i + 1];
+        }
+    }
+
+    $moyenne = round($total / $count);
+
+    // format heure
+    $format = function($min) {
+        $h = floor($min / 60);
+        $m = $min % 60;
+        return sprintf('%dh%02d', $h, $m);
+    };
+
+    if (!isset($statsParCategorie[$categorieNom])) {
+        $statsParCategorie[$categorieNom] = [
+            'totalEcart' => 0,
+            'nbEquipes' => 0,
+            'maxAttente' => 0,
+            'maxEquipe' => '',
+            'maxEquipeDe' => '',
+            'maxEquipeA' => '',
+            'minAttente' => PHP_INT_MAX,
+            'minEquipe' => ''
+        ];
+    }
+
+    $cat = &$statsParCategorie[$categorieNom];
+
+    if ($maxEcart > $cat['maxAttente']) {
+        $cat['maxAttente'] = $maxEcart;
+        $cat['maxEquipe'] = $equipeNom;
+        $cat['maxEquipeDe'] = $format($maxDe);
+        $cat['maxEquipeA'] = $format($maxA);
+    }
+
+    if ($moyenne < $cat['minAttente']) {
+        $cat['minAttente'] = $moyenne;
+        $cat['minEquipe'] = $equipeNom;
+    }
+
+    $cat['totalEcart'] += $moyenne;
+    $cat['nbEquipes']++;
+}
 
 
 
@@ -166,6 +253,7 @@ echo $template->render([
     'listeCategorie' => $categories->obtenirCategoriesDuTournoi($_GET['id_tournoi']),
     'licence' => $licence,
     'AfficherLesEquipes' => $listeDesEquipes,
+    'statsParCategorie' => $statsParCategorie,
 
     
 

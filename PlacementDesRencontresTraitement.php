@@ -19,6 +19,7 @@ if (isset ($_POST['nomTerrain'])) {
     require 'class/planificationDao.class.php';
     $planification = new planificationDao();
     
+   $planification->nettoyerPlanificationsVides($_POST['idTournoi']);
     $planifId    = (int) $_POST['planifId'];
     $newTerrain  = (int) $_POST['newTerrain'];
     $newCreneau  = (int) $_POST['newCreneau'];

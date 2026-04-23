@@ -823,131 +823,13 @@ body {
 					</div>
 
 
-					{# ── Calcul des temps d'attente par équipe et par catégorie ── #}
-{% set equipeMatchs = {} %}
 
-{% for p in afficherPlanification %}
-    {% if p.rencontre_id is not null %}
-        {% set parts = p.creneau_nom|split(':') %}
-        {% set heureMin = (parts[0] * 60) + parts[1] %}
 
-        {% set key1 = p.equipe1_id ~ '|' ~ p.equipe1_nom ~ '|' ~ p.equipe1_categorie_nom %}
-        {% if equipeMatchs[key1] is not defined %}
-            {% set equipeMatchs = equipeMatchs|merge({ (key1): [] }) %}
-        {% endif %}
-        {% set equipeMatchs = equipeMatchs|merge({ (key1): equipeMatchs[key1]|merge([heureMin]) }) %}
-
-        {% set key2 = p.equipe2_id ~ '|' ~ p.equipe2_nom ~ '|' ~ p.equipe2_categorie_nom %}
-        {% if equipeMatchs[key2] is not defined %}
-            {% set equipeMatchs = equipeMatchs|merge({ (key2): [] }) %}
-        {% endif %}
-        {% set equipeMatchs = equipeMatchs|merge({ (key2): equipeMatchs[key2]|merge([heureMin]) }) %}
-    {% endif %}
-{% endfor %}
-
-{% set statsParCategorie = {} %}
-
-{% for key, creneaux in equipeMatchs %}
-    {% if creneaux|length >= 2 %}
-        {% set parts = key|split('|') %}
-        {% set equipeNom = parts[1] %}
-        {% set categorieNom = parts[2] %}
-
-        {# Tri à bulles manuel #}
-        {% set sorted = creneaux %}
-        {% set swapped = true %}
-        {% for pass in 1..sorted|length %}
-            {% if swapped %}
-                {% set swapped = false %}
-                {% for i in 0..sorted|length - 2 %}
-                    {% if sorted[i] > sorted[i + 1] %}
-                        {% set tmp = sorted[i] %}
-                        {% set sorted = sorted|merge({ (i): sorted[i + 1], (i + 1): tmp }) %}
-                        {% set swapped = true %}
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-
-        {# Trouver l'écart le plus grand entre deux matchs consécutifs #}
-        {% set maxEcartPaire = 0 %}
-        {% set maxEcartDe = 0 %}
-        {% set maxEcartA = 0 %}
-        {% set totalEcarts = 0 %}
-        {% set nbEcarts = 0 %}
-
-        {% for i in 0..sorted|length - 2 %}
-		{% set ecart = sorted[i + 1] - (sorted[i] + tournoiInfo.pasHoraire) %}            {% set totalEcarts = totalEcarts + ecart %}
-            {% set nbEcarts = nbEcarts + 1 %}
-            {% if ecart > maxEcartPaire %}
-                {% set maxEcartPaire = ecart %}
-                {% set maxEcartDe = sorted[i] %}
-                {% set maxEcartA = sorted[i + 1] %}
-            {% endif %}
-        {% endfor %}
-
-        {% set ecartMoyen = (totalEcarts / nbEcarts)|round %}
-
-        {# Formater les heures de début et fin de la plus longue attente #}
-        {% set hDe_h = (maxEcartDe // 60)|number_format(0) %}
-        {% set hDe_m = (maxEcartDe % 60)|number_format(0, '.', '') %}
-        {% set hA_h  = (maxEcartA  // 60)|number_format(0) %}
-        {% set hA_m  = (maxEcartA  % 60)|number_format(0, '.', '') %}
-        {% set heureDeStr = hDe_h ~ 'h' ~ (hDe_m < 10 ? '0' ~ hDe_m : hDe_m) %}
-        {% set heureAStr  = hA_h  ~ 'h' ~ (hA_m  < 10 ? '0' ~ hA_m  : hA_m)  %}
-
-        {% if statsParCategorie[categorieNom] is not defined %}
-            {% set statsParCategorie = statsParCategorie|merge({
-                (categorieNom): {
-                    'totalEcart': 0,
-                    'nbEquipes': 0,
-                    'maxAttente': 0,
-                    'maxEquipe': '',
-                    'maxEquipeDe': '',
-                    'maxEquipeA': '',
-                    'minAttente': 99999,
-                    'minEquipe': ''
-                }
-            }) %}
-        {% endif %}
-
-        {% set cat = statsParCategorie[categorieNom] %}
-        {% set newMax = cat.maxAttente %}
-        {% set newMaxEquipe = cat.maxEquipe %}
-        {% set newMaxDe = cat.maxEquipeDe %}
-        {% set newMaxA  = cat.maxEquipeA %}
-        {% set newMin = cat.minAttente %}
-        {% set newMinEquipe = cat.minEquipe %}
-
-        {% if maxEcartPaire > cat.maxAttente %}
-            {% set newMax = maxEcartPaire %}
-            {% set newMaxEquipe = equipeNom %}
-            {% set newMaxDe = heureDeStr %}
-            {% set newMaxA  = heureAStr %}
-        {% endif %}
-        {% if ecartMoyen < cat.minAttente %}
-            {% set newMin = ecartMoyen %}
-            {% set newMinEquipe = equipeNom %}
-        {% endif %}
-
-        {% set statsParCategorie = statsParCategorie|merge({
-            (categorieNom): {
-                'totalEcart': cat.totalEcart + ecartMoyen,
-                'nbEquipes': cat.nbEquipes + 1,
-                'maxAttente': newMax,
-                'maxEquipe': newMaxEquipe,
-                'maxEquipeDe': newMaxDe,
-                'maxEquipeA': newMaxA,
-                'minAttente': newMin,
-                'minEquipe': newMinEquipe
-            }
-        }) %}
-    {% endif %}
-{% endfor %}
 
 {# ── Affichage ── #}
 {% if statsParCategorie|length > 0 %}
 <div class="stat-item" style="flex-direction: column; align-items: flex-start; gap: 12px; grid-column: 1 / -1;">
+    
     <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
         <div class="stat-icon warning">
             <i class="bi bi-hourglass-split"></i>
@@ -958,8 +840,10 @@ body {
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
+        
         {% for categorie, stats in statsParCategorie %}
             {% set moyenneCategorie = (stats.totalEcart / stats.nbEquipes)|round %}
+
             <div style="
                 background: var(--bg-light);
                 border-radius: 10px;
@@ -969,35 +853,55 @@ body {
                 border-left: 4px solid var(--primary-color);
                 box-shadow: var(--shadow-sm);
             ">
+                
                 <div style="font-weight: 700; color: var(--primary-color); margin-bottom: 8px; font-size: 0.9rem;">
                     {{ categorie }}
                 </div>
+
                 <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.85rem; color: var(--bg-dark);">
+                    
                     <div>
                         <i class="bi bi-clock" style="color: var(--info-color);"></i>
                         <strong>Moyenne :</strong>
-                        {% if moyenneCategorie >= 60 %}{{ (moyenneCategorie / 60)|round }}h{{ moyenneCategorie % 60 }}min
-                        {% else %}{{ moyenneCategorie }} min{% endif %}
+                        {% if moyenneCategorie >= 60 %}
+                            {{ (moyenneCategorie / 60)|round }}h{{ moyenneCategorie % 60 }}min
+                        {% else %}
+                            {{ moyenneCategorie }} min
+                        {% endif %}
                     </div>
+
                     <div style="color: var(--danger-color);">
                         <i class="bi bi-arrow-up-circle"></i>
                         <strong>Plus longue attente :</strong>
                         {{ stats.maxEquipe }}
-                        ({% if stats.maxAttente >= 60 %}{{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
-                        {% else %}{{ stats.maxAttente }} min{% endif %})
+                        (
+                        {% if stats.maxAttente >= 60 %}
+                            {{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
+                        {% else %}
+                            {{ stats.maxAttente }} min
+                        {% endif %}
+                        )
+                        
                         {% if stats.maxEquipeDe is not empty %}
                             <span style="color: var(--text-light); font-size: 0.8rem;">
                                 — entre {{ stats.maxEquipeDe }} et {{ stats.maxEquipeA }}
                             </span>
                         {% endif %}
                     </div>
+
                     <div style="color: var(--success-color);">
                         <i class="bi bi-arrow-down-circle"></i>
                         <strong>Plus courte attente :</strong>
                         {{ stats.minEquipe }}
-                        ({% if stats.minAttente >= 60 %}{{ (stats.minAttente / 60)|round }}h{{ stats.minAttente % 60 }}min
-                        {% else %}{{ stats.minAttente }} min{% endif %})
+                        (
+                        {% if stats.minAttente >= 60 %}
+                            {{ (stats.minAttente / 60)|round }}h{{ stats.minAttente % 60 }}min
+                        {% else %}
+                            {{ stats.minAttente }} min
+                        {% endif %}
+                        )
                     </div>
+
                 </div>
             </div>
         {% endfor %}
@@ -1128,7 +1032,7 @@ body {
 																<select class="empty-select" name="Addevent">
 																	<option value="">{{t('choisirArbitre')}}</option>
 																	{% for arbitre in listeDesArbitres %}
-																		<option value='{"idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idtournoi}}"}'>
+																		<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
 																			{% if arbitre.nom is not empty %}
 																				{{t('arbitre')}}:
 																				{{arbitre.nom}}
@@ -1145,8 +1049,8 @@ body {
 													{% endif %}
 
 													<!-- Rencontre -->
-
 													{% if planification.rencontre_id is not null %}
+
 														<div class="match-card" draggable="true" data-planif-id="{{ planification.planification_id }}" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}">
 
 															<div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">

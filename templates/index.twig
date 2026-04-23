@@ -231,6 +231,31 @@
     overflow: hidden;
         }
 
+       /* Dans le @media (min-width: 768px) */
+@media (min-width: 768px) {
+
+    .match-header {
+        grid-template-columns: 1fr auto 1fr;
+        gap: 24px;
+        padding: 24px 32px;
+    }
+
+    .team-side {
+        max-width: none;  /* supprime la limite de 110px */
+        width: 100%;
+    }
+
+    .team-name {
+        max-width: none;  /* supprime la limite de 110px */
+        font-size: 1rem;
+    }
+
+    .team-logo {
+        width: 90px;
+        height: 90px;
+    }
+}
+
         .team-logo {
             width: 60px;
             height: 60px;
@@ -1274,13 +1299,13 @@
                             </div>
             {% endif %}
                 
-                {% if RencontreByPoule[0].equipe2_has_phase_finale ==2 or RencontreByPoule[0].equipe1_has_phase_finale ==2 %}
+                {% if RencontreByPoule[0].equipe2_has_phase_finale == 1 or RencontreByPoule[0].equipe1_has_phase_finale == 1 %}
                             <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
                                 <i class="fas fa-trophy me-3 fs-4"></i>
 
                                 <div>
-                                    <strong>Phase finale disponible</strong><br>
-                                    Votre catégorie comporte une phase finale.
+                                    <strong>Phase finale </strong><br>
+                                    Votre catégorie comporte une phase finale à élimination direct .
 
                                     <div class="mt-2">
                                         <a class="btn btn-sm btn-primary"

@@ -28,6 +28,23 @@ class planificationDao {
     ]);
 }
 
+
+public function nettoyerPlanificationsVides(int $tournoi_id): int {
+    $stmt = $this->connexion->prepare("
+        DELETE FROM Planification
+        WHERE tournoi_id = :tournoi_id
+          AND rencontre_id IS NULL
+          AND label_id IS NULL
+          AND arbitre_id IS NULL
+    ");
+
+    $stmt->execute([
+        ':tournoi_id' => $tournoi_id
+    ]);
+
+    return $stmt->rowCount();
+}
+
     public function ajouterOuModifierPlanification(int $terrain_id, int $creneau_id, ?int $rencontre_id, int $tournoi_id, ?int $arbitre_id = null, ?int $label_id = null): void {
         // Vérifier si la planification avec ce couple terrain_id et creneau_id existe déjà
         $checkStmt = $this->connexion->prepare("SELECT COUNT(*) FROM Planification WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id");
