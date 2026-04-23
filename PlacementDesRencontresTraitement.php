@@ -69,7 +69,7 @@ if (isset ($_POST['Addevent'])) {
         $idtournoi = $dataArray['idtournoi'];
         
         require 'class/planificationDao.class.php';
-        
+        var_dump($dataArray);
         $planification = new planificationDao();
 
         if (!empty($idrencontre)) {

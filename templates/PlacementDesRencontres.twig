@@ -877,8 +877,7 @@ body {
         {% set nbEcarts = 0 %}
 
         {% for i in 0..sorted|length - 2 %}
-            {% set ecart = sorted[i + 1] - sorted[i] %}
-            {% set totalEcarts = totalEcarts + ecart %}
+		{% set ecart = sorted[i + 1] - (sorted[i] + tournoiInfo.pasHoraire) %}            {% set totalEcarts = totalEcarts + ecart %}
             {% set nbEcarts = nbEcarts + 1 %}
             {% if ecart > maxEcartPaire %}
                 {% set maxEcartPaire = ecart %}
@@ -1273,7 +1272,7 @@ body {
 
 															{% if planif.phase_finale_id is not null %}
 																{# Option pour phase finale à élimination directe #}
-																<option value='{"idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idtournoi}}"}'>
+																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
 																	Elimination-Direct -
 																	{{ planif.phase_finale_libelle }}
 																	-
@@ -1284,7 +1283,7 @@ body {
 																</option>
 
 															{% elseif planif.type_rencontre_id == 1 %}
-																<option value='{"idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idtournoi}}"}'>
+																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
 																	tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }}
 																	{{planif.equipe1_nom}}
 																	vs
@@ -1293,7 +1292,7 @@ body {
 																</option>
 
 															{% elseif planif.type_rencontre_id == 3 %}
-																<option value='{"idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idtournoi}}"}'>
+																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
 																	PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }}
 																	{{planif.equipe1_nom}}
 																	vs
@@ -1301,7 +1300,7 @@ body {
 																	{{ planif.equipe1_poule_nom }}
 																</option>
 															{% elseif planif.type_rencontre_id == 4 %}
-																<option value='{"idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idtournoi}}"}'>
+																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
 																	⭐ Match amical -
 																	{{ planif.equipe1_categorie_nom }}
 																	{{planif.equipe1_nom}}
@@ -1313,7 +1312,7 @@ body {
 
 														{% endfor %}
 														{% for label in libelleParTournoi %}
-															<option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j][' terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idtournoi}}"}'>
+															<option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>
 																{{t('label')}}:
 																{{label.description}}
 															</option>
