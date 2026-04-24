@@ -155,6 +155,7 @@ foreach ($ToutesPlanification as $p) {
 }
 
 $format = function(int $min): string {
+    $min = $min % 1440;
     return sprintf('%dh%02d', floor($min / 60), $min % 60);
 };
 
@@ -164,7 +165,27 @@ foreach ($equipeMatchs as $key => $creneaux) {
 
     [$id, $equipeNom, $categorieNom] = explode('|', $key);
 
+    // 1. Tri initial
     sort($creneaux);
+
+    // 2. Trouver le plus grand écart pour détecter le passage minuit
+    $maxGap   = 0;
+    $cutIndex = 0;
+    for ($i = 0; $i < count($creneaux) - 1; $i++) {
+        $gap = $creneaux[$i + 1] - $creneaux[$i];
+        if ($gap > $maxGap) {
+            $maxGap   = $gap;
+            $cutIndex = $i + 1;
+        }
+    }
+
+    // 3. Si l'écart max > 12h, c'est un passage minuit
+    if ($maxGap > 720) {
+        for ($i = 0; $i < $cutIndex; $i++) {
+            $creneaux[$i] += 1440;
+        }
+        sort($creneaux);
+    }
 
     $maxEcart      = 0;
     $maxDe         = 0;
@@ -173,16 +194,15 @@ foreach ($equipeMatchs as $key => $creneaux) {
     $count         = 0;
     $enchaînements = [];
 
+    // 4. Calculer les écarts
     for ($i = 0; $i < count($creneaux) - 1; $i++) {
         $ecart = $creneaux[$i + 1] - ($creneaux[$i] + $tournoiInfo['pasHoraire']);
         $ecart = max(0, $ecart);
 
-        // Détecter tous les enchaînements sans pause
         if ($ecart === 0) {
             $enchaînements[] = $format($creneaux[$i]);
         }
 
-        // Ne compter que les vraies pauses
         if ($ecart > 0) {
             $total += $ecart;
             $count++;
@@ -199,15 +219,15 @@ foreach ($equipeMatchs as $key => $creneaux) {
 
     if (!isset($statsParCategorie[$categorieNom])) {
         $statsParCategorie[$categorieNom] = [
-            'totalEcart'     => 0,
-            'nbEquipes'      => 0,
-            'maxAttente'     => 0,
-            'maxEquipe'      => '',
-            'maxEquipeDe'    => '',
-            'maxEquipeA'     => '',
-            'minAttente'     => PHP_INT_MAX,
-            'minEquipe'      => '',
-            'enchaînements'  => [],  // toutes les équipes qui enchaînent
+            'totalEcart'    => 0,
+            'nbEquipes'     => 0,
+            'maxAttente'    => 0,
+            'maxEquipe'     => '',
+            'maxEquipeDe'   => '',
+            'maxEquipeA'    => '',
+            'minAttente'    => PHP_INT_MAX,
+            'minEquipe'     => '',
+            'enchaînements' => [],
         ];
     }
 
@@ -225,10 +245,9 @@ foreach ($equipeMatchs as $key => $creneaux) {
         $cat['minEquipe']  = $equipeNom;
     }
 
-    // Stocker les enchaînements de cette équipe
     if (!empty($enchaînements)) {
         $cat['enchaînements'][] = [
-            'equipe'  => $equipeNom,
+            'equipe'   => $equipeNom,
             'horaires' => $enchaînements,
         ];
     }
@@ -236,7 +255,6 @@ foreach ($equipeMatchs as $key => $creneaux) {
     $cat['totalEcart'] += $moyenne;
     $cat['nbEquipes']++;
 }
-
 
 
 
