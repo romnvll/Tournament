@@ -1190,6 +1190,118 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
+{
+    $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
+    $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
+
+    $query = "
+        SELECT 
+            r.id AS rencontre_id,
+            r.tour AS tour,
+            p.terrain_id,
+            t.nom AS terrain_nom,
+            p.creneau_id,
+            c.nom AS creneau_nom,
+            
+            equipe1.isPresent AS equipe1_isPresent,
+            equipe1.id AS equipe1_id,
+            equipe1.nomCoach AS equipe1_coach_nom,
+            equipe1.nom AS equipe1_nom,
+            club1.id AS club1_id,
+            club1.nom AS club1_nom,
+            club1.logo AS club1_logo,
+            
+            equipe2.id AS equipe2_id,
+            equipe2.isPresent AS equipe2_isPresent,
+            equipe2.nom AS equipe2_nom,
+            equipe2.nomCoach AS equipe2_coach_nom,
+            club2.id AS club2_id,
+            club2.nom AS club2_nom,
+            club2.logo AS club2_logo,
+
+            cat1.Nom_categorie AS equipe1_categorie_nom,
+            cat1.id_categorie AS equipe1_categorie_id,
+            cat1.Couleur AS equipe1_categorie_couleur,
+            cat2.Nom_categorie AS equipe2_categorie_nom,
+            cat2.Couleur AS equipe2_categorie_couleur,
+            cat2.id_categorie AS equipe2_categorie_id,          
+            
+            r.score1,
+            r.score2,
+            r.isTerminated,
+            
+            a.nom AS arbitre_nom,
+            clubArbitre.nom AS arbitre_club_nom,
+            
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM Labels l 
+                    WHERE l.categorie_id = equipe1.categorie 
+                    AND l.tournoi_id = r.tournoi_id
+                    AND l.description LIKE 'EliminationDirect%'
+                ) THEN 1 
+                ELSE 0 
+            END AS equipe1_has_phase_finale,
+            
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM Labels l 
+                    WHERE l.categorie_id = equipe2.categorie 
+                    AND l.tournoi_id = r.tournoi_id
+                    AND l.description LIKE 'EliminationDirect%'
+                ) THEN 1 
+                ELSE 0 
+            END AS equipe2_has_phase_finale
+
+        FROM 
+            Rencontres r
+        JOIN 
+            Equipes equipe1 ON r.equipe1_id = equipe1.id
+        JOIN 
+            Clubs club1 ON equipe1.club_id = club1.id
+        LEFT JOIN 
+            Categorie cat1 ON equipe1.categorie = cat1.id_categorie
+        JOIN 
+            Equipes equipe2 ON r.equipe2_id = equipe2.id
+        JOIN 
+            Clubs club2 ON equipe2.club_id = club2.id
+        LEFT JOIN 
+            Categorie cat2 ON equipe2.categorie = cat2.id_categorie
+        LEFT JOIN 
+            Planification p ON r.id = p.rencontre_id
+        LEFT JOIN 
+            Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN 
+            Terrains t ON p.terrain_id = t.terrain_id
+        LEFT JOIN 
+            Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN 
+            Clubs clubArbitre ON a.club_id = clubArbitre.id
+
+        WHERE 
+            r.type_rencontre_id = :typeRencontreId
+            AND equipe1.categorie = :categorieId
+            AND equipe2.categorie = :categorieId
+            $additionalCondition
+
+        ORDER BY 
+            $orderBy;
+    ";
+    
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindParam(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->bindParam(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
     public function updateStatusByCreneau(int $idCreneau, int $status): void
 {
     $query = "

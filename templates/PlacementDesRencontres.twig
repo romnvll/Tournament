@@ -871,34 +871,54 @@ body {
                     </div>
 
                     <div style="color: var(--danger-color);">
-                        <i class="bi bi-arrow-up-circle"></i>
-                        <strong>Plus longue attente :</strong>
-                        
-						
+						<i class="bi bi-arrow-up-circle"></i>
+						<strong>Plus longue attente :</strong>
 
 						{% if stats.maxAttente == tournoiInfo.pasHoraire %}
-						pas d'anomalie detectée
+							pas d'anomalie detectée
 
 						{% else %}
-						{{ stats.maxEquipe }}
-						
+							{{ stats.maxEquipe }}
 
-                        (
-                        {% if stats.maxAttente >= 60 %}
-                            {{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
-                        {% else %}
-                            {{ stats.maxAttente }} min
-                        {% endif %}
-                        )
-						
-                        
-                        {% if stats.maxEquipeDe is not empty %}
-                            <span style="color: var(--text-light); font-size: 0.8rem;">
-                                — entre {{ stats.maxEquipeDe }} et {{ stats.maxEquipeA }}
-                            </span>
-                        {% endif %}
-					{% endif %}
-                    </div>
+							(
+							{% if stats.maxAttente >= 60 %}
+								{{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
+							{% else %}
+								{{ stats.maxAttente + tournoiInfo.pasHoraire  }} min
+							{% endif %}
+							)
+
+							{% if stats.maxEquipeDe is not empty %}
+								<span style="color: var(--text-light); font-size: 0.8rem;">
+									— entre {{ stats.maxEquipeDe }} et {{ stats.maxEquipeA }}
+								</span>
+							{% endif %}
+
+							{# ← NOUVEAU : détail par équipe #}
+							{% if stats.detailEquipes is not empty %}
+								<div style="margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px;">
+									{% for e in stats.detailEquipes|sort((a, b) => b.attente <=> a.attente) %}
+										<div style="display: flex; justify-content: space-between; padding: 4px 8px; background: rgba(239,68,68,0.05); border-radius: 6px;">
+											<span>{{ e.equipe }}</span>
+											<span>
+												{% if e.attente == 0 %}
+													✅ 0 min
+												{% elseif e.attente >= 60 %}
+													{{ (e.attente / 60)|round }}h{{ e.attente % 60 }}min
+												{% else %}
+													{{ e.attente }} min
+												{% endif %}
+												{% if e.de is not empty %}
+													<span style="opacity: 0.6;">— entre {{ e.de }} et {{ e.a }}</span>
+												{% endif %}
+											</span>
+										</div>
+									{% endfor %}
+								</div>
+							{% endif %}
+
+						{% endif %}
+					</div>
 						
                 
 

@@ -307,6 +307,26 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
             throw $e; // Relancer l'exception pour traitement
         }
     }
+
+    //  méthode pour supprimer tous les labels d'un creneau donné, utilisée avant de supprimer un créneau pour éviter les erreurs de contrainte d'intégrité
+   public function retirerLabelsDuCreneau(int $creneau_id): void {
+    $this->connexion->beginTransaction();
+
+    try {
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Planification 
+            WHERE creneau_id = :creneau_id
+            AND label_id IS NOT NULL
+        ");
+        $stmt->bindParam(':creneau_id', $creneau_id);
+        $stmt->execute();
+
+        $this->connexion->commit();
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
+    }
+}
     
 
     public function supprimerCreneauxParTournoi(int $tournoi_id): void {
@@ -406,6 +426,26 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
     } catch (Exception $e) {
         echo "<div class='alert alert-danger'>".$e->getMessage()."</div>";
         exit();
+    }
+}
+
+public function retirerArbitresDuCreneau(int $creneau_id): void {
+    $this->connexion->beginTransaction();
+
+    try {
+        $stmt = $this->connexion->prepare("
+            DELETE FROM Planification 
+            WHERE creneau_id = :creneau_id
+            AND arbitre_id IS NOT NULL
+            
+        ");
+        $stmt->bindParam(':creneau_id', $creneau_id);
+        $stmt->execute();
+
+        $this->connexion->commit();
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
     }
 }
 

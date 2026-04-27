@@ -157,6 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
         $premierCreneau = $listCreneaux[0];
         foreach ($listCreneaux as $cr) {
             if ($cr['creneau_id'] !== $premierCreneau['creneau_id']) {
+                $creneauxDao->retirerLabelsDuCreneau($cr['creneau_id']);
+                $creneauxDao->retirerArbitresDuCreneau($cr['creneau_id']);
                 $creneauxDao->supprimerCreneau($cr['creneau_id']);
             }
         }

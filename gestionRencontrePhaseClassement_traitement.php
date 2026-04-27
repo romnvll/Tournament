@@ -22,6 +22,19 @@ if (
 }
 
 
+
+if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
+    $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
+
+    if ($categorieId && $idTournoi) {
+        $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
+    }
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+
 if (isset($_GET['addpoule'])) {
     $pouledao->addEquipeToPoule($_GET['idequipe'], $_GET['pouleId'], $_GET['tournoiId']);
 

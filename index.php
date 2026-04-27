@@ -120,7 +120,9 @@ foreach ($listeDesEquipesByClubs as $equipe) {
         'id' => $equipe['id'],
         'nom' => $equipe['nom'],
         'Nom_categorie' => $equipe['Nom_categorie'],
-        'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id']),
+        'idCategorie' => $equipe['idCategorie'],
+        'idPoule' => $poulemanager->getPremierePouleIdParEquipe($equipe['id']) ?? null,
+        //'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id']),
         'couleurCategorie' => $equipe['Couleur'],
         'nomCoach' => $equipe['nomCoach'] ?? null,
     ];
@@ -128,7 +130,10 @@ foreach ($listeDesEquipesByClubs as $equipe) {
 
 
 //
-
+$classementFinal = [];
+if (isset($_GET['idCategorie'])) {
+    $classementFinal = $poulemanager->getClassementFinal((int)$_GET['id_tournoi'], (int)$_GET['idCategorie']);
+}
 
 
 
@@ -177,9 +182,12 @@ else {
 
 if (isset ($_GET['idPoule'])) {
 $idPoule = $_GET['idPoule'];
+$pouleInfo = $poulemanager->getPouleById($idPoule);
+
 }
 else {
   $idPoule = null;
+  $pouleInfo = null;
 }
 
 if (isset ($_GET['idPoule'])) {
@@ -198,6 +206,7 @@ if (isset ($_GET['idPoule'])) {
 
    }
 
+   
 
 
 
@@ -207,6 +216,17 @@ if (isset ($_GET['idPoule'])) {
   $GetResultatDesPoules = null;
   $PouleHasPhasefinal = null;
  }
+
+
+ if (isset ($_GET['idCategorie'])) {
+    
+    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie']);
+   
+   }
+
+   else {
+    $RencontreByCategorie = null;
+   }
 
 
 if (isset ($_GET['id_equipe'])) {
@@ -262,6 +282,9 @@ echo $template->render([
     'licence' =>$licenceDao->getTousLesTypesDeLicence(),
     'planTournoi' => $planTournoi,
     'equipeAsRencontreAmicale' => $equipeAsRencontreAmicale,
+     'classementFinal' => $classementFinal,
+     'RencontreByCategorie' => $RencontreByCategorie,
+     'pouleInfo' => $pouleInfo,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

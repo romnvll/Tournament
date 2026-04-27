@@ -443,13 +443,33 @@
                 <span class="badge bg-secondary">{{ NombreEquipeParPoules }}</span>
             </h3>
           
+                    {% set categoriesDejaAffichees = [] %}
+
+            {# Boucle 1 : boutons de sélection des poules #}
             {% for poule in afficherLesPoules %}
                 {% set btnClass = "btn btn-primary" %}
                 {% if pouleEnCours == poule.id %}
                     {% set btnClass = "btn btn-danger" %}
                 {% endif %}
-                <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{ poule.fk_idcategorie }}" class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
+                <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{ poule.fk_idcategorie }}" 
+                class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
             {% endfor %}
+
+            {# Boucle 2 : boutons de génération auto, un par catégorie #}
+            <div class="mt-2">
+            {% for poule in afficherLesPoules %}
+            
+                {% if poule.fk_idcategorie not in categoriesDejaAffichees %}
+                    <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                    class="btn btn-warning mb-2"
+                    onclick="return confirm('Générer automatiquement les poules de classement pour cette catégorie ?')">
+                        <i class="fas fa-magic"></i> Générer la phase de classement pour les {{ poule.nom | split(' ')[0] }}
+                    </a>
+                    {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
+                {% endif %}
+            {% endfor %}
+            </div>
+            
 
             <!-- Desktop table -->
             <table class="table table-bordered table-striped">
@@ -485,6 +505,7 @@
                                 {% endfor %}
                             </td>
                             <td>
+                           
                                 {% for poule in equipe.poules %}
                                     {% if poule.is_classement == 1 %}
                                         <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"

@@ -422,7 +422,7 @@ public function mettreAJourAudioEquipe(int $idEquipe, ?string $audioPath): void
     
 
     public function getAllEquipeByIdTournoiAndClub (int $idTournoi, int $clubId) {
-        $query = "SELECT e.*, c.logo, cat.Nom_categorie, cat.Couleur
+        $query = "SELECT e.*, c.logo, cat.Nom_categorie, cat.Couleur,cat.id_categorie as idCategorie
 FROM Equipes e
 INNER JOIN Clubs c ON e.club_id = c.id
 INNER JOIN Categorie cat ON e.categorie = cat.id_categorie

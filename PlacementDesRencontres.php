@@ -228,8 +228,11 @@ foreach ($equipeMatchs as $key => $creneaux) {
             'minAttente'    => PHP_INT_MAX,
             'minEquipe'     => '',
             'enchaînements' => [],
+            'detailEquipes' => [],  // ← ajoutez cette ligne pour stocker les détails de chaque équipe
         ];
     }
+
+ 
 
     $cat = &$statsParCategorie[$categorieNom];
 
@@ -251,6 +254,13 @@ foreach ($equipeMatchs as $key => $creneaux) {
             'horaires' => $enchaînements,
         ];
     }
+
+       $cat['detailEquipes'][] = [
+    'equipe'  => $equipeNom,
+    'attente' => $maxEcart,
+    'de'      => $maxEcart > 0 ? $format($maxDe) : '',
+    'a'       => $maxEcart > 0 ? $format($maxA)  : '',
+    ];
 
     $cat['totalEcart'] += $moyenne;
     $cat['nbEquipes']++;

@@ -81,6 +81,254 @@ class PouleManager {
         }
     }
 
+/**
+ * Récupère le classement d'une poule (phase initiale, type 1)
+ */
+public function getClassementPoule(int $pouleId): array {
+    $query = "
+        SELECT * FROM (
+            SELECT 
+                e.id,
+                e.nom,
+                e.categorie,
+                SUM(CASE
+                    WHEN r.equipe1_id = e.id AND r.score1 > r.score2 THEN 3
+                    WHEN r.equipe2_id = e.id AND r.score2 > r.score1 THEN 3
+                    WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 1
+                    ELSE 0
+                END) AS points,
+                COALESCE(SUM(CASE WHEN r.equipe1_id = e.id THEN r.score1
+                                  WHEN r.equipe2_id = e.id THEN r.score2 END), 0) AS buts_pour,
+                COALESCE(SUM(CASE WHEN r.equipe1_id = e.id THEN r.score2
+                                  WHEN r.equipe2_id = e.id THEN r.score1 END), 0) AS buts_contre
+            FROM Equipes e
+            JOIN EquipePoule ep ON ep.equipe_id = e.id
+            LEFT JOIN Rencontres r ON (r.equipe1_id = e.id OR r.equipe2_id = e.id)
+                                   AND r.type_rencontre_id = :typePoule
+                                   AND r.score1 IS NOT NULL
+            WHERE ep.poule_id = :pouleId
+            GROUP BY e.id, e.nom, e.categorie
+        ) AS classement
+        ORDER BY points DESC, (buts_pour - buts_contre) DESC, buts_pour DESC
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typePoule', TYPE_RENCONTRE_POULE, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+/**
+ * Crée ou récupère une poule de classement existante
+ */
+public function creerOuRecupererPouleClassement(int $tournoiId, int $categorieId, string $nom): int {
+    $stmt = $this->connexion->prepare("
+        SELECT id FROM Poules 
+        WHERE nom = :nom 
+          AND tournoi_id = :tournoiId 
+          AND fk_idcategorie = :categorieId 
+          AND is_classement = 1
+    ");
+    $stmt->execute([':nom' => $nom, ':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+    $existing = $stmt->fetchColumn();
+
+    if ($existing) {
+        return (int) $existing;
+    }
+
+    $stmt = $this->connexion->prepare("
+        INSERT INTO Poules (nom, tournoi_id, fk_idcategorie, is_classement)
+        VALUES (:nom, :tournoiId, :categorieId, 1)
+    ");
+    $stmt->execute([':nom' => $nom, ':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+    return (int) $this->connexion->lastInsertId();
+}
+
+/**
+ * Génère le nom de la poule selon le rang et le nombre total de poules.
+ * Exemple : rang=1, nbPoules=3 → "1-2-3ème place"
+ *           rang=2, nbPoules=3 → "4-5-6ème place"
+ */
+private function nomPouleClassement(int $rang, int $nbPoules): string {
+    // Les places disputées dans cette poule de classement
+    $debut = ($rang - 1) * $nbPoules + 1;
+    $fin   = $rang * $nbPoules;
+
+    if ($debut === $fin) {
+        return "{$debut}ème place";
+    }
+
+    // Construire "1-2-3ème place"
+    $places = implode('-', range($debut, $fin));
+    return "{$places}ème place";
+}
+
+/**
+ * Retourne le classement général final pour une catégorie.
+ * Les équipes sont groupées par poule de classement (1-2ème place, 3-4ème place...),
+ * et triées par points à l'intérieur de chaque poule.
+ */
+public function getClassementFinal(int $tournoiId, int $categorieId): array {
+    $query = "
+        SELECT
+            e.id,
+            e.nom,
+            cl.id AS club_id,
+            cl.logo AS club_logo,
+            p.id AS poule_id,
+            p.nom AS poule_nom,
+            SUM(CASE
+                WHEN r.equipe1_id = e.id AND r.score1 > r.score2 THEN 3
+                WHEN r.equipe2_id = e.id AND r.score2 > r.score1 THEN 3
+                WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 1
+                ELSE 0
+            END) AS TotalDesPoints,
+            COALESCE(SUM(CASE 
+                WHEN r.equipe1_id = e.id THEN r.score1
+                WHEN r.equipe2_id = e.id THEN r.score2 
+            END), 0) AS nombreButsMarque,
+            COALESCE(SUM(CASE 
+                WHEN r.equipe1_id = e.id THEN r.score2
+                WHEN r.equipe2_id = e.id THEN r.score1 
+            END), 0) AS nombreButsEncaisse,
+            COALESCE(SUM(CASE 
+                WHEN r.equipe1_id = e.id THEN r.score1 - r.score2
+                WHEN r.equipe2_id = e.id THEN r.score2 - r.score1 
+            END), 0) AS DifferenceButs
+        FROM Equipes e
+        JOIN EquipePoule ep ON ep.equipe_id = e.id
+        JOIN Poules p ON p.id = ep.poule_id
+        JOIN Clubs cl ON cl.id = e.club_id
+        LEFT JOIN Rencontres r ON (r.equipe1_id = e.id OR r.equipe2_id = e.id)
+                               AND r.type_rencontre_id = :typeClassement
+                               AND r.score1 IS NOT NULL
+        WHERE p.tournoi_id = :tournoiId
+          AND p.fk_idcategorie = :categorieId
+          AND p.is_classement = 1
+        GROUP BY e.id, e.nom, cl.id, cl.logo, p.id, p.nom
+        ORDER BY 
+            CAST(SUBSTRING_INDEX(p.nom, '-', 1) AS UNSIGNED) ASC,
+            TotalDesPoints DESC, 
+            DifferenceButs DESC, 
+            nombreButsMarque DESC
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->bindValue(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeClassement', TYPE_RENCONTRE_CLASSEMENT, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
+/**
+ * Génère automatiquement les poules de classement pour une catégorie.
+ */
+public function genererPoulesClassementAutomatique(int $tournoiId, int $categorieId): array {
+
+    $stmt = $this->connexion->prepare("
+        SELECT id FROM Poules 
+        WHERE tournoi_id = :tournoiId 
+          AND fk_idcategorie = :categorieId 
+          AND is_classement = 0
+    ");
+    $stmt->execute([':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+    $poulesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($poulesIds)) {
+        return [];
+    }
+
+    $nbPoules = count($poulesIds);
+
+    // ── CAS SPÉCIAL : une seule poule ──────────────────────────────────────
+    // On crée des poules "1vs2", "3vs4", etc. à partir du classement
+    if ($nbPoules === 1) {
+        $classement = $this->getClassementPoule($poulesIds[0]);
+        $poulesCreees = [];
+
+        // Regrouper par paires consécutives : [0,1], [2,3], [4,5]...
+        $chunks = array_chunk($classement, 2);
+
+        foreach ($chunks as $index => $paire) {
+            $rang1 = $index * 2 + 1;           // ex: 1, 3, 5...
+            $rang2 = min($rang1 + 1, count($classement)); // ex: 2, 4, 6...
+
+            if ($rang1 === $rang2) {
+                // Nombre impair d'équipes, la dernière n'a pas d'adversaire
+                break;
+            }
+
+            $nomPoule = "{$rang1}-{$rang2}ème place";
+            $pouleId  = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPoule);
+
+            foreach ($paire as $equipe) {
+                try {
+                    $this->addEquipeToPoule($equipe['id'], $pouleId, $tournoiId);
+                } catch (Exception $e) {
+                    // déjà dans la poule
+                }
+            }
+
+            $poulesCreees[$rang1] = [
+                'pouleId' => $pouleId,
+                'nom'     => $nomPoule,
+                'equipes' => array_column($paire, 'id'),
+            ];
+        }
+
+        return $poulesCreees;
+    }
+
+    // ── CAS NORMAL : plusieurs poules ─────────────────────────────────────
+    // Regrouper les équipes par rang (1ers ensemble, 2èmes ensemble...)
+    $equipesByRang = [];
+
+    foreach ($poulesIds as $pouleId) {
+        $classement = $this->getClassementPoule($pouleId);
+        foreach ($classement as $rang => $equipe) {
+            $equipesByRang[$rang + 1][] = $equipe['id'];
+        }
+    }
+
+    $poulesCreees = [];
+    ksort($equipesByRang);
+
+    foreach ($equipesByRang as $rang => $equipes) {
+        $nomPoule = $this->nomPouleClassement($rang, $nbPoules);
+        $pouleId  = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPoule);
+
+        foreach ($equipes as $equipeId) {
+            try {
+                $this->addEquipeToPoule($equipeId, $pouleId, $tournoiId);
+            } catch (Exception $e) {
+                // déjà dans la poule
+            }
+        }
+
+        $poulesCreees[$rang] = [
+            'pouleId' => $pouleId,
+            'nom'     => $nomPoule,
+            'equipes' => $equipes,
+        ];
+    }
+
+    return $poulesCreees;
+}
+
+private function ordinalFr(int $n): string {
+    $map = [1 => '1ers', 2 => '2èmes', 3 => '3èmes', 4 => '4èmes', 5 => '5èmes'];
+    return $map[$n] ?? "{$n}èmes";
+}
+
+
+
+
+
 
     public function deletePoule($idPoule) {
         try {
@@ -506,6 +754,22 @@ public function getDernierePouleIdParEquipe(int $equipeId): ?int {
         FROM EquipePoule ep
         WHERE ep.equipe_id = :equipeId
         ORDER BY ep.poule_id DESC
+        LIMIT 1
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':equipeId', $equipeId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchColumn() ?: null;
+}
+
+public function getPremierePouleIdParEquipe(int $equipeId): ?int {
+    $query = "
+        SELECT ep.poule_id
+        FROM EquipePoule ep
+        WHERE ep.equipe_id = :equipeId
+        ORDER BY ep.poule_id ASC
         LIMIT 1
     ";
 
