@@ -1594,6 +1594,10 @@
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                                     </a> 
+                                    {% elseif affichageByPoule %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                    </a> 
                                     {% else %}
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
@@ -1693,6 +1697,10 @@
                                     {% elseif affichageByTerrain %}
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                    </a> 
+                                    {% elseif affichageByPoule %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                                     </a> 
                                     {% else %}
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&idPoule={{ equipe.equipe2_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
