@@ -238,8 +238,11 @@ $logoClub = $getClubNom ? $getClubNom['club_logo'] : null;
             </p>
         </div>
 
-        <?php if (!empty($sponsors)) : ?>
-            <div class="row mt-1">
+<?php 
+$tournoi = $tournoiDao->getTournoiById($_GET['idTournoi']);
+
+if (!empty($sponsors) && $tournoi["gestionPartenaires"] == 1) : 
+?>            <div class="row mt-1">
                 <h3 class="text-center mb-1">
                     <i class="fas fa-handshake me-2"></i>
                     <?= count($sponsors) === 1 ? 'Notre sponsor' : 'Nos sponsors' ?>

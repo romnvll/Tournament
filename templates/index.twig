@@ -22,14 +22,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <!--<script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>-->
     <title>
-        {% if IdPoules %}
-            Vue par poule - Brackito
+        {% if affichageByCategorie %}
+            Vue par catégorie - Brackito
         {% elseif affichageByTeam %}
             Vue par équipe - Brackito
         {% elseif affichageByClubs %}
             Vue par club - Brackito
         {% elseif affichageByTerrain %}
             Vue par terrain - Brackito
+        {% elseif affichageByPoule %}
+            Vue par poule - Brackito
         {% else %}
             Brackito - Gestion de tournois sportifs
         {% endif %}
@@ -311,6 +313,33 @@
     align-items: center;
     justify-content: center;
     border: 2px solid white;
+}
+.terrain-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.7rem;
+}
+.terrain-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 6px 10px;
+  gap: 3px;
+  max-width: 90px;
+}
+
+.terrain-nom {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
        /* Dans le @media (min-width: 768px) */
@@ -1234,7 +1263,7 @@
                         {% for equipe in equipesAvecPoule %}
                             {% if equipe.idPoule != null %}
                              
-                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}&idCategorie={{ equipe.idCategorie }}&affichageByCategorie=true" class="selection-item">
+                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}&idCategorie={{ equipe.idCategorie }}&affichageByPoule=true" class="selection-item">
                                     <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}; font-size: 1.5rem;"></i>
                                     <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }} 
                                     {% if equipe.nomCoach %}
@@ -1558,7 +1587,7 @@
                                 
                                 </a>
                                    {% if affichageByClubs %}
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByClubs=true" class="team-name">
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
                                     {% elseif affichageByTerrain %}
@@ -1610,7 +1639,42 @@
 
                                    <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true" 
                                     class="terrain-link">
-                                    📍 Terrain <span class="terrain-num">{{ equipe.terrain_nom }}</span>
+                                    <span class="terrain-icon">
+                                    <div class="terrain-wrapper">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40" width="48" height="30" fill="none" stroke="currentColor" stroke-width="1.5">
+    <!-- Pelouse -->
+    <rect x="1" y="1" width="62" height="38" rx="2" fill="#4CAF50" stroke="white"/>
+    <!-- Ligne médiane -->
+    <line x1="32" y1="1" x2="32" y2="39" stroke="white"/>
+    <!-- Cercle central -->
+    <circle cx="32" cy="20" r="7" stroke="white"/>
+    <!-- Point central -->
+    <circle cx="32" cy="20" r="0.8" fill="white"/>
+    <!-- Surface de réparation gauche -->
+    <rect x="1" y="10" width="12" height="20" stroke="white"/>
+    <!-- Surface de but gauche -->
+    <rect x="1" y="15" width="5" height="10" stroke="white"/>
+    <!-- Surface de réparation droite -->
+    <rect x="51" y="10" width="12" height="20" stroke="white"/>
+    <!-- Surface de but droite -->
+    <rect x="58" y="15" width="5" height="10" stroke="white"/>
+    <!-- Arc gauche -->
+    <path d="M13,16 A7,7 0 0,1 13,24" stroke="white" fill="none"/>
+    <!-- Arc droit -->
+    <path d="M51,16 A7,7 0 0,0 51,24" stroke="white" fill="none"/>
+    <!-- Point penalty gauche -->
+    <circle cx="10" cy="20" r="0.8" fill="white"/>
+    <!-- Point penalty droit -->
+    <circle cx="54" cy="20" r="0.8" fill="white"/>
+    <!-- Corners -->
+    <path d="M1,4 A3,3 0 0,0 4,1" stroke="white" fill="none"/>
+    <path d="M60,1 A3,3 0 0,0 63,4" stroke="white" fill="none"/>
+    <path d="M1,36 A3,3 0 0,1 4,39" stroke="white" fill="none"/>
+    <path d="M60,39 A3,3 0 0,1 63,36" stroke="white" fill="none"/>
+  </svg>
+</span>
+<span class="terrain-nom">{{ equipe.terrain_nom }}</span>
+</div>
                                     </a>
                                 </div>
 
@@ -1623,7 +1687,7 @@
                                 
                                 </a>
                                    {% if affichageByClubs %}
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByClubs=true" class="team-name">
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
                                         {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
                                     {% elseif affichageByTerrain %}
