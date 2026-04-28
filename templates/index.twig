@@ -1936,11 +1936,25 @@ setInterval(function () {
 
 
         // Animation hint une seule fois au chargement
-setTimeout(function () {
-    document.querySelectorAll('.team-name, .team-logo-wrap, .terrain-link').forEach(function (el) {
-        el.classList.add('hint-animate');
+const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+            // L'élément est visible à l'écran
+            entry.target.querySelectorAll('.team-name, .team-logo-wrap, .terrain-link').forEach(function (el) {
+                el.classList.add('hint-animate');
+            });
+            // On arrête d'observer cette carte (animation une seule fois)
+            observer.unobserve(entry.target);
+        }
     });
-}, 5000); // petit délai pour laisser la page se charger visuellement
+}, {
+    threshold: 0.8 // déclenche quand 30% de la carte est visible
+});
+
+// Observer chaque carte de rencontre
+document.querySelectorAll('.match-card').forEach(function (card) {
+    observer.observe(card);
+});
     
     </script>
 </body>
