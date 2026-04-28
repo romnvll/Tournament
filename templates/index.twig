@@ -95,6 +95,17 @@
             }
         }
 
+        @keyframes hintPulse {
+                0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(79,70,229,0.4); }
+                40%  { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(79,70,229,0); }
+                60%  { transform: scale(0.97); }
+                100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+            }
+
+            .hint-animate {
+                animation: hintPulse 0.6s ease-out 2;
+            }
+
         .card-header-modern {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
             color: white;
@@ -1922,6 +1933,14 @@ setInterval(function () {
           
            
         });
+
+
+        // Animation hint une seule fois au chargement
+setTimeout(function () {
+    document.querySelectorAll('.team-name, .team-logo-wrap, .terrain-link').forEach(function (el) {
+        el.classList.add('hint-animate');
+    });
+}, 5000); // petit délai pour laisser la page se charger visuellement
     
     </script>
 </body>
