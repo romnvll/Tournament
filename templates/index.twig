@@ -247,16 +247,16 @@
  .terrain-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 3px;
     font-size: 0.8rem;
     font-weight: 500;
     text-decoration: none;
     border-radius: 20px;
-    padding: 5px 14px;
+    padding: 5px 8px;
     cursor: pointer;
     background: #222;
     color: white;
-    border: 1.5px solid rgba(255,255,255,0.15);
+    border: 1.0px solid rgba(255,255,255,0.15);
     box-shadow: 0 2px 0 rgba(0,0,0,0.35);
     transition: transform 0.1s, box-shadow 0.1s;
 }
@@ -334,7 +334,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  width: 500%;
 }
 
        /* Dans le @media (min-width: 768px) */
@@ -1433,8 +1433,11 @@
                 <!-- Info Labels -->
                 
                 {% set current_time = "now"|date("H:i") %}
-                
-                {% set labels_to_display = labels|filter(label => label['creneau_horaire'] > current_time) %}
+
+                    {% set labels_to_display = labels|filter(label => 
+                        label['creneau_horaire']|slice(0,5) > current_time 
+                        or label['creneau_horaire']|slice(0,2) < "06"
+                    ) %}
                 
                 {% if labels_to_display|length > 0 or planTournoi is not null %}
                     <div class="info-alert {% if IdEquipe is null %}d-none{% endif %}" id="labels">
@@ -1442,13 +1445,20 @@
                             <i class="fa-solid fa-circle-info"></i>
                             Informations
                         </div>
-                        {% for label in labels_to_display %}
-                            <div class="info-item">
-                                <i class="fa-solid fa-check-circle" style="color: var(--success-color);"></i>
-                                <strong>{{ label['creneau_horaire'] }}</strong>
-                                → {{ label['labels'] }}
-                            </div>
-                        {% endfor %}
+                        {% set labels_grouped = labels_to_display|reduce((carry, label) => 
+                        carry|merge({
+                            (label['labels']): (carry[label['labels']] is defined 
+                                ? carry[label['labels']] ~ ', ' ~ label['creneau_horaire']|slice(0,5)|replace({':': 'h'})
+                                : label['creneau_horaire']|slice(0,5)|replace({':': 'h'}))
+                        }), {}
+                    ) %}
+
+                    {% for labelName, horaires in labels_grouped %}
+                        <div class="info-item">
+                            <i class="fa-solid fa-check-circle" style="color: var(--success-color);"></i>
+                            {{ labelName }} : <strong>{{ horaires }}</strong>
+                        </div>
+                    {% endfor %}
                         
                         {% if planTournoi is defined and planTournoi is not null %}
                             <div style="text-align: center; margin-top: 16px; padding: 12px; background: var(--bg-light); border-radius: 10px;">
