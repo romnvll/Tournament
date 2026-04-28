@@ -10,6 +10,7 @@ require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/licenceDao.class.php';
+require 'class/categorie.class.php';
 require 'Lang/lang.php';
 
 
@@ -40,6 +41,7 @@ $poulemanager = new PouleManager();
 $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
 $licenceDao = new LicenceDAO();
+$categorieDao = new CategorieDao();
 
 
 
@@ -49,7 +51,7 @@ $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
 $terrain = new TerrainDao();
 $planTournoi = null;
-
+$classementFinal = null;
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
   if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
@@ -62,7 +64,12 @@ else {
 }
 
 
-
+if (isset ($_GET['affichageByPoule'])) {
+  $affichageByPoule = true;
+}
+else {
+  $affichageByPoule = null;
+}
 
 
 if (isset ($_GET['affichageByClubs'])) {
@@ -91,8 +98,6 @@ if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
 
 
-
-
 }
 
 else {
@@ -100,6 +105,31 @@ else {
   $listePoulesParEquipe = null;
  
 }
+
+if (isset ($_GET['affichageByCategorie'])) {
+  
+  $affichageByCategorie = true;
+   if (isset ($_GET['idCategorie'])) {
+    
+    
+    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie']);
+    $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
+    
+   }
+
+   else {
+    $RencontreByCategorie = null;
+   }
+}
+else {
+  $affichageByCategorie = null;
+    $RencontreByCategorie = null;
+  }
+
+
+
+
+
 
 
 if (isset ($_GET['id_club'])) {
@@ -130,6 +160,9 @@ foreach ($listeDesEquipesByClubs as $equipe) {
 
 
 //
+
+
+
 $classementFinal = [];
 if (isset($_GET['idCategorie'])) {
     $classementFinal = $poulemanager->getClassementFinal((int)$_GET['id_tournoi'], (int)$_GET['idCategorie']);
@@ -218,15 +251,7 @@ if (isset ($_GET['idPoule'])) {
  }
 
 
- if (isset ($_GET['idCategorie'])) {
-    
-    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie']);
-   
-   }
 
-   else {
-    $RencontreByCategorie = null;
-   }
 
 
 if (isset ($_GET['id_equipe'])) {
@@ -262,6 +287,8 @@ echo $template->render([
     'IdClub' => $idclub,
     'affichageByClubs'=> $affichageByClubs,
     'affichageByTeam' =>$affichageByTeam,
+    'affichageByPoule' => $affichageByPoule,
+    'affichageByCategorie' => $affichageByCategorie,
     'listeDesCLubs' => $listeClubsParticipants,
     'listeDesRencontreByClubs' => $listeDesRencontreByClubs,
     'listeDesEquipesByClubs' =>$listeDesEquipesByClubs,
@@ -272,6 +299,7 @@ echo $template->render([
     'affichageByTerrain' => $listeDesRencontresByTerrain,
     'resultatRencontres'=> $GetResultatDesPoules,
     'getNomClubCourant' => $nomClub,
+    'getCategorieCourante' => $getCategorieCourante ?? null,
     'getNomEquipeCourant' => $equipeNom,
     'logoClub' => $logoClub,
     'labels' => $Labels,

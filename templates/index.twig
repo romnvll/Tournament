@@ -105,6 +105,17 @@
             align-items: center;
             gap: 10px;
         }
+        .clickable-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background-color: #e53935;
+    border-radius: 50%;
+    border: 1.5px solid white;
+    display: block;
+}
 
         /* Selection Lists */
         .selection-item {
@@ -231,6 +242,77 @@
     overflow: hidden;
         }
 
+ .terrain-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 20px;
+    padding: 5px 14px;
+    cursor: pointer;
+    background: #222;
+    color: white;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.terrain-link:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.terrain-num {
+    background: #e63946;
+    color: white;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}  
+
+.team-logo-wrap {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.team-logo {
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.1s;
+}
+
+.team-logo-wrap:active .team-logo {
+    transform: scale(0.92);
+}
+
+.team-logo-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #e63946;
+    color: white;
+    font-weight: 700;
+    font-size: 9px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
        /* Dans le @media (min-width: 768px) */
 @media (min-width: 768px) {
 
@@ -250,9 +332,39 @@
         font-size: 1rem;
     }
 
+    .team-logo-wrap {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.team-logo-wrap:active .team-logo {
+    transform: scale(0.92);
+}
+
+.team-logo-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #e63946;
+    color: white;
+    font-weight: 700;
+    font-size: 9px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
     .team-logo {
-        width: 90px;
-        height: 90px;
+       border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.1s;
     }
 }
 
@@ -265,7 +377,7 @@
         }
 
         .team-name {
-    font-size: clamp(0.6rem, 2vw, 0.9rem); /* réduit automatiquement selon la longueur */
+     font-size: clamp(0.6rem, 2vw, 0.9rem);
     font-weight: 400;
     text-align: center;
     background: var(--bg-dark);
@@ -278,6 +390,17 @@
     overflow-wrap: normal;
     line-height: 1.2;
     display: inline-block;
+ border: 1.5px solid rgba(255,255,255,0.4);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3); /* effet "bouton physique" */
+}
+
+.team-name:active {
+    box-shadow: none;
+    transform: translateY(2px); /* s'enfonce */
+}
+.team-arrow {
+    opacity: 0.6;
+    font-size: 1.1em;
 }
 
         .match-center {
@@ -1111,7 +1234,7 @@
                         {% for equipe in equipesAvecPoule %}
                             {% if equipe.idPoule != null %}
                              
-                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}&idCategorie={{ equipe.idCategorie }}" class="selection-item">
+                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}&idCategorie={{ equipe.idCategorie }}&affichageByCategorie=true" class="selection-item">
                                     <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}; font-size: 1.5rem;"></i>
                                     <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }} 
                                     {% if equipe.nomCoach %}
@@ -1211,6 +1334,12 @@
                         </a>
                     </div>
                 {% endif %} #}
+        
+        {% if idCategorie %}
+                <div class="card-modern">
+                Planning de la catégorie {{ nomCategorie|upper }}
+                </div>
+        {% endif %}
 
  <!-- Ranking -->
 {% if IsRankingView == 1 and IdPoules != null %}
@@ -1370,6 +1499,37 @@
                                 </div>
                             </div>
                         {% endif %}
+
+                            <!-- Titre de la vue courante -->
+                            <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                                    
+                                    {% if affichageByClubs %}
+                                        <i class="fas fa-building" style="color: var(--warning-color);"></i>
+                                        Toutes les rencontres du club <span style="color: var(--primary-color);">{{ getNomClubCourant }}</span>
+
+                                    {% elseif affichageByTeam %}
+                                        <i class="fas fa-users" style="color: var(--primary-color);"></i>
+                                        Toutes les rencontres de l'équipe <span style="color: var(--primary-color);">{{ getNomEquipeCourant }}</span>
+
+                                    {% elseif affichageByPoule %}
+                                        <i class="fas fa-layer-group" style="color: var(--success-color);"></i>
+                                        Toutes les rencontres de la poule <span style="color: var(--success-color);">{{ pouleInfo.nom|upper }}</span>
+
+                                    {% elseif affichageByCategorie %}
+                                        <i class="fas fa-tag" style="color: var(--info-color);"></i>
+                                        Toutes les rencontres de la catégorie <span style="color: var(--info-color);">{{ getCategorieCourante['Nom_categorie']|upper }}</span>
+
+                                    {% elseif affichageByTerrain %}
+                                        <i class="fas fa-map-marker-alt" style="color: var(--danger-color);"></i>
+                                        Toutes les rencontres du terrain <span style="color: var(--danger-color);">{{ listeDesRencontresByTerrain[0]["terrain_nom"] }}</span>
+
+                                    {% endif %}
+                                </div>
+                            </div>
+
+<div id="score">
+
                 <!-- Matches List -->
                 <div id="score">
                     {% if affichageByClubs %}
@@ -1383,19 +1543,33 @@
                     {% elseif IdPoules %}
                         {% set rencontres = RencontreByPoule %}
                     {% endif %}
-                    
+                                       
                     {% for equipe in rencontres %}
                        
                         <div class="match-card {% if equipe.score1 != 0 or equipe.score2 != 0 %}finished{% endif %}">
                             <div class="match-header">
+                           
                                 <!-- Team 1 -->
                                 <div class="team-side">
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true">
-                                        <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
+                                
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                    <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
+                                    <span class="team-logo-badge">›</span>
+                                
+                                </a>
+                                   {% if affichageByClubs %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByClubs=true" class="team-name">
+                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&affichageByTeam=true" class="team-name">
-                                        {{ equipe.equipe1_nom|upper }}
+                                    {% elseif affichageByTerrain %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                    </a> 
+                                    {% else %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
+                                    {% endif %}
                                     
                                     {% if equipe.equipe1_coach_nom %}
                                         <div class="coach-info">
@@ -1434,66 +1608,87 @@
                                         {% endif %}
                                     </div>
 
-                                    {% if nbrTerrains > 1 and equipe.terrain_nom %}
-                                        <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true" class="match-terrain">
-                                            <i class="fas fa-map-marker-alt"></i> {{ equipe.terrain_nom }}
-                                        </a>
-                                    {% endif %}
+                                   <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true" 
+                                    class="terrain-link">
+                                    📍 Terrain <span class="terrain-num">{{ equipe.terrain_nom }}</span>
+                                    </a>
                                 </div>
 
                                 <!-- Team 2 -->
-                                <div class="team-side">
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true">
-                                        <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
+                               <div class="team-side">
+                                
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                    <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
+                                    <span class="team-logo-badge">›</span>
+                                
+                                </a>
+                                   {% if affichageByClubs %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByClubs=true" class="team-name">
+                                        {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&affichageByTeam=true" class="team-name">
-                                        {{ equipe.equipe2_nom|upper }}
+                                    {% elseif affichageByTerrain %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                    </a> 
+                                    {% else %}
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&idPoule={{ equipe.equipe2_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                                     </a>
+                                    {% endif %}
+                                    
                                     {% if equipe.equipe2_coach_nom %}
                                         <div class="coach-info">
                                             <i class="fas fa-clipboard-user"></i>
                                             <span>{{ equipe.equipe2_coach_nom|upper }}</span>
                                         </div>
-                                        {% else %}
+                                    {% else %}
                                     <div class="coach-info">
                                             <i class="fas fa-clipboard-user"></i>
-                                            
-                                        </div>
-                                    
+                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <div class="match-details">
-                                <div class="detail-row">
-                                    
-                                    {% if equipe.type_rencontre_id == 4 %}
-                                        <span class="match-category" style="background-color: #ffc107; color: #212529;">
-                                            <i class="fa fa-star"></i>Rencontre amicale
-                                        </span>
-                                    {% else %}
-                                    
-                                    <span class="match-category" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
-                                        {{ equipe.equipe2_categorie_nom }}
-                                    </span>
-                                        {% endif %}
-                                    {% if equipe.isTerminated == 0 %}
-                                        <span class="match-status status-pending">
-                                            <i class="fas fa-clock"></i>
-                                            À venir
-                                        </span>
-                                    {% elseif equipe.isTerminated == 1 %}
-                                        <span class="match-status status-finished">
-                                            <i class="fas fa-check-circle"></i>
-                                            Terminée
-                                        </span>
-                                    {% elseif equipe.isTerminated == 2 %}
-                                        <span class="match-status status-ongoing">
-                                            <span class="spinner-grow spinner-grow-sm"></span>
-                                            En cours
-                                        </span>
-                                    {% endif %}
-                                </div>
+            <div class="detail-row">
+        
+                {% if equipe.type_rencontre_id == 4 %}
+                    <span class="match-category" style="background-color: #ffc107; color: #212529;">
+                        <i class="fa fa-star"></i>Rencontre amicale
+                    </span>
+                {% else %}
+                
+                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ equipe.club1_id }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByCategorie=true" style="position: relative; display: inline-block;"> 
+                    <span class="match-category team-name" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
+                        {{ equipe.equipe2_categorie_nom }}
+                    </span>
+                    <span class="clickable-badge"></span>
+                </a>
+
+                {% if equipe.equipe1_poules_ids %}
+                <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&id_club={{IdClub}}&affichageByPoule=true" style="position: relative; display: inline-block;">
+                    <span class="match-category team-name" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
+                        {{ equipe.equipe1_poules|split(' - ')[1]|split(',')[0] }}
+                    </span>
+                    <span class="clickable-badge"></span>
+                </a>
+                {% endif %}
+                {% endif %}
+
+                {% if equipe.isTerminated == 0 %}
+                    <span class="match-status status-pending">
+                        <i class="fas fa-clock"></i> À venir
+                    </span>
+                {% elseif equipe.isTerminated == 1 %}
+                    <span class="match-status status-finished">
+                        <i class="fas fa-check-circle"></i> Terminée
+                    </span>
+                {% elseif equipe.isTerminated == 2 %}
+                    <span class="match-status status-ongoing">
+                        <span class="spinner-grow spinner-grow-sm"></span> En cours
+                    </span>
+                {% endif %}
+            </div>
 
                                 {% if gestionArbitres == 1 and (equipe.arbitre_nom or equipe.arbitre_club_nom) %}
                                     <div class="detail-row">

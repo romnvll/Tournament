@@ -1211,6 +1211,22 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
             club1.id AS club1_id,
             club1.nom AS club1_nom,
             club1.logo AS club1_logo,
+
+            (
+                SELECT GROUP_CONCAT(pou.nom SEPARATOR ', ')
+                FROM EquipePoule ep
+                JOIN Poules pou ON ep.poule_id = pou.id
+                WHERE ep.equipe_id = equipe1.id
+                  AND pou.tournoi_id = r.tournoi_id
+            ) AS equipe1_poules,
+
+            (
+                SELECT GROUP_CONCAT(pou.id SEPARATOR ', ')
+                FROM EquipePoule ep
+                JOIN Poules pou ON ep.poule_id = pou.id
+                WHERE ep.equipe_id = equipe1.id
+                  AND pou.tournoi_id = r.tournoi_id
+            ) AS equipe1_poules_ids,
             
             equipe2.id AS equipe2_id,
             equipe2.isPresent AS equipe2_isPresent,
@@ -1219,6 +1235,22 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
             club2.id AS club2_id,
             club2.nom AS club2_nom,
             club2.logo AS club2_logo,
+
+            (
+                SELECT GROUP_CONCAT(pou.nom SEPARATOR ', ')
+                FROM EquipePoule ep
+                JOIN Poules pou ON ep.poule_id = pou.id
+                WHERE ep.equipe_id = equipe2.id
+                  AND pou.tournoi_id = r.tournoi_id
+            ) AS equipe2_poules,
+
+            (
+                SELECT GROUP_CONCAT(pou.id SEPARATOR ', ')
+                FROM EquipePoule ep
+                JOIN Poules pou ON ep.poule_id = pou.id
+                WHERE ep.equipe_id = equipe2.id
+                  AND pou.tournoi_id = r.tournoi_id
+            ) AS equipe2_poules_ids,
 
             cat1.Nom_categorie AS equipe1_categorie_nom,
             cat1.id_categorie AS equipe1_categorie_id,
@@ -1256,30 +1288,22 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
                 ELSE 0 
             END AS equipe2_has_phase_finale
 
-        FROM 
-            Rencontres r
-        JOIN 
-            Equipes equipe1 ON r.equipe1_id = equipe1.id
-        JOIN 
-            Clubs club1 ON equipe1.club_id = club1.id
-        LEFT JOIN 
-            Categorie cat1 ON equipe1.categorie = cat1.id_categorie
-        JOIN 
-            Equipes equipe2 ON r.equipe2_id = equipe2.id
-        JOIN 
-            Clubs club2 ON equipe2.club_id = club2.id
-        LEFT JOIN 
-            Categorie cat2 ON equipe2.categorie = cat2.id_categorie
-        LEFT JOIN 
-            Planification p ON r.id = p.rencontre_id
-        LEFT JOIN 
-            Creneaux c ON p.creneau_id = c.creneau_id
-        LEFT JOIN 
-            Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN 
-            Arbitres a ON p.arbitre_id = a.arbitre_id
-        LEFT JOIN 
-            Clubs clubArbitre ON a.club_id = clubArbitre.id
+        FROM Rencontres r
+
+        JOIN Equipes equipe1 ON r.equipe1_id = equipe1.id
+        JOIN Clubs club1 ON equipe1.club_id = club1.id
+        LEFT JOIN Categorie cat1 ON equipe1.categorie = cat1.id_categorie
+
+        JOIN Equipes equipe2 ON r.equipe2_id = equipe2.id
+        JOIN Clubs club2 ON equipe2.club_id = club2.id
+        LEFT JOIN Categorie cat2 ON equipe2.categorie = cat2.id_categorie
+
+        LEFT JOIN Planification p ON r.id = p.rencontre_id
+        LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
+
+        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN Clubs clubArbitre ON a.club_id = clubArbitre.id
 
         WHERE 
             r.type_rencontre_id = :typeRencontreId
@@ -1288,7 +1312,7 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
             $additionalCondition
 
         ORDER BY 
-            $orderBy;
+            $orderBy
     ";
     
     $stmt = $this->connexion->prepare($query);
@@ -1842,86 +1866,108 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
     
 
     function afficherRencontreByTournoiByEquipe(int $idTournoi, int $id_equipe)
-    {
-        $query = "
-            SELECT 
-                r.id AS rencontre_id,
-                r.tour AS tour,
-                p.terrain_id,
-                t.nom AS terrain_nom,
-                p.creneau_id,
-                c.nom AS creneau_nom,
-                
-                equipe1.id AS equipe1_id,
-                equipe1.nom AS equipe1_nom,
-                equipe1.nomCoach AS equipe1_coach_nom,
-                club1.id AS club1_id,
-                club1.nom AS club1_nom,
-                
-                club1.logo AS club1_logo,
-                cat1.id_categorie AS equipe1_categorie_id,
-                cat1.Nom_categorie AS equipe1_categorie_nom,
-                cat1.Couleur AS equipe1_categorie_couleur,
-                
-                equipe2.id AS equipe2_id,
-                equipe2.nom AS equipe2_nom,
-                equipe2.nomCoach AS equipe2_coach_nom,
-                club2.id AS club2_id,
-                club2.nom AS club2_nom,
-                
-                club2.logo AS club2_logo,
-                cat2.id_categorie AS equipe2_categorie_id,
-                cat2.Nom_categorie AS equipe2_categorie_nom,
-                cat2.Couleur AS equipe2_categorie_couleur,
-                
-                r.score1,
-                r.score2,
-                r.type_rencontre_id,
-                r.isTerminated,
-    
-                 
-                a.nom AS arbitre_nom,
-                clubArbitre.nom AS arbitre_club_nom
-    
-            FROM 
-                Rencontres r
-            JOIN 
-                Equipes equipe1 ON r.equipe1_id = equipe1.id
-            JOIN 
-                Clubs club1 ON equipe1.club_id = club1.id
-            JOIN 
-                Categorie cat1 ON equipe1.categorie = cat1.id_categorie
-            JOIN 
-                Equipes equipe2 ON r.equipe2_id = equipe2.id
-            JOIN 
-                Clubs club2 ON equipe2.club_id = club2.id
-            JOIN 
-                Categorie cat2 ON equipe2.categorie = cat2.id_categorie
-            LEFT JOIN 
-                Planification p ON r.id = p.rencontre_id
-            LEFT JOIN 
-                Creneaux c ON p.creneau_id = c.creneau_id
-            LEFT JOIN 
-                Terrains t ON p.terrain_id = t.terrain_id
+{
+    $query = "
+        SELECT 
+            r.id AS rencontre_id,
+            r.tour AS tour,
+            p.terrain_id,
+            t.nom AS terrain_nom,
+            p.creneau_id,
+            c.nom AS creneau_nom,
             
-            LEFT JOIN 
-                Arbitres a ON p.arbitre_id = a.arbitre_id
-            LEFT JOIN 
-                Clubs clubArbitre ON a.club_id = clubArbitre.id
-            WHERE 
-                (equipe1.id = :id_equipe OR equipe2.id = :id_equipe)
-                AND (equipe1.tournoi_id = :idTournoi OR equipe2.tournoi_id = :idTournoi)
-                AND p.creneau_id IS NOT NULL
-            ORDER BY 
-                p.creneau_id, r.tour;
-        ";
-    
-        $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
-        $stmt->bindValue(':id_equipe', $id_equipe, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+            equipe1.id AS equipe1_id,
+            equipe1.nom AS equipe1_nom,
+            equipe1.nomCoach AS equipe1_coach_nom,
+            club1.id AS club1_id,
+            club1.nom AS club1_nom,
+            club1.logo AS club1_logo,
+            cat1.id_categorie AS equipe1_categorie_id,
+            cat1.Nom_categorie AS equipe1_categorie_nom,
+            cat1.Couleur AS equipe1_categorie_couleur,
+            
+            (
+    SELECT GROUP_CONCAT(pou.nom SEPARATOR ', ')
+    FROM EquipePoule ep
+    JOIN Poules pou ON ep.poule_id = pou.id
+    WHERE ep.equipe_id = equipe1.id
+      AND pou.tournoi_id = :idTournoi
+) AS equipe1_poules,
+
+(
+    SELECT GROUP_CONCAT(pou.id SEPARATOR ', ')
+    FROM EquipePoule ep
+    JOIN Poules pou ON ep.poule_id = pou.id
+    WHERE ep.equipe_id = equipe1.id
+      AND pou.tournoi_id = :idTournoi
+) AS equipe1_poules_ids,
+            
+            equipe2.id AS equipe2_id,
+            equipe2.nom AS equipe2_nom,
+            equipe2.nomCoach AS equipe2_coach_nom,
+            club2.id AS club2_id,
+            club2.nom AS club2_nom,
+            club2.logo AS club2_logo,
+            cat2.id_categorie AS equipe2_categorie_id,
+            cat2.Nom_categorie AS equipe2_categorie_nom,
+            cat2.Couleur AS equipe2_categorie_couleur,
+            
+         (
+    SELECT GROUP_CONCAT(pou.nom SEPARATOR ', ')
+    FROM EquipePoule ep
+    JOIN Poules pou ON ep.poule_id = pou.id
+    WHERE ep.equipe_id = equipe2.id
+      AND pou.tournoi_id = :idTournoi
+) AS equipe2_poules,
+
+(
+    SELECT GROUP_CONCAT(pou.id SEPARATOR ', ')
+    FROM EquipePoule ep
+    JOIN Poules pou ON ep.poule_id = pou.id
+    WHERE ep.equipe_id = equipe2.id
+      AND pou.tournoi_id = :idTournoi
+) AS equipe2_poules_ids,
+
+            r.score1,
+            r.score2,
+            r.type_rencontre_id,
+            r.isTerminated,
+
+            a.nom AS arbitre_nom,
+            clubArbitre.nom AS arbitre_club_nom
+
+        FROM Rencontres r
+
+        JOIN Equipes equipe1 ON r.equipe1_id = equipe1.id
+        JOIN Clubs club1 ON equipe1.club_id = club1.id
+        JOIN Categorie cat1 ON equipe1.categorie = cat1.id_categorie
+
+        JOIN Equipes equipe2 ON r.equipe2_id = equipe2.id
+        JOIN Clubs club2 ON equipe2.club_id = club2.id
+        JOIN Categorie cat2 ON equipe2.categorie = cat2.id_categorie
+
+        LEFT JOIN Planification p ON r.id = p.rencontre_id
+        LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
+        LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
+
+        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN Clubs clubArbitre ON a.club_id = clubArbitre.id
+
+        WHERE 
+            (equipe1.id = :id_equipe OR equipe2.id = :id_equipe)
+            AND (equipe1.tournoi_id = :idTournoi OR equipe2.tournoi_id = :idTournoi)
+            AND p.creneau_id IS NOT NULL
+
+        ORDER BY p.creneau_id, r.tour
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->bindValue(':id_equipe', $id_equipe, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
     
 
     function rencontreExisteDeja($equipe1Id, $equipe2Id)
