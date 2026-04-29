@@ -1998,66 +1998,67 @@
 </div>
 {% endif %}
 <!-- fin phase finale -->
+ {% if RencontreByCategoriePhaseFinale is not empty %} 
+                {% set pouleEnCours = null %}
+                {% set classement = 0 %}
+                {% set rang = 0 %}  {# ← compteur global, jamais remis à 0 #}
 
-        {% set pouleEnCours = null %}
-        {% set classement = 0 %}
-        {% set rang = 0 %}  {# ← compteur global, jamais remis à 0 #}
-
-        <div class="table-responsive" id="classementTableauFinal">
-            <table class="table table-hover align-middle mb-0 w-100 rounded">
-                <thead>
-                    <tr class="table-light">
-                        <th>#</th>
-                        <th>Équipe</th>
-                        <th class="text-center" style="width: 70px;">Pts</th>
-                        <th class="text-center" style="width: 50px;">+</th>
-                        <th class="text-center" style="width: 50px;">-</th>
-                        <th class="text-center" style="width: 60px;">Diff</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for resultat in classementFinal %}
-
-                        {# Séparateur entre chaque poule de classement #}
-                        {% if pouleEnCours != resultat.poule_nom %}
-                            {% set pouleEnCours = resultat.poule_nom %}
-                            {% set classement = 0 %}
-                            <tr>
-                                <td colspan="6" class="text-center fw-bold py-2"
-                                    style="background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; letter-spacing: 0.05em;">
-                                    <i class="fas fa-medal me-2"></i>{{ pouleEnCours }}
-                                </td>
+                <div class="table-responsive" id="classementTableauFinal">
+                    <table class="table table-hover align-middle mb-0 w-100 rounded">
+                        <thead>
+                            <tr class="table-light">
+                                <th>#</th>
+                                <th>Équipe</th>
+                                <th class="text-center" style="width: 70px;">Pts</th>
+                                <th class="text-center" style="width: 50px;">+</th>
+                                <th class="text-center" style="width: 50px;">-</th>
+                                <th class="text-center" style="width: 60px;">Diff</th>
                             </tr>
-                        {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for resultat in classementFinal %}
 
-                         {% set rang = rang + 1 %}
-                        <tr>
-                            <td class="fw-bold fs-5">{{ rang }}.</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ resultat.club_logo }}"
-                                         class="rounded-circle"
-                                         style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;"
-                                         alt="logo"
-                                         loading="lazy">
-                                    <span class="fw-semibold">{{ resultat.nom|upper }}</span>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge rounded-pill"
-                                      style="background-color: var(--warning-color); font-size: 0.9rem; padding: 6px 12px;">
-                                    {{ resultat.TotalDesPoints }}
-                                </span>
-                            </td>
-                            <td class="text-center fw-semibold">{{ resultat.nombreButsMarque }}</td>
-                            <td class="text-center fw-semibold">{{ resultat.nombreButsEncaisse }}</td>
-                            <td class="text-center fw-semibold">{{ resultat.DifferenceButs }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                                {# Séparateur entre chaque poule de classement #}
+                                {% if pouleEnCours != resultat.poule_nom %}
+                                    {% set pouleEnCours = resultat.poule_nom %}
+                                    {% set classement = 0 %}
+                                    <tr>
+                                        <td colspan="6" class="text-center fw-bold py-2"
+                                            style="background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; letter-spacing: 0.05em;">
+                                            <i class="fas fa-medal me-2"></i>{{ pouleEnCours }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                                {% set rang = rang + 1 %}
+                                <tr>
+                                    <td class="fw-bold fs-5">{{ rang }}.</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="{{ resultat.club_logo }}"
+                                                class="rounded-circle"
+                                                style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;"
+                                                alt="logo"
+                                                loading="lazy">
+                                            <span class="fw-semibold">{{ resultat.nom|upper }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill"
+                                            style="background-color: var(--warning-color); font-size: 0.9rem; padding: 6px 12px;">
+                                            {{ resultat.TotalDesPoints }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-semibold">{{ resultat.nombreButsMarque }}</td>
+                                    <td class="text-center fw-semibold">{{ resultat.nombreButsEncaisse }}</td>
+                                    <td class="text-center fw-semibold">{{ resultat.DifferenceButs }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    {% endif %}
 {% endif %}
 
             {% endif %}
