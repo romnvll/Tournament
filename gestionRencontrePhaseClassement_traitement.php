@@ -28,6 +28,8 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
 
     if ($categorieId && $idTournoi) {
         $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
+        
+       
     }
 
     header("Location: " . $_SERVER['HTTP_REFERER']);

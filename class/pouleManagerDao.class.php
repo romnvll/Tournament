@@ -31,8 +31,8 @@ class PouleManager {
         $query = "INSERT INTO Poules (nom, tournoi_id, fk_idcategorie, is_classement) VALUES (:nom, :idTournoi, :fk_idcategorie, :is_classement)";
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':nom', $nomPoule);
-        $stmt->bindValue(':idTournoi', $idTournoi);
-        $stmt->bindValue(':fk_idcategorie', $categorie);
+        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->bindValue(':fk_idcategorie', $categorie, PDO::PARAM_INT);
         $stmt->bindValue(':is_classement', $is_classement, PDO::PARAM_INT);
         $stmt->execute();
     
@@ -42,16 +42,16 @@ class PouleManager {
     
     
 
-    public function getPouleById($idPoule) {
+    public function getPouleById(int $idPoule) {
         $query = "SELECT * FROM Poules WHERE id = :id";
         $stmt = $this->connexion->prepare($query);
-        $stmt->bindValue(':id', $idPoule);
+        $stmt->bindValue(':id', $idPoule, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
 
-  public function checkRencontresInPoule($idPoule, $typeRencontreId = TYPE_RENCONTRE_POULE) {
+  public function checkRencontresInPoule(int $idPoule, int $typeRencontreId = TYPE_RENCONTRE_POULE) {
     $query = "SELECT COUNT(*) as count FROM Rencontres r
               JOIN EquipePoule ep ON r.equipe1_id = ep.equipe_id OR r.equipe2_id = ep.equipe_id
               WHERE ep.poule_id = :id AND r.type_rencontre_id = :typeRencontreId";
@@ -462,7 +462,7 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     
     
 
-    public function getAllPoulesFinalesByTournoi($idTournoi) {
+    public function getAllPoulesFinalesByTournoi(int $idTournoi) {
     $query = "
         SELECT p.*, c.Nom_categorie
         FROM Poules p
@@ -480,7 +480,7 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
 }
 
 
-   public function getEquipesInPoule($idPoule) {
+   public function getEquipesInPoule(int $idPoule) {
   
     $query = "SELECT
                 e.id,

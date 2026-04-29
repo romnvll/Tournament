@@ -99,11 +99,12 @@ usort($poulesFinales, function($a, $b) {
 });
 foreach ($poulesFinales as &$poule) {
   $poule['contenu'] = $poulemanager->getEquipesInPoule($poule['id']);
-  $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],1);
+  $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],3);
+  
 }
 
 
-//Savoir si une poule contient des rencontre
+//Savoir si une poule contient des rencontres
 if (isset ($_GET['idPoule'])) {
   $idPoule = $_GET['idPoule'];
 $pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);

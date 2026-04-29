@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
         foreach ($_POST['ordre_categories'] as $catId => $ordre) {
             $categorieDao->mettreAJourOrdrePlacement((int)$catId, (int)$ordre);
         }
-        // Recharger les catégories avec le nouvel ordre
         $categories = $categorieDao->obtenirCategoriesDuTournoi($idTournoi);
     }
 
@@ -73,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
 
     $contraintesTerrain['garder_arbitres']                   = isset($_POST['garder_arbitres']) ? 1 : 0;
     $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']);
+    $contraintesTerrain['une_categorie_par_creneau']         = isset($_POST['une_categorie_par_creneau']) ? 1 : 0;
 
     $_SESSION[$sessionKey] = $contraintesTerrain;
     header("Location: PlacementAutomatique.php?id_tournoi={$idTournoi}&contraintes_ok=1");
@@ -96,12 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
     } else {
 
         // ── 1. Trier les rencontres ──────────────────────────────────────────
-        // Tour ASC → ordrePlacementAuto ASC (NULL en dernier) → poule
-        // Les phases finales sont toujours placées en tout dernier.
         usort($rencontresAP, function ($a, $b) {
             // Phases finales en dernier
-            $afinal = ($a['phase_finale_id'] !== null) ? 1 : 0;
-            $bfinal = ($b['phase_finale_id'] !== null) ? 1 : 0;
+            $afinal = ($a['phase_finale_id'] !== null && $a['phase_finale_id'] !== '' || (int)($a['type_rencontre_id'] ?? 0) === 3) ? 1 : 0;
+            $bfinal = ($b['phase_finale_id'] !== null && $b['phase_finale_id'] !== '' || (int)($b['type_rencontre_id'] ?? 0) === 3) ? 1 : 0;
             if ($afinal !== $bfinal) return $afinal - $bfinal;
 
             // Tour ASC
@@ -116,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 ? (int)$b['equipe1_categorie_ordre'] : null;
 
             if ($ordreA === null && $ordreB === null) {
-                // Fallback alphabétique si aucun ordre défini
                 return strcmp($a['equipe1_categorie_nom'] ?? '', $b['equipe1_categorie_nom'] ?? '');
             }
             if ($ordreA === null) return 1;
@@ -174,25 +171,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             }
         }
 
-        // Recharger après suppression des labels
         $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
 
         // ── 4. Initialiser la grille ─────────────────────────────────────────
-        $grid              = [];
-        $equipesByCreneau  = [];
-        $arbitresByCreneau = [];
-
+        $grid                = [];
+        $equipesByCreneau    = [];
+        $arbitresByCreneau   = [];
+        $categorieByCreneau  = []; // catégorie occupant le créneau (contrainte 1 cat/créneau)
+        $rencontresByCreneau = []; // [cid][catId] = nb rencontres placées sur ce créneau
+        $tourByCreneau = []; // tour occupant le créneau
+        $phaseFinaleByCreneau = []; // true si le créneau contient une phase finale
+        
         foreach ($listCreneaux as $cr) {
             $cid = $cr['creneau_id'];
-            $grid[$cid]              = [];
-            $equipesByCreneau[$cid]  = [];
-            $arbitresByCreneau[$cid] = [];
+            $grid[$cid]               = [];
+            $equipesByCreneau[$cid]   = [];
+            $arbitresByCreneau[$cid]  = [];
+            $categorieByCreneau[$cid] = null;
+            $rencontresByCreneau[$cid] = [];
+            $tourByCreneau[$cid] = null;
             foreach ($terrains as $t) {
                 $grid[$cid][$t['terrain_id']] = false;
             }
         }
 
-        // Enregistrer les arbitres déjà présents pour contrainte d'unicité
+        // Enregistrer les arbitres déjà présents
         foreach ($planificationsRestantes as $p) {
             $cid = $p['creneau_id'];
             if (!isset($arbitresByCreneau[$cid])) $arbitresByCreneau[$cid] = [];
@@ -201,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             }
         }
 
-        // Recréer les arbitres sauvegardés sur leurs créneaux d'origine
+        // Recréer les arbitres sauvegardés
         foreach ($arbitresSauvegardes as $arb) {
             $cid = $arb['creneau_id'];
             $tid = $arb['terrain_id'];
@@ -220,9 +223,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 $newCreneau   = end($listCreneaux);
                 $cid          = $newCreneau['creneau_id'];
 
-                $grid[$cid]              = [];
-                $equipesByCreneau[$cid]  = [];
-                $arbitresByCreneau[$cid] = [];
+                $grid[$cid]                = [];
+                $equipesByCreneau[$cid]    = [];
+                $arbitresByCreneau[$cid]   = [];
+                $categorieByCreneau[$cid]  = null;
+                $rencontresByCreneau[$cid] = [];
                 foreach ($terrains as $t) {
                     $grid[$cid][$t['terrain_id']] = false;
                 }
@@ -234,8 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             $arbitresByCreneau[$cid][] = $aid;
         }
 
-        $lastCreneau = $listCreneaux[array_key_last($listCreneaux)];
-        $pasHoraire  = (int)($tournoiInfo['pasHoraire'] ?? 30);
+        $lastCreneau  = $listCreneaux[array_key_last($listCreneaux)];
+        $pasHoraire   = (int)($tournoiInfo['pasHoraire'] ?? 30);
+        $uneCategorie = !empty($contraintesTerrain['une_categorie_par_creneau']);
 
         // ── 5. Placer chaque rencontre ───────────────────────────────────────
         foreach ($rencontresAP as $rencontre) {
@@ -244,10 +250,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             $eq2    = isset($rencontre['equipe2_id'])           ? (int)$rencontre['equipe2_id']           : null;
             $arb    = isset($rencontre['Arbitre'])              ? (int)$rencontre['Arbitre']              : null;
             $catId  = isset($rencontre['equipe1_categorie_id']) ? (int)$rencontre['equipe1_categorie_id'] : null;
-
+             $tourRencontre = isset($rencontre['tour']) ? (int)$rencontre['tour'] : null;
+            $estPhaseFinale = ($rencontre['phase_finale_id'] !== null && $rencontre['phase_finale_id'] !== '')               || (int)($rencontre['type_rencontre_id'] ?? 0) === 3; // ← ligne ajoutée
             $terrainsAutorises = ($catId !== null && isset($contraintesTerrain[$catId]))
                 ? $contraintesTerrain[$catId]
                 : null;
+
+            // Nb max de rencontres de cette catégorie par créneau = nb terrains autorisés
+            $nbTerrainsDispos = $terrainsAutorises !== null ? count($terrainsAutorises) : count($terrains);
 
             for ($ci = 0; $ci < count($listCreneaux); $ci++) {
                 $creneau = $listCreneaux[$ci];
@@ -257,6 +267,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 if ($eq2 && in_array($eq2, $equipesByCreneau[$cid] ?? [], true)) continue;
                 if ($arb && in_array($arb, $arbitresByCreneau[$cid] ?? [], true)) continue;
 
+                if ($uneCategorie) {
+                        if ($categorieByCreneau[$cid] !== null && $categorieByCreneau[$cid] !== $catId) continue;
+
+                        $estPhaseFinale = ($rencontre['phase_finale_id'] !== null && $rencontre['phase_finale_id'] !== '')
+                                    || (int)($rencontre['type_rencontre_id'] ?? 0) === 3;
+
+                        // Phase finale ne peut pas aller sur un créneau avec des rencontres normales
+                        if ($estPhaseFinale && $tourByCreneau[$cid] !== null) continue;
+
+                        // Rencontre normale ne peut pas aller sur un créneau avec des phases finales
+                        if (!$estPhaseFinale && $phaseFinaleByCreneau[$cid]) continue;
+
+                        if (!$estPhaseFinale && $tourByCreneau[$cid] !== null && $tourRencontre !== null && $tourByCreneau[$cid] !== $tourRencontre) continue;
+
+                        $nbDejaPlaces = $rencontresByCreneau[$cid][$catId] ?? 0;
+                        if ($nbDejaPlaces >= $nbTerrainsDispos) continue;
+                    }
+
                 foreach ($terrains as $terrain) {
                     $tid = $terrain['terrain_id'];
                     if ($terrainsAutorises !== null && !in_array($tid, $terrainsAutorises, true)) continue;
@@ -264,7 +292,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
 
                     // Placement trouvé
                     $planificationDao->ajouterOuModifierPlanification($tid, $cid, $rencontre['id'], $idTournoi);
-                    $grid[$cid][$tid] = true;
+                    $grid[$cid][$tid]          = true;
+                    $categorieByCreneau[$cid]  = $catId;
+                    $tourByCreneau[$cid]      = $tourRencontre; // ← ajouter
+                    $phaseFinaleByCreneau[$cid]  = $estPhaseFinale; // ← ajouter
+                    $rencontresByCreneau[$cid][$catId] = ($rencontresByCreneau[$cid][$catId] ?? 0) + 1;
                     if ($eq1) $equipesByCreneau[$cid][]  = $eq1;
                     if ($eq2) $equipesByCreneau[$cid][]  = $eq2;
                     if ($arb) $arbitresByCreneau[$cid][] = $arb;
@@ -286,9 +318,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 $lastCreneau  = $newCreneau;
                 $newCid       = $newCreneau['creneau_id'];
 
-                $grid[$newCid]              = [];
-                $equipesByCreneau[$newCid]  = [];
-                $arbitresByCreneau[$newCid] = [];
+                $grid[$newCid]               = [];
+                $equipesByCreneau[$newCid]   = [];
+                $arbitresByCreneau[$newCid]  = [];
+                $categorieByCreneau[$newCid] = null;
+                $rencontresByCreneau[$newCid] = [];
+                $phaseFinaleByCreneau[$newCid] = false;
                 foreach ($terrains as $t) {
                     $grid[$newCid][$t['terrain_id']] = false;
                 }
@@ -304,7 +339,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
                 $tid = $terrainChoisi['terrain_id'];
 
                 $planificationDao->ajouterOuModifierPlanification($tid, $newCid, $rencontre['id'], $idTournoi);
-                $grid[$newCid][$tid] = true;
+                $grid[$newCid][$tid]          = true;
+                $categorieByCreneau[$newCid]  = $catId;
+                $tourByCreneau[$newCid]      = $tourRencontre;
+                $phaseFinaleByCreneau[$newCid] = $estPhaseFinale; // ← ajouter
+                $rencontresByCreneau[$newCid][$catId] = 1;
                 if ($eq1) $equipesByCreneau[$newCid][]  = $eq1;
                 if ($eq2) $equipesByCreneau[$newCid][]  = $eq2;
                 if ($arb) $arbitresByCreneau[$newCid][] = $arb;

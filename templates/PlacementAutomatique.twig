@@ -541,6 +541,18 @@
                         </label>
                     </div>
 
+                    <div class="option-checkbox-row">
+                        <input type="checkbox"
+                            id="uneCategorieCreneau"
+                            name="une_categorie_par_creneau"
+                            value="1"
+                            {% if contraintesTerrain.une_categorie_par_creneau is defined and contraintesTerrain.une_categorie_par_creneau == 1 %}checked{% endif %}>
+                        <label for="uneCategorieCreneau">
+                            <i class="bi bi-layers" style="color:var(--info-color)"></i>
+                            1 catégorie par créneau (évite de mélanger les catégories sur un même horaire)
+                        </label>
+                    </div>
+
                     <button type="submit" class="modern-btn btn-save">
                         <i class="bi bi-floppy"></i> Enregistrer les contraintes
                     </button>
