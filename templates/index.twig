@@ -103,7 +103,7 @@
             }
 
             .hint-animate {
-                animation: hintPulse 0.6s ease-out 2;
+                animation: hintPulse 0.6s ease-out 4;
             }
 
         .card-header-modern {
@@ -348,6 +348,51 @@
   width: 500%;
 }
 
+
+
+/* ── Phase Finale ─────────────────────────────────────────── */
+.phase-finale-time-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--danger-color), #dc2626);
+    color: #fff;
+    font-weight: 700;
+    font-size: .8rem;
+    padding: .3rem .85rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: .03em;
+}
+
+/* ── Match card ───────────────────────────────────────────── */
+.match-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow .2s ease, transform .2s ease;
+}
+.match-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,.1);
+    transform: translateY(-2px);
+}
+.match-card--terminated {
+    border-color: var(--danger-color, #ef4444);
+}
+
+
+
+
+.phase-finale-poule {
+    font-size: .68rem;
+    color: var(--danger-color, #ef4444);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 110px;
+}
+
+
        /* Dans le @media (min-width: 768px) */
 @media (min-width: 768px) {
 
@@ -570,53 +615,10 @@
             padding: 0 16px;
         }
 
-        .ranking-row:last-child {
-            border-bottom: none;
-        }
+     
 
-        .ranking-row {
-            display: grid;
-            grid-template-columns: 40px 1fr 50px 40px 40px 45px;
-            gap: 10px;
-            padding: 12px 8px;
-            border-bottom: 1px solid #e5e7eb;
-            align-items: center;
-            font-size: 0.9rem;
-        }
 
-        .ranking-team {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .ranking-logo {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .ranking-team span {
-            font-weight: 600;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            line-height: 1.2;
-        }
-
-        .ranking-points {
-            background: var(--warning-color);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
+        
         .coach-tag {
     display: inline-flex;
     align-items: center;
@@ -1180,19 +1182,24 @@
                 {% if idclub is not null or idIdPoules is not null or IdEquipe is not null %}
                      <div class="card-modern organisateur-info">
             <div class="organisateur-content">
-                <span class="organisateur-label">
-                    <i class="fas fa-trophy"></i>
-                    Tournoi organisé par
-                </span>
-                <div class="organisateur-club">
-                    {% if infoTournoiEnCours.logo_club %}
-                        <img src="{{ infoTournoiEnCours.logo_club }}" 
-                             alt="{{ infoTournoiEnCours.nom_club }}" 
-                             loading="lazy" 
-                             class="organisateur-logo">
-                    {% endif %}
-                    <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
-                </div>
+                <a href="index.php?id_tournoi={{ infoTournoiEnCours.id }}" 
+                style="text-decoration: none; color: inherit; display: block;">
+                    <div class="organisateur-content">
+                        <span class="organisateur-label">
+                            <i class="fas fa-trophy"></i>
+                            Tournoi organisé par
+                        </span>
+                        <div class="organisateur-club">
+                            {% if infoTournoiEnCours.logo_club %}
+                                <img src="{{ infoTournoiEnCours.logo_club }}" 
+                                    alt="{{ infoTournoiEnCours.nom_club }}" 
+                                    loading="lazy" 
+                                    class="organisateur-logo">
+                            {% endif %}
+                            <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
                 {% endif %}
@@ -1800,19 +1807,203 @@
                         </div>
                     {% endfor %}
                 </div>
+<div>
 
-            {% if classementFinal is not empty %}
-    <div class="card-modern ranking-card" id="classementTableauFinal">
-        <div class="ranking-header">
-            <i class="fas fa-trophy"></i>
-            Classement final
+           
+         <!-- phases finales -->
+{% if RencontreByCategoriePhaseFinale is not empty %}
+<div class="card-modern" id="phase-finale">
+    <div class="card-header-modern" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
+    <i class="fas fa-trophy"></i>
+    Phase finale {{ getCategorieCourante['Nom_categorie']|upper }}
+    <a href="#classementTableauFinal" class="ms-auto" style="color: white; font-size: 0.8rem; font-weight: 600; text-decoration: none; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">
+        <i class="fas fa-ranking-star me-1"></i> Classement final
+    </a>
+</div>
+
+    {# Grouper par créneau horaire #}
+    {% set rencontresByHoraire = {} %}
+    {% for rencontre in RencontreByCategoriePhaseFinale %}
+        {% set horaire = rencontre.creneau_nom %}
+        {% if rencontresByHoraire[horaire] is not defined %}
+            {% set rencontresByHoraire = rencontresByHoraire|merge({(horaire): []}) %}
+        {% endif %}
+        {% set rencontresByHoraire = rencontresByHoraire|merge({
+            (horaire): rencontresByHoraire[horaire]|merge([rencontre])
+        }) %}
+    {% endfor %}
+
+    {% for horaire, rencontresSlot in rencontresByHoraire %}
+
+        {# Bandeau horaire #}
+        <div class="d-flex align-items-center gap-2 mb-3 px-2 pt-2">
+            <div class="phase-finale-time-badge">
+                <i class="fas fa-clock me-1"></i>
+                {{ horaire|slice(0, 5) }}
+            </div>
+            <hr class="flex-grow-1 m-0" style="border-color: #e5e7eb;">
         </div>
+
+        {% for equipe in rencontresSlot %}
+
+            <div class="match-card {% if equipe.score1 != 0 or equipe.score2 != 0 %}finished{% endif %}" style="border-left: 4px solid var(--danger-color);">
+                <div class="match-header">
+
+                    {# ── Équipe 1 ── #}
+                    <div class="team-side">
+                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true" class="team-logo-wrap">
+                            <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
+                            <span class="team-logo-badge">›</span>
+                        </a>
+                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                        </a>
+                        <div class="phase-finale-poule">
+                            <i class="fas fa-sitemap"></i> {{ equipe.equipe1_poules|split(' - ')|last|split(', ')|last }}
+                        </div>
+                        {% if equipe.equipe1_coach_nom %}
+                            <div class="coach-info">
+                                <i class="fas fa-clipboard-user"></i>
+                                <span>{{ equipe.equipe1_coach_nom|upper }}</span>
+                            </div>
+                        {% else %}
+                            <div class="coach-info">
+                                <i class="fas fa-clipboard-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# ── Centre : heure + score + terrain ── #}
+                    <div class="match-center">
+                        {% if heureIsVisible == 1 and equipe.creneau_nom %}
+                            <div class="match-time">
+                                <i class="fas fa-clock"></i>
+                                {{ equipe.creneau_nom|slice(0, -3) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="match-score">
+                            {% if equipe.score1 > equipe.score2 %}
+                                <span class="score-badge score-win">{{ equipe.score1 }}</span>
+                                <span>-</span>
+                                <span class="score-badge score-lose">{{ equipe.score2 }}</span>
+                            {% elseif equipe.score1 < equipe.score2 %}
+                                <span class="score-badge score-lose">{{ equipe.score1 }}</span>
+                                <span>-</span>
+                                <span class="score-badge score-win">{{ equipe.score2 }}</span>
+                            {% else %}
+                                <span class="score-badge score-draw">{{ equipe.score1 ?? 0 }}</span>
+                                <span>-</span>
+                                <span class="score-badge score-draw">{{ equipe.score2 ?? 0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true"
+                           class="terrain-link">
+                            <div class="terrain-wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40" width="48" height="30" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="1" y="1" width="62" height="38" rx="2" fill="#4CAF50" stroke="white"/>
+                                    <line x1="32" y1="1" x2="32" y2="39" stroke="white"/>
+                                    <circle cx="32" cy="20" r="7" stroke="white"/>
+                                    <circle cx="32" cy="20" r="0.8" fill="white"/>
+                                    <rect x="1" y="10" width="12" height="20" stroke="white"/>
+                                    <rect x="1" y="15" width="5" height="10" stroke="white"/>
+                                    <rect x="51" y="10" width="12" height="20" stroke="white"/>
+                                    <rect x="58" y="15" width="5" height="10" stroke="white"/>
+                                    <path d="M13,16 A7,7 0 0,1 13,24" stroke="white" fill="none"/>
+                                    <path d="M51,16 A7,7 0 0,0 51,24" stroke="white" fill="none"/>
+                                    <circle cx="10" cy="20" r="0.8" fill="white"/>
+                                    <circle cx="54" cy="20" r="0.8" fill="white"/>
+                                    <path d="M1,4 A3,3 0 0,0 4,1" stroke="white" fill="none"/>
+                                    <path d="M60,1 A3,3 0 0,0 63,4" stroke="white" fill="none"/>
+                                    <path d="M1,36 A3,3 0 0,1 4,39" stroke="white" fill="none"/>
+                                    <path d="M60,39 A3,3 0 0,1 63,36" stroke="white" fill="none"/>
+                                </svg>
+                                <span class="terrain-nom">{{ equipe.terrain_nom }}</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    {# ── Équipe 2 ── #}
+                    <div class="team-side">
+                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true" class="team-logo-wrap">
+                            <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
+                            <span class="team-logo-badge">›</span>
+                        </a>
+                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                        </a>
+                        <div class="phase-finale-poule">
+                            <i class="fas fa-sitemap"></i> {{ equipe.equipe2_poules|split(' - ')|last|split(', ')|last }}
+                        </div>
+                        {% if equipe.equipe2_coach_nom %}
+                            <div class="coach-info">
+                                <i class="fas fa-clipboard-user"></i>
+                                <span>{{ equipe.equipe2_coach_nom|upper }}</span>
+                            </div>
+                        {% else %}
+                            <div class="coach-info">
+                                <i class="fas fa-clipboard-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>{# /.match-header #}
+
+                {# ── Détails : statut + arbitre + sponsor ── #}
+                <div class="match-details">
+                    <div class="detail-row">
+                        
+
+                        {% if equipe.isTerminated == 0 %}
+                            <span class="match-status status-pending">
+                                <i class="fas fa-clock"></i> À venir
+                            </span>
+                        {% elseif equipe.isTerminated == 1 %}
+                            <span class="match-status status-finished">
+                                <i class="fas fa-check-circle"></i> Terminée
+                            </span>
+                        {% elseif equipe.isTerminated == 2 %}
+                            <span class="match-status status-ongoing">
+                                <span class="spinner-grow spinner-grow-sm"></span> En cours
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {% if gestionArbitres == 1 and (equipe.arbitre_nom or equipe.arbitre_club_nom) %}
+                        <div class="detail-row">
+                            <i class="fas fa-user-tie" style="color: var(--bg-dark);"></i>
+                            <span>{{ equipe.arbitre_nom|capitalize }} ({{ equipe.arbitre_club_nom|upper }})</span>
+                        </div>
+                    {% endif %}
+
+                    {% if partenaires is not empty %}
+                        {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                        <div class="sponsor-box" style="margin: 0; padding: 10px;">
+                            <div>
+                                Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
+                            </div>
+                            {% if sponsor.logo %}
+                                <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}" loading="lazy">
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>{# /.match-details #}
+
+            </div>{# /.match-card #}
+
+        {% endfor %}
+    {% endfor %}
+
+</div>
+{% endif %}
+<!-- fin phase finale -->
 
         {% set pouleEnCours = null %}
         {% set classement = 0 %}
         {% set rang = 0 %}  {# ← compteur global, jamais remis à 0 #}
 
-        <div class="table-responsive">
+        <div class="table-responsive" id="classementTableauFinal">
             <table class="table table-hover align-middle mb-0 w-100 rounded">
                 <thead>
                     <tr class="table-light">
@@ -1870,7 +2061,7 @@
 {% endif %}
 
             {% endif %}
-        {% endif %}
+     
          
  <!-- Footer -->
     <footer class="modern-footer">
@@ -1955,6 +2146,19 @@ const observer = new IntersectionObserver(function (entries) {
 document.querySelectorAll('.match-card').forEach(function (card) {
     observer.observe(card);
 });
+
+
+    {% if RencontreByCategoriePhaseFinale is not empty %}
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function() {
+        const el = document.getElementById('phase-finale');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 300); // 300ms laisse le temps au navigateur de tout rendre
+});
+{% endif %}
+
     
     </script>
 </body>

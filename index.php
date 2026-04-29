@@ -115,16 +115,19 @@ if (isset ($_GET['affichageByCategorie'])) {
     $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie']);
     $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
     
+  
    }
 
    else {
     $RencontreByCategorie = null;
+    $RencontreByCategoriePhaseFinale = null;
    }
 }
 else {
   $affichageByCategorie = null;
     $RencontreByCategorie = null;
-  }
+    $RencontreByCategoriePhaseFinale = null;
+}
 
 
 
@@ -185,9 +188,10 @@ if (isset ($_GET['id_equipe'])) {
 
   $listeDesRenbcontreByEquipe = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
 $idequipe = $_GET['id_equipe'];
-
-
 $equipeNom = $equipeDao->getEquipeById($_GET['id_equipe'])['nom'];
+
+
+
 }
 
 
@@ -223,9 +227,12 @@ else {
   $pouleInfo = null;
 }
 
+
+
 if (isset ($_GET['idPoule'])) {
   //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
  
+
  
   if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 3 ) {
     
@@ -278,6 +285,13 @@ if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
 }
 
 
+if (isset ($_GET['idCategorie'])) {
+  $RencontreByCategoriePhaseFinale = $rencontre->getRencontreByCategorie($_GET['idCategorie'], 3);
+   $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
+
+}
+
+
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
     'ListeDesTournois' => $listeDesTournois,
@@ -313,6 +327,7 @@ echo $template->render([
      'classementFinal' => $classementFinal,
      'RencontreByCategorie' => $RencontreByCategorie,
      'pouleInfo' => $pouleInfo,
+     'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
   
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
