@@ -837,10 +837,19 @@
 
     }
   $(document).ready(function () {
-            setTimeout(function () {
-                location.reload(true);
-            }, 30000);
-    });
+    // Restaure la position si elle a été sauvegardée
+    const savedScroll = sessionStorage.getItem('scrollPos');
+    if (savedScroll) {
+        window.scrollTo(0, parseInt(savedScroll));
+        sessionStorage.removeItem('scrollPos');
+    }
+
+    // Sauvegarde la position avant le rechargement automatique
+    setTimeout(function () {
+        sessionStorage.setItem('scrollPos', window.scrollY);
+        location.reload(true);
+    }, 30000);
+});
     
 $(document).ready(function () {
     // Restaure la position si elle a été sauvegardée
