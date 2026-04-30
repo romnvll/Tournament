@@ -4,11 +4,6 @@ require ('class/tournoiDao.class.php');
 
 
 
-
-
-
-
-
 if (isset ($_POST['nomTerrain'])) {
     require ('class/terrainDao.class.php');
     $terrain = new TerrainDao();
@@ -30,7 +25,9 @@ if (isset ($_POST['nomTerrain'])) {
     exit;
 }
 
-if ($_POST['action'] == "deplanifier") {
+
+
+if (isset($_POST['action']) && $_POST['action'] === 'deplanifier') {
   require ('class/planificationDao.class.php');
   $planification = new planificationDao();
     $idTournoi = $_POST['idTournoi'];
@@ -96,7 +93,9 @@ if (isset ($_POST['Addevent'])) {
    
 }
 
-if ($_POST['modifMinutes'] != "" ) {
+
+
+if (isset($_POST['modifMinutes']) && $_POST['modifMinutes'] != "" ) {
     
     require 'class/creneauxDao.class.php';
     $creneau=new creneauxDao();
@@ -220,10 +219,22 @@ if (isset($_GET['action'])) {
 
         if (($_GET['action'] == "delTerrain")) {
             require 'class/terrainDao.class.php';
+            require 'class/PersonneTableDao.class.php';
             try {
                 $terrain = new TerrainDao();
-                $terrain->suppressionTerrain($_GET['idTournoi'], $_GET['terrain_id']);
+                $personneTableDao = new PersonneTableDao();
+                $verif = $personneTableDao->verifierSiPersonneEstSurUnTerrain((int)$_GET['terrain_id']);
+                if ($verif) {
+                    echo "Erreur: Impossible de supprimer ce terrain car il y a des personnes assignées à cette table .";
+                    header("Refresh:3; url=" . $_SERVER['HTTP_REFERER']);
+                    exit();
+
+                }
+                else {
+                 $terrain->suppressionTerrain($_GET['idTournoi'], $_GET['terrain_id']);
                 header("Location: " . $_SERVER['HTTP_REFERER']);
+                }
+               
             } catch (PDOException $e) {
                 
                     echo "Erreur: Impossible de supprimer ce terrain car il est déjà utilisé, il faut deplanifier les événements.";
