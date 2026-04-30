@@ -11,6 +11,7 @@ require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/licenceDao.class.php';
 require 'class/categorie.class.php';
+require 'class/gymnaseDao.class.php';
 require 'Lang/lang.php';
 
 
@@ -42,6 +43,7 @@ $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
 $licenceDao = new LicenceDAO();
 $categorieDao = new CategorieDao();
+$gymnaseDao = new GymnaseDAO();
 
 
 
@@ -52,15 +54,22 @@ $listeDesRencontresByTerrain = null;
 $terrain = new TerrainDao();
 $planTournoi = null;
 $classementFinal = null;
+
+
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
   if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
   $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
   
   }
+
+$gymnaseDao = new GymnaseDAO();
+$gymnaseInfo = $gymnaseDao->getGymnaseByTournoiId($_GET['id_tournoi']);
+
 }
 else {
   $planTournoi = null;
+  $gymnaseInfo = null;
 }
 
 
@@ -112,7 +121,7 @@ if (isset ($_GET['affichageByCategorie'])) {
    if (isset ($_GET['idCategorie'])) {
     
     
-    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie']);
+    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie'], $_GET['id_tournoi'], 1);
     $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
     
   
@@ -286,7 +295,7 @@ if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
 
 
 if (isset ($_GET['idCategorie'])) {
-  $RencontreByCategoriePhaseFinale = $rencontre->getRencontreByCategorie($_GET['idCategorie'], 3);
+  $RencontreByCategoriePhaseFinale = $rencontre->getRencontreByCategorie($_GET['idCategorie'], $_GET['id_tournoi'], 3);
    $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
 
 }
@@ -328,7 +337,7 @@ echo $template->render([
      'RencontreByCategorie' => $RencontreByCategorie,
      'pouleInfo' => $pouleInfo,
      'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
-  
+      'gymnaseInfo' => $gymnaseInfo,
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),

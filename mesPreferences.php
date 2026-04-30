@@ -7,6 +7,7 @@ require 'class/categorie.class.php';
 require_once 'class/SponsorDAO.class.php';
 require 'Lang/lang.php';
 require_once 'class/utilisateurDao.class.php';
+require_once 'class/gymnaseDao.class.php';
 
 $sponsorDao = new SponsorDAO();
 $categories = new CategorieDao();
@@ -61,6 +62,11 @@ function getBanqueSons($type) {
     return $sons;
 }
 
+$gymnaseDao = new GymnaseDAO();
+$gymnases   = $gymnaseDao->getGymnasesByUser($userData['id']);
+
+
+
 $idClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_id'] ?? null;
 $logoClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_logo'] ?? null;    
 
@@ -87,6 +93,9 @@ echo $template->render([
     'logoClubChoisit' => $logoClubChoisit,
     'monClub' => isset($_GET['monClub']) && $_GET['monClub'] === 'true',
     'affichageFlyer' => isset($_GET['affichageFlyer']),
+    'gestionGymnases' => isset($_GET['gestionGymnases']) && $_GET['gestionGymnases'] === 'true',
+  'gymnases'        => $gymnases,
+
    
 
 

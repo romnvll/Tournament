@@ -7,13 +7,10 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <style>
     :root {
@@ -98,6 +95,44 @@
       font-size: 0.85rem;
     }
 
+    /* ── Gymnases ── */
+    .gymnase-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .gymnase-card:hover {
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.12);
+    }
+
+    .gymnase-card .gymnase-header {
+      background: linear-gradient(135deg, #f3f4f6, #e9e9ff);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .gymnase-card .gymnase-header strong {
+      font-size: 1rem;
+      color: #1f2937;
+    }
+
+    .gymnase-info p {
+      margin-bottom: 4px;
+      font-size: 0.92rem;
+      color: #374151;
+    }
+
+    .gymnase-edit-form {
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      padding: 16px;
+    }
+
     footer {
       text-align: center;
       color: white;
@@ -118,12 +153,13 @@
   <div class="container">
     <!-- NAVIGATION -->
     <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
-      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true" class="btn-nav {% if affichageSponsors %}active{% endif %}">🏢 Gestion des sponsors</a>
-      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true" class="btn-nav {% if monMotDePasse %}active{% endif %}">🔐 Mot de passe</a>
-      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true" class="btn-nav {% if gestionCategorie %}active{% endif %}">🏷️ Catégories</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageSponsors=true"  class="btn-nav {% if affichageSponsors %}active{% endif %}">🏢 Gestion des sponsors</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monMotDePasse=true"      class="btn-nav {% if monMotDePasse %}active{% endif %}">🔐 Mot de passe</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionCategorie=true"   class="btn-nav {% if gestionCategorie %}active{% endif %}">🏷️ Catégories</a>
       <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionEffetsSonores=true" class="btn-nav {% if gestionEffetsSonores %}active{% endif %}">🔊 Effets sonores</a>
-      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monClub=true" class="btn-nav {% if monClub %}active{% endif %}">🏠 Mon club</a>
-      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageFlyer=true" class="btn-nav {% if affichageFlyer %}active{% endif %}">🖼️ Flyer</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&monClub=true"            class="btn-nav {% if monClub %}active{% endif %}">🏠 Mon club</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&affichageFlyer=true"     class="btn-nav {% if affichageFlyer %}active{% endif %}">🖼️ Flyer</a>
+      <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true"    class="btn-nav {% if gestionGymnases %}active{% endif %}">🏟️ Gymnases</a>
     </div>
 
     <div class="row g-4">
@@ -166,39 +202,34 @@
               <table class="table table-hover table-bordered align-middle">
                 <thead>
                   <tr>
-                    <th>Nom</th>
-                    <th>Lien</th>
-                    <th>Description</th>
-                    <th>Téléphone</th>
-                    <th>Adresse</th>
-                    <th>Logo</th>
-                    <th>Actif</th>
-                    <th>Actions</th>
+                    <th>Nom</th><th>Lien</th><th>Description</th>
+                    <th>Téléphone</th><th>Adresse</th><th>Logo</th>
+                    <th>Actif</th><th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for sponsor in sponsors %}
                     <tr>
                       <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="{{ sponsor.id }}">
-                        <input type="hidden" name="club_id" value="{{ idClub }}">
+                        <input type="hidden" name="id"             value="{{ sponsor.id }}">
+                        <input type="hidden" name="club_id"        value="{{ idClub }}">
                         <input type="hidden" name="modifierSponsor" value="1">
-                        <td><input type="text" name="nom" value="{{ sponsor.nom }}" class="form-control" onchange="this.form.submit()"></td>
-                        <td><input type="url" name="lien_web" value="{{ sponsor.lien_web }}" class="form-control" onchange="this.form.submit()"></td>
+                        <td><input type="text" name="nom"       value="{{ sponsor.nom }}"      class="form-control" onchange="this.form.submit()"></td>
+                        <td><input type="url"  name="lien_web"  value="{{ sponsor.lien_web }}" class="form-control" onchange="this.form.submit()"></td>
                         <td><textarea name="description" class="form-control" onchange="this.form.submit()">{{ sponsor.description }}</textarea></td>
                         <td><input type="text" name="telephone" value="{{ sponsor.telephone }}" class="form-control" onchange="this.form.submit()"></td>
-                        <td><input type="text" name="adresse" value="{{ sponsor.adresse }}" class="form-control" onchange="this.form.submit()"></td>
+                        <td><input type="text" name="adresse"   value="{{ sponsor.adresse }}"  class="form-control" onchange="this.form.submit()"></td>
                         <td>
-                          {% if sponsor.logo %}
-                            <img src="{{ sponsor.logo }}" width="40" class="rounded mb-1">
-                          {% endif %}
+                          {% if sponsor.logo %}<img src="{{ sponsor.logo }}" width="40" class="rounded mb-1">{% endif %}
                           <input type="file" name="logo" class="form-control form-control-sm" onchange="this.form.submit()">
                         </td>
                         <td class="text-center">
                           <input type="checkbox" name="actif" value="1" {% if sponsor.is_actif %}checked{% endif %} onchange="this.form.submit()">
                         </td>
                         <td class="text-center">
-                          <a href="mesPreferences_traitement.php?id={{ sponsor.id }}&supprimerSponsors" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer ce sponsor ?');">
+                          <a href="mesPreferences_traitement.php?id={{ sponsor.id }}&supprimerSponsors"
+                             class="btn btn-sm btn-outline-danger"
+                             onclick="return confirm('Supprimer ce sponsor ?');">
                             <i class="bi bi-trash"></i>
                           </a>
                         </td>
@@ -253,16 +284,14 @@
               <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-plus-circle"></i></button>
             </form>
           </div>
-
           <div class="card-body">
             <p>La gestion des catégories permet de configurer les différentes catégories auxquelles une équipe peut appartenir.</p>
             {% set palette = [
-              '#BB8FCE', '#FFC300', '#DAF7A6', '#CCFFFF',
-              '#E57373', '#F5B041', '#FF7F7F', '#F9E79F',
-              '#FF6F61', '#85C1E9', '#AED6F1', '#48C9B0',
-              '#73C6B6', '#F39C12', '#E67E22'
+              '#BB8FCE','#FFC300','#DAF7A6','#CCFFFF',
+              '#E57373','#F5B041','#FF7F7F','#F9E79F',
+              '#FF6F61','#85C1E9','#AED6F1','#48C9B0',
+              '#73C6B6','#F39C12','#E67E22'
             ] %}
-
             <form id="preferencesForm" action="mesPreferences_traitement.php" method="post">
               <div class="row g-3">
                 {% for cat in categories %}
@@ -272,22 +301,23 @@
                         <label>Nom</label>
                         <input type="text" class="form-control mb-2" name="nomCategorie" value="{{ cat.Nom_categorie }}">
                         <label>Couleur</label>
-                         <div class="d-flex flex-wrap gap-2">
+                        <div class="d-flex flex-wrap gap-2">
                           {% for color in palette %}
-                          <input type="hidden" name="ChangeColor" value="true">
-                            <input class="form-check-input" type="radio" name="{{ cat.id_categorie }}" value="{{ color }}" {% if cat.Couleur == color %}checked{% endif %} onchange="document.getElementById('preferencesForm').submit();">
+                            <input type="hidden" name="ChangeColor" value="true">
+                            <input class="form-check-input" type="radio" name="{{ cat.id_categorie }}" value="{{ color }}"
+                                   {% if cat.Couleur == color %}checked{% endif %}
+                                   onchange="document.getElementById('preferencesForm').submit();">
                             <span class="badge-color" style="background-color: {{ color }}">{{ color }}</span>
                           {% endfor %}
                         </div>
                         <div class="text-end mt-2">
-                          <a href="delCategorie.php?delete={{ cat.id_categorie }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette catégorie ?');">
+                          <a href="delCategorie.php?delete={{ cat.id_categorie }}"
+                             class="btn btn-sm btn-outline-danger"
+                             onclick="return confirm('Supprimer cette catégorie ?');">
                             <i class="bi bi-trash"></i>
                           </a>
                         </div>
                       </div>
-
-                       
-
                     </div>
                   </div>
                 {% endfor %}
@@ -297,378 +327,473 @@
         </div>
       </div>
 
-
-        <!-- 🏠 MON CLUB --> 
-                        <div class="col-lg-8 mx-auto {{ monClub ? '' : 'd-none' }}">
-                          <div class="card">
-                            <div class="card-header">Mon club 
-                            {% if logoClubChoisit is not null %}
-                             <img src="{{ logoClubChoisit }}" alt="Logo club" width="80" class="rounded">
-                              {% endif %}
-                              </div>
-                            <div class="card-body">
-                              {% if club %}
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                  {% if club.logo %}
-                                    <img src="{{ club.logo }}" alt="Logo club" width="80" class="rounded">
-                                  {% endif %}
-                                  <div>
-                                    <h5 class="mb-0">{{ club.nom }}</h5>
-                                    {% if club.adresse %}<p class="text-muted mb-0">{{ club.adresse }}</p>{% endif %}
-                                  </div>
-                                </div>
-                                <div class="d-flex gap-2">
-                                  <a href="modifierClub.php?idclub={{ idClub }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i> Modifier le club</a>
-                                  <a href="modifierClub.php?id_tournoi={{ idTournoi }}" class="btn btn-outline-secondary">Gérer les clubs</a>
-                                </div>
-                              {% else %}
-                                {% if idClubChoisit == null %}
-
-                                <p class="text-muted">Vous n'avez pas encore de club associé.<br>Cette partie va permettre d'afficher les informations du créateur du tournoi sur les affiches et l'application mobile</p>
-                                {% endif %}
-                                <form action="mesPreferences_traitement.php" method="POST">
-                                    <select name="clubToUser" onchange="this.form.submit()">
-                                      
-                                        <option value="">-- Sélectionnez un club --</option>
-                                        {% for club in listeClubs %}
-                                          {% if idClubChoisit == club.id %}
-                                            <option value="{{ club.id }}" selected> 
-                                                {{ club.nom }}
-                                            </option>
-                                          {% else %}
-                                            <option value="{{ club.id }}">
-                                                {{ club.nom }}
-                                            </option>
-                                          {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </form>
-
-                                {% endif %}
-                            </div>
-                          </div>
-                        </div>
+      <!-- 🏠 MON CLUB -->
+      <div class="col-lg-8 mx-auto {{ monClub ? '' : 'd-none' }}">
+        <div class="card">
+          <div class="card-header">Mon club
+            {% if logoClubChoisit is not null %}
+              <img src="{{ logoClubChoisit }}" alt="Logo club" width="80" class="rounded">
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if club %}
+              <div class="d-flex align-items-center gap-3 mb-3">
+                {% if club.logo %}<img src="{{ club.logo }}" alt="Logo club" width="80" class="rounded">{% endif %}
+                <div>
+                  <h5 class="mb-0">{{ club.nom }}</h5>
+                  {% if club.adresse %}<p class="text-muted mb-0">{{ club.adresse }}</p>{% endif %}
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="modifierClub.php?idclub={{ idClub }}" class="btn btn-primary"><i class="bi bi-pencil-square"></i> Modifier le club</a>
+                <a href="modifierClub.php?id_tournoi={{ idTournoi }}" class="btn btn-outline-secondary">Gérer les clubs</a>
+              </div>
+            {% else %}
+              {% if idClubChoisit == null %}
+                <p class="text-muted">Vous n'avez pas encore de club associé.<br>Cette partie va permettre d'afficher les informations du créateur du tournoi sur les affiches et l'application mobile</p>
+              {% endif %}
+              <form action="mesPreferences_traitement.php" method="POST">
+                <select name="clubToUser" onchange="this.form.submit()">
+                  <option value="">-- Sélectionnez un club --</option>
+                  {% for club in listeClubs %}
+                    <option value="{{ club.id }}" {% if idClubChoisit == club.id %}selected{% endif %}>
+                      {{ club.nom }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
 
       <!-- 🔊 GESTION DES EFFETS SONORES -->
-<div class="col-lg-10 mx-auto {{ gestionEffetsSonores ? '' : 'd-none' }}">
-  <div class="card">
-    <div class="card-header">Gestion des effets sonores</div>
-    <div class="card-body">
-      
-      <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> Ajoutez des effets sonores personnalisés pour le début et la fin de vos matchs. Vous pouvez choisir dans la banque de sons, uploader un fichier MP3 ou enregistrer votre voix directement.
-      </div>
-
-      <!-- Effet sonore de DÉBUT -->
-      <div class="card border mb-4">
-        <div class="card-body">
-          <h5 class="mb-3">🎵 Effet sonore de début de match</h5>
-          
-          {% if effetsSonoreDebut %}
-            <div class="mb-3">
-              <label class="form-label fw-bold">Aperçu actuel :</label>
-              <audio controls class="w-100">
-                <source src="{{ effetsSonoreDebut }}" type="audio/mpeg">
-              </audio>
+      <div class="col-lg-10 mx-auto {{ gestionEffetsSonores ? '' : 'd-none' }}">
+        <div class="card">
+          <div class="card-header">Gestion des effets sonores</div>
+          <div class="card-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> Ajoutez des effets sonores personnalisés pour le début et la fin de vos matchs.
             </div>
-            <a href="mesPreferences_traitement.php?supprimerEffetDebut=1" class="btn btn-danger" onclick="return confirm('Supprimer cet effet sonore ?');">
-              <i class="bi bi-trash"></i> Supprimer l'effet de début
-            </a>
-          {% else %}
-            <!-- Onglets pour les différentes options -->
-            <ul class="nav nav-tabs mb-3" id="tabsDebut" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="banque-debut-tab" data-bs-toggle="tab" data-bs-target="#banque-debut" type="button">
-                  🎵 Banque de sons
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="upload-debut-tab" data-bs-toggle="tab" data-bs-target="#upload-debut" type="button">
-                  📁 Uploader
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="record-debut-tab" data-bs-toggle="tab" data-bs-target="#record-debut" type="button">
-                  🎙️ Enregistrer
-                </button>
-              </li>
-            </ul>
 
-            <div class="tab-content" id="tabsDebutContent">
-              <!-- BANQUE DE SONS -->
-              <div class="tab-pane fade show active" id="banque-debut" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST">
-                  <input type="hidden" name="ajouterEffetDebutBanque" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="row g-3">
-                    {% if banqueSonsDebut %}
-                      {% for son in banqueSonsDebut %}
-                        <div class="col-md-6 col-lg-4">
-                          <div class="card h-100 border">
-                            <div class="card-body">
-                              <h6 class="card-title">{{ son.nom }}</h6>
-                              <audio controls class="w-100 mb-2">
-                                <source src="{{ son.chemin }}" type="audio/mpeg">
-                              </audio>
-                              <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100">
-                                <i class="bi bi-check-circle"></i> Choisir
-                              </button>
+            <!-- Effet de DÉBUT -->
+            <div class="card border mb-4">
+              <div class="card-body">
+                <h5 class="mb-3">🎵 Effet sonore de début de match</h5>
+                {% if effetsSonoreDebut %}
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Aperçu actuel :</label>
+                    <audio controls class="w-100"><source src="{{ effetsSonoreDebut }}" type="audio/mpeg"></audio>
+                  </div>
+                  <a href="mesPreferences_traitement.php?supprimerEffetDebut=1" class="btn btn-danger"
+                     onclick="return confirm('Supprimer cet effet sonore ?');">
+                    <i class="bi bi-trash"></i> Supprimer l'effet de début
+                  </a>
+                {% else %}
+                  <ul class="nav nav-tabs mb-3" id="tabsDebut" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#banque-debut" type="button">🎵 Banque de sons</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#upload-debut" type="button">📁 Uploader</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#record-debut" type="button">🎙️ Enregistrer</button></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane fade show active" id="banque-debut">
+                      <form action="mesPreferences_traitement.php" method="POST">
+                        <input type="hidden" name="ajouterEffetDebutBanque" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <div class="row g-3">
+                          {% for son in banqueSonsDebut %}
+                            <div class="col-md-6 col-lg-4">
+                              <div class="card h-100 border">
+                                <div class="card-body">
+                                  <h6>{{ son.nom }}</h6>
+                                  <audio controls class="w-100 mb-2"><source src="{{ son.chemin }}" type="audio/mpeg"></audio>
+                                  <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100"><i class="bi bi-check-circle"></i> Choisir</button>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          {% else %}
+                            <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
+                          {% endfor %}
                         </div>
-                      {% endfor %}
-                    {% else %}
-                      <div class="col-12">
-                        <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
-                      </div>
-                    {% endif %}
-                  </div>
-                </form>
-              </div>
-
-              <!-- UPLOAD FICHIER -->
-              <div class="tab-pane fade" id="upload-debut" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
-                  <input type="hidden" name="ajouterEffetDebut" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="mb-3">
-                    <label for="effetDebutFile" class="form-label">📁 Choisir un fichier MP3</label>
-                    <input type="file" name="effetDebutFile" id="effetDebutFile" class="form-control" accept=".mp3,audio/mpeg" required>
-                  </div>
-
-                  <button type="submit" class="btn btn-success">
-                    <i class="bi bi-upload"></i> Uploader l'effet de début
-                  </button>
-                </form>
-              </div>
-
-              <!-- ENREGISTREMENT VOCAL -->
-              <div class="tab-pane fade" id="record-debut" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetDebut">
-                  <input type="hidden" name="ajouterEffetDebut" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="mb-3">
-                    <label class="form-label">🎙️ Enregistrer votre voix</label>
-                    <div class="d-flex gap-2 align-items-center mb-2">
-                      <button type="button" id="recordDebutBtn" class="btn btn-primary">
-                        <i class="bi bi-mic-fill"></i> Démarrer l'enregistrement
-                      </button>
-                      <button type="button" id="stopDebutBtn" class="btn btn-danger d-none">
-                        <i class="bi bi-stop-fill"></i> Arrêter
-                      </button>
-                      <span id="recordDebutStatus" class="text-muted"></span>
+                      </form>
                     </div>
-                    <audio id="previewDebut" controls class="w-100 d-none mb-2"></audio>
-                    <input type="hidden" name="effetDebutRecorded" id="effetDebutRecorded">
+                    <div class="tab-pane fade" id="upload-debut">
+                      <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="ajouterEffetDebut" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <input type="file" name="effetDebutFile" class="form-control mb-3" accept=".mp3,audio/mpeg" required>
+                        <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Uploader</button>
+                      </form>
+                    </div>
+                    <div class="tab-pane fade" id="record-debut">
+                      <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetDebut">
+                        <input type="hidden" name="ajouterEffetDebut" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                          <button type="button" id="recordDebutBtn" class="btn btn-primary"><i class="bi bi-mic-fill"></i> Démarrer</button>
+                          <button type="button" id="stopDebutBtn" class="btn btn-danger d-none"><i class="bi bi-stop-fill"></i> Arrêter</button>
+                          <span id="recordDebutStatus" class="text-muted"></span>
+                        </div>
+                        <audio id="previewDebut" controls class="w-100 d-none mb-2"></audio>
+                        <input type="hidden" name="effetDebutRecorded" id="effetDebutRecorded">
+                        <button type="submit" class="btn btn-success" id="submitDebutRecord" disabled><i class="bi bi-save"></i> Enregistrer</button>
+                      </form>
+                    </div>
                   </div>
-
-                  <button type="submit" class="btn btn-success" id="submitDebutRecord" disabled>
-                    <i class="bi bi-save"></i> Enregistrer l'effet de début
-                  </button>
-                </form>
+                {% endif %}
               </div>
             </div>
-          {% endif %}
+
+            <!-- Effet de FIN -->
+            <div class="card border">
+              <div class="card-body">
+                <h5 class="mb-3">🎵 Effet sonore de fin de match</h5>
+                {% if effetsSonoreFin %}
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Aperçu actuel :</label>
+                    <audio controls class="w-100"><source src="{{ effetsSonoreFin }}" type="audio/mpeg"></audio>
+                  </div>
+                  <a href="mesPreferences_traitement.php?supprimerEffetFin=1" class="btn btn-danger"
+                     onclick="return confirm('Supprimer cet effet sonore ?');">
+                    <i class="bi bi-trash"></i> Supprimer l'effet de fin
+                  </a>
+                {% else %}
+                  <ul class="nav nav-tabs mb-3" id="tabsFin" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#banque-fin" type="button">🎵 Banque de sons</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#upload-fin" type="button">📁 Uploader</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#record-fin" type="button">🎙️ Enregistrer</button></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane fade show active" id="banque-fin">
+                      <form action="mesPreferences_traitement.php" method="POST">
+                        <input type="hidden" name="ajouterEffetFinBanque" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <div class="row g-3">
+                          {% for son in banqueSonsFin %}
+                            <div class="col-md-6 col-lg-4">
+                              <div class="card h-100 border">
+                                <div class="card-body">
+                                  <h6>{{ son.nom }}</h6>
+                                  <audio controls class="w-100 mb-2"><source src="{{ son.chemin }}" type="audio/mpeg"></audio>
+                                  <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100"><i class="bi bi-check-circle"></i> Choisir</button>
+                                </div>
+                              </div>
+                            </div>
+                          {% else %}
+                            <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
+                          {% endfor %}
+                        </div>
+                      </form>
+                    </div>
+                    <div class="tab-pane fade" id="upload-fin">
+                      <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="ajouterEffetFin" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <input type="file" name="effetFinFile" class="form-control mb-3" accept=".mp3,audio/mpeg" required>
+                        <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Uploader</button>
+                      </form>
+                    </div>
+                    <div class="tab-pane fade" id="record-fin">
+                      <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetFin">
+                        <input type="hidden" name="ajouterEffetFin" value="1">
+                        <input type="hidden" name="user_id" value="{{ userId }}">
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                          <button type="button" id="recordFinBtn" class="btn btn-primary"><i class="bi bi-mic-fill"></i> Démarrer</button>
+                          <button type="button" id="stopFinBtn" class="btn btn-danger d-none"><i class="bi bi-stop-fill"></i> Arrêter</button>
+                          <span id="recordFinStatus" class="text-muted"></span>
+                        </div>
+                        <audio id="previewFin" controls class="w-100 d-none mb-2"></audio>
+                        <input type="hidden" name="effetFinRecorded" id="effetFinRecorded">
+                        <button type="submit" class="btn btn-success" id="submitFinRecord" disabled><i class="bi bi-save"></i> Enregistrer</button>
+                      </form>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      <!-- Effet sonore de FIN -->
-      <div class="card border">
-        <div class="card-body">
-          <h5 class="mb-3">🎵 Effet sonore de fin de match</h5>
-          
-          {% if effetsSonoreFin %}
-            <div class="mb-3">
-              <label class="form-label fw-bold">Aperçu actuel :</label>
-              <audio controls class="w-100">
-                <source src="{{ effetsSonoreFin }}" type="audio/mpeg">
-              </audio>
-            </div>
-            <a href="mesPreferences_traitement.php?supprimerEffetFin=1" class="btn btn-danger" onclick="return confirm('Supprimer cet effet sonore ?');">
-              <i class="bi bi-trash"></i> Supprimer l'effet de fin
-            </a>
-          {% else %}
-            <!-- Onglets pour les différentes options -->
-            <ul class="nav nav-tabs mb-3" id="tabsFin" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="banque-fin-tab" data-bs-toggle="tab" data-bs-target="#banque-fin" type="button">
-                  🎵 Banque de sons
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="upload-fin-tab" data-bs-toggle="tab" data-bs-target="#upload-fin" type="button">
-                  📁 Uploader
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="record-fin-tab" data-bs-toggle="tab" data-bs-target="#record-fin" type="button">
-                  🎙️ Enregistrer
-                </button>
-              </li>
-            </ul>
-
-            <div class="tab-content" id="tabsFinContent">
-              <!-- BANQUE DE SONS -->
-              <div class="tab-pane fade show active" id="banque-fin" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST">
-                  <input type="hidden" name="ajouterEffetFinBanque" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="row g-3">
-                    {% if banqueSonsFin %}
-                      {% for son in banqueSonsFin %}
-                        <div class="col-md-6 col-lg-4">
-                          <div class="card h-100 border">
-                            <div class="card-body">
-                              <h6 class="card-title">{{ son.nom }}</h6>
-                              <audio controls class="w-100 mb-2">
-                                <source src="{{ son.chemin }}" type="audio/mpeg">
-                              </audio>
-                              <button type="submit" name="sonChoisi" value="{{ son.chemin }}" class="btn btn-sm btn-primary w-100">
-                                <i class="bi bi-check-circle"></i> Choisir
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      {% endfor %}
-                    {% else %}
-                      <div class="col-12">
-                        <p class="text-muted text-center">Aucun son disponible dans la banque.</p>
-                      </div>
-                    {% endif %}
-                  </div>
-                </form>
-              </div>
-
-              <!-- UPLOAD FICHIER -->
-              <div class="tab-pane fade" id="upload-fin" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data">
-                  <input type="hidden" name="ajouterEffetFin" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="mb-3">
-                    <label for="effetFinFile" class="form-label">📁 Choisir un fichier MP3</label>
-                    <input type="file" name="effetFinFile" id="effetFinFile" class="form-control" accept=".mp3,audio/mpeg" required>
-                  </div>
-
-                  <button type="submit" class="btn btn-success">
-                    <i class="bi bi-upload"></i> Uploader l'effet de fin
-                  </button>
-                </form>
-              </div>
-
-              <!-- ENREGISTREMENT VOCAL -->
-              <div class="tab-pane fade" id="record-fin" role="tabpanel">
-                <form action="mesPreferences_traitement.php" method="POST" enctype="multipart/form-data" id="formEffetFin">
-                  <input type="hidden" name="ajouterEffetFin" value="1">
-                  <input type="hidden" name="user_id" value="{{ userId }}">
-                  
-                  <div class="mb-3">
-                    <label class="form-label">🎙️ Enregistrer votre voix</label>
-                    <div class="d-flex gap-2 align-items-center mb-2">
-                      <button type="button" id="recordFinBtn" class="btn btn-primary">
-                        <i class="bi bi-mic-fill"></i> Démarrer l'enregistrement
-                      </button>
-                      <button type="button" id="stopFinBtn" class="btn btn-danger d-none">
-                        <i class="bi bi-stop-fill"></i> Arrêter
-                      </button>
-                      <span id="recordFinStatus" class="text-muted"></span>
-                    </div>
-                    <audio id="previewFin" controls class="w-100 d-none mb-2"></audio>
-                    <input type="hidden" name="effetFinRecorded" id="effetFinRecorded">
-                  </div>
-
-                  <button type="submit" class="btn btn-success" id="submitFinRecord" disabled>
-                    <i class="bi bi-save"></i> Enregistrer l'effet de fin
-                  </button>
-                </form>
-              </div>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-<!-- 🖼️ FLYER -->
-<div class="col-lg-10 mx-auto {{ affichageFlyer ? '' : 'd-none' }}">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+      <!-- 🖼️ FLYER -->
+      <div class="col-lg-10 mx-auto {{ affichageFlyer ? '' : 'd-none' }}">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <span>🖼️ Flyer du tournoi</span>
             <a href="Flyers/FlyerBrackito.html" target="_blank" class="btn btn-sm btn-outline-light">
-                <i class="bi bi-box-arrow-up-right"></i> Ouvrir en plein écran
+              <i class="bi bi-box-arrow-up-right"></i> Ouvrir en plein écran
             </a>
+          </div>
+          <div class="card-body p-0">
+            <iframe src="Flyers/FlyerBrackito.html" style="width:100%; height:80vh; border:none; border-radius: 0 0 16px 16px;"></iframe>
+          </div>
         </div>
-        <div class="card-body p-0">
-            <iframe src="Flyers/FlyerBrackito.html"
-                    style="width:100%; height:80vh; border:none; border-radius: 0 0 16px 16px;">
-            </iframe>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           🏟️ GESTION DES GYMNASES
+           ═══════════════════════════════════════════════════════════ -->
+      <div class="col-lg-9 mx-auto {{ gestionGymnases ? '' : 'd-none' }}">
+        <div class="card">
+          <div class="card-header">🏟️ Gestion de mes gymnases</div>
+          <div class="card-body">
+
+            {# ── Messages de retour ──────────────────────────────── #}
+            {% if app.request is defined %}
+              {% set statusGym = app.request.query.get('status') %}
+              {% set errorGym  = app.request.query.get('error') %}
+            {% else %}
+              {# Fallback si app.request n'est pas dispo dans ce contexte Twig #}
+              {% set statusGym = null %}
+              {% set errorGym  = null %}
+            {% endif %}
+
+            {% if statusGym == 'gymnase_cree' %}
+              <div class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle-fill"></i> Gymnase créé avec succès.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% elseif statusGym == 'gymnase_modifie' %}
+              <div class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle-fill"></i> Gymnase modifié avec succès.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% elseif statusGym == 'gymnase_supprime' %}
+              <div class="alert alert-warning alert-dismissible fade show">
+                <i class="bi bi-trash-fill"></i> Gymnase supprimé.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endif %}
+
+            {% if errorGym == 'champs_manquants' %}
+              <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle-fill"></i> Veuillez remplir tous les champs obligatoires.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% elseif errorGym == 'acces_refuse' %}
+              <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-lock-fill"></i> Accès refusé.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endif %}
+
+            {# ── Formulaire d'ajout ──────────────────────────────── #}
+            <div class="card border mb-4">
+              <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary"></i> Ajouter un gymnase</h6>
+                <form action="traitement_gymnase.php" method="POST">
+                  <input type="hidden" name="action"     value="creer">
+                  <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Nom <span class="text-danger">*</span></label>
+                      <input type="text" name="nom" class="form-control" placeholder="Ex : Gymnase Jean Moulin" required maxlength="100">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Téléphone</label>
+                      <input type="tel" name="telephone" class="form-control" placeholder="06 00 00 00 00" maxlength="20">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Adresse <span class="text-danger">*</span></label>
+                      <input type="text" name="adresse" class="form-control" placeholder="12 rue de la Paix" required maxlength="255">
+                    </div>
+                    <div class="col-md-8">
+                      <label class="form-label">Ville <span class="text-danger">*</span></label>
+                      <input type="text" name="ville" class="form-control" placeholder="Paris" required maxlength="100">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Code postal <span class="text-danger">*</span></label>
+                      <input type="text" name="code_postal" class="form-control" placeholder="75001" required maxlength="10">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Commentaire</label>
+                      <textarea name="commentaire" class="form-control" rows="2"
+                                placeholder="Accès, parking, vestiaires..." maxlength="500"></textarea>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Ajouter
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {# ── Liste des gymnases ──────────────────────────────── #}
+            {% if gymnases is empty %}
+              <div class="text-center text-muted py-4">
+                <i class="bi bi-building" style="font-size:2.5rem; opacity:.4;"></i>
+                <p class="mt-2">Vous n'avez pas encore de gymnase enregistré.</p>
+              </div>
+            {% else %}
+              <h6 class="fw-bold mb-3">
+                <i class="bi bi-list-ul text-primary"></i>
+                Mes gymnases ({{ gymnases|length }})
+              </h6>
+
+              <div class="row g-3">
+                {% for gymnase in gymnases %}
+                <div class="col-12">
+                  <div class="gymnase-card" id="gymnase-{{ gymnase.id }}">
+
+                    {# En-tête de la carte #}
+                    <div class="gymnase-header">
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-building text-primary"></i>
+                        <strong>{{ gymnase.nom }}</strong>
+                        <span class="badge bg-light text-secondary fw-normal ms-1">
+                          {{ gymnase.code_postal }} {{ gymnase.ville }}
+                        </span>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                onclick="toggleGymnaseEdit({{ gymnase.id }})">
+                          <i class="bi bi-pencil"></i> Modifier
+                        </button>
+                        <form method="POST" action="traitement_gymnase.php" style="display:inline;"
+                              onsubmit="return confirm('Supprimer le gymnase « {{ gymnase.nom }} » ?');">
+                          <input type="hidden" name="action"     value="supprimer">
+                          <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
+                          <input type="hidden" name="gymnase_id" value="{{ gymnase.id }}">
+                          <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+
+                    {# Vue résumé #}
+                    <div class="gymnase-info p-3 view-gymnase-{{ gymnase.id }}">
+                      <p><i class="bi bi-geo-alt-fill text-primary me-1"></i>
+                        {{ gymnase.adresse }}, {{ gymnase.code_postal }} {{ gymnase.ville }}</p>
+                      {% if gymnase.telephone %}
+                        <p><i class="bi bi-telephone-fill text-primary me-1"></i> {{ gymnase.telephone }}</p>
+                      {% endif %}
+                      {% if gymnase.commentaire %}
+                        <p class="text-muted mb-0">
+                          <i class="bi bi-chat-left-text me-1"></i> {{ gymnase.commentaire }}
+                        </p>
+                      {% endif %}
+                    </div>
+
+                    {# Formulaire de modification (masqué par défaut) #}
+                    <div class="gymnase-edit-form edit-gymnase-{{ gymnase.id }}" style="display:none;">
+                      <form method="POST" action="traitement_gymnase.php">
+                        <input type="hidden" name="action"     value="modifier">
+                        <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
+                        <input type="hidden" name="gymnase_id" value="{{ gymnase.id }}">
+
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="nom" class="form-control"
+                                   value="{{ gymnase.nom }}" required maxlength="100">
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" name="telephone" class="form-control"
+                                   value="{{ gymnase.telephone }}" maxlength="20">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label">Adresse *</label>
+                            <input type="text" name="adresse" class="form-control"
+                                   value="{{ gymnase.adresse }}" required maxlength="255">
+                          </div>
+                          <div class="col-md-8">
+                            <label class="form-label">Ville *</label>
+                            <input type="text" name="ville" class="form-control"
+                                   value="{{ gymnase.ville }}" required maxlength="100">
+                          </div>
+                          <div class="col-md-4">
+                            <label class="form-label">Code postal *</label>
+                            <input type="text" name="code_postal" class="form-control"
+                                   value="{{ gymnase.code_postal }}" required maxlength="10">
+                          </div>
+                          <div class="col-12">
+                            <label class="form-label">Commentaire</label>
+                            <textarea name="commentaire" class="form-control"
+                                      rows="2" maxlength="500">{{ gymnase.commentaire }}</textarea>
+                          </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                          <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-lg"></i> Enregistrer
+                          </button>
+                          <button type="button" class="btn btn-secondary btn-sm"
+                                  onclick="toggleGymnaseEdit({{ gymnase.id }})">
+                            Annuler
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                  </div>{# fin .gymnase-card #}
+                </div>
+                {% endfor %}
+              </div>{# fin .row #}
+            {% endif %}
+
+          </div>
         </div>
-    </div>
-</div>
+      </div>
+      {# ══ FIN GYMNASES ══════════════════════════════════════════ #}
+
+    </div>{# fin .row g-4 #}
+
     {{ include('footerAdmin.twig') }}
-  </div>
+  </div>{# fin .container #}
+
 
   <script>
-    window.onload = function() {
-      if (typeof(sessionStorage) !== 'undefined') {
-        var scrollPosition = sessionStorage.getItem('scrollPosition');
-        if (scrollPosition !== null) {
-          window.scrollTo(0, scrollPosition);
-        }
-      }
+    // ── Sauvegarde position de scroll ───────────────────────────
+    window.onload = function () {
+      var pos = sessionStorage.getItem('scrollPosition');
+      if (pos !== null) window.scrollTo(0, pos);
+    };
+    window.onbeforeunload = function () {
+      sessionStorage.setItem('scrollPosition', window.scrollY);
     };
 
-    window.onbeforeunload = function() {
-      if (typeof(sessionStorage) !== 'undefined') {
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-      }
-    };
+    // ── Toggle affichage / formulaire de modification (gymnases) ──
+    function toggleGymnaseEdit(id) {
+      var view = document.querySelector('.view-gymnase-' + id);
+      var edit = document.querySelector('.edit-gymnase-' + id);
+      var isEditing = edit.style.display !== 'none';
+      view.style.display = isEditing ? 'block' : 'none';
+      edit.style.display = isEditing ? 'none'  : 'block';
+    }
 
-    // ==================== GESTION DE L'ENREGISTREMENT AUDIO ====================
+    // ── Enregistrement audio – DÉBUT ────────────────────────────
     let mediaRecorderDebut, audioChunksDebut = [];
-    let mediaRecorderFin, audioChunksFin = [];
 
-    // DÉBUT - Enregistrement
     document.getElementById('recordDebutBtn')?.addEventListener('click', async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorderDebut = new MediaRecorder(stream);
-        audioChunksDebut = [];
-
-        mediaRecorderDebut.ondataavailable = (event) => {
-          audioChunksDebut.push(event.data);
-        };
-
+        audioChunksDebut   = [];
+        mediaRecorderDebut.ondataavailable = e => audioChunksDebut.push(e.data);
         mediaRecorderDebut.onstop = () => {
-          const audioBlob = new Blob(audioChunksDebut, { type: 'audio/mpeg' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          
-          const preview = document.getElementById('previewDebut');
-          preview.src = audioUrl;
-          preview.classList.remove('d-none');
-
-          // Convertir en base64 pour l'envoyer
+          const blob = new Blob(audioChunksDebut, { type: 'audio/mpeg' });
+          const url  = URL.createObjectURL(blob);
+          const prev = document.getElementById('previewDebut');
+          prev.src = url;
+          prev.classList.remove('d-none');
           const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
+          reader.readAsDataURL(blob);
           reader.onloadend = () => {
             document.getElementById('effetDebutRecorded').value = reader.result;
           };
-
-          stream.getTracks().forEach(track => track.stop());
+          stream.getTracks().forEach(t => t.stop());
         };
-
         mediaRecorderDebut.start();
         document.getElementById('recordDebutBtn').classList.add('d-none');
         document.getElementById('stopDebutBtn').classList.remove('d-none');
         document.getElementById('recordDebutStatus').textContent = 'Enregistrement en cours...';
-      } catch (err) {
-        alert('Erreur d\'accès au microphone : ' + err.message);
-      }
+      } catch (err) { alert('Erreur microphone : ' + err.message); }
     });
 
     document.getElementById('stopDebutBtn')?.addEventListener('click', () => {
@@ -676,47 +801,36 @@
       document.getElementById('recordDebutBtn').classList.remove('d-none');
       document.getElementById('stopDebutBtn').classList.add('d-none');
       document.getElementById('recordDebutStatus').textContent = 'Enregistrement terminé';
-       document.getElementById('submitDebutRecord').disabled = false; // Activer le bouton
+      document.getElementById('submitDebutRecord').disabled = false;
     });
 
-    // FIN - Enregistrement
+    // ── Enregistrement audio – FIN ──────────────────────────────
+    let mediaRecorderFin, audioChunksFin = [];
+
     document.getElementById('recordFinBtn')?.addEventListener('click', async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorderFin = new MediaRecorder(stream);
-        audioChunksFin = [];
-
-        mediaRecorderFin.ondataavailable = (event) => {
-          audioChunksFin.push(event.data);
-        };
-
+        audioChunksFin   = [];
+        mediaRecorderFin.ondataavailable = e => audioChunksFin.push(e.data);
         mediaRecorderFin.onstop = () => {
-          const audioBlob = new Blob(audioChunksFin, { type: 'audio/mpeg' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          
-          const preview = document.getElementById('previewFin');
-          preview.src = audioUrl;
-          preview.classList.remove('d-none');
-
-          // Convertir en base64 pour l'envoyer
+          const blob = new Blob(audioChunksFin, { type: 'audio/mpeg' });
+          const url  = URL.createObjectURL(blob);
+          const prev = document.getElementById('previewFin');
+          prev.src = url;
+          prev.classList.remove('d-none');
           const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
+          reader.readAsDataURL(blob);
           reader.onloadend = () => {
             document.getElementById('effetFinRecorded').value = reader.result;
           };
-
-          stream.getTracks().forEach(track => track.stop());
+          stream.getTracks().forEach(t => t.stop());
         };
-
         mediaRecorderFin.start();
         document.getElementById('recordFinBtn').classList.add('d-none');
         document.getElementById('stopFinBtn').classList.remove('d-none');
         document.getElementById('recordFinStatus').textContent = 'Enregistrement en cours...';
-       
-
-      } catch (err) {
-        alert('Erreur d\'accès au microphone : ' + err.message);
-      }
+      } catch (err) { alert('Erreur microphone : ' + err.message); }
     });
 
     document.getElementById('stopFinBtn')?.addEventListener('click', () => {
@@ -724,14 +838,9 @@
       document.getElementById('recordFinBtn').classList.remove('d-none');
       document.getElementById('stopFinBtn').classList.add('d-none');
       document.getElementById('recordFinStatus').textContent = 'Enregistrement terminé';
-        document.getElementById('submitFinRecord').disabled = false; // Activer le bouton
-
+      document.getElementById('submitFinRecord').disabled = false;
     });
   </script>
-
-
- 
-
 
 </body>
 </html>

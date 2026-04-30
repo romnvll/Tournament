@@ -25,7 +25,7 @@ if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) == null) {
 
 
 
-if ($_GET['action'] == "ajoutUserSurTable") {
+if (isset($_GET['action']) && $_GET['action'] == "ajoutUserSurTable") {
     $idTournoi = $_GET['tournoiId'];
     require 'class/PersonneTableDao.class.php';
     $personneTable = new PersonneTableDao();
@@ -98,6 +98,20 @@ if (isset($_GET['addArbitre']) && $_GET['addArbitre'] == "true") {
     header("Location: modifierTournoi.php?idTournoi=".$idTournoi."&tab=arbitres");
    exit();
 }
+
+
+// Attacher/détacher un gymnase d'un tournoi
+if (isset($_POST['attacherGymnase'])) {
+    require_once 'class/gymnaseDao.class.php';
+    $gymnaseDao = new GymnaseDAO();
+    $gymnase_id = !empty($_POST['gymnase_id']) ? (int)$_POST['gymnase_id'] : null;
+    echo "Gymnase ID reçu : " . var_export($gymnase_id, true) . "<br>";
+    echo 'Tournoi ID reçu : ' . var_export($_POST['idTournoi'], true) . "<br>";
+    $gymnaseDao->attacherGymnaseATournoi((int)$_POST['idTournoi'],$userData['id'], $gymnase_id );
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
 
 if (isset($_GET['delArbitre']) && $_GET['delArbitre'] == "true") {
     (int)$idTournoi = $_GET['tournoiId'];

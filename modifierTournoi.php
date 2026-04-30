@@ -23,6 +23,7 @@ require 'class/personneDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/PersonneTableDao.class.php';
 require 'Lang/lang.php';
+require 'class/gymnaseDao.class.php';
 
 $tournoiDao = new tournoiDao();
 if (
@@ -36,6 +37,7 @@ if (
 
 $terrain = new TerrainDao();
 $personneTable = new PersonneTableDao();
+$gymnaseDao = new GymnaseDAO();
 
 $poules = new PouleManager();
 
@@ -79,5 +81,7 @@ echo $template->render([
 'AfficherLesClubsPourArbitres' => $listeClub->clubsParticipatingInTournoi($_GET['idTournoi']),
 'AfficherLesArbitres' => $arbitre->afficherArbitres($_GET['idTournoi']),
 'tab'=>$_GET['tab'] ?? null,
+'gymnases' => $gymnaseDao->getGymnasesByUser($userData['id']),
+'gymnaseActuel' => $tournoiDao->getTournoiById($_GET['idTournoi'])['gymnase_id'] ?? null,
 
 ]);

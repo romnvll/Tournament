@@ -766,6 +766,10 @@
                                 </div>
                             </div>
 
+
+
+
+
                             <div class="form-switch-modern">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="gestionVoix" 
@@ -873,6 +877,117 @@
                             </div>
                         </div>
                     </form>
+
+
+                                    {# ================================================================
+   BLOC GYMNASE — à insérer dans modifierTournoi.twig
+   Emplacement : dans la colonne gauche (.col-lg-6), après la </form>
+   des paramètres du tournoi et avant le bouton suppression.
+   ================================================================ #}
+
+<div class="options-section mt-4">
+    <div class="options-title">
+        <i class="fas fa-building"></i>
+        🏟️ Gymnase du tournoi
+        <span class="badge bg-secondary ms-2" style="font-size:0.7rem;font-weight:500;">Optionnel</span>
+    </div>
+     <div class="info-box mb-3">
+        <i class="fa-solid fa-circle-info"></i>
+        <strong>Ces informations seront visibles par les participants</strong> sur la page publique du tournoi —
+        adresse, ville et téléphone du gymnase s'afficheront automatiquement,
+        ce qui évitera aux participants de vous contacter pour savoir où se rendre.
+    </div>
+
+    {% if gymnases is empty %}
+        {# Aucun gymnase créé → invitation à en créer un #}
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-0" style="border-radius:8px;">
+            <i class="fas fa-info-circle"></i>
+            <span>
+                Vous n'avez pas encore de gymnase.
+                <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true"
+                   class="fw-bold">
+                    Créer un gymnase dans mes préférences
+                </a>
+            </span>
+        </div>
+    {% else %}
+        <form action="modifierTournoi_traitement.php" method="POST">
+            <input type="hidden" name="attacherGymnase" value="1">
+            <input type="hidden" name="idTournoi"       value="{{ infotournoi.id }}">
+
+            <div class="form-group-modern mb-3">
+                <label for="gymnase_id" class="form-label-modern">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Sélectionner un gymnase
+                </label>
+                <select name="gymnase_id"
+                        id="gymnase_id"
+                        class="modern-input"
+                        onchange="this.form.submit()">
+                    <option value="">— Aucun gymnase —</option>
+                    {% for g in gymnases %}
+                        <option value="{{ g.id }}"
+                            {% if gymnaseActuel == g.id %}selected{% endif %}>
+                            {{ g.nom }}
+                            {% if g.ville %} — {{ g.ville }}{% endif %}
+                            {% if g.nb_terrains %} ({{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {# Fiche récapitulative du gymnase sélectionné #}
+            {% if gymnaseActuel %}
+                {% for g in gymnases %}
+                    {% if g.id == gymnaseActuel %}
+                    <div class="info-box" style="margin-top:0;">
+                        <div class="fw-bold mb-1">
+                            <i class="fas fa-building me-1"></i>{{ g.nom }}
+                        </div>
+                        {% if g.adresse %}
+                            <div class="text-muted" style="font-size:0.9rem;">
+                                <i class="fas fa-map-pin me-1"></i>{{ g.adresse }}
+                                {% if g.ville %}, {{ g.ville }}{% endif %}
+                                {% if g.code_postal %} {{ g.code_postal }}{% endif %}
+                            </div>
+                        {% endif %}
+                        {% if g.telephone %}
+                            <div class="text-muted" style="font-size:0.9rem;">
+                                <i class="fas fa-phone me-1"></i>{{ g.telephone }}
+                            </div>
+                        {% endif %}
+                        {% if g.nb_terrains %}
+                            <div class="text-muted" style="font-size:0.9rem;">
+                                <i class="fas fa-th-large me-1"></i>
+                                {{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="d-flex gap-2 mt-3">
+                <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true"
+                   class="modern-btn btn-primary-modern btn-sm">
+                    <i class="fas fa-cog"></i>
+                    Gérer mes gymnases
+                </a>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
                     {% if infotournoi.isArchived == 1 %}
                         <a class="modern-btn btn-danger-modern mt-3" 

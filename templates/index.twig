@@ -1229,10 +1229,69 @@
     {% endif %}
 
     <div class="card-modern choisirClub">
-        <div class="card-header-modern">
-            <i class="fas fa-users"></i>
-            Choisir un club
+       
+  {% if gymnaseInfo %}
+<div class="modern-card mt-4">
+    <div class="card-header-modern" style="background: linear-gradient(135deg, #0f766e, #0d9488);">
+        <i class="fas fa-building"></i>
+        🏟️ {{ gymnaseInfo.nom }}
+    </div>
+    <div class="card-body-modern">
+        <div class="d-flex flex-column gap-3 mb-5" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px;">
+
+            {% if gymnaseInfo.adresse or gymnaseInfo.ville or gymnaseInfo.code_postal %}
+                {% set adresseComplete %}{% if gymnaseInfo.adresse %}{{ gymnaseInfo.adresse }}, {% endif %}{% if gymnaseInfo.ville %}{{ gymnaseInfo.ville }} {% endif %}{% if gymnaseInfo.code_postal %}{{ gymnaseInfo.code_postal }}{% endif %}{% endset %}
+                <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
+                   target="_blank"
+                   class="text-decoration-none d-flex align-items-center gap-3">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-map-marker-alt" style="color:white;font-size:1.1rem;"></i>
+                    </div>
+                    <div style="font-size:1rem;color:#1f2937;font-weight:500;">
+                        {% if gymnaseInfo.adresse %}{{ gymnaseInfo.adresse }},{% endif %}
+                        {% if gymnaseInfo.ville %}{{ gymnaseInfo.ville }}{% endif %}
+                        {% if gymnaseInfo.code_postal %}{{ gymnaseInfo.code_postal }}{% endif %}
+                    </div>
+                </a>
+            {% endif %}
+
+            {% if gymnaseInfo.adresse and gymnaseInfo.telephone %}
+                <hr style="margin: 0; border-color: #e5e7eb;">
+            {% endif %}
+
+            {% if gymnaseInfo.telephone %}
+                <a href="tel:{{ gymnaseInfo.telephone }}"
+                   class="text-decoration-none d-flex align-items-center gap-3">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#4338ca);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-phone" style="color:white;font-size:1rem;"></i>
+                    </div>
+                    <div style="font-size:1rem;color:#1f2937;font-weight:500;">
+                        {{ gymnaseInfo.telephone }}
+                    </div>
+                </a>
+            {% endif %}
+
+            {% if gymnaseInfo.commentaire %}
+                <hr style="margin: 0; border-color: #e5e7eb;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-comment-alt" style="color:white;font-size:1rem;"></i>
+                    </div>
+                    <div style="font-size:1rem;color:#1f2937;">
+                        {{ gymnaseInfo.commentaire }}
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
 
         {% if listeDesCLubs|length == 1 %}
             <script>

@@ -37,7 +37,7 @@ CREATE TABLE elimination_config (
     UNIQUE KEY uq_config (tournoi_id, categorie_id)
 );
 
-//08/04/2026
+//08/04/2026 en prod depuis le 30/04
 AJOUT de type de Rencontres
 CREATE TABLE typeDeRencontres (
     id        INT(11)     NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -69,4 +69,33 @@ ALTER TABLE Rencontres
     ADD CONSTRAINT fk_type_rencontre FOREIGN KEY (type_rencontre_id) REFERENCES typeDeRencontres(id),
     DROP COLUMN isClassement;
 
-    
+//pas de difference entre dev et prod
+
+//Modif 30/04:
+CREATE TABLE Gymnases (
+  id              INT(11)      NOT NULL AUTO_INCREMENT,
+  nom             VARCHAR(128) NOT NULL,
+  adresse         VARCHAR(255) DEFAULT NULL,
+  ville           VARCHAR(128) DEFAULT NULL,
+  code_postal     VARCHAR(10)  DEFAULT NULL,
+  telephone       VARCHAR(32)   DEFAULT NULL,
+  commentaire     TEXT DEFAULT NOT NULL,
+  utilisateur_id  INT(11)      NOT NULL,
+  date_creation   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_gymnase_utilisateur
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ajouter un champ commentaire text can be null
+ajouter un champs telephone VARCHAR 32 can be null
+
+ALTER TABLE Tournois
+  ADD COLUMN gymnase_id INT(11) DEFAULT NULL AFTER utilisateur_id,
+  ADD CONSTRAINT fk_tournoi_gymnase
+    FOREIGN KEY (gymnase_id) REFERENCES Gymnases(id)
+    ON DELETE SET NULL ON UPDATE CASCADE;
+
+ajouter un champ commentaire text can be null
+ajouter un champs telephone VARCHAR 32 can be null

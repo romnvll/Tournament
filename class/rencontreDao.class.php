@@ -1190,7 +1190,7 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
+public function getRencontreByCategorie($categorieId, $tournoiId, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
 {
     $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
     $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
@@ -1307,6 +1307,7 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
 
         WHERE 
             r.type_rencontre_id = :typeRencontreId
+            AND r.tournoi_id = :tournoiId
             AND equipe1.categorie = :categorieId
             AND equipe2.categorie = :categorieId
             $additionalCondition
@@ -1317,13 +1318,13 @@ public function getRencontreByCategorie($categorieId, $typeRencontreId = TYPE_RE
     
     $stmt = $this->connexion->prepare($query);
     $stmt->bindParam(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->bindParam(':tournoiId', $tournoiId, PDO::PARAM_INT);
     $stmt->bindParam(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
     
     $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 
 
     public function updateStatusByCreneau(int $idCreneau, int $status): void
