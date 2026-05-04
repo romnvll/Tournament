@@ -470,9 +470,7 @@
             <span class="header-badge">
                 <i class="fas fa-handshake"></i> Matchs Amicaux
             </span>
-            <a href="GestionDesRencontres.php?id_tournoi={{ idTournoi }}" class="back-link">
-                <i class="bi bi-arrow-left"></i> Retour à la gestion
-            </a>
+           
         </div>
 
         <!-- Alerts -->
@@ -652,6 +650,8 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}" class="back-link">
+                    <i class="bi bi-calendar3"></i> Placer dans le planning
             {% else %}
                 <div class="empty-state">
                     <i class="bi bi-inbox"></i>
