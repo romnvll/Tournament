@@ -690,32 +690,32 @@
                           <div class="col-md-6">
                             <label class="form-label">Nom *</label>
                             <input type="text" name="nom" class="form-control"
-                                   value="{{ gymnase.nom }}" required maxlength="100">
+                                   value="{{ gymnase.nom|e('html_attr') }}" required maxlength="100">
                           </div>
                           <div class="col-md-6">
                             <label class="form-label">Téléphone</label>
                             <input type="tel" name="telephone" class="form-control"
-                                   value="{{ gymnase.telephone }}" maxlength="20">
+                                   value="{{ gymnase.telephone|e('html_attr') }}" maxlength="20">
                           </div>
                           <div class="col-12">
                             <label class="form-label">Adresse *</label>
                             <input type="text" name="adresse" class="form-control"
-                                   value="{{ gymnase.adresse }}" required maxlength="255">
+                                   value="{{ gymnase.adresse|e('html_attr') }}" required maxlength="255">
                           </div>
                           <div class="col-md-8">
                             <label class="form-label">Ville *</label>
                             <input type="text" name="ville" class="form-control"
-                                   value="{{ gymnase.ville }}" required maxlength="100">
+                                   value="{{ gymnase.ville|e('html_attr') }}" required maxlength="100">
                           </div>
                           <div class="col-md-4">
                             <label class="form-label">Code postal *</label>
                             <input type="text" name="code_postal" class="form-control"
-                                   value="{{ gymnase.code_postal }}" required maxlength="10">
+                                   value="{{ gymnase.code_postal|e('html_attr') }}" required maxlength="10">
                           </div>
                           <div class="col-12">
                             <label class="form-label">Commentaire</label>
                             <textarea name="commentaire" class="form-control"
-                                      rows="2" maxlength="500">{{ gymnase.commentaire }}</textarea>
+                                      rows="2" maxlength="500">{{ gymnase.commentaire|e('html_attr') }}</textarea>
                           </div>
                         </div>
 

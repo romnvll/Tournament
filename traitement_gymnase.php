@@ -38,11 +38,12 @@ switch ($action) {
         $gymnaseId  = (int) ($_POST['gymnase_id'] ?? 0);
         $nom        = trim($_POST['nom']         ?? '');
         $adresse    = trim($_POST['adresse']     ?? '');
+        
         $ville      = trim($_POST['ville']       ?? '');
         $codePostal = trim($_POST['code_postal'] ?? '');
         $telephone  = trim($_POST['telephone']   ?? '') ?: null;
         $commentaire = trim($_POST['commentaire'] ?? '') ?: null;
-
+        
         if ($gymnaseId === 0 || empty($nom) || empty($adresse) || empty($ville) || empty($codePostal)) {
             header('Location: mesPreferences.php?id_tournoi=' . intval($_POST['id_tournoi'])
                 . '&gestionGymnases=true&error=champs_manquants');
@@ -58,7 +59,7 @@ switch ($action) {
 
         $gymnaseDao->modifierGymnase($gymnaseId, $userId, $nom, $adresse, $ville, $codePostal, $telephone, $commentaire);
         header('Location: mesPreferences.php?id_tournoi=' . intval($_POST['id_tournoi'])
-            . '&gestionGymnases=true&status=gymnase_modifie');
+         . '&gestionGymnases=true&status=gymnase_modifie');
         exit;
 
     // ─────────────────────────────────────────────

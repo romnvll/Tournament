@@ -227,6 +227,16 @@ else {
 }
 
 
+if ($_POST['gestionInformations'] == "") {
+    $gestionInformations = 0;
+}
+else {
+    $gestionInformations = 1;
+    
+}
+
+
+
 
 if (isset($_POST['idArbitre'])) {
    require ('class/arbitreDao.class.php');
@@ -256,7 +266,7 @@ $tempRefresh = $_POST['refreshClientTime'] * 1000;
 
 
 $tournoidao = new tournoiDao();
-$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh,$gestionRepas,$gestionPartenaires,$gestionVoix);
+$var = $tournoidao->modifierTournoi($_POST['idTournoi'],$_POST['nom'],$_POST['heure_debut'],$isClassement,$_POST['pasHoraire'],$isVisible,$heureIsVisible,$isArchived,$IsRankingView,$gestionTables,$gestionArbitres,$tempRefresh,$gestionRepas,$gestionPartenaires,$gestionVoix,$gestionInformations);
 
 header("Location: " . $_SERVER['HTTP_REFERER'] ."");
 ?>

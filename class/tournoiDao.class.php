@@ -621,6 +621,7 @@ public function modifierTournoi(
     ?int $gestionRepas = null,
     ?int $gestionPartenaires = null,
     ?int $gestionVoix = null,
+    ?int $gestionInformations = null,
 ): void {
     $fields = [];
     $params = [':idTournoi' => $idTournoi];
@@ -679,6 +680,11 @@ public function modifierTournoi(
     if ($gestionPartenaires !== null) {
         $fields[] = "gestionPartenaires = :gestionPartenaires";
         $params[':gestionPartenaires'] = $gestionPartenaires;
+    }
+
+    if ($gestionInformations !== null) {
+        $fields[] = "gestionInformations = :gestionInformations";
+        $params[':gestionInformations'] = $gestionInformations;
     }
 
     // Gestion de refreshClientTime : si null, on le met à 30000

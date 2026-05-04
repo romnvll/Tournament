@@ -71,22 +71,23 @@ ALTER TABLE Rencontres
 
 //pas de difference entre dev et prod
 
-//Modif 30/04:
+//Modif 30/04: en PROD
 CREATE TABLE Gymnases (
   id              INT(11)      NOT NULL AUTO_INCREMENT,
   nom             VARCHAR(128) NOT NULL,
   adresse         VARCHAR(255) DEFAULT NULL,
   ville           VARCHAR(128) DEFAULT NULL,
   code_postal     VARCHAR(10)  DEFAULT NULL,
-  telephone       VARCHAR(32)   DEFAULT NULL,
-  commentaire     TEXT DEFAULT NOT NULL,
+  
   utilisateur_id  INT(11)      NOT NULL,
-  date_creation   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  
   PRIMARY KEY (id),
   CONSTRAINT fk_gymnase_utilisateur
     FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `Gymnases` ADD `commentaire` TEXT NULL AFTER `nom`, ADD `telephone` VARCHAR(32) NOT NULL AFTER `commentaire`;
 
 ajouter un champ commentaire text can be null
 ajouter un champs telephone VARCHAR 32 can be null
@@ -99,3 +100,6 @@ ALTER TABLE Tournois
 
 ajouter un champ commentaire text can be null
 ajouter un champs telephone VARCHAR 32 can be null
+
+Modif 04/05 c'est pas en prod
+ALTER TABLE Tournois ADD COLUMN gestionInformations INT(1) DEFAULT 0 AFTER gestionArbitres;
