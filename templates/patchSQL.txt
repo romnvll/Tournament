@@ -101,5 +101,5 @@ ALTER TABLE Tournois
 ajouter un champ commentaire text can be null
 ajouter un champs telephone VARCHAR 32 can be null
 
-Modif 04/05 c'est pas en prod
+Modif 04/05 c'est en PROD
 ALTER TABLE Tournois ADD COLUMN gestionInformations INT(1) DEFAULT 0 AFTER gestionArbitres;

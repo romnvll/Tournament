@@ -1049,7 +1049,11 @@ details > summary::-webkit-details-marker {
 										{% endif %}
 									{% endfor %}
 
-									<td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" style="background-color: {{ couleurDeFond }}" class="planif-cell planif-item">
+									<td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" style="background-color: {{ couleurDeFond }}" 
+									
+									data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+    								data-creneau-id="{{ creneau.creneau_id }}"
+									class="planif-cell planif-item drop-zone">
 
 										{% set planificationFound = false %}
 										{% set creneauOqp = false %}
@@ -1213,7 +1217,6 @@ details > summary::-webkit-details-marker {
 										<!-- Sélecteur vide -->
 										{% if creneauOqp == false %}
 
-											<div class="drop-zone" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}">
 
 												<form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
 
@@ -1271,7 +1274,7 @@ details > summary::-webkit-details-marker {
 													</select>
 												</form>
 
-											</div>
+											
 										{% endif %}
 									</td>
 								{% endfor %}
@@ -1462,58 +1465,71 @@ details > summary::-webkit-details-marker {
 		</script>
 
 	 <script>
-		(function() {
-		    let dragged = null;
-		
-		    // Rendre les cartes draggables
-		    document.querySelectorAll('.match-card[draggable]').forEach(card => {
-		        card.addEventListener('dragstart', e => {
-		            dragged = card;
-		            setTimeout(() => card.classList.add('dragging'), 0);
-		            e.dataTransfer.effectAllowed = 'move';
-		        });
-		        card.addEventListener('dragend', () => {
-		            card.classList.remove('dragging');
-		            dragged = null;
-		            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
-		        });
-		    });
-		
-		    // Gérer les zones de dépôt
-		    document.querySelectorAll('.drop-zone').forEach(zone => {
-		        zone.addEventListener('dragover', e => {
-		            e.preventDefault();
-		            zone.classList.add('drag-over');
-		            e.dataTransfer.dropEffect = 'move';
-		        });
-		        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-		        zone.addEventListener('drop', e => {
-		            e.preventDefault();
-		            zone.classList.remove('drag-over');
-		            if (!dragged) return;
-		
-		            const planifId  = dragged.dataset.planifId;
-		            const newTerrain = zone.dataset.terrainId;
-		            const newCreneau = zone.dataset.creneauId;
-		
-		            // Appel POST vers votre traitement
-		            fetch('PlacementDesRencontresTraitement.php', {
-		                method: 'POST',
-		                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		                body: new URLSearchParams({
-		                    action:      'deplacerPlanification',
-		                    planifId:    planifId,
-		                    newTerrain:  newTerrain,
-		                    newCreneau:  newCreneau,
-		                    idTournoi:   '{{ idTournoi }}'
-		                })
-		            }).then(r => {
-		                if (r.ok) location.reload();
-		                else alert('Erreur lors du déplacement.');
-		            });
-		        });
-		    });
-		})();
-		</script>
+(function() {
+    let dragged = null;
+
+    // Rendre les cartes draggables
+    document.querySelectorAll('.match-card[draggable]').forEach(card => {
+        card.addEventListener('dragstart', e => {
+            dragged = card;
+            setTimeout(() => card.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            dragged = null;
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+        });
+    });
+
+    // Gérer les zones de dépôt
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+
+        zone.addEventListener('dragover', e => {
+            // Bloquer si la cellule contient déjà un match (sauf la carte qu'on est en train de glisser)
+            const existingCard = zone.querySelector('.match-card:not(.dragging)');
+            if (existingCard) return; // cellule occupée → on refuse
+            e.preventDefault();
+            zone.classList.add('drag-over');
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        zone.addEventListener('dragleave', e => {
+            // Éviter le flickering quand on passe sur un enfant du td
+            if (!zone.contains(e.relatedTarget)) {
+                zone.classList.remove('drag-over');
+            }
+        });
+
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            if (!dragged) return;
+
+            const existingCard = zone.querySelector('.match-card:not(.dragging)');
+            if (existingCard) return; // double sécurité
+
+            const planifId   = dragged.dataset.planifId;
+            const newTerrain = zone.dataset.terrainId;
+            const newCreneau = zone.dataset.creneauId;
+
+            fetch('PlacementDesRencontresTraitement.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action:     'deplacerPlanification',
+                    planifId:   planifId,
+                    newTerrain: newTerrain,
+                    newCreneau: newCreneau,
+                    idTournoi:  '{{ idTournoi }}'
+                })
+            }).then(r => {
+                if (r.ok) location.reload();
+                else alert('Erreur lors du déplacement.');
+            });
+        });
+    });
+})();
+</script>
 
 </body></html>
