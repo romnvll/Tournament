@@ -2062,6 +2062,9 @@
 </div>
 {% endif %}
 <!-- fin phase finale -->
+
+
+{% if IsRankingView %}
  {% if RencontreByCategoriePhaseFinale is not empty %} 
                 {% set pouleEnCours = null %}
                 {% set classement = 0 %}
@@ -2104,7 +2107,11 @@
                                                 style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;"
                                                 alt="logo"
                                                 loading="lazy">
-                                            <span class="fw-semibold">{{ resultat.nom|upper }}</span>
+                                            <span class="fw-semibold">
+                                           <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ resultat.id }}&id_club={{ resultat.club_id }}&affichageByTeam=true" class="team-name">
+                                            {{ resultat.nom|upper }} </a>
+                                            
+                                            </span>
                                         </div>
                                     </td>
                                     <td class="text-center">
@@ -2123,6 +2130,7 @@
                 </div>
             </div>
     {% endif %}
+{% endif %}
 {% endif %}
 
             {% endif %}
