@@ -732,6 +732,7 @@ public function pourcentageRencontresTermineesDuTournoi(int $idTournoi): int {
 }
 
 
+
 public function rencontresPlanifieeDuTournoi(int $idTournoi): int {
    
     $stmt = $this->connexion->prepare("

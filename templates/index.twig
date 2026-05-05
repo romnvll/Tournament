@@ -1303,11 +1303,15 @@
             </script>
         {% else %}
             {% for club in listeDesCLubs %}
-                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
+               
+                 
+               
+                    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
                     <img src="{{ club.logo }}" alt="{{ club.nom }}" loading="lazy" class="selection-logo">
                     <div class="selection-text">{{ club.nom|upper }}</div>
                     <i class="fas fa-chevron-right"></i>
                 </a>
+                  
 
                 {% if partenaires is not empty %}
                     {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
@@ -1782,8 +1786,8 @@
                                         {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                                     </a> 
                                     {% elseif affichageByPoule %}
-                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
-                                        {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                        {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                                     </a> 
                                     {% else %}
                                     <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&idPoule={{ equipe.equipe2_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">

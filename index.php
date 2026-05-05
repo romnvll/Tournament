@@ -58,9 +58,16 @@ $classementFinal = null;
 
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
+    
+    
+  
+   
   if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
   $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
-  
+
+
+
+
   }
 
 $gymnaseDao = new GymnaseDAO();
@@ -70,6 +77,8 @@ $gymnaseInfo = $gymnaseDao->getGymnaseByTournoiId($_GET['id_tournoi']);
 else {
   $planTournoi = null;
   $gymnaseInfo = null;
+ 
+   $nbrterrain = null;
 }
 
 
@@ -338,6 +347,7 @@ echo $template->render([
      'pouleInfo' => $pouleInfo,
      'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
       'gymnaseInfo' => $gymnaseInfo,
+      
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),
