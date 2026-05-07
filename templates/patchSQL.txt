@@ -103,3 +103,6 @@ ajouter un champs telephone VARCHAR 32 can be null
 
 Modif 04/05 c'est en PROD
 ALTER TABLE Tournois ADD COLUMN gestionInformations INT(1) DEFAULT 0 AFTER gestionArbitres;
+
+modif 07/05 c'est en prod
+ALTER TABLE Categorie ADD COLUMN afficherClassement INT(1) DEFAULT 1 AFTER Couleur;
