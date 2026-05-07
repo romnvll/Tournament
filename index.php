@@ -306,7 +306,7 @@ if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
 if (isset ($_GET['idCategorie'])) {
   $RencontreByCategoriePhaseFinale = $rencontre->getRencontreByCategorie($_GET['idCategorie'], $_GET['id_tournoi'], 3);
    $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
-
+    
 }
 
 

@@ -97,6 +97,40 @@ public function existePlanificationPourCategorie(int $idCategorie): bool
         $stmt->bindParam(':utilisateurId', $utilisateurId);
         $stmt->execute();
     }
+/**
+ * Met à jour l'affichage du classement d'une catégorie.
+ * @param int $id
+ * @param int $afficherClassement
+ * @param int $utilisateurId
+ */
+public function changerAfficherClassementCategorie(int $id, int $afficherClassement, int $utilisateurId): void {
+    $stmt = $this->connexion->prepare("
+        UPDATE Categorie
+        SET afficherClassement = :afficherClassement
+        WHERE id_categorie = :id AND utilisateur_id = :utilisateurId
+    ");
+    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':afficherClassement', $afficherClassement);
+    $stmt->bindParam(':utilisateurId', $utilisateurId);
+    $stmt->execute();
+}
+
+
+public function renommerCategorie(int $id, string $nom, int $utilisateurId): void {
+    $stmt = $this->connexion->prepare("
+        UPDATE Categorie
+        SET Nom_categorie = :nom
+        WHERE id_categorie = :id AND utilisateur_id = :utilisateurId
+    ");
+    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':utilisateurId', $utilisateurId);
+    $stmt->execute();
+}
+
+
+
+
     /**
      * Met à jour une catégorie existante.
      */

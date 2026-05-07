@@ -1166,7 +1166,7 @@
                         {% if tournoi.isVisible == 1 %}
                             {% set visibility = 1 %}
                         {% endif %}
-                        {% if tournoi.IsRankingView == 1 %}
+                        {% if tournoi.IsRankingView == 1 and getCategorieCourante['afficherClassement'] == 1 %}
                             {% set IsRankingView = 1 %}
                         {% endif %}
                         {% if tournoi.gestionArbitres == 1 %}
@@ -1880,9 +1880,11 @@
     <div class="card-header-modern" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
     <i class="fas fa-trophy"></i>
     Phase finale {{ getCategorieCourante['Nom_categorie']|upper }}
+    {% if IsRankingView %}
     <a href="#classementTableauFinal" class="ms-auto team-name" style="color: white; font-size: 0.8rem; font-weight: 600; text-decoration: none; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">
         <i class="fas fa-ranking-star me-1"></i> Classement final
     </a>
+    {% endif %}
 </div>
 
     {# Grouper par créneau horaire #}
@@ -1919,12 +1921,16 @@
                             <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
                             <span class="team-logo-badge">›</span>
                         </a>
+                       
                         <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
                             {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
                         </a>
+                       
+                         {% if IsRankingView %}
                         <div class="phase-finale-poule">
                             <i class="fas fa-sitemap"></i> {{ equipe.equipe1_poules|split(' - ')|last|split(', ')|last }}
                         </div>
+                         {% endif %}
                         {% if equipe.equipe1_coach_nom %}
                             <div class="coach-info">
                                 <i class="fas fa-clipboard-user"></i>
@@ -1997,9 +2003,11 @@
                         <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
                             {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
                         </a>
+                        {% if IsRankingView %}
                         <div class="phase-finale-poule">
                             <i class="fas fa-sitemap"></i> {{ equipe.equipe2_poules|split(' - ')|last|split(', ')|last }}
                         </div>
+                        {% endif %}
                         {% if equipe.equipe2_coach_nom %}
                             <div class="coach-info">
                                 <i class="fas fa-clipboard-user"></i>

@@ -5,6 +5,26 @@ require_once 'class/categorie.class.php';
 $categorieDao = new CategorieDao();
 
 
+if (isset($_POST['renommerCategorie'])) {
+    $categorieDao->renommerCategorie(
+        (int)$_POST['id_categorie'], 
+        $_POST['nomCategorie'], 
+        $userData['id']
+    );
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+if (isset($_POST['afficherClassement']) ) {
+
+    
+    $categorieDao->changerAfficherClassementCategorie($_POST['id_categorie'], $_POST['afficherClassement'], $userData['id']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+   
+    
+}
+
+
 if (isset ($_POST['clubToUser']))   {
     require_once ('class/utilisateurDao.class.php');
     $utilisateurDao = new UtilisateurDAO();
@@ -313,29 +333,25 @@ if (isset($_GET['supprimerEffetFin'])) {
     exit();
 }
 
-if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POST['newPassword2'])) {
-    require_once 'class/utilisateurDao.class.php';
-    $utilisateurDao = new UtilisateurDAO();
+if (isset($_POST['oldPassword']) || isset($_POST['newPassword1']) || isset($_POST['newPassword2'])) {
+    if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POST['newPassword2'])) {
+        require_once 'class/utilisateurDao.class.php';
+        $utilisateurDao = new UtilisateurDAO();
 
-    // Vérifier si les deux nouveaux mots de passe sont identiques
-    if ($_POST['newPassword1'] === $_POST['newPassword2']) {
-        $success = $utilisateurDao->changerMotDePasse($userData['id'], $_POST['oldPassword'], $_POST['newPassword1']);
-        
-        // Vérifier si le changement de mot de passe a réussi
-        if ($success) {
-            header("Location: " . $_SERVER['HTTP_REFERER'] ."?status=success");
-            exit();
+        if ($_POST['newPassword1'] === $_POST['newPassword2']) {
+            $success = $utilisateurDao->changerMotDePasse($userData['id'], $_POST['oldPassword'], $_POST['newPassword1']);
+            if ($success) {
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "?status=success");
+                exit();
+            } else {
+                echo "L'ancien mot de passe est incorrect.";
+            }
         } else {
-            // Gérer l'erreur, par exemple, afficher un message d'erreur
-            echo "L'ancien mot de passe est incorrect.";
+            echo "Les nouveaux mots de passe ne correspondent pas.";
         }
     } else {
-        // Gérer l'erreur, par exemple, afficher un message d'erreur
-        echo "Les nouveaux mots de passe ne correspondent pas.";
+        echo "Tous les champs de mot de passe doivent être remplis.";
     }
-} else {
-    // Gérer l'erreur, par exemple, afficher un message d'erreur
-    echo "Tous les champs de mot de passe doivent être remplis.";
 }
 
 if (isset($_GET['supprimerSponsors'])) {
