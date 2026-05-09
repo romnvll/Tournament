@@ -611,10 +611,24 @@
                     <div class="card mb-3 {% if poule.fk_idcategorie != idCategorieEnCours %}d-none{% endif %}">
                         <div class="card-header">
                             <div class="d-flex align-items-center justify-content-between p-3 border rounded shadow-sm bg-light">
-                                <span class="badge rounded-pill bg-info text-dark fs-6">{{ poule.nom }}</span>
-                                <a class="btn btn-primary btn-sm" href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}">
-                                    <i class="fas fa-plus-circle me-1"></i> Créer les rencontres
-                                </a>
+                              <span class="badge rounded-pill bg-info text-dark fs-6">{{ poule.nom }}</span>
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check mb-0">
+                                            <input class="form-check-input checkbox-retour" type="checkbox" 
+                                                data-target="btnCreer_{{ poule.id }}">
+                                            <label class="form-check-label text-dark">
+                                                Créer les rencontres retour
+                                            </label>
+                                        </div>
+
+                                        <a class="btn btn-primary btn-sm" id="btnCreer_{{ poule.id }}"
+                                        data-base-href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
+                                        href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}">
+                                            <i class="fas fa-plus-circle me-1"></i> Créer les rencontres
+                                        </a>
+                                    </div>
+                                   
                                 <div class="d-flex align-items-center">
                                     {% if poule.hasRencontres %}
                                         <span class="text-success fw-bold me-2">Rencontres créées</span>
@@ -664,7 +678,7 @@
                                         {% set nbRencontres = (nbEquipes * (nbEquipes - 1)) // 2 %}
                                         <tr>
                                             <td colspan="5" class="text-center fw-bold">
-                                                {{ nbRencontres }} rencontres à planifier
+                                            <!--    {{ nbRencontres }} rencontres à planifier -->
                                             </td>
                                         </tr>
                                         {% for equipe in poule.contenu %}
@@ -710,5 +724,19 @@
             }
         };
     </script>
+
+
+<script>
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('checkbox-retour')) {
+            const checkbox = e.target;
+            const btn = document.getElementById(checkbox.dataset.target);
+            const baseHref = btn.dataset.baseHref;
+            btn.href = baseHref + (checkbox.checked ? '&creerRencontresRetour=true' : '');
+        }
+    });
+</script>
+
+
 </body>
 </html>

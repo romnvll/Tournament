@@ -4,10 +4,14 @@ require ('security.php');
 require 'class/pouleManagerDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
+require 'class/labelsDao.class.php';
+require 'class/categorie.class.php';
 
 $pouledao = new PouleManager();
 $rencontreDao = new RencontreDAO();
 $tournoiDao = new tournoiDao();
+$labelsDao = new LabelDAO();
+$categorieDao = new CategorieDao();
 
 $idTournoi = isset($_GET['tournoiId']) ? (int) $_GET['tournoiId'] : 0;
 
@@ -25,14 +29,27 @@ if (
 
 if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
     $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
-
+    $nomCategorie = $categorieDao->obtenirCategorie($categorieId);
+    //var_dump($nomCategorie);
     if ($categorieId && $idTournoi) {
-        $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
+       $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
+       
+       foreach ($poules as $poule) {
+        
+       if ($labelsDao->labelDescriptionExiste($nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], $idTournoi)) {
+            // Le label existe déjà, ne pas le créer à nouveau
+        } else {
+            $labelsDao->ajouterLabel($nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], '#000000',$idTournoi);
+        }
+       }
+      
+         
+        
         
        
     }
-
-    header("Location: " . $_SERVER['HTTP_REFERER']);
+ 
+  header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
 }
 
@@ -87,6 +104,10 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1) {
 if (isset($_GET['CreerRencontre'])) {
         if ($_GET['CreerRencontre'] == 1) {
         $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3);
+
+        if (isset($_GET['creerRencontresRetour']) && $_GET['creerRencontresRetour'] == 'true') {
+            $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3,true);
+        }
         header("Location: " . $_SERVER['HTTP_REFERER']);
 
       //header("Location:  PlacementDesRencontres.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);

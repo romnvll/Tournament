@@ -180,6 +180,20 @@ ORDER BY c.nom
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+
+public function labelDescriptionExiste(string $description, int $tournoi_id): bool {
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(*) 
+        FROM Labels 
+        WHERE description = :description 
+        AND tournoi_id = :tournoi_id
+    ");
+    $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetchColumn() > 0;
+}
     
 
 
