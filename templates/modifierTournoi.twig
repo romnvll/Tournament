@@ -654,7 +654,12 @@
                 </div>
                 <div class="card-body-modern">
 
-                    {# ── FORMULAIRE PRINCIPAL (sans bloc gymnase) ── #}
+                    {# ================================================================
+                       FORMULAIRE PRINCIPAL
+                       Contient : nom, heure_debut, pasHoraire, tous les switches,
+                       ET refreshClientTime (déplacé ici pour éviter l'écrasement des
+                       autres champs lors du submit de refreshClientTime).
+                       ================================================================ #}
                     <form action="modifierTournoi_traitement.php" method="POST">
                         <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
 
@@ -797,7 +802,6 @@
                                 </div>
                             </div>
 
-                            {# ── Switch gestionInformations ── #}
                             <div class="form-switch-modern">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="gestionInformations"
@@ -810,16 +814,22 @@
                                 </div>
                             </div>
 
+                            {# ── refreshClientTime déplacé ici (même formulaire que les autres champs) ── #}
+                            <div class="form-group-modern mt-3">
+                                <label for="refreshClientTime" class="form-label-modern">
+                                    🔄 Taux rafraîchissement (s)
+                                </label>
+                                <input type="number" class="modern-input" id="refreshClientTime"
+                                       name="refreshClientTime" value="{{ infotournoi.refreshClientTime / 1000 }}"
+                                       onchange="this.form.submit()" min="20" max="200">
+                            </div>
+
                         </div>{# ── FIN .options-section ── #}
                     </form>
                     {# ── FIN du formulaire principal ── #}
 
                     {# ================================================================
                        BLOC GYMNASE
-                       - Juste sous le switch gestionInformations
-                       - En dehors de la form principale (évite les forms imbriquées)
-                       - Caché par défaut via style="display:none;"
-                       - Affiché par toggleDependencies() si gestionInformations est coché
                        ================================================================ #}
                     <div id="gymnaseContainer" class="options-section mt-4" style="display:none;">
                         <div class="options-title">
@@ -867,7 +877,6 @@
                                     </select>
                                 </div>
 
-                                {# Fiche récapitulative du gymnase sélectionné #}
                                 {% if gymnaseActuel %}
                                     {% for g in gymnases %}
                                         {% if g.id == gymnaseActuel %}
@@ -910,10 +919,10 @@
                     </div>
                     {# ── FIN bloc gymnase ── #}
 
-                    {# ── Form pour les options restantes (archivage + refresh) ── #}
+                    {# ── Formulaire archivage seul ── #}
                     <form action="modifierTournoi_traitement.php" method="POST">
                         <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-                         <input type="hidden" name="actionArchiver" value="1"> 
+                        <input type="hidden" name="actionArchiver" value="1">
                         <div class="options-section mt-3">
                             <div class="form-switch-modern">
                                 <div class="form-check form-switch">
@@ -926,18 +935,9 @@
                                     </label>
                                 </div>
                             </div>
-
-                            <div class="form-group-modern mt-3">
-                                <label for="refreshClientTime" class="form-label-modern">
-                                    🔄 Taux rafraîchissement (s)
-                                </label>
-                                <input type="number" class="modern-input" id="refreshClientTime"
-                                       name="refreshClientTime" value="{{ infotournoi.refreshClientTime / 1000 }}"
-                                       onchange="this.form.submit()" min="20" max="200">
-                            </div>
                         </div>
                     </form>
-                    {# ── FIN form options restantes ── #}
+                    {# ── FIN formulaire archivage ── #}
 
                     {% if infotournoi.isArchived == 1 %}
                         <a class="modern-btn btn-danger-modern mt-3"
