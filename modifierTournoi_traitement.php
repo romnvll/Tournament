@@ -67,6 +67,7 @@ if (isset($_GET['action'])) {
             exit;
 
         case 'delArbitre':
+            
             require 'class/arbitreDao.class.php';
             $arbitre = new arbitreDao();
             try {
@@ -101,6 +102,12 @@ if (isset($_GET['addPersonne']) && $_GET['addPersonne'] === 'true') {
 // --- Ajouter un arbitre ---
 if (isset($_GET['addArbitre']) && $_GET['addArbitre'] === 'true') {
     require 'class/arbitreDao.class.php';
+
+    if (empty($_GET['clubID'])) {
+        header("Location: modifierTournoi.php?idTournoi={$tournoiId}&tab=arbitres&error=Il faut au moins créer les équipes avant de placer les arbitres");
+        exit;
+    }
+
     $arbitre = new arbitreDao();
     $arbitre->ajouterArbitre($_GET['nomArbitre'], $tournoiId, (int)$_GET['clubID']);
     header("Location: modifierTournoi.php?idTournoi={$tournoiId}&tab=arbitres");
