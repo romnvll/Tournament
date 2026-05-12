@@ -2,7 +2,11 @@
 require 'security.php';
 require 'vendor/autoload.php';
 require 'class/labelsDao.class.php';
-session_start();
+require 'class/tournoiDao.class.php';
+require 'Lang/lang.php';
+
+
+$tournois = new tournoiDao();
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -11,10 +15,17 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 
-if (($_SESSION['id_tournoi']) == null) {
-
-    $_SESSION['id_tournoi'] = $_GET['id_tournoi'];
+$idTournoi = $_GET['id_tournoi'];
+//detection du propriaitire du tournoi
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
+
+
+
 
 $labels = new LabelDao();
 
@@ -34,7 +45,7 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:/
         // Récupère le chemin de base en excluant la page actuelle
         $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-        $url = $protocol . $domainName . $basePath . "PlacementDesRencontres.php?id_tournoi=" . urlencode($_SESSION['id_tournoi']);
+        $url = $protocol . $domainName . $basePath . "PlacementDesRencontres.php?id_tournoi=" . urlencode($_GET['id_tournoi']);
        
 //
 
@@ -57,7 +68,7 @@ if (isset($_POST['labelModif']) && $_POST['labelModif'] == true) {
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'addLabel') {
     $description = $_GET['description'];
     $couleur = $_GET['couleur'];
-    $tournoi_id = $_SESSION['id_tournoi'];
+    $tournoi_id = $_GET['id_tournoi'];
 
 
     $labelDao = new LabelDao();
@@ -68,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     $domainName = $_SERVER['HTTP_HOST'];
     // Récupère le chemin de base en excluant la page actuelle
     $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
-    $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_SESSION['id_tournoi']);
+    $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_GET['id_tournoi']);
 
 
     // Rediriger vers la page de gestion des labels
@@ -97,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
         // Récupère le chemin de base en excluant la page actuelle
         $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-        $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_SESSION['id_tournoi']);
+        $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_GET['id_tournoi']);
         $url = $url . "&message=Label supprimé avec succès";
         echo $url;
         header('Location: ' . $url);
@@ -113,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
         // Récupère le chemin de base en excluant la page actuelle
         $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 
-        $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_SESSION['id_tournoi']);
+        $url = $protocol . $domainName . $basePath . "GererLabels.php?id_tournoi=" . urlencode($_GET['id_tournoi']);
         $url = $url . "&error=" . urlencode($e->getMessage()) . "";
         echo $url;
         header('Location: ' . $url);
