@@ -535,13 +535,15 @@
                                 <th>Nom</th>
                                 <th>Logo</th>
                                 <th>Sport</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for club in ListeDesClubs %}
                             <tr>
                                 <td>
-                                    {% if idUser == club.utilisateur_id %}
+                               
+                                    {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
                                         <a class="btn-edit" href="modifierClub.php?idclub={{ club.id }}">
                                             <i class="fas fa-edit"></i>
                                             {{ club.nom }}
@@ -568,6 +570,14 @@
                                         <span class="badge-modern badge-secondary-modern">
                                             Non spécifié
                                         </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
+                                        <button type="button" class="btn-edit" style="background: linear-gradient(135deg, #ef4444, #dc2626);"
+                                            onclick="confirmerSuppression({{ club.id }}, '{{ club.nom }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -631,7 +641,33 @@
                 }
             });
         }
+
+
+        function confirmerSuppression(idClub, nomClub) {
+    document.getElementById('nomClubASupprimer').textContent = nomClub;
+    document.getElementById('lienSuppression').href = `supprimerClub.php?idclub=${idClub}`;
+    new bootstrap.Modal(document.getElementById('modalSuppression')).show();
+}
     </script>
+
+
+
+    <div class="modal fade" id="modalSuppression" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer le club <strong id="nomClubASupprimer"></strong> ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <a id="lienSuppression" href="#" class="btn btn-danger">Supprimer</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

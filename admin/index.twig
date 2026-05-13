@@ -57,11 +57,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for t in tournoisEnCours %}
+                        {% for t in tournoisEnCours|sort((a, b) => b.id <=> a.id) %}
                             <tr>
                                 <td><a href="../modifierTournoi.php?idTournoi={{ t.id }}">{{ t.id }}</a></td>
                                 <td>{{ t.nom }}</td>
-                                <td>{{ t.dateDebut }}</td>
+                                <td>
+                                    {{ t.dateDebut }}
+                                    {% if t.dateDebut|date('Y-m-d') < "now"|date('Y-m-d') %}
+                                        <span style="color: red;">&#x2713; Terminé</span>
+                                    {% endif %}
+                                </td>
                                 <td> {{ t.email_utilisateur }}</td>
                             </tr>
                         {% endfor %}
@@ -93,18 +98,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for l in licences %}
-                            <tr>
-                                <td>{{ l.licence_id }}</td>
-                                <td>{{ l.nom_utilisateur }}</td>
-                                <td>{{ l.email_utilisateur }}</td>
-                                <td>{{ l.type_licence }}</td>
-                                <td>{{ l.date_debut }}</td>
-                                <td>{{ l.date_fin ?? '—' }}</td>
-                                <td>{{ l.prix }} €</td>
-                                <td>{{ l.limite_tournois }}</td>
-                                <td>{{ l.limite_equipes }}</td>
-                            </tr>
+                       {% for l in licences %}
+                            {% if l.type_licence != 'Gratuite' %}
+                                <tr>
+                                    <td>{{ l.licence_id }}</td>
+                                    <td>{{ l.nom_utilisateur }}</td>
+                                    <td>{{ l.email_utilisateur }}</td>
+                                    <td>{{ l.type_licence }}</td>
+                                    <td>{{ l.date_debut }}</td>
+                                    <td>{{ l.date_fin ?? '—' }}</td>
+                                    <td>{{ l.prix }} €</td>
+                                    <td>{{ l.limite_tournois }}</td>
+                                    <td>{{ l.limite_equipes }}</td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>

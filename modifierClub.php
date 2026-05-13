@@ -30,6 +30,7 @@ echo $template->render([
     'idTournoi' => $_GET['id_tournoi'] ?? null,
     'idClub' => $_GET['idclub'] ?? null,
     'listeSports' => $typeSportDao->getTousLesTypesDeSport(),
+    'isAdmin' => $userData['role'],
 
 
 ]);
