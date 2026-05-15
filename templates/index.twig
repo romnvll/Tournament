@@ -1177,9 +1177,8 @@
                         {% endif %}
                     {% endif %}
                 {% endfor %}
-
                 <!-- Header Logo -->
-                {% if idclub is not null or idIdPoules is not null or IdEquipe is not null %}
+                {% if IdClub is not null or idIdPoules is not null or IdEquipe is not null %}
                      <div class="card-modern organisateur-info">
             <div class="organisateur-content">
                 <a href="index.php?id_tournoi={{ infoTournoiEnCours.id }}" 
@@ -1448,6 +1447,7 @@
         {% endif %}
 
  <!-- Ranking -->
+
 {% if IsRankingView == 1 and IdPoules != null %}
     <div class="card-modern ranking-card" id="classementTableau">
         <div class="ranking-header">
@@ -1825,7 +1825,7 @@
                 </a>
 
                 {% if equipe.equipe1_poules_ids %}
-                <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&id_club={{IdClub}}&affichageByPoule=true" style="position: relative; display: inline-block;">
+                <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&id_club={{IdClub}}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByPoule=true" style="position: relative; display: inline-block;">
                     <span class="match-category team-name" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
                         {{ equipe.equipe1_poules|split(' - ')[1]|split(',')[0] }}
                     </span>
