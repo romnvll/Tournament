@@ -94,8 +94,8 @@ public function getClassementPoule(int $pouleId): array {
                 SUM(CASE
                     WHEN r.equipe1_id = e.id AND r.score1 > r.score2 THEN 3
                     WHEN r.equipe2_id = e.id AND r.score2 > r.score1 THEN 3
-                    WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 1
-                    ELSE 0
+                    WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 2
+                    ELSE 1
                 END) AS points,
                 COALESCE(SUM(CASE WHEN r.equipe1_id = e.id THEN r.score1
                                   WHEN r.equipe2_id = e.id THEN r.score2 END), 0) AS buts_pour,
@@ -182,8 +182,9 @@ public function getClassementFinal(int $tournoiId, int $categorieId): array {
             SUM(CASE
                 WHEN r.equipe1_id = e.id AND r.score1 > r.score2 THEN 3
                 WHEN r.equipe2_id = e.id AND r.score2 > r.score1 THEN 3
-                WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 1
-                ELSE 0
+                WHEN r.score1 IS NOT NULL AND r.score1 = r.score2 THEN 2
+                WHEN r.score1 IS NULL and r.score2 IS NULL THEN 0
+                ELSE 1
             END) AS TotalDesPoints,
             COALESCE(SUM(CASE 
                 WHEN r.equipe1_id = e.id THEN r.score1
@@ -208,8 +209,9 @@ public function getClassementFinal(int $tournoiId, int $categorieId): array {
           AND p.fk_idcategorie = :categorieId
           AND p.is_classement = 1
         GROUP BY e.id, e.nom, cl.id, cl.logo, p.id, p.nom
-        ORDER BY 
-            CAST(SUBSTRING_INDEX(p.nom, '-', 1) AS UNSIGNED) ASC,
+        ORDER BY
+         p.id ASC, 
+           --CAST(SUBSTRING_INDEX(p.nom, '-', 1) AS UNSIGNED) ASC,
             TotalDesPoints DESC, 
             DifferenceButs DESC, 
             nombreButsMarque DESC
