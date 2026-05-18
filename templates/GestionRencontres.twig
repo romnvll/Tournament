@@ -449,7 +449,7 @@
         <div class="tournament-buttons">
             {% for tournoi in afficherLesTournois %}
                 {% if tournoi.isArchived == 0 %}
-                    <a href="gestionRencontres.php?idTournoi={{tournoi.id}}" 
+                    <a href="gestionRencontres.php?idTournoi={{tournoi.id}}&idPoule=0" 
                        class="tournament-btn {% if tournoi.id == tournoiEnCours %}active{% endif %}">
                         {{tournoi.nom}}
                         <span class="badge-count">
