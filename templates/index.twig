@@ -1027,8 +1027,7 @@
                                 <div class="d-flex flex-column gap-3 mb-5" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px;">
 
                                     {% if gymnaseInfo.adresse or gymnaseInfo.ville or gymnaseInfo.code_postal %}
-                                        {% set adresseComplete = gymnaseInfo.adresse ~ ', ' ~ gymnaseInfo.ville ~ ' ' ~ gymnaseInfo.code_postal %}
-                                        <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
+                                            {% set adresseComplete = gymnaseInfo.nom ~ ', ' ~ gymnaseInfo.adresse ~ ', ' ~ gymnaseInfo.ville ~ ' ' ~ gymnaseInfo.code_postal %}                                        <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
                                            target="_blank"
                                            class="text-decoration-none d-flex align-items-center gap-3">
                                             <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
