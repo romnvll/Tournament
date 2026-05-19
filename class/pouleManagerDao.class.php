@@ -534,14 +534,14 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     $nomCategorie = $stmtNomCategorie->fetchColumn();
 
     if (!$nomCategorie) {
-        return []; // Pas de catégorie trouvée
+        return [];
     }
 
-    // Étape 1 : Récupérer les équipes de la catégorie spécifique
+    // Étape 1 : Récupérer les équipes avec leur club_id
     $stmtEquipes = $this->connexion->prepare("
-        SELECT id, nom
-        FROM Equipes
-        WHERE tournoi_id = :idTournoi AND categorie = :idCategorie
+        SELECT e.id, e.nom, e.club_id
+        FROM Equipes e
+        WHERE e.tournoi_id = :idTournoi AND e.categorie = :idCategorie
     ");
     $stmtEquipes->bindValue(':idTournoi', $idTournoi);
     $stmtEquipes->bindValue(':idCategorie', $idCategorie);
@@ -549,33 +549,46 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
     $equipes = $stmtEquipes->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($equipes)) {
-        return []; // Pas d'équipes dans cette catégorie pour ce tournoi
+        return [];
     }
 
-    // Étape 2 : Regrouper les équipes en poules selon le nombre d'équipes par poule
-    $poules = [];
-    $currentPoule = [];
-    foreach ($equipes as $index => $equipe) {
-        $currentPoule[] = $equipe;
-        if (count($currentPoule) === $nombreEquipesParPoule) {
-            $poules[] = $currentPoule;
-            $currentPoule = [];
+    // Étape 2 : Distribuer les équipes en évitant les clubs en double dans une même poule
+    $nbPoules = (int) ceil(count($equipes) / $nombreEquipesParPoule);
+    $poules   = array_fill(0, $nbPoules, []);
+
+    // 2a. Grouper par club, clubs les plus représentés en premier
+    $parClub = [];
+    foreach ($equipes as $equipe) {
+        $clubId = $equipe['club_id'] ?? 'sans_club';
+        $parClub[$clubId][] = $equipe;
+    }
+    usort($parClub, fn($a, $b) => count($b) - count($a));
+
+    // 2b. Distribution en serpentin : 0,1,2,...,N,N,...,1,0,0,1,...
+    $pouleIndex = 0;
+    $direction  = 1;
+
+    foreach ($parClub as $clubEquipes) {
+        foreach ($clubEquipes as $equipe) {
+            $poules[$pouleIndex][] = $equipe;
+
+            $pouleIndex += $direction;
+            if ($pouleIndex >= $nbPoules) {
+                $direction  = -1;
+                $pouleIndex = $nbPoules - 1;
+            } elseif ($pouleIndex < 0) {
+                $direction  = 1;
+                $pouleIndex = 0;
+            }
         }
     }
 
-    // Ajouter la dernière poule si elle n'est pas vide
-    if (!empty($currentPoule)) {
-        $poules[] = $currentPoule;
-    }
-
-    // Variable pour stocker les IDs des poules (existantes ou nouvelles)
+    // Étape 3 : Insérer ou mettre à jour les poules en base (inchangé)
     $allPouleIds = [];
 
-    // Étape 3 : Insérer ou mettre à jour les poules et les équipes associées
     foreach ($poules as $index => $poule) {
         $nomPoule = "$nomCategorie - Poule " . ($index + 1);
 
-        // Vérifier si la poule existe déjà
         $stmtPoule = $this->connexion->prepare("
             SELECT id FROM Poules WHERE nom = :nomPoule AND tournoi_id = :idTournoi
         ");
@@ -585,28 +598,20 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
         $pouleId = $stmtPoule->fetchColumn();
 
         if ($pouleId) {
-            // Ajouter l'ID de la poule existante
             $allPouleIds[] = $pouleId;
 
-            // Supprimer les équipes de la poule existante avant de les réassigner
             $this->connexion->prepare("DELETE FROM EquipePoule WHERE poule_id = :pouleId")
                 ->execute([':pouleId' => $pouleId]);
 
             foreach ($poule as $equipe) {
-                // Supprimer l'équipe de toute autre poule à laquelle elle pourrait appartenir
                 $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :equipeId")
                     ->execute([':equipeId' => $equipe['id']]);
 
-                // Ajouter l'équipe à la poule actuelle
-                $stmtEquipePoule = $this->connexion->prepare("
+                $this->connexion->prepare("
                     INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)
-                ");
-                $stmtEquipePoule->bindValue(':equipeId', $equipe['id']);
-                $stmtEquipePoule->bindValue(':pouleId', $pouleId);
-                $stmtEquipePoule->execute();
+                ")->execute([':equipeId' => $equipe['id'], ':pouleId' => $pouleId]);
             }
         } else {
-            // Créer une nouvelle poule
             $stmtInsertPoule = $this->connexion->prepare("
                 INSERT INTO Poules (nom, is_classement, fk_idcategorie, tournoi_id) 
                 VALUES (:nom, 0, :idCategorie, :idTournoi)
@@ -617,26 +622,19 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
             $stmtInsertPoule->execute();
             $newPouleId = $this->connexion->lastInsertId();
 
-            // Ajouter l'ID de la nouvelle poule créée
             $allPouleIds[] = $newPouleId;
 
             foreach ($poule as $equipe) {
-                // Supprimer l'équipe de toute autre poule à laquelle elle pourrait appartenir
                 $this->connexion->prepare("DELETE FROM EquipePoule WHERE equipe_id = :equipeId")
                     ->execute([':equipeId' => $equipe['id']]);
 
-                // Ajouter l'équipe à la nouvelle poule
-                $stmtEquipePoule = $this->connexion->prepare("
+                $this->connexion->prepare("
                     INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)
-                ");
-                $stmtEquipePoule->bindValue(':equipeId', $equipe['id']);
-                $stmtEquipePoule->bindValue(':pouleId', $newPouleId);
-                $stmtEquipePoule->execute();
+                ")->execute([':equipeId' => $equipe['id'], ':pouleId' => $newPouleId]);
             }
         }
     }
 
-    // Retourner les IDs des poules (toutes étapes confondues)
     return $allPouleIds;
 }
 
@@ -645,68 +643,62 @@ public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
 
 
     public function afficherPoulesPourCategorie(int $idTournoi, int $nombreEquipesParPoule, int $idCategorie): array {
-        // Étape 1 : Récupérer toutes les équipes de la catégorie et du tournoi
-        $stmt = $this->connexion->prepare("
-           SELECT 
-    e.id,
-    e.isPresent, 
-    e.nom AS equipe_nom, 
-    c.nom AS club_nom, 
-    c.logo AS club_logo
-FROM Equipes e
-INNER JOIN Clubs c ON e.club_id = c.id
-WHERE e.tournoi_id = :idTournoi
-  AND e.categorie = :idCategorie;
+    // Étape 1 : Récupérer toutes les équipes avec leur club_id
+    $stmt = $this->connexion->prepare("
+        SELECT 
+            e.id,
+            e.isPresent, 
+            e.nom AS equipe_nom, 
+            e.club_id,
+            c.nom AS club_nom, 
+            c.logo AS club_logo
+        FROM Equipes e
+        INNER JOIN Clubs c ON e.club_id = c.id
+        WHERE e.tournoi_id = :idTournoi
+          AND e.categorie = :idCategorie
+    ");
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->bindValue(':idCategorie', $idCategorie, PDO::PARAM_INT);
+    $stmt->execute();
+    $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        ");
-        $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
-        $stmt->bindValue(':idCategorie', $idCategorie, PDO::PARAM_INT);
-        $stmt->execute();
-        $equipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-        // Étape 2 : Regrouper les équipes par poules
-        $totalEquipes = count($equipes);
-        $nombrePoules = ceil($totalEquipes / $nombreEquipesParPoule);
-        
-        // Stocker les poules et leurs équipes
-        $poules = [];
-        
-        for ($i = 0; $i < $nombrePoules; $i++) {
-            $nomPoule = "Poule " . ($i + 1);
-    
-            // Vérifier si la poule existe déjà
-            $stmtCheck = $this->connexion->prepare("
-                SELECT COUNT(*) 
-                FROM Poules 
-                WHERE nom = :nomPoule 
-                AND tournoi_id = :idTournoi
-            ");
-            $stmtCheck->bindValue(':nomPoule', $nomPoule, PDO::PARAM_STR);
-            $stmtCheck->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
-            $stmtCheck->execute();
-            $exists = $stmtCheck->fetchColumn();
-    
-            // Ajouter la poule et ses équipes à la liste
-            if ($exists == 0) {
-                $poule = ['nom' => $nomPoule, 'equipes' => []];
-    
-                // Assigner les équipes à la poule
-                for ($j = 0; $j < $nombreEquipesParPoule; $j++) {
-                    $indexEquipe = $i * $nombreEquipesParPoule + $j;
-                    if ($indexEquipe >= $totalEquipes) {
-                        break;
-                    }
-                    $equipe = $equipes[$indexEquipe];
-                    $poule['equipes'][] = $equipe;
-                }
-                
-                $poules[] = $poule;
+    $totalEquipes  = count($equipes);
+    $nombrePoules  = (int) ceil($totalEquipes / $nombreEquipesParPoule);
+
+    // Étape 2 : Distribution serpentin par club
+    $poules = array_fill(0, $nombrePoules, ['equipes' => []]);
+    for ($i = 0; $i < $nombrePoules; $i++) {
+        $poules[$i]['nom'] = "Poule " . ($i + 1);
+    }
+
+    // 2a. Grouper par club, plus grand club en premier
+    $parClub = [];
+    foreach ($equipes as $equipe) {
+        $parClub[$equipe['club_id']][] = $equipe;
+    }
+    usort($parClub, fn($a, $b) => count($b) - count($a));
+
+    // 2b. Serpentin
+    $pouleIndex = 0;
+    $direction  = 1;
+
+    foreach ($parClub as $clubEquipes) {
+        foreach ($clubEquipes as $equipe) {
+            $poules[$pouleIndex]['equipes'][] = $equipe;
+
+            $pouleIndex += $direction;
+            if ($pouleIndex >= $nombrePoules) {
+                $direction  = -1;
+                $pouleIndex = $nombrePoules - 1;
+            } elseif ($pouleIndex < 0) {
+                $direction  = 1;
+                $pouleIndex = 0;
             }
         }
-    
-        // Retourner le tableau des poules
-        return $poules;
     }
+
+    return $poules;
+}
 
 
 
