@@ -226,6 +226,21 @@
             overflow: hidden;
         }
 
+        .progress-bar-mini {
+    width: 60px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--win);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+
         .scroll-container {
             flex: 1;
             overflow: hidden;
@@ -416,7 +431,7 @@
             font-family:var(--font-head); font-size:1rem; font-weight:900;
             letter-spacing:0.12em; color:var(--accent); flex-shrink:0;
         }
-        .ticker-wrap { flex:1; overflow:hidden; position:relative; }
+        .ticker-wrap {  overflow:hidden; position:relative; }
         .ticker-wrap::before,
         .ticker-wrap::after {
             content:''; position:absolute; top:0; bottom:0; width:40px; z-index:2;
@@ -508,8 +523,23 @@
             {% if infoTournoi.logo_club %}
                 <img src="{{ infoTournoi.logo_club }}" alt="{{ infoTournoi.nom_club }}" class="header-logo">
             {% endif %}
-            <span class="header-title">{{ infoTournoi.nom|upper }}</span>
-            Nombre de rencontres : {{ nombreRencontresPlanifiees }} ({{ nombreRencontresTerminees }} terminées)
+            <div style="display: flex; align-items: center; gap: 12px;">
+    <span class="header-title">{{ infoTournoi.nom|upper }}</span>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="matches-badge">
+            <i class="fas fa-calendar-alt"></i>
+            {{ nombreRencontresTerminees }} / {{ nombreRencontresPlanifiees }}
+        </span>
+        <div class="progress-bar-mini">
+ <div class="progress-bar-fill"
+     style="width: {{ nombreRencontresPlanifiees > 0
+        ? ((nombreRencontresTerminees / nombreRencontresPlanifiees) * 100)|round(1)
+        : 0 }}%;">
+</div>
+
+        </div>
+    </div>
+</div>
         </div>
 
         <div class="header-center">
@@ -696,19 +726,7 @@
                 {% endif %}
             </div>
 
-            {% if partenaires is not empty %}
-            <div class="sponsors-strip">
-                <div class="sponsors-title"><i class="fas fa-handshake"></i> Partenaires</div>
-                <div class="sponsors-list">
-                    {% for sp in partenaires %}
-                    <a href="{{ sp.lien_web }}" target="_blank" class="sponsor-item">
-                        {% if sp.logo %}<img src="{{ sp.logo }}" class="sponsor-logo-sm" alt="{{ sp.nom }}">{% endif %}
-                        {{ sp.nom }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+            
 
         </div>{# /panneau centre #}
 
@@ -783,27 +801,40 @@
 
     {# ══ FOOTER ═══════════════════════════════════════════ #}
     <footer class="tv-footer">
-        <span class="footer-brand">⚡ BRACKITO</span>
+        <span class="footer-brand">📺 BRACKITO TV</span>
 
         <div class="ticker-wrap">
-            <div class="ticker">
-                {% set tickerItems = [] %}
-                {% for dc in donneesCategories %}
-                    {% for pd in dc.classementsPoules %}
-                        {% if pd.classement|length > 0 %}
-                            {% set leader = pd.classement[0] %}
-                            {% set tickerItems = tickerItems|merge(['🏆 ' ~ dc.categorie.Nom_categorie ~ ' — 1er : ' ~ leader.nom|upper ~ ' (' ~ leader.TotalDesPoints ~ ' pts)']) %}
-                        {% endif %}
-                    {% endfor %}
-                    {% for r in dc.enCours %}
-                        {% set tickerItems = tickerItems|merge(['⚽ EN COURS : ' ~ r.equipe1_nom|upper ~ ' ' ~ (r.score1 ?? 0) ~ ' – ' ~ (r.score2 ?? 0) ~ ' ' ~ r.equipe2_nom|upper]) %}
-                    {% endfor %}
-                {% endfor %}
-                {% if tickerItems|length == 0 %}{% set tickerItems = ['⚡ Bienvenue sur Brackito'] %}{% endif %}
+         
+<div class="ticker">
+    {% if partenaires is not empty %}
+        {% for sp in partenaires %}
+            <span class="ticker-item">
+                {% if sp.logo %}
+                    <img src="{{ sp.logo }}" class="ticker-logo" alt="{{ sp.nom }}" style="height: 16px; margin-right: 6px;">
+                {% else %}
+                    <i class="fas fa-handshake" style="color: var(--gold);"></i>
+                {% endif %}
+                {{ sp.nom|upper }}
+            </span>
+        {% endfor %}
+        
+        {% for sp in partenaires %}
+            <span class="ticker-item">
+                {% if sp.logo %}
+                    <img src="{{ sp.logo }}" class="ticker-logo" alt="{{ sp.nom }}" style="height: 16px; margin-right: 6px;">
+                {% else %}
+                    <i class="fas fa-handshake" style="color: var(--gold);"></i>
+                {% endif %}
+                {{ sp.nom|upper }}
+            </span>
+        {% endfor %}
+    {% else %}
+        <span class="ticker-item"><i class="fas fa-circle-dot"></i> ⚡ Bienvenue sur Brackito TV</span>
+        <span class="ticker-item"><i class="fas fa-circle-dot"></i> ⚡ Bienvenue sur Brackito TV</span>
+    {% endif %}
+</div>
 
-                {% for item in tickerItems %}<span class="ticker-item"><i class="fas fa-circle-dot"></i> {{ item }}</span>{% endfor %}
-                {% for item in tickerItems %}<span class="ticker-item"><i class="fas fa-circle-dot"></i> {{ item }}</span>{% endfor %}
-            </div>
+
         </div>
 
         <span class="footer-date" id="footerDate">—</span>

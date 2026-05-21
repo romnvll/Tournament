@@ -1468,7 +1468,6 @@ details > summary::-webkit-details-marker {
 (function() {
     let dragged = null;
 
-    // Rendre les cartes draggables
     document.querySelectorAll('.match-card[draggable]').forEach(card => {
         card.addEventListener('dragstart', e => {
             dragged = card;
@@ -1482,20 +1481,15 @@ details > summary::-webkit-details-marker {
         });
     });
 
-    // Gérer les zones de dépôt
     document.querySelectorAll('.drop-zone').forEach(zone => {
 
         zone.addEventListener('dragover', e => {
-            // Bloquer si la cellule contient déjà un match (sauf la carte qu'on est en train de glisser)
-            const existingCard = zone.querySelector('.match-card:not(.dragging)');
-            if (existingCard) return; // cellule occupée → on refuse
             e.preventDefault();
             zone.classList.add('drag-over');
             e.dataTransfer.dropEffect = 'move';
         });
 
         zone.addEventListener('dragleave', e => {
-            // Éviter le flickering quand on passe sur un enfant du td
             if (!zone.contains(e.relatedTarget)) {
                 zone.classList.remove('drag-over');
             }
@@ -1506,22 +1500,31 @@ details > summary::-webkit-details-marker {
             zone.classList.remove('drag-over');
             if (!dragged) return;
 
-            const existingCard = zone.querySelector('.match-card:not(.dragging)');
-            if (existingCard) return; // double sécurité
-
             const planifId   = dragged.dataset.planifId;
             const newTerrain = zone.dataset.terrainId;
             const newCreneau = zone.dataset.creneauId;
+
+            // Récupère la carte déjà présente dans la zone cible (si elle existe)
+            const targetCard = zone.querySelector('.match-card:not(.dragging)');
+            const targetPlanifId = targetCard ? targetCard.dataset.planifId : null;
+
+            // Récupère terrain/créneau d'origine de la carte glissée
+            const originTerrain = dragged.dataset.terrainId;
+            const originCreneau = dragged.dataset.creneauId;
 
             fetch('PlacementDesRencontresTraitement.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    action:     'deplacerPlanification',
-                    planifId:   planifId,
-                    newTerrain: newTerrain,
-                    newCreneau: newCreneau,
-                    idTournoi:  '{{ idTournoi }}'
+                    action:          'deplacerPlanification',
+                    planifId:        planifId,
+                    newTerrain:      newTerrain,
+                    newCreneau:      newCreneau,
+                    idTournoi:       '{{ idTournoi }}',
+                    // Infos pour le swap
+                    targetPlanifId:  targetPlanifId ?? '',
+                    originTerrain:   originTerrain,
+                    originCreneau:   originCreneau,
                 })
             }).then(r => {
                 if (r.ok) location.reload();

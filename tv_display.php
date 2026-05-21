@@ -85,12 +85,13 @@ foreach ($categories as $cat) {
 
     // Priorité : poules de classement si elles existent, sinon poules normales
     $poulesAfficher = !empty($poulesClassement) ? $poulesClassement : $poulesNormales;
-
+   
     $classementsPoules = [];
     foreach ($poulesAfficher as $poule) {
+        
         $isClassement = (int)$poule['is_classement'];
-        // Type 3 = rencontre de classement, type 1 = poule normale
-        $typeRencontre   = $isClassement === 1 ? 3 : 1;
+        // Type 1 = rencontre de classement, type 0 = poule normale
+        $typeRencontre   = $isClassement === 0 ? 1 : 0;
         $classement      = $rencontreDao->GetResultatDesPoules((int)$poule['id'], $typeRencontre);
         // Fallback type 1 si pas de résultats type 3
         if (empty($classement)) {

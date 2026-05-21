@@ -13,14 +13,27 @@ if (isset ($_POST['nomTerrain'])) {
  if (isset($_POST['action']) && $_POST['action'] === 'deplacerPlanification') {
     require 'class/planificationDao.class.php';
     $planification = new planificationDao();
-    
-   $planification->nettoyerPlanificationsVides($_POST['idTournoi']);
-    $planifId    = (int) $_POST['planifId'];
-    $newTerrain  = (int) $_POST['newTerrain'];
-    $newCreneau  = (int) $_POST['newCreneau'];
-    
-    $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
-    
+
+    $planification->nettoyerPlanificationsVides($_POST['idTournoi']);
+
+    $planifId      = (int) $_POST['planifId'];
+    $newTerrain    = (int) $_POST['newTerrain'];
+    $newCreneau    = (int) $_POST['newCreneau'];
+    $targetPlanifId = isset($_POST['targetPlanifId']) && $_POST['targetPlanifId'] !== '' 
+                        ? (int) $_POST['targetPlanifId'] 
+                        : null;
+    $originTerrain = (int) $_POST['originTerrain'];
+    $originCreneau = (int) $_POST['originCreneau'];
+
+    if ($targetPlanifId !== null) {
+        // SWAP : déplacer d'abord la cible vers l'origine, puis la source vers la destination
+        $planification->deplacerPlanification($targetPlanifId, $originTerrain, $originCreneau);
+        $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    } else {
+        // Déplacement simple
+        $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    }
+
     http_response_code(200);
     exit;
 }

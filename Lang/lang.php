@@ -196,7 +196,9 @@ $allLangs = [
         'effetsSonoresMatch' => 'Effets sonores start/stop pour les rencontres',
         'supprimerArbitre' => 'Supprimer cet arbitre',
         'Appliquerleretard' => 'Appliquer le retard',
-        'presence' => 'Présence'
+        'presence' => 'Présence',
+        'explicationTv' => 'Permet de visualiser les matchs en direct sur un grand écran',
+        'voirSurTv' => 'Voir sur TV'
         
         
         
@@ -385,7 +387,10 @@ $allLangs = [
         'effetsSonoresMatch' => 'Sound effects start/stop for matches',
         'supprimerArbitre' => 'Delete this referee',
         'Appliquerleretard' => 'Apply the delay',
-        'presence' => 'Presence'
+        'presence' => 'Presence',
+        'explicationTv' => 'Allows you to view live matches on a big screen',
+        'voirSurTv' => 'View on TV'
+
                 
 
         
