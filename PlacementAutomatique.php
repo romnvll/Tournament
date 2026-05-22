@@ -62,13 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'sauve
     }
 
     // Sauvegarde des contraintes terrains
-    $contraintesTerrain = [];
-    foreach ($_POST['contraintes'] ?? [] as $catId => $terrainIds) {
-        $filtered = array_filter(array_map('intval', (array)$terrainIds));
-        if (!empty($filtered)) {
-            $contraintesTerrain[(int)$catId] = $filtered;
+   
+        $contraintesTerrain = [];
+
+        // On enregistre TOUTES les catégories, même celles sans terrain coché (tableau vide = non placée)
+        foreach ($categories as $cat) {
+            $catId = (int)$cat['id_categorie'];
+            $terrainIds = $_POST['contraintes'][$catId] ?? [];
+            $filtered = array_filter(array_map('intval', (array)$terrainIds));
+            $contraintesTerrain[$catId] = array_values($filtered); // [] si aucun terrain coché
         }
-    }
 
     $contraintesTerrain['garder_arbitres']                   = isset($_POST['garder_arbitres']) ? 1 : 0;
     $contraintesTerrain['pas_de_placement_pour_les_absents'] = isset($_POST['pas_de_placement_pour_les_absents']);
@@ -150,50 +153,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             }
         }
 
-        // Supprimer tous les créneaux sauf le premier
-        $premierCreneau = $listCreneaux[0];
-        foreach ($listCreneaux as $cr) {
-            if ($cr['creneau_id'] !== $premierCreneau['creneau_id']) {
-                $creneauxDao->retirerLabelsDuCreneau($cr['creneau_id']);
-                $creneauxDao->retirerArbitresDuCreneau($cr['creneau_id']);
-                $creneauxDao->supprimerCreneau($cr['creneau_id']);
-            }
-        }
-
+        
         // Recharger avec uniquement le premier créneau
         $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
 
-        // ── 3. Supprimer les labels existants ────────────────────────────────
-        $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
-        foreach ($planificationsRestantes as $p) {
-            if (!empty($p['label_id'])) {
-                $planificationDao->supprimerPlanification($p['planification_id']);
-            }
-        }
+        
 
         $planificationsRestantes = $planificationDao->afficherPlanifications($idTournoi);
 
         // ── 4. Initialiser la grille ─────────────────────────────────────────
-        $grid                = [];
-        $equipesByCreneau    = [];
-        $arbitresByCreneau   = [];
-        $categorieByCreneau  = []; // catégorie occupant le créneau (contrainte 1 cat/créneau)
-        $rencontresByCreneau = []; // [cid][catId] = nb rencontres placées sur ce créneau
-        $tourByCreneau = []; // tour occupant le créneau
-        $phaseFinaleByCreneau = []; // true si le créneau contient une phase finale
-        
-        foreach ($listCreneaux as $cr) {
-            $cid = $cr['creneau_id'];
-            $grid[$cid]               = [];
-            $equipesByCreneau[$cid]   = [];
-            $arbitresByCreneau[$cid]  = [];
-            $categorieByCreneau[$cid] = null;
-            $rencontresByCreneau[$cid] = [];
-            $tourByCreneau[$cid] = null;
-            foreach ($terrains as $t) {
-                $grid[$cid][$t['terrain_id']] = false;
+$grid                = [];
+$equipesByCreneau    = [];
+$arbitresByCreneau   = [];
+$categorieByCreneau  = [];
+$rencontresByCreneau = [];
+$tourByCreneau       = [];
+$phaseFinaleByCreneau = [];
+
+foreach ($listCreneaux as $cr) {
+    $cid = $cr['creneau_id'];
+    $grid[$cid]                = [];
+    $equipesByCreneau[$cid]    = [];
+    $arbitresByCreneau[$cid]   = [];
+    $categorieByCreneau[$cid]  = null;
+    $rencontresByCreneau[$cid] = [];
+    $tourByCreneau[$cid]       = null;
+    $phaseFinaleByCreneau[$cid] = false;
+    foreach ($terrains as $t) {
+        $grid[$cid][$t['terrain_id']] = false;
+    }
+}
+
+            // ← NOUVEAU : marquer les cases déjà occupées dans la grille
+            foreach ($planificationsRestantes as $p) {
+                $cid = (int)$p['creneau_id'];
+                $tid = (int)$p['terrain_id'];
+
+                if (!isset($grid[$cid])) continue;
+
+                if (!empty($p['rencontre_id']) || !empty($p['label_id'])) {
+                    $grid[$cid][$tid] = true; // case occupée
+                }
+
+                if (!empty($p['arbitre_id'])) {
+                    $arbitresByCreneau[$cid][] = (int)$p['arbitre_id'];
+                }
+
+                if (!empty($p['equipe1_id'])) {
+                    $equipesByCreneau[$cid][] = (int)$p['equipe1_id'];
+                }
+                if (!empty($p['equipe2_id'])) {
+                    $equipesByCreneau[$cid][] = (int)$p['equipe2_id'];
+                }
+
+                // Reconstituer catégorie/tour/phase du créneau
+                if (!empty($p['rencontre_id'])) {
+                    if (!empty($p['equipe1_categorie_id'])) {
+                        $categorieByCreneau[$cid] = (int)$p['equipe1_categorie_id'];
+                    }
+                    if (!empty($p['tour'])) {
+                        $tourByCreneau[$cid] = (int)$p['tour'];
+                    }
+                    $estPF = (!empty($p['phase_finale_id'])) || (int)($p['type_rencontre_id'] ?? 0) === 3;
+                    if ($estPF) $phaseFinaleByCreneau[$cid] = true;
+                }
             }
-        }
 
         // Enregistrer les arbitres déjà présents
         foreach ($planificationsRestantes as $p) {
@@ -252,6 +276,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'place
             $catId  = isset($rencontre['equipe1_categorie_id']) ? (int)$rencontre['equipe1_categorie_id'] : null;
              $tourRencontre = isset($rencontre['tour']) ? (int)$rencontre['tour'] : null;
             $estPhaseFinale = ($rencontre['phase_finale_id'] !== null && $rencontre['phase_finale_id'] !== '')               || (int)($rencontre['type_rencontre_id'] ?? 0) === 3; // ← ligne ajoutée
+            // Si aucun terrain sélectionné pour cette catégorie → on skip la rencontre
+            if ($catId !== null && isset($contraintesTerrain[$catId]) && empty($contraintesTerrain[$catId])) {
+                continue; // Aucun terrain autorisé = catégorie non placée
+            }
             $terrainsAutorises = ($catId !== null && isset($contraintesTerrain[$catId]))
                 ? $contraintesTerrain[$catId]
                 : null;

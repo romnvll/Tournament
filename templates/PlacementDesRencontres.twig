@@ -751,6 +751,33 @@ details > summary::-webkit-details-marker {
 					class="control-section">
 					<!-- Action groupée -->
 					<form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post" class="control-group">
+
+					<select id="categorieSelector" class="modern-select" style="max-width: 250px;">
+							<option value="">Sélectionner une catégorie</option>
+
+							{% set categories = [] %}
+
+							{% for planification in afficherPlanification %}
+								{% if planification.equipe1_categorie_nom not in categories %}
+									{% set categories = categories|merge([planification.equipe1_categorie_nom]) %}
+									<option value="{{ planification.equipe1_categorie_nom|lower }}">
+										{{ planification.equipe1_categorie_nom }}
+									</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+
+						<button type="button"
+								class="modern-btn"
+								style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;"
+								onclick="cocherCategorie()">
+							<i class="bi bi-collection"></i>
+							Sélectionner
+						</button>
+
+
+
+
 						<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
 						<label for="bulkAction" class="control-label">
 							<i class="bi bi-check2-square"></i>
@@ -760,13 +787,14 @@ details > summary::-webkit-details-marker {
 							<option value="" disabled selected>{{t('actionGroupee')}}</option>
 							<option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
 						</select>
-						<button type="button" class="modern-btn" id="btnToutCocher" style="background: linear-gradient(135deg, #10b981, #059669); color: white;" onclick="toggleToutCocher(this)">
-							<i class="bi bi-check2-all"></i>
-							Tout cocher
-						</button>
+						
 						<button type="submit" class="modern-btn btn-primary-modern">
 							<i class="bi bi-check-lg"></i>
 							{{t('valider')}}
+						</button>
+						<button type="button" class="modern-btn" id="btnToutCocher" style="background: linear-gradient(135deg, #10b981, #059669); color: white;" onclick="toggleToutCocher(this)">
+							<i class="bi bi-check2-all"></i>
+							Tout cocher
 						</button>
 					</form>
 
@@ -1102,7 +1130,8 @@ details > summary::-webkit-details-marker {
 													<!-- Rencontre -->
 													{% if planification.rencontre_id is not null %}
 
-														<div class="match-card" draggable="true" data-planif-id="{{ planification.planification_id }}" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}">
+														<div class="match-card" draggable="true" data-planif-id="{{ planification.planification_id }}" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}" data-categorie="{{ planification.equipe1_categorie_nom|lower }}">
+														
 
 															<div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
 
@@ -1533,6 +1562,34 @@ details > summary::-webkit-details-marker {
         });
     });
 })();
+</script>
+
+<script>
+function cocherCategorie() {
+
+    const categorie = document
+        .getElementById('categorieSelector')
+        .value
+        .toLowerCase();
+
+    if (!categorie) return;
+
+    document.querySelectorAll('.match-card').forEach(card => {
+
+        const cardCategorie = (card.dataset.categorie || '').toLowerCase();
+
+        if (cardCategorie === categorie) {
+
+            const checkbox = card.querySelector(
+                'input[name="rencontreCheck[]"]'
+            );
+
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        }
+    });
+}
 </script>
 
 </body></html>

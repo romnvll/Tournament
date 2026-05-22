@@ -91,7 +91,7 @@ foreach ($categories as $cat) {
         
         $isClassement = (int)$poule['is_classement'];
         // Type 1 = rencontre de classement, type 0 = poule normale
-        $typeRencontre   = $isClassement === 0 ? 1 : 0;
+        $typeRencontre   = $isClassement === 0 ? 1 : 1;
         $classement      = $rencontreDao->GetResultatDesPoules((int)$poule['id'], $typeRencontre);
         // Fallback type 1 si pas de résultats type 3
         if (empty($classement)) {

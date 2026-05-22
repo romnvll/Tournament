@@ -459,7 +459,7 @@
                 {# ── Contraintes terrains par catégorie ── #}
                 <div class="section-title">
                     <i class="bi bi-sliders2"></i> Contraintes terrains par catégorie
-                    <span class="hint">Aucune sélection = tous les terrains autorisés</span>
+                <span class="hint">Aucune sélection = catégorie non placée automatiquement</span>
                 </div>
 
                 {% for cat in categories %}
@@ -618,7 +618,7 @@
                 {% else %}
                     <div class="alert-box alert-info" style="margin-bottom:0">
                         <i class="bi bi-info-circle"></i>
-                        <span>Aucune contrainte terrain active — toutes les catégories peuvent jouer sur tous les terrains.</span>
+                    <span>Aucune contrainte terrain active — aucune catégorie ne sera placée automatiquement. Cochez au moins un terrain par catégorie.</span>
                     </div>
                 {% endif %}
             </div>
@@ -628,7 +628,7 @@
                 <div class="action-bar-left">
                     <p>
                         <i class="bi bi-exclamation-triangle-fill" style="color:var(--warning-color)"></i>
-                        Les créneaux existants (sauf le premier) seront supprimés et toutes les rencontres replacées depuis zéro.
+                    Seules les rencontres non planifiées seront placées. Les rencontres déjà planifiées restent en place.
                     </p>
                     <label class="confirm-label">
                         <input type="checkbox" id="confirmCheck">
