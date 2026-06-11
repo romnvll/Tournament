@@ -26,8 +26,6 @@ $pouleManager = new PouleManager();
 // ── Tournoi ───────────────────────────────────────────────────────────────────
 $idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
 
-
-
 if ($idTournoi === 0) {
     echo $template->render([
         'listeTournois'     => $tournoiDao->afficherTousLesTournois(),
@@ -59,7 +57,6 @@ $nombreTerminees = count(array_filter(
     fn($rencontre) => (int)$rencontre['isTerminated'] === 1
 ));
 
-
 // ── Paramètres ────────────────────────────────────────────────────────────────
 $rotationTime = isset($_GET['rotation']) ? (int) $_GET['rotation'] : 12;
 $catIndex     = isset($_GET['cat'])      ? (int) $_GET['cat']      : 0;
@@ -79,33 +76,43 @@ foreach ($categories as $cat) {
         fn($p) => (int)$p['fk_idcategorie'] === $catId
     ));
 
-    // Y a-t-il des poules de classement (phase finale) pour cette catégorie ?
+    // Séparation poules normales / poules de classement (phase finale)
     $poulesClassement = array_values(array_filter($toutesLesPoules, fn($p) => (int)$p['is_classement'] === 1));
     $poulesNormales   = array_values(array_filter($toutesLesPoules, fn($p) => (int)$p['is_classement'] === 0));
 
-    // Priorité : poules de classement si elles existent, sinon poules normales
-    $poulesAfficher = !empty($poulesClassement) ? $poulesClassement : $poulesNormales;
-   
     $classementsPoules = [];
-    foreach ($poulesAfficher as $poule) {
-        
+
+    // Essaie d'abord les poules de classement si elles existent
+    $poulesAEssayer = !empty($poulesClassement) ? $poulesClassement : $poulesNormales;
+
+    foreach ($poulesAEssayer as $poule) {
         $isClassement = (int)$poule['is_classement'];
-        // Type 1 = rencontre de classement, type 0 = poule normale
-        $typeRencontre   = $isClassement === 0 ? 1 : 1;
-        $classement      = $rencontreDao->GetResultatDesPoules((int)$poule['id'], $typeRencontre);
-        // Fallback type 1 si pas de résultats type 3
-        if (empty($classement)) {
-            $classement = $rencontreDao->GetResultatDesPoules((int)$poule['id'], 1);
-        }
+        $classement   = $rencontreDao->GetResultatDesPoules((int)$poule['id'], 1);
         if (!empty($classement)) {
             $classementsPoules[] = [
-                'poule'          => $poule,
-                'classement'     => $classement,
-                'is_classement'  => $isClassement,
+                'poule'         => $poule,
+                'classement'    => $classement,
+                'is_classement' => $isClassement,
             ];
         }
     }
 
+    // Fallback : si les poules de classement existent mais sont toutes vides
+    // (aucune équipe affectée encore), on affiche le classement des poules normales
+    if (empty($classementsPoules) && !empty($poulesClassement)) {
+        foreach ($poulesNormales as $poule) {
+            $classement = $rencontreDao->GetResultatDesPoules((int)$poule['id'], 1);
+            if (!empty($classement)) {
+                $classementsPoules[] = [
+                    'poule'         => $poule,
+                    'classement'    => $classement,
+                    'is_classement' => 0,
+                ];
+            }
+        }
+    }
+
+    // Si la catégorie est configurée pour ne pas afficher le classement
     if ((int)($cat['afficherClassement'] ?? 1) === 0) {
         $classementsPoules = [];
     }
@@ -139,18 +146,18 @@ $donneesCat   = $donneesCategories[$catIndex] ?? null;
 
 // ── Rendu ─────────────────────────────────────────────────────────────────────
 echo $template->render([
-    'listeTournois'     => [],
-    'infoTournoi'       => $infoTournoi,
-    'categories'        => $categories,
-    'donneesCategories' => $donneesCategories,
-    'partenaires'       => $partenaires,
-    'rotationTime'      => $rotationTime,
-    'idTournoi'         => $idTournoi,
-    'catIndex'          => $catIndex,
-    'nextCatIndex'      => $nextCatIndex,
-    'nbCategories'      => $nbCategories,
-    'isLastCat'         => $isLastCat,
-    'donneesCat'        => $donneesCat,
+    'listeTournois'              => [],
+    'infoTournoi'                => $infoTournoi,
+    'categories'                 => $categories,
+    'donneesCategories'          => $donneesCategories,
+    'partenaires'                => $partenaires,
+    'rotationTime'               => $rotationTime,
+    'idTournoi'                  => $idTournoi,
+    'catIndex'                   => $catIndex,
+    'nextCatIndex'               => $nextCatIndex,
+    'nbCategories'               => $nbCategories,
+    'isLastCat'                  => $isLastCat,
+    'donneesCat'                 => $donneesCat,
     'nombreRencontresPlanifiees' => $nombreRencontresPlanifiees,
-    'nombreRencontresTerminees' => $nombreTerminees,
+    'nombreRencontresTerminees'  => $nombreTerminees,
 ]);
