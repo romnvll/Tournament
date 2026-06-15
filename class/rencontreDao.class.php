@@ -1082,8 +1082,7 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
 
    public function getRencontreByPoule($pouleid, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
 {
-    $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
-    $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
+$orderBy = ($from === 'tour') ? "r.tour, c.nom, r.id" : "c.nom, r.id";    $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
 
     $query = "
         SELECT 

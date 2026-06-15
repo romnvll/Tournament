@@ -213,8 +213,8 @@ public function getClassementFinal(int $tournoiId, int $categorieId): array {
          p.id ASC, 
            --CAST(SUBSTRING_INDEX(p.nom, '-', 1) AS UNSIGNED) ASC,
             TotalDesPoints DESC, 
-            DifferenceButs DESC, 
-            nombreButsMarque DESC
+            nombreButsMarque DESC,
+            DifferenceButs DESC
     ";
 
     $stmt = $this->connexion->prepare($query);
