@@ -5,608 +5,579 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <title>Gestion de la table</title>
+    <title>Saisie des scores</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --danger-color: #ef4444;
-            --success-color: #10b981;
-            --bg-dark: #1f2937;
-            --bg-light: #f9fafb;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --border-radius: 16px;
+            --c-primary:   #4f46e5;
+            --c-primary-d: #4338ca;
+            --c-danger:    #ef4444;
+            --c-success:   #10b981;
+            --c-warning:   #f59e0b;
+            --c-dark:      #1f2937;
+            --c-muted:     #6b7280;
+            --c-border:    #e5e7eb;
+            --c-bg:        #f3f4f6;
+            --radius:      14px;
+            --radius-sm:   8px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #eef0f8;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--c-dark);
         }
 
-        /* Status Stepper */
-.status-stepper {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    width: 100%;
-    margin: 4px 0;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    flex: 1;
-    position: relative;
-}
-
-.step-bubble {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-}
-
-.step-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    text-align: center;
-    line-height: 1.2;
-    color: #9ca3af;
-}
-
-.step-arrow {
-    flex: 0 0 auto;
-    color: #d1d5db;
-    font-size: 1rem;
-    margin: 0 2px;
-    padding-bottom: 20px; /* aligne avec les bulles */
-}
-
-/* État : inactif (étape future) */
-.step.inactive .step-bubble {
-    background: #f3f4f6;
-    border-color: #e5e7eb;
-    color: #9ca3af;
-}
-
-/* État : actif courant */
-.step.active .step-bubble {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-    border-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-}
-
-.step.active .step-label {
-    color: var(--primary-color);
-    font-weight: 800;
-}
-
-/* État : complété */
-.step.done .step-bubble {
-    background: linear-gradient(135deg, var(--success-color), #059669);
-    border-color: var(--success-color);
-    color: white;
-}
-
-.step.done .step-label {
-    color: var(--success-color);
-}
-
-/* État : attention (saisir score) */
-.step.warning .step-bubble {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border-color: #f59e0b;
-    color: white;
-    animation: pulse-warning 1.8s ease-in-out infinite;
-}
-
-.step.warning .step-label {
-    color: #d97706;
-    font-weight: 800;
-}
-
-@keyframes pulse-warning {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-    50%       { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
-}
-
-/* Flèche active entre étapes franchies */
-.step-arrow.done {
-    color: var(--success-color);
-}
-
-.step-arrow.active {
-    color: var(--primary-color);
-}
-
-/* Bouton cliquable sur l'étape "En cours" */
-.step.active.clickable .step-bubble {
-    cursor: pointer;
-}
-
-.step.active.clickable:hover .step-bubble {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.2);
-}
-
-.step-hint {
-    font-size: 0.6rem;
-    color: #9ca3af;
-    text-align: center;
-    margin-top: 2px;
-    font-style: italic;
-    line-height: 1.2;
-}
-
-.step.active.clickable .step-hint {
-    color: var(--primary-color);
-    font-style: normal;
-}
-
-        .container-fluid {
-            padding: 12px;
-            max-width: 100vw;
+        /* ── Layout ── */
+        .page {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 12px 12px 40px;
         }
 
-        /* Header */
-        .welcome-header {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            padding: 20px 16px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .welcome-header h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--bg-dark);
-            margin-bottom: 10px;
-        }
-
-        .welcome-header p {
-            font-size: 1rem;
-            color: #6b7280;
-            margin: 0;
-        }
-
-        .terrain-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        /* ── Header ── */
+        .page-header {
+            background: var(--c-primary);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 14px;
             color: white;
-            padding: 8px 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
+        .terrain-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.35);
             border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.85rem;
             font-weight: 700;
             margin-top: 8px;
-            font-size: 0.95rem;
         }
 
-        /* Match Card */
+        /* ── Section label (heure) ── */
+        .time-separator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0 8px;
+        }
+
+        .time-separator .time-pill {
+            background: var(--c-dark);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .time-separator .sep-line {
+            flex: 1;
+            height: 1px;
+            background: var(--c-border);
+        }
+
+        /* ── Carte terminée (ligne compacte) ── */
+        .card-done {
+            background: white;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--c-border);
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 10px;
+            margin-bottom: 6px;
+            opacity: 0.7;
+        }
+
+        .card-done .done-icon {
+            color: var(--c-success);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .card-done .done-team {
+            flex: 1;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--c-dark);
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .card-done .done-team.right {
+            text-align: right;
+        }
+
+        .card-done .done-score {
+            background: var(--c-bg);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--c-primary);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ── Carte match en cours / à venir ── */
         .match-card {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            margin-bottom: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--c-border);
+            margin-bottom: 14px;
             overflow: hidden;
         }
 
-        /* Time header */
-        .time-header {
-            background: linear-gradient(135deg, var(--bg-dark), #374151);
+        /* time strip */
+        .match-time-bar {
+            background: var(--c-dark);
             color: white;
-            padding: 16px;
-            text-align: center;
-        }
-
-        .time-display {
-            font-size: 2rem;
-            font-weight: 700;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            justify-content: space-between;
         }
 
-        /* Swap button */
+        .match-time-bar .time-txt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
         .btn-swap {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            gap: 5px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
             border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 0.85rem;
+            padding: 5px 12px;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
             text-decoration: none;
-            transition: background 0.2s, transform 0.15s;
+            transition: background 0.15s;
         }
 
-        .btn-swap:hover {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-            text-decoration: none;
-        }
+        .btn-swap:hover { background: rgba(255,255,255,0.22); color: white; }
+        .btn-swap:active { transform: scale(0.95); }
 
-        .btn-swap:active {
-            transform: scale(0.95);
-        }
+        .btn-swap .swap-icon { transition: transform 0.3s; }
+        .btn-swap.is-swapped .swap-icon { transform: rotate(180deg); }
 
-        .btn-swap.is-swapped {
-            background: rgba(255, 255, 255, 0.35);
-            border-color: white;
-        }
-
-        .btn-swap .swap-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .btn-swap.is-swapped .swap-icon {
-            transform: rotate(180deg);
-        }
-
-        /* Teams container */
-        .teams-grid {
+        /* teams */
+        .teams-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
             gap: 0;
-            border-bottom: 2px solid #e5e7eb;
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--c-border);
         }
 
-        .team-column {
-            padding: 20px 12px;
+        .team-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            border-right: 2px solid #e5e7eb;
+            gap: 8px;
         }
 
-        .team-column:last-child {
-            border-right: none;
-        }
+        .team-col.right { align-items: center; }
 
         .team-logo {
-            width: 90px;
-            height: 90px;
+            width: 72px;
+            height: 72px;
             object-fit: cover;
             border-radius: 50%;
-            box-shadow: var(--shadow-sm);
+            border: 2px solid var(--c-border);
         }
 
         .team-name {
-            font-size: 1.1rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
-            color: var(--bg-dark);
             text-align: center;
             line-height: 1.2;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--c-dark);
         }
 
-        .score-display {
-            font-size: 3rem;
+        .score-big {
+            font-size: 2.4rem;
             font-weight: 700;
-            color: var(--primary-color);
-            margin: 8px 0;
+            color: var(--c-primary);
         }
 
-        /* Score buttons */
-        .score-buttons {
+        /* vs divider */
+        .vs-col {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+        }
+
+        .vs-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--c-muted);
+            letter-spacing: 1px;
+        }
+
+        .vs-dash {
+            width: 1px;
+            height: 20px;
+            background: var(--c-border);
+        }
+
+        /* score buttons */
+        .score-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
             width: 100%;
+            padding: 0 4px;
         }
 
         .btn-goal {
-            padding: 14px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
             border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: var(--shadow-sm);
-            width: 100%;
+            gap: 6px;
+            transition: filter 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-goal:active:not(:disabled) {
-            transform: scale(0.95);
-        }
+        .btn-goal:active:not(:disabled) { transform: scale(0.94); }
+        .btn-goal:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        .btn-goal.add {
-            background: linear-gradient(135deg, var(--success-color), #059669);
+        .btn-add {
+            background: var(--c-success);
             color: white;
+            padding: 11px;
         }
 
-        .btn-goal.remove {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-            font-size: 0.95rem;
-            padding: 10px 16px;
+        .btn-sub {
+            background: #fee2e2;
+            color: var(--c-danger);
+            padding: 7px;
+            font-size: 0.85rem;
         }
 
-        .btn-goal:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* Info section */
-        .info-section {
-            padding: 20px 16px;
+        /* info section */
+        .match-info {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .info-row {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
+            align-items: flex-start;
+            gap: 10px;
         }
 
-        .info-row:last-child {
-            border-bottom: none;
+        .info-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--c-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--c-muted);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .info-body {
+            flex: 1;
         }
 
         .info-label {
+            font-size: 0.7rem;
             font-weight: 700;
-            color: var(--bg-dark);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--c-muted);
+            margin-bottom: 2px;
         }
 
         .info-value {
-            font-size: 0.95rem;
-            color: #374151;
+            font-size: 0.9rem;
+            color: var(--c-dark);
         }
 
-        /* Status badges */
-        .status-badge {
-            display: inline-flex;
+        /* status stepper */
+        .stepper {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            gap: 0;
         }
 
-        .status-badge.danger {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .status-badge.primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .status-badge:active {
-            transform: scale(0.95);
-        }
-
-        /* Category badge */
-        .category-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            color: #000;
-            font-size: 0.95rem;
-        }
-
-        /* Sponsor */
-        .sponsor-box {
+        .stp {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--bg-light), white);
-            border-radius: 12px;
-            margin-top: 16px;
-            border-left: 4px solid var(--primary-color);
-            box-shadow: var(--shadow-sm);
+            gap: 3px;
+            flex: 1;
+        }
+
+        .stp-bubble {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.25s;
+        }
+
+        .stp-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--c-muted);
             text-align: center;
         }
 
-        .sponsor-info {
-            font-size: 0.9rem;
-            line-height: 1.4;
+        .stp-arrow {
+            color: var(--c-border);
+            font-size: 0.7rem;
+            padding-bottom: 16px;
+            flex-shrink: 0;
         }
 
-        .sponsor-info strong a {
-            color: var(--primary-color);
-            text-decoration: none;
+        .stp-arrow.done { color: var(--c-success); }
+
+        .stp.inactive .stp-bubble { background: var(--c-bg); color: var(--c-muted); }
+        .stp.done .stp-bubble { background: var(--c-success); color: white; }
+        .stp.done .stp-label { color: var(--c-success); }
+
+        .stp.current .stp-bubble {
+            background: var(--c-primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.15);
         }
 
-        .sponsor-logo {
-            max-width: 80px;
-            max-height: 60px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-sm);
+        .stp.current .stp-label { color: var(--c-primary); font-weight: 800; }
+
+        .stp.warn .stp-bubble {
+            background: var(--c-warning);
+            color: white;
+            animation: pulse-w 1.8s ease-in-out infinite;
         }
 
-        /* Label card */
+        .stp.warn .stp-label { color: #b45309; font-weight: 800; }
+        .stp-hint { font-size: 0.58rem; color: var(--c-muted); text-align: center; }
+
+        @keyframes pulse-w {
+            0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+            50%      { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+        }
+
+        .stp.clickable { cursor: pointer; }
+        .stp.clickable:hover .stp-bubble { transform: scale(1.08); }
+
+        /* category badge */
+        .cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        /* sponsor */
+        .sponsor-strip {
+            border-top: 1px solid var(--c-border);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: var(--c-muted);
+        }
+
+        .sponsor-strip a { color: var(--c-primary); font-weight: 700; text-decoration: none; }
+        .sponsor-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
+
+        /* label card */
         .label-card {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            margin-bottom: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--c-border);
+            margin-bottom: 14px;
             overflow: hidden;
         }
 
-        .label-content {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
-            padding: 24px 16px;
-            text-align: center;
+        .label-body {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--c-dark);
         }
 
-        .label-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--bg-dark);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .match-card, .label-card {
-            animation: fadeIn 0.4s ease;
-        }
-
-        button, a {
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+        .label-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fef3c7;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         @media (max-width: 360px) {
-            .team-logo     { width: 70px; height: 70px; }
-            .team-name     { font-size: 0.95rem; min-height: 38px; }
-            .score-display { font-size: 2.5rem; }
-            .btn-goal      { padding: 12px 16px; font-size: 1rem; }
-            .info-label,
-            .info-value    { font-size: 0.9rem; }
+            .team-logo { width: 58px; height: 58px; }
+            .score-big { font-size: 2rem; }
+            .team-name { font-size: 0.78rem; }
         }
     </style>
 </head>
 <body>
-<div class="container-fluid">
+<div class="page">
 
-    <!-- Welcome header -->
-    <div class="welcome-header">
-        <h2>
-            <i class="fas fa-user-check" style="color: var(--success-color);"></i>
-            Bonjour {{ prenom }} !
-        </h2>
-        <p>
-            Vous êtes en charge d'insérer les scores pour le terrain
-            <span class="terrain-badge">
-                <i class="fas fa-map-marker-alt"></i>
-                {{ terrain }}
-            </span>
-        </p>
+    {# ── Header ── #}
+    <div class="page-header">
+        <h1><i class="fas fa-user-check"></i> Bonjour {{ prenom }} !</h1>
+        <p>Saisie des scores</p>
+        <div class="terrain-chip">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ terrain }}
+        </div>
     </div>
 
-    <!-- Matches -->
     <div id="scoreRefresh">
-        {% for planification in AffichagePlanification %}
+    {% for planification in AffichagePlanification %}
 
-            {% if planification.rencontre_id is not null %}
+        {% if planification.rencontre_id is not null %}
 
-                {# ── Swap logic ─────────────────────────────────────────── #}
-                {% set rid       = planification.rencontre_id %}
-                {% set isSwapped = rid in swappedIds %}
+            {# ── Swap logic ── #}
+            {% set rid       = planification.rencontre_id %}
+            {% set isSwapped = rid in swappedIds %}
 
-                {# Nouvelle liste après toggle de cet ID #}
-                {% if isSwapped %}
-                    {% set newSwaps = swappedIds | filter(id => id != rid) %}
-                {% else %}
-                    {% set newSwaps = swappedIds | merge([rid]) %}
-                {% endif %}
+            {% if isSwapped %}
+                {% set newSwaps = swappedIds | filter(id => id != rid) %}
+            {% else %}
+                {% set newSwaps = swappedIds | merge([rid]) %}
+            {% endif %}
 
-                {# Construire ?swap[]=x&swap[]=y pour le lien du bouton #}
-                {% set swapQuery = '' %}
-                {% for id in newSwaps %}
-                    {% set swapQuery = swapQuery ~ 'swap[]=' ~ id ~ '&' %}
-                {% endfor %}
+            {% set swapQuery = '' %}
+            {% for id in newSwaps %}
+                {% set swapQuery = swapQuery ~ 'swap[]=' ~ id ~ '&' %}
+            {% endfor %}
 
-                {# Équipes gauche / droite selon l'état du swap #}
-                {% if isSwapped %}
-                    {% set gauche = {
-                        nom:     planification.equipe2_nom,
-                        logo:    planification.club2_logo,
-                        score:   planification.score2,
-                        dispId:  'displayScoreEquipe2' ~ rid,
-                        hidId:   'scoreEquipe2' ~ rid,
-                        hidName: 'scoreEquipe2',
-                        team:    2
-                    } %}
-                    {% set droite = {
-                        nom:     planification.equipe1_nom,
-                        logo:    planification.club1_logo,
-                        score:   planification.score1,
-                        dispId:  'displayScoreEquipe1' ~ rid,
-                        hidId:   'scoreEquipe1' ~ rid,
-                        hidName: 'scoreEquipe1',
-                        team:    1
-                    } %}
-                {% else %}
-                    {% set gauche = {
-                        nom:     planification.equipe1_nom,
-                        logo:    planification.club1_logo,
-                        score:   planification.score1,
-                        dispId:  'displayScoreEquipe1' ~ rid,
-                        hidId:   'scoreEquipe1' ~ rid,
-                        hidName: 'scoreEquipe1',
-                        team:    1
-                    } %}
-                    {% set droite = {
-                        nom:     planification.equipe2_nom,
-                        logo:    planification.club2_logo,
-                        score:   planification.score2,
-                        dispId:  'displayScoreEquipe2' ~ rid,
-                        hidId:   'scoreEquipe2' ~ rid,
-                        hidName: 'scoreEquipe2',
-                        team:    2
-                    } %}
-                {% endif %}
-                {# ────────────────────────────────────────────────────────── #}
+            {% if isSwapped %}
+                {% set gauche = {
+                    nom:     planification.equipe2_nom,
+                    logo:    planification.club2_logo,
+                    score:   planification.score2,
+                    dispId:  'displayScoreEquipe2' ~ rid,
+                    hidId:   'scoreEquipe2' ~ rid,
+                    hidName: 'scoreEquipe2',
+                    team:    2
+                } %}
+                {% set droite = {
+                    nom:     planification.equipe1_nom,
+                    logo:    planification.club1_logo,
+                    score:   planification.score1,
+                    dispId:  'displayScoreEquipe1' ~ rid,
+                    hidId:   'scoreEquipe1' ~ rid,
+                    hidName: 'scoreEquipe1',
+                    team:    1
+                } %}
+            {% else %}
+                {% set gauche = {
+                    nom:     planification.equipe1_nom,
+                    logo:    planification.club1_logo,
+                    score:   planification.score1,
+                    dispId:  'displayScoreEquipe1' ~ rid,
+                    hidId:   'scoreEquipe1' ~ rid,
+                    hidName: 'scoreEquipe1',
+                    team:    1
+                } %}
+                {% set droite = {
+                    nom:     planification.equipe2_nom,
+                    logo:    planification.club2_logo,
+                    score:   planification.score2,
+                    dispId:  'displayScoreEquipe2' ~ rid,
+                    hidId:   'scoreEquipe2' ~ rid,
+                    hidName: 'scoreEquipe2',
+                    team:    2
+                } %}
+            {% endif %}
 
-                <!-- Match Card -->
+            {# ══════════════════════════════════════════════════ #}
+            {# CAS 1 — Rencontre TERMINÉE → ligne compacte       #}
+            {# ══════════════════════════════════════════════════ #}
+            {% if planification.isTerminated == 1 %}
+
+                <div class="card-done d-none">
+                    <span class="done-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="done-time" style="font-size:0.8rem;font-weight:700;color:#6b7280;white-space:nowrap;min-width:38px;">
+                        {{ planification.creneau_nom|slice(0, -3) }}
+                    </span>
+                    <span class="done-team">{{ gauche.nom }}</span>
+                    <span class="done-score">{{ gauche.score }} – {{ droite.score }}</span>
+                    <span class="done-team right">{{ droite.nom }}</span>
+                </div>
+
+            {# ══════════════════════════════════════════════════ #}
+            {# CAS 2 — En cours ou à venir → carte complète      #}
+            {# ══════════════════════════════════════════════════ #}
+            {% else %}
+
                 <div class="match-card" id="planification-{{ rid }}">
 
-                    <!-- Time header -->
-                    <div class="time-header">
-                        <div class="time-display">
-                            <i class="fas fa-clock"></i>
-                            <span>{{ planification.creneau_nom|slice(0, -3) }}</span>
+                    {# Time bar #}
+                    <div class="match-time-bar">
+                        <div class="time-txt">
+                            <i class="fas fa-clock" style="font-size:1rem;opacity:0.7;"></i>
+                            {{ planification.creneau_nom|slice(0, -3) }}
                         </div>
-                        <a href="?{{ swapQuery }}#planification-{{ rid }}" class="btn-swap {{ isSwapped ? 'is-swapped' : '' }}">
+                        <a href="?{{ swapQuery }}#planification-{{ rid }}"
+                           class="btn-swap {{ isSwapped ? 'is-swapped' : '' }}">
                             <i class="fas fa-exchange-alt swap-icon"></i>
                             Inverser
                         </a>
@@ -615,210 +586,214 @@
                     <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ rid }}">
                         <input type="hidden" name="return_id" value="row-{{ rid }}">
 
-                        <!-- Teams Grid -->
-                        <div class="teams-grid">
+                        {# Teams row #}
+                        <div class="teams-row">
 
-                            {% for equipe in [gauche, droite] %}
-                                <div class="team-column">
-                                    <img src="{{ equipe.logo }}" class="team-logo" alt="{{ equipe.nom }}">
-                                    <div class="team-name">{{ equipe.nom }}</div>
-                                    <input type="hidden"
-                                           name="{{ equipe.hidName }}"
-                                           value="{{ equipe.score }}"
-                                           id="{{ equipe.hidId }}">
-                                    <div class="score-display" id="{{ equipe.dispId }}">
-                                        {{ equipe.score }}
+                            {# Équipe gauche #}
+                            <div class="team-col">
+                                <img src="{{ gauche.logo }}" class="team-logo" alt="{{ gauche.nom }}">
+                                <div class="team-name">{{ gauche.nom }}</div>
+                                <input type="hidden" name="{{ gauche.hidName }}" value="{{ gauche.score }}" id="{{ gauche.hidId }}">
+                                <div class="score-big" id="{{ gauche.dispId }}">{{ gauche.score }}</div>
+                                {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                    <div class="score-btns">
+                                        <button type="button" class="btn-goal btn-add"
+                                                hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ gauche.team }}"
+                                                hx-trigger="click"
+                                                hx-on::after-request="vibrate(50)"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ gauche.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-plus"></i> But
+                                        </button>
+                                        <button type="button" class="btn-goal btn-sub"
+                                                hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ gauche.team }}"
+                                                hx-on::after-request="vibrate(200)"
+                                                hx-trigger="click"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ gauche.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
                                     </div>
-                                    {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                        <div class="score-buttons">
-                                            <button type="button"
-                                                    class="btn-goal add"
-                                                    
-                                                    hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ equipe.team }}"
-                                                    hx-trigger="click"
-                                                    hx-on::after-request="vibrate(50)"
-                                                    hx-swap="innerHTML"
-                                                    hx-target="#{{ equipe.dispId }}"
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-plus"></i>
-                                                But
-                                            </button>
-                                            <button type="button"
-                                                    class="btn-goal remove"
-                                                    hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ equipe.team }}"
-                                                    hx-on::after-request="vibrate(200)"
-                                                    hx-trigger="click"
-                                                    hx-swap="innerHTML"
-                                                    hx-target="#{{ equipe.dispId }}"
-                                                    {% if planification.est_premier_zero == false %}disabled{% endif %}>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                                {% endif %}
+                            </div>
 
-                        </div>{# /teams-grid #}
+                            {# VS divider #}
+                            <div class="vs-col">
+                                <span class="vs-label">VS</span>
+                                <div class="vs-dash"></div>
+                            </div>
 
-                        <!-- Info section -->
-                        <div class="info-section">
+                            {# Équipe droite #}
+                            <div class="team-col right">
+                                <img src="{{ droite.logo }}" class="team-logo" alt="{{ droite.nom }}">
+                                <div class="team-name">{{ droite.nom }}</div>
+                                <input type="hidden" name="{{ droite.hidName }}" value="{{ droite.score }}" id="{{ droite.hidId }}">
+                                <div class="score-big" id="{{ droite.dispId }}">{{ droite.score }}</div>
+                                {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                    <div class="score-btns">
+                                        <button type="button" class="btn-goal btn-add"
+                                                hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ droite.team }}"
+                                                hx-trigger="click"
+                                                hx-on::after-request="vibrate(50)"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ droite.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-plus"></i> But
+                                        </button>
+                                        <button type="button" class="btn-goal btn-sub"
+                                                hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ droite.team }}"
+                                                hx-on::after-request="vibrate(200)"
+                                                hx-trigger="click"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ droite.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
 
+                        </div>{# /teams-row #}
+
+                        {# Info section #}
+                        <div class="match-info">
+
+                            {# Statut #}
                             <div class="info-row">
-                                <div class="info-label">
-                                    <i class="fas fa-flag"></i>
-                                    Statut
-                                </div>
-                                <div class="info-value">
-                    {% if planification.isTerminated == 1 %}
-                        {# ── Rencontre terminée ── #}
-                        <div class="status-stepper">
-                            <div class="step done">
-                                <div class="step-bubble"><i class="fas fa-check"></i></div>
-                                <div class="step-label">À venir</div>
-                            </div>
-                            <div class="step-arrow done"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step done">
-                                <div class="step-bubble"><i class="fas fa-check"></i></div>
-                                <div class="step-label">En cours</div>
-                            </div>
-                            <div class="step-arrow done"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step active">
-                                <div class="step-bubble"><i class="fas fa-flag-checkered"></i></div>
-                                <div class="step-label">Terminée</div>
-                            </div>
-                        </div>
+                                <div class="info-icon"><i class="fas fa-flag"></i></div>
+                                <div class="info-body">
+                                    <div class="info-label">Statut</div>
+                                    <div class="info-value">
 
-                    {% elseif planification.isTerminated == 0 %}
-                        {# ── À venir / Score à saisir ── #}
-                        <div class="status-stepper">
-                            <div class="step warning">
-                                <div class="step-bubble"><i class="fas fa-exclamation"></i></div>
-                                <div class="step-label">À venir</div>
-                                <div class="step-hint">Saisir le score</div>
-                            </div>
-                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step inactive">
-                                <div class="step-bubble"><i class="fas fa-play"></i></div>
-                                <div class="step-label">En cours</div>
-                            </div>
-                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step inactive">
-                                <div class="step-bubble"><i class="fas fa-flag-checkered"></i></div>
-                                <div class="step-label">Terminée</div>
-                            </div>
-                        </div>
+                                        {% if planification.isTerminated == 0 %}
+                                            <div class="stepper">
+                                                <div class="stp warn">
+                                                    <div class="stp-bubble"><i class="fas fa-exclamation"></i></div>
+                                                    <div class="stp-label">À venir</div>
+                                                    <div class="stp-hint">Saisir le score</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-play"></i></div>
+                                                    <div class="stp-label">En cours</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-flag-checkered"></i></div>
+                                                    <div class="stp-label">Terminée</div>
+                                                </div>
+                                            </div>
 
-                    {% elseif planification.isTerminated == 2 %}
-                        {# ── En cours → cliquer pour terminer ── #}
-                        <div class="status-stepper">
-                            <div class="step done">
-                                <div class="step-bubble"><i class="fas fa-check"></i></div>
-                                <div class="step-label">À venir</div>
-                            </div>
-                            <div class="step-arrow done"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step active clickable" onclick="updateStatus({{ rid }})" title="Appuyer pour terminer" id="State{{ rid }}">
-                                <div class="step-bubble"><i class="fas fa-play"></i></div>
-                                <div class="step-label">En cours</div>
-                                <div class="step-hint">Appuyer pour<br>terminer</div>
-                            </div>
-                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
-                            <div class="step inactive">
-                                <div class="step-bubble"><i class="fas fa-flag-checkered"></i></div>
-                                <div class="step-label">Terminée</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-                            </div>
-
-                            <div class="info-row">
-                                <div class="info-label">
-                                    <i class="fas fa-tag"></i>
-                                    Catégorie
-                                </div>
-                                <div class="info-value">
-                                    <span class="category-badge" style="background-color: {{ planification.Couleur }};">
-                                        <i class="fas fa-layer-group"></i>
-                                        {{ planification.categorie_equipe1_nom }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% if   planification.arbitre_nom  %}
-                            <div class="info-row">
-                                <div class="info-label">
-                                    <i class="fas fa-user-tie"></i>
-                                    Arbitre
-                                </div>
-                                <div class="info-value">
-                                    {{ planification.arbitre_nom }} {{ planification.arbitre_club_nom }}
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if partenaires is not empty %}
-                                {% set randIndex = random(0, partenaires|length - 1) %}
-                                {% set sponsor = partenaires[randIndex] %}
-                                <div class="sponsor-box">
-                                    <div class="sponsor-info">
-                                        <i class="fas fa-handshake" style="color: var(--primary-color);"></i>
-                                        Sponsorisé par
-                                        <strong>
-                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                {{ sponsor.nom }}
-                                            </a>
-                                        </strong>
-                                        {% if sponsor.description %}
-                                            <br><em>{{ sponsor.description }}</em>
+                                        {% elseif planification.isTerminated == 2 %}
+                                            <div class="stepper">
+                                                <div class="stp done">
+                                                    <div class="stp-bubble"><i class="fas fa-check"></i></div>
+                                                    <div class="stp-label">À venir</div>
+                                                </div>
+                                                <div class="stp-arrow done"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp current clickable" onclick="updateStatus({{ rid }})" id="State{{ rid }}">
+                                                    <div class="stp-bubble"><i class="fas fa-play"></i></div>
+                                                    <div class="stp-label">En cours</div>
+                                                    <div class="stp-hint">Appuyer pour<br>terminer</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-flag-checkered"></i></div>
+                                                    <div class="stp-label">Terminée</div>
+                                                </div>
+                                            </div>
                                         {% endif %}
+
                                     </div>
-                                    {% if sponsor.logo %}
-                                        <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                            <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
-                                        </a>
-                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {# Catégorie #}
+                            <div class="info-row">
+                                <div class="info-icon"><i class="fas fa-tag"></i></div>
+                                <div class="info-body">
+                                    <div class="info-label">Catégorie</div>
+                                    <div class="info-value">
+                                        <span class="cat-badge" style="background-color: {{ planification.Couleur }};">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ planification.categorie_equipe1_nom }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Arbitre #}
+                            {% if planification.arbitre_nom %}
+                                <div class="info-row">
+                                    <div class="info-icon"><i class="fas fa-user-tie"></i></div>
+                                    <div class="info-body">
+                                        <div class="info-label">Arbitre</div>
+                                        <div class="info-value">{{ planification.arbitre_nom }} — {{ planification.arbitre_club_nom }}</div>
+                                    </div>
                                 </div>
                             {% endif %}
 
-                        </div>{# /info-section #}
+                        </div>{# /match-info #}
+
+                        {# Sponsor #}
+                        {% if partenaires is not empty %}
+                            {% set randIndex = random(0, partenaires|length - 1) %}
+                            {% set sponsor = partenaires[randIndex] %}
+                            <div class="sponsor-strip">
+                                <i class="fas fa-handshake" style="color:var(--c-primary);font-size:1rem;flex-shrink:0;"></i>
+                                <div style="flex:1;line-height:1.4;">
+                                    Sponsorisé par <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">{{ sponsor.nom }}</a>
+                                    {% if sponsor.description %}<br><em>{{ sponsor.description }}</em>{% endif %}
+                                </div>
+                                {% if sponsor.logo %}
+                                    <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                        <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
                     </form>
                 </div>{# /match-card #}
 
-            {% elseif planification.label_description is not null %}
+            {% endif %}{# /isTerminated #}
 
-                <!-- Label Card -->
-                <div class="label-card">
-                    <div class="time-header">
-                        <div class="time-display">
-                            <i class="fas fa-clock"></i>
-                            <span>{{ planification.creneau_nom }}</span>
-                        </div>
-                    </div>
-                    <div class="label-content">
-                        <div class="label-text">
-                            <i class="fas fa-info-circle"></i>
-                            {{ planification.label_description }}
-                        </div>
+        {% elseif planification.label_description is not null %}
+
+            {# ── Label card ── #}
+            <div class="label-card">
+                <div class="match-time-bar" style="padding:10px 16px;">
+                    <div class="time-txt" style="font-size:1rem;">
+                        <i class="fas fa-clock" style="font-size:0.9rem;opacity:0.7;"></i>
+                        {{ planification.creneau_nom }}
                     </div>
                 </div>
+                <div class="label-body">
+                    <div class="label-icon-box"><i class="fas fa-info"></i></div>
+                    {{ planification.label_description }}
+                </div>
+            </div>
 
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
+        {% endif %}
+
+    {% endfor %}
+    </div>{# /scoreRefresh #}
+
+</div>{# /page #}
 
 <script>
     function updateStatus(idRencontre) {
         if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
             const target = `#State${idRencontre}`;
-
             const handler = function(evt) {
                 if (evt.target.id === `State${idRencontre}`) {
                     document.body.removeEventListener('htmx:afterSwap', handler);
                     location.reload();
                 }
             };
-
             document.body.addEventListener('htmx:afterSwap', handler);
-
             htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
                 target: target,
                 swap: 'outerHTML'
@@ -827,40 +802,21 @@
     }
 
     function vibrate(temps) {
-       
+        if (navigator.vibrate) navigator.vibrate(temps);
+    }
 
-        if (navigator.vibrate) {
-            navigator.vibrate(temps);
-           
+    $(document).ready(function () {
+        const savedScroll = sessionStorage.getItem('scrollPos');
+        if (savedScroll) {
+            window.scrollTo(0, parseInt(savedScroll));
+            sessionStorage.removeItem('scrollPos');
         }
-        
 
-    }
-  $(document).ready(function () {
-    // Restaure la position si elle a été sauvegardée
-    const savedScroll = sessionStorage.getItem('scrollPos');
-    if (savedScroll) {
-        window.scrollTo(0, parseInt(savedScroll));
-        sessionStorage.removeItem('scrollPos');
-    }
-
-    // Sauvegarde la position avant le rechargement automatique
-    setTimeout(function () {
-        sessionStorage.setItem('scrollPos', window.scrollY);
-        location.reload(true);
-    }, 30000);
-});
-    
-$(document).ready(function () {
-    // Restaure la position si elle a été sauvegardée
-    const savedScroll = sessionStorage.getItem('scrollPos');
-    if (savedScroll) {
-        window.scrollTo(0, parseInt(savedScroll));
-        sessionStorage.removeItem('scrollPos');
-    }
-
-  
-});
+        setTimeout(function () {
+            sessionStorage.setItem('scrollPos', window.scrollY);
+            location.reload(true);
+        }, 30000);
+    });
 </script>
 </body>
 </html>
