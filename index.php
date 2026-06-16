@@ -259,7 +259,7 @@ if (isset ($_GET['idPoule'])) {
 
   }
    else {
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1,'index',true);
    $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 
    }

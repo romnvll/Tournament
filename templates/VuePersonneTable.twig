@@ -49,6 +49,19 @@
             color: white;
         }
 
+        .page-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brackito-logo {
+            width: 100px;
+            max-height: 40px;
+            object-fit: contain;
+        }
+
         .page-header h1 {
             font-size: 1.1rem;
             font-weight: 700;
@@ -480,7 +493,10 @@
 
     {# ── Header ── #}
     <div class="page-header">
-        <h1><i class="fas fa-user-check"></i> Bonjour {{ prenom }} !</h1>
+        <div class="page-header-top">
+            <h1><i class="fas fa-user-check"></i> Bonjour {{ prenom }} !</h1>
+            <img src="logos/Logo.png" class="brackito-logo" alt="Brackito">
+        </div>
         <p>Saisie des scores</p>
         <div class="terrain-chip">
             <i class="fas fa-map-marker-alt"></i>

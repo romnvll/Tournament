@@ -1289,6 +1289,8 @@
                                 </thead>
                                 <tbody>
                                     {% for personne in AfficherPersonnes %}
+                                   
+                                    
                                     <tr data-nom="{{ personne.Nom | lower }}">
                                         <td>{{ personne.Nom }}</td>
                                         <td>{{ personne.Prenom }}</td>
@@ -1382,21 +1384,38 @@
                                             <th>{{ t('prenom') }}</th>
                                             <th>{{ t('email') }}</th>
                                             <th>{{ t('terrainN') }}</th>
-                                            <th>{{ t('codePIN') }}</th>
-                                            <th>{{ t('cleSecurisee') }}</th>
-                                            <th>{{ t('envoiDesInformations') }}</th>
+                                             <th>{{ t('envoiDesInformations') }}</th>
                                             <th>{{ t('supprimerPersonneTerrain') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                    
                                         {% for personneTable in AfficherLesPersonnesCrees %}
-                                        <tr data-nom="{{ personneTable.Nom | lower }}">
-                                            <td>{{ personneTable.Nom }}</td>
-                                            <td>{{ personneTable.Prenom }}</td>
-                                            <td>{{ personneTable.Mail }}</td>
+                                        <td colspan="3">
+                                                    <form id="form-personne-{{ personneTable.personne_id }}"
+                                                        hx-post="modifierTournoi_traitement.php"
+                                                        hx-trigger="keyup delay:800ms"
+                                                        hx-target="#msg-personne-{{ personneTable.personne_id }}"
+                                                        hx-swap="innerHTML"
+                                                        style="display:flex; gap:8px; align-items:center;">
+                                                        <input type="hidden" name="idPersonneTable" value="{{ personneTable.personne_id }}">
+                                                        <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+                                                        <input type="text"  name="nomPersonneTable"    value="{{ personneTable.Nom }}"
+                                                            class="modern-input" style="min-width:100px;" placeholder="{{ t('name') }}">
+                                                        <input type="text"  name="prenomPersonneTable" value="{{ personneTable.Prenom }}"
+                                                            class="modern-input" style="min-width:100px;" placeholder="{{ t('prenom') }}">
+                                                        <input type="email" name="mailPersonneTable"   value="{{ personneTable.Mail }}"
+                                                            class="modern-input" style="min-width:150px;" placeholder="{{ t('email') }}">
+                                                        <span id="msg-personne-{{ personneTable.personne_id }}" style="color:var(--success-color); white-space:nowrap;"></span>
+                                                    </form>
+                                                </td>
+
+
+
+
                                             <td>{{ personneTable.terrain_nom }}</td>
-                                            <td><strong>{{ personneTable.code_pin }}</strong></td>
-                                            <td><small>{{ personneTable.url_key }}</small></td>
+                                            <!--<td><strong>{{ personneTable.code_pin }}</strong></td>
+                                            <td><small>{{ personneTable.url_key }}</small></td> -->
                                             <td>
                                                 <div class="d-flex gap-2 align-items-center justify-content-center">
                                                     <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"

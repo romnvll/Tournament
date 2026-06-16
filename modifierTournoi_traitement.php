@@ -165,6 +165,22 @@ if (isset($_POST['actionArchiver'])) {
     exit;
 }
 
+// --- Modifier nom/prénom/mail d'une personne table (inline) ---
+if (isset($_POST['idPersonneTable'])) {
+    require 'class/personneDao.class.php';
+    $personneDao = new PersonneDao();
+    $personneDao->modifierPersonne(
+        (int)$_POST['idPersonneTable'],
+        trim($_POST['nomPersonneTable']    ?? ''),
+        trim($_POST['prenomPersonneTable'] ?? ''),
+        trim($_POST['mailPersonneTable']   ?? ''),
+        $tournoiId
+    );
+    echo "✅ Ok!";
+    exit;
+}
+
+
 // ─────────────────────────────────────────────
 // 4. Mise à jour générale du tournoi (formulaire principal)
 // ─────────────────────────────────────────────

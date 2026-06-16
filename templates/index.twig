@@ -1581,7 +1581,8 @@
 
                             <div class="match-details">
                                 <div class="detail-row">
-                                    {% if equipe.type_rencontre_id == 4 %}
+                                
+                                    {% if equipe.type_rencontre_id == 4 or equipe.source_type == 'amical' %}
                                         <span class="match-category" style="background-color: #ffc107; color: #212529;">
                                             <i class="fa fa-star"></i>Rencontre amicale
                                         </span>

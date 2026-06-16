@@ -1080,112 +1080,134 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
 
 
 
-   public function getRencontreByPoule($pouleid, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
+  public function getRencontreByPoule($pouleid, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index', $includeAmicaux = false)
 {
-$orderBy = ($from === 'tour') ? "r.tour, c.nom, r.id" : "c.nom, r.id";    $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
+    $orderBy            = ($from === 'tour') ? "r_tour, creneau_nom, rencontre_id" : "creneau_nom, rencontre_id";
+    $additionalCondition = ($from === 'tour') ? '' : 'AND t.nom IS NOT NULL';
 
-    $query = "
-        SELECT 
-            r.id AS rencontre_id,
-            r.tour AS tour,
-            p.terrain_id,
-            t.nom AS terrain_nom,
-            p.creneau_id,
-            c.nom AS creneau_nom,
-            
-            equipe1.isPresent AS equipe1_isPresent,
-            equipe1.id AS equipe1_id,
-            equipe1.nomCoach AS equipe1_coach_nom,
-            equipe1.nom AS equipe1_nom,
-            club1.id AS club1_id,
-            club1.nom AS club1_nom,
-            club1.logo AS club1_logo,
-            
-            equipe2.id AS equipe2_id,
-            equipe2.isPresent AS equipe2_isPresent,
-            equipe2.nom AS equipe2_nom,
-            equipe2.nomCoach AS equipe2_coach_nom,
-            club2.id AS club2_id,
-            club2.nom AS club2_nom,
-            club2.logo AS club2_logo,
+    $selectFields = "
+        r.id              AS rencontre_id,
+        r.tour            AS r_tour,
+        p.terrain_id,
+        t.nom             AS terrain_nom,
+        p.creneau_id,
+        c.nom             AS creneau_nom,
 
-            cat1.Nom_categorie AS equipe1_categorie_nom,
-            cat1.id_categorie AS equipe1_categorie_id,
-            cat1.Couleur AS equipe1_categorie_couleur,
-            cat2.Nom_categorie AS equipe2_categorie_nom,
-            cat2.Couleur AS equipe2_categorie_couleur,
-            cat2.id_categorie AS equipe2_categorie_id,          
-            
-            r.score1,
-            r.score2,
-            r.isTerminated,
-            
-            a.nom AS arbitre_nom,
-            clubArbitre.nom AS arbitre_club_nom,
-            
-            CASE 
-                WHEN EXISTS (
-                    SELECT 1 
-                    FROM Labels l 
-                    WHERE l.categorie_id = equipe1.categorie 
-                    AND l.tournoi_id = r.tournoi_id
-                    AND l.description LIKE 'EliminationDirect%'
-                ) THEN 1 
-                ELSE 0 
-            END AS equipe1_has_phase_finale,
-            
-            CASE 
-                WHEN EXISTS (
-                    SELECT 1 
-                    FROM Labels l 
-                    WHERE l.categorie_id = equipe2.categorie 
-                    AND l.tournoi_id = r.tournoi_id
-                    AND l.description LIKE 'EliminationDirect%'
-                ) THEN 1 
-                ELSE 0 
-            END AS equipe2_has_phase_finale
+        equipe1.isPresent AS equipe1_isPresent,
+        equipe1.id        AS equipe1_id,
+        equipe1.nomCoach  AS equipe1_coach_nom,
+        equipe1.nom       AS equipe1_nom,
+        club1.id          AS club1_id,
+        club1.nom         AS club1_nom,
+        club1.logo        AS club1_logo,
 
-        FROM 
-            Rencontres r
-        JOIN 
-            Equipes equipe1 ON r.equipe1_id = equipe1.id
-        JOIN 
-            EquipePoule ep1 ON equipe1.id = ep1.equipe_id AND ep1.poule_id = :pouleid
-        JOIN 
-            Clubs club1 ON equipe1.club_id = club1.id
-        LEFT JOIN 
-            Categorie cat1 ON equipe1.categorie = cat1.id_categorie
-        JOIN 
-            Equipes equipe2 ON r.equipe2_id = equipe2.id
-        JOIN 
-            EquipePoule ep2 ON equipe2.id = ep2.equipe_id AND ep2.poule_id = :pouleid
-        JOIN 
-            Clubs club2 ON equipe2.club_id = club2.id
-        LEFT JOIN 
-            Planification p ON r.id = p.rencontre_id
-        LEFT JOIN 
-            Creneaux c ON p.creneau_id = c.creneau_id
-        LEFT JOIN 
-            Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN 
-            Arbitres a ON p.arbitre_id = a.arbitre_id
-        LEFT JOIN 
-            Clubs clubArbitre ON a.club_id = clubArbitre.id
-        LEFT JOIN 
-            Categorie cat2 ON equipe2.categorie = cat2.id_categorie
-        WHERE 
-            r.type_rencontre_id = :typeRencontreId
-            $additionalCondition
-        ORDER BY 
-            $orderBy;
+        equipe2.id        AS equipe2_id,
+        equipe2.isPresent AS equipe2_isPresent,
+        equipe2.nom       AS equipe2_nom,
+        equipe2.nomCoach  AS equipe2_coach_nom,
+        club2.id          AS club2_id,
+        club2.nom         AS club2_nom,
+        club2.logo        AS club2_logo,
+
+        cat1.Nom_categorie AS equipe1_categorie_nom,
+        cat1.id_categorie  AS equipe1_categorie_id,
+        cat1.Couleur       AS equipe1_categorie_couleur,
+        cat2.Nom_categorie AS equipe2_categorie_nom,
+        cat2.Couleur       AS equipe2_categorie_couleur,
+        cat2.id_categorie  AS equipe2_categorie_id,
+
+        r.score1,
+        r.score2,
+        r.isTerminated,
+
+        a.nom            AS arbitre_nom,
+        clubArbitre.nom  AS arbitre_club_nom,
+
+        CASE
+            WHEN EXISTS (
+                SELECT 1 FROM Labels l
+                WHERE l.categorie_id = equipe1.categorie
+                AND   l.tournoi_id   = r.tournoi_id
+                AND   l.description LIKE 'EliminationDirect%'
+            ) THEN 1 ELSE 0
+        END AS equipe1_has_phase_finale,
+
+        CASE
+            WHEN EXISTS (
+                SELECT 1 FROM Labels l
+                WHERE l.categorie_id = equipe2.categorie
+                AND   l.tournoi_id   = r.tournoi_id
+                AND   l.description LIKE 'EliminationDirect%'
+            ) THEN 1 ELSE 0
+        END AS equipe2_has_phase_finale
     ";
-    
-    $stmt = $this->connexion->prepare($query);
-    $stmt->bindParam(':pouleid', $pouleid, PDO::PARAM_INT);
-    $stmt->bindParam(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
-    
+
+    $joins = "
+        JOIN      Equipes     equipe1      ON r.equipe1_id    = equipe1.id
+        JOIN      Clubs       club1        ON equipe1.club_id = club1.id
+        LEFT JOIN Categorie   cat1         ON equipe1.categorie = cat1.id_categorie
+        JOIN      Equipes     equipe2      ON r.equipe2_id    = equipe2.id
+        JOIN      Clubs       club2        ON equipe2.club_id = club2.id
+        LEFT JOIN Categorie   cat2         ON equipe2.categorie = cat2.id_categorie
+        LEFT JOIN Planification p          ON r.id            = p.rencontre_id
+        LEFT JOIN Creneaux    c            ON p.creneau_id    = c.creneau_id
+        LEFT JOIN Terrains    t            ON p.terrain_id    = t.terrain_id
+        LEFT JOIN Arbitres    a            ON p.arbitre_id    = a.arbitre_id
+        LEFT JOIN Clubs       clubArbitre  ON a.club_id       = clubArbitre.id
+    ";
+
+    // ── Requête principale : rencontres de la poule ──────────────────────
+    $queryPoule = "
+        SELECT $selectFields, 'poule' AS source_type
+        FROM Rencontres r
+        $joins
+        JOIN EquipePoule ep1 ON equipe1.id = ep1.equipe_id AND ep1.poule_id = :pouleid
+        JOIN EquipePoule ep2 ON equipe2.id = ep2.equipe_id AND ep2.poule_id = :pouleid
+        WHERE r.type_rencontre_id = :typeRencontreId
+        $additionalCondition
+    ";
+
+    if (!$includeAmicaux) {
+        // ── Pas d'amicaux : requête simple ──────────────────────────────
+        $query = "$queryPoule ORDER BY $orderBy";
+
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindParam(':pouleid',         $pouleid,         PDO::PARAM_INT);
+        $stmt->bindParam(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+
+    } else {
+        // ── Avec amicaux : UNION ALL dans une sous-requête ───────────────
+        $queryAmicaux = "
+            SELECT $selectFields, 'amical' AS source_type
+            FROM Rencontres r
+            $joins
+            WHERE r.type_rencontre_id = :typeAmical
+            AND (
+                equipe1.id IN (SELECT ep.equipe_id FROM EquipePoule ep WHERE ep.poule_id = :pouleid)
+                OR
+                equipe2.id IN (SELECT ep.equipe_id FROM EquipePoule ep WHERE ep.poule_id = :pouleid)
+            )
+            $additionalCondition
+        ";
+
+        $query = "
+            SELECT * FROM (
+                $queryPoule
+                UNION ALL
+                $queryAmicaux
+            ) AS rencontres_union
+            ORDER BY $orderBy
+        ";
+
+        $typeAmical = TYPE_RENCONTRE_AMICAL;
+
+        $stmt = $this->connexion->prepare($query);
+        $stmt->bindParam(':pouleid',         $pouleid,         PDO::PARAM_INT);
+        $stmt->bindParam(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+        $stmt->bindParam(':typeAmical',      $typeAmical,      PDO::PARAM_INT);
+    }
+
     $stmt->execute();
-    
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
