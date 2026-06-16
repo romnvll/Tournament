@@ -24,13 +24,29 @@ if (isset($_GET['idCreneau'])) {
 
     $audioCreneaux = new creneauxDao();
 
-    foreach ($audioCreneaux->getAudiosPourCreneau($idCreneau) as $audio) {
-        foreach (['terrain_audio', 'equipe1_audio', 'equipe2_audio', 'arbitre_audio'] as $key) {
-            if (!empty($audio[$key])) {
-                $audioPaths[] = $audio[$key];
-            }
+   foreach ($audioCreneaux->getAudiosPourCreneau($idCreneau) as $audio) {
+
+    $rencontreValide =
+        !empty($audio['rencontre_id']) &&
+        $audio['equipe1_isPresent'] == 1 &&
+        $audio['equipe2_isPresent'] == 1;
+
+    // On passe complètement cette planification
+    if (!$rencontreValide) {
+        continue;
+    }
+
+    foreach ([
+        'terrain_audio',
+        'equipe1_audio',
+        'equipe2_audio',
+        'arbitre_audio'
+    ] as $key) {
+        if (!empty($audio[$key])) {
+            $audioPaths[] = $audio[$key];
         }
     }
+}
     
 }
 

@@ -41,6 +41,7 @@
 				padding: 30px;
 			}
 
+			
 			/* Boutons de tournois */
 			.tournament-buttons {
 				display: flex;
@@ -186,7 +187,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 900;
+    font-weight: 500;
     font-size: 2.5rem;
     color: white;
     padding: 15px 30px;
@@ -271,6 +272,12 @@
 			.modern-table tbody tr:hover {
 				background: var(--bg-light);
 			}
+
+		.match-absent {
+    border: 3px solid #ef4444 !important;
+    background: #fef2f2 !important;
+}
+
 
 			/* Cartes de match */
 			.match-card {
@@ -773,7 +780,10 @@
 											{% for planification in afficherPlanification %}
 												{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
 													{% if planification.rencontre_id is not null or planification.arbitre_id is not null %}
-														<div class="match-card">
+													
+														<div class="match-card  {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
+																match-absent
+															{% endif %}">
 															{% if tournoiInfo.gestionArbitres == 1 %}
 																<div class="text-center mb-2">
 																	<i class="fas fa-user-tie me-1"></i>
@@ -854,14 +864,15 @@
 
 																<div class="text-center">
 																	<div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-																		<span class="fw-bold">{{ planification.equipe1_nom }}</span>
+																		<span class="fw-bold">{{ planification.equipe1_nom }} {% if planification.equipe1_isPresent == 0 %}(Absente){% endif %}</span>
+																		
 																		{% if tournoiInfo.gestionVoix == 1 %}
 																			<span class="icon-badge {% if planification.audio1 is null %}icon-danger{% else %}icon-success{% endif %}">
 																				<i class="fas fa-microphone{% if planification.audio1 is null %}-slash{% endif %}"></i>
 																			</span>
 																		{% endif %}
 																		<span class="text-muted">vs</span>
-																		<span class="fw-bold">{{ planification.equipe2_nom }}</span>
+																		<span class="fw-bold">{{ planification.equipe2_nom }} {% if planification.equipe2_isPresent == 0 %}(Absente){% endif %}</span>
 																		{% if tournoiInfo.gestionVoix == 1 %}
 																			<span class="icon-badge {% if planification.audio2 is null %}icon-danger{% else %}icon-success{% endif %}">
 																				<i class="fas fa-microphone{% if planification.audio2 is null %}-slash{% endif %}"></i>
@@ -1074,7 +1085,57 @@
 					updateScrollIndicator();
 				}
 			});
+		
+
+
+
+function rafraichirScores() {
+    const idTournoi = {{ idTournoi }};
+    
+    fetch(`getScores.php?idTournoi=${idTournoi}`)
+        .then(r => r.json())
+        .then(scores => {
+            Object.entries(scores).forEach(([rencontreId, data]) => {
+                // Ne pas écraser un champ en cours d'édition
+                const input1 = document.querySelector(
+                    `input[name="scoreEquipe1"][hx-include="#idRencontre${rencontreId}"]`
+                );
+                const input2 = document.querySelector(
+                    `input[name="scoreEquipe2"][hx-include="#idRencontre${rencontreId}"]`
+                );
+
+                if (input1 && document.activeElement !== input1) {
+                    input1.value = data.score1 ?? '';
+                }
+                if (input2 && document.activeElement !== input2) {
+                    input2.value = data.score2 ?? '';
+                }
+
+                // Mettre à jour le label de statut
+                const label = document.getElementById(`Label${rencontreId}`);
+                if (label) {
+                    const statusMap = {
+                        0: `<div class="match-status status-upcoming" id="Label${rencontreId}">⏱️ Rencontre à venir</div>`,
+                        1: `<div class="match-status status-finished" id="Label${rencontreId}">✓ Rencontre terminée</div>`,
+                        2: `<div class="match-status status-ongoing" id="Label${rencontreId}">▶️ Rencontre en cours</div>`,
+                    };
+                    // Remplacer seulement si le statut a changé
+                    const newStatus = data.isTerminated;
+                    const currentClass = label.className;
+                    const expectedClass = ['status-upcoming','status-finished','status-ongoing'][newStatus];
+                    if (!currentClass.includes(expectedClass)) {
+                        label.outerHTML = statusMap[newStatus];
+                    }
+                }
+            });
+        })
+        .catch(err => console.warn('Rafraîchissement scores échoué:', err));
+}
+
+// Rafraîchir toutes les 10 secondes
+setInterval(rafraichirScores, 10000);
 		</script>
+
 
 	</body>
 </html>

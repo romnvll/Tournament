@@ -45,18 +45,22 @@ class creneauxDao {
 public function getAudiosPourCreneau(int $creneau_id): array {
     $stmt = $this->connexion->prepare("
         SELECT 
-            T.terrain_id,
-            T.audio_path AS terrain_audio,
-            E1.audio_path AS equipe1_audio,
-            E2.audio_path AS equipe2_audio,
-            A.audio_path AS arbitre_audio
-        FROM Planification P
-        LEFT JOIN Rencontres R ON R.id = P.rencontre_id
-        LEFT JOIN Terrains T ON T.terrain_id = P.terrain_id
-        LEFT JOIN Equipes E1 ON E1.id = R.equipe1_id
-        LEFT JOIN Equipes E2 ON E2.id = R.equipe2_id
-        LEFT JOIN Arbitres A ON A.arbitre_id = P.arbitre_id
-        WHERE P.creneau_id = :creneau_id order by T.terrain_id;
+    R.id AS rencontre_id,
+    T.terrain_id,
+    T.audio_path AS terrain_audio,
+    E1.isPresent AS equipe1_isPresent,
+    E2.isPresent AS equipe2_isPresent,
+    E1.audio_path AS equipe1_audio,
+    E2.audio_path AS equipe2_audio,
+    A.audio_path AS arbitre_audio
+FROM Planification P
+LEFT JOIN Rencontres R ON R.id = P.rencontre_id
+LEFT JOIN Terrains T ON T.terrain_id = P.terrain_id
+LEFT JOIN Equipes E1 ON E1.id = R.equipe1_id
+LEFT JOIN Equipes E2 ON E2.id = R.equipe2_id
+LEFT JOIN Arbitres A ON A.arbitre_id = P.arbitre_id
+WHERE P.creneau_id = :creneau_id
+ORDER BY T.terrain_id
     ");
     $stmt->bindParam(':creneau_id', $creneau_id, PDO::PARAM_INT);
     $stmt->execute();
