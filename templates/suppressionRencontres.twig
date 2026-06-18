@@ -57,7 +57,9 @@
                     <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" 
                        class="{{ btnClass }}" 
                        role="button">{{ poule.nom }}</a>
+                       
                   {% endfor %}
+
                 </div>
               {% endif %}
 
@@ -71,7 +73,7 @@
                     {% endif %}
                     <a href="suppressionRencontres.php?id_tournoi={{ tournoiEnCours }}&idPoule={{ poule.id }}" 
                        class="{{ btnClass }}" 
-                       role="button">{{ poule.nom }}</a>
+                       role="button">{{ poule.Nom_categorie }} | {{ poule.nom }}</a>
                   {% endfor %}
                 </div>
               {% endif %}

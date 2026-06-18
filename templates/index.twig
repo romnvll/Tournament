@@ -375,6 +375,57 @@
             line-height: 1.3;
             max-width: 110px;
         }
+          .bell-wrapper {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 200;
+    }
+
+    .bell-button {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--bg-dark);
+        position: relative;
+        transition: transform .15s;
+    }
+    .bell-button:active { transform: scale(0.94); }
+
+    .bell-button i { font-size: 1.2rem; }
+
+    .bell-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        min-width: 19px;
+        height: 19px;
+        padding: 0 4px;
+        border-radius: 99px;
+        background: var(--danger-color, #ef4444);
+        color: white;
+        font-size: .68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+    }
+
+    @keyframes bellRing {
+        0%, 100% { transform: rotate(0deg); }
+        10%, 30% { transform: rotate(-12deg); }
+        20%, 40% { transform: rotate(12deg); }
+        50% { transform: rotate(0deg); }
+    }
+    .bell-button.has-unread i { animation: bellRing 1.8s ease-in-out infinite; transform-origin: top center; }
+
 
         @media (min-width: 768px) {
             .match-header {
@@ -1227,34 +1278,22 @@
                     </div>
                 {% endif %}
 
-                <!-- Info Labels -->
-                {% set current_time = "now"|date("H:i") %}
-                {% set labels_to_display = labels|filter(label => 
-                    label['creneau_horaire']|slice(0,5) > current_time 
-                    or label['creneau_horaire']|slice(0,2) < "06"
-                ) %}
-                
-                {% if labels_to_display|length > 0 or planTournoi is not null %}
-                    <div class="info-alert {% if IdEquipe is null %}d-none{% endif %}" id="labels">
-                        <div class="info-header">
-                            <i class="fa-solid fa-circle-info"></i>
-                            Informations
+                <!-- Notifications -->
+                      
+                          {% if IdEquipe is not null %}
+               
+                            <div class="bell-wrapper" id="bellWrapper">
+                            <a href="messages.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}"
+                            class="bell-button {% if nbMessagesNonLus > 0 %}has-unread{% endif %}">
+                                <i class="fas fa-bell"></i>
+                                {% if nbMessagesNonLus > 0 %}
+                                    <span class="bell-badge">
+                                        {{ nbMessagesNonLus > 9 ? '9+' : nbMessagesNonLus }}
+                                    </span>
+                                {% endif %}
+                            </a>
                         </div>
-                        {% set labels_grouped = labels_to_display|reduce((carry, label) => 
-                            carry|merge({
-                                (label['labels']): (carry[label['labels']] is defined 
-                                    ? carry[label['labels']] ~ ', ' ~ label['creneau_horaire']|slice(0,5)|replace({':': 'h'})
-                                    : label['creneau_horaire']|slice(0,5)|replace({':': 'h'}))
-                            }), {}
-                        ) %}
-
-                        {% for labelName, horaires in labels_grouped %}
-                            <div class="info-item">
-                                <i class="fa-solid fa-check-circle" style="color: var(--success-color);"></i>
-                                {{ labelName }} : <strong>{{ horaires }}</strong>
-                            </div>
-                        {% endfor %}
-                            
+{% endif %}
                         {% if planTournoi is defined and planTournoi is not null %}
                             <div style="text-align: center; margin-top: 16px; padding: 12px; background: var(--bg-light); border-radius: 10px;">
                                 <div style="font-size: 0.9rem; font-weight: 600; color: var(--bg-dark); margin-bottom: 8px;">
@@ -1900,7 +1939,7 @@
                 {% endif %}
 
             {% endif %}
-        {% endif %}
+       
 
     </div>
 
@@ -1913,19 +1952,21 @@
     <script>
         var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
 
-        setInterval(function () {
-            $('#score').load(location.href + ' #score > *');
-            $('#classementTableau').load(location.href + ' #classementTableau > *');
-            $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
+       setInterval(function () {
+    $('#score').load(location.href + ' #score > *');
+    $('#classementTableau').load(location.href + ' #classementTableau > *');
+    $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
 
-            $('#labels').load(location.href + ' #labels > *', function () {
-                if ($.trim($('#labels').text()) === '') {
-                    $('#labels').hide();
-                } else {
-                    $('#labels').show();
-                }
-            });
-        }, refreshInterval);
+    $('#labels').load(location.href + ' #labels > *', function () {
+        if ($.trim($('#labels').text()) === '') {
+            $('#labels').hide();
+        } else {
+            $('#labels').show();
+        }
+    });
+
+    $('#bellWrapper').load(location.href + ' #bellWrapper > *');
+}, refreshInterval);
 
         document.addEventListener("DOMContentLoaded", function () {
             function getUrlParams() {

@@ -12,9 +12,25 @@ require 'class/terrainDao.class.php';
 require 'class/licenceDao.class.php';
 require 'class/categorie.class.php';
 require 'class/gymnaseDao.class.php';
+require 'class/messageDao.class.php';
 require 'Lang/lang.php';
 
+/* COOKIE des messages */
 
+function getVisiteurId(): string {
+    if (!empty($_COOKIE['visiteur_id']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['visiteur_id'])) {
+        return $_COOKIE['visiteur_id'];
+    }
+    $id = bin2hex(random_bytes(16));
+    setcookie('visiteur_id', $id, [
+        'expires'  => time() + 60 * 60 * 24 * 365 * 2, // 2 ans
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE['visiteur_id'] = $id;
+    return $id;
+}
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -80,6 +96,19 @@ else {
  
    $nbrterrain = null;
 }
+
+
+
+$messageDao = new MessageDAO();
+ 
+if (isset($_GET['id_equipe'])) {
+    $nbMessagesNonLus = $messageDao->compterMessagesNonLusParEquipe((int)$_GET['id_equipe'],getVisiteurId());
+   
+} else {
+    $nbMessagesNonLus = 0;
+}
+ 
+
 
 
 if (isset ($_GET['affichageByPoule'])) {
@@ -347,6 +376,7 @@ echo $template->render([
      'pouleInfo' => $pouleInfo,
      'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
       'gymnaseInfo' => $gymnaseInfo,
+      'nbMessagesNonLus' => $nbMessagesNonLus,
       
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

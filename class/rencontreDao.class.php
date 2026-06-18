@@ -20,7 +20,25 @@ class RencontreDAO
         }
     }
 
-
+public function countRencontresNonTermineesByCategorie(int $tournoiId, int $categorieId): int
+{
+    $query = "
+        SELECT COUNT(*) 
+        FROM Rencontres r
+        JOIN Equipes e1 ON r.equipe1_id = e1.id
+        WHERE r.tournoi_id = :tournoiId
+          AND e1.categorie = :categorieId
+          AND r.type_rencontre_id = :typePoule
+          AND r.isTerminated = 0
+          AND r.phase_finale_id IS NULL
+    ";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->bindValue(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->bindValue(':typePoule', TYPE_RENCONTRE_POULE, PDO::PARAM_INT);
+    $stmt->execute();
+    return (int) $stmt->fetchColumn();
+}
 
 
    public function createRencontreByPoule($pouleId, $tournoi_id, $typeRencontreId = TYPE_RENCONTRE_POULE, $isMatchRetour = false)
@@ -889,7 +907,7 @@ public function supprimerRencontre($rencontre_id)
         if ($isClassement == 1) {
             $sql = "SELECT id FROM Rencontres 
                     WHERE (equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)) 
-                    AND isClassement = 1";
+                    AND type_rencontre_id = 3";
         } else {
             $sql = "SELECT id FROM Rencontres 
                     WHERE equipe1_id IN ($placeholders) OR equipe2_id IN ($placeholders)";

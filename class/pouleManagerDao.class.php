@@ -404,27 +404,25 @@ public function supprimerPoulesParTournoi(int $idTournoi): void {
 
 
 
-public function getAllPoulesByTournoi($idTournoi, $AndIsClassement = false) {
-    
+public function getAllPoulesByTournoi(int $idTournoi, $AndIsClassement = false) {
 
     if ($AndIsClassement === true) {
-        $query = "SELECT p.*, COUNT(ep.equipe_id) AS nombre_equipes
+        $query = "SELECT p.*, c.Nom_categorie, COUNT(ep.equipe_id) AS nombre_equipes
         FROM Poules p
         LEFT JOIN EquipePoule ep ON p.id = ep.poule_id
+        LEFT JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
         WHERE p.tournoi_id = :idTournoi
         GROUP BY p.id
         ORDER BY p.nom";
     } else {
-        
-        $query = "SELECT p.*, COUNT(ep.equipe_id) AS nombre_equipes
+        $query = "SELECT p.*, c.Nom_categorie, COUNT(ep.equipe_id) AS nombre_equipes
         FROM Poules p
         LEFT JOIN EquipePoule ep ON p.id = ep.poule_id
+        LEFT JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
         WHERE p.tournoi_id = :idTournoi AND p.is_classement = '0'
         GROUP BY p.id
         ORDER BY p.nom";
     }
-
-    //$query .= " ORDER BY nom";
 
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':idTournoi', $idTournoi);

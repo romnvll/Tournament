@@ -228,6 +228,15 @@
             animation: slideUp 1.2s ease both;
         }
 
+        .media-caption2 {
+            position: absolute; bottom: 60px; left: 20px; right: 20px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 14px 18px; border-radius: 14px; box-shadow: var(--shadow-md);
+            z-index: 3; font-size: 0.83rem; color: var(--bg-dark); line-height: 1.5;
+            border-left: 3px solid var(--primary);
+            animation: slideUp 1.2s ease both;
+        }
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -390,6 +399,10 @@
                 <img src="logos/Logo.png" class="media-logo" alt="Brackito">
 
                 <div class="media-caption">
+                    <i class="fas fa-quote-left" style="color: var(--primary); margin-right: 6px; font-size: 0.75rem;"></i>
+                    {{t('indexCaptionVideo1')}}
+                </div>
+                <div class="media-caption2">
                     <i class="fas fa-quote-left" style="color: var(--primary); margin-right: 6px; font-size: 0.75rem;"></i>
                     {{t('indexCaptionVideo1')}}
                 </div>

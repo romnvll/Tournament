@@ -30,7 +30,9 @@ if (
 if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
     $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
     $nomCategorie = $categorieDao->obtenirCategorie($categorieId);
-    //var_dump($nomCategorie);
+   
+
+
     if ($categorieId && $idTournoi) {
        $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
        
@@ -103,6 +105,18 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1) {
 
 if (isset($_GET['CreerRencontre'])) {
         if ($_GET['CreerRencontre'] == 1) {
+    //verifier si les rencontres sont terminées avant de creer les rencontres de classement
+$rencontresNonTerminees = $rencontreDao->countRencontresNonTermineesByCategorie($idTournoi,$_GET['idCategorie']);
+if ($rencontresNonTerminees > 0) {
+    // Rediriger vers la page précédente avec un message d'erreur
+    echo "Il y a encore des rencontres non terminées pour cette catégorie. Veuillez terminer toutes les rencontres avant de créer les rencontres de classement.";
+   // header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=rencontres_non_terminees");
+    exit();
+}
+
+
+
+
         $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3);
 
         if (isset($_GET['creerRencontresRetour']) && $_GET['creerRencontresRetour'] == 'true') {

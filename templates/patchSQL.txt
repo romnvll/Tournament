@@ -106,3 +106,84 @@ ALTER TABLE Tournois ADD COLUMN gestionInformations INT(1) DEFAULT 0 AFTER gesti
 
 modif 07/05 c'est en prod
 ALTER TABLE Categorie ADD COLUMN afficherClassement INT(1) DEFAULT 1 AFTER Couleur;
+
+
+MODIF 18/06
+-- ============================================================
+-- Système de messagerie Brackito
+-- Permet à l'organisateur d'envoyer un message à :
+--   - une catégorie entière (toutes les poules / équipes de la catégorie)
+--   - une poule précise (toutes les équipes de cette poule)
+--   - une équipe précise
+--
+-- La portée du message est stockée via 3 colonnes nullables
+-- (categorie_id / poule_id / equipe_id) : une seule est renseignée
+-- selon le niveau de ciblage choisi par l'organisateur.
+-- ============================================================
+
+-- --------------------------------------------------------------
+-- Table `Messages`
+-- --------------------------------------------------------------
+DROP TABLE IF EXISTS `MessagesVues`;
+DROP TABLE IF EXISTS `Messages`;
+
+CREATE TABLE `Messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tournoi_id` int(11) NOT NULL,
+  `contenu` text NOT NULL,
+  `categorie_id` int(11) DEFAULT NULL,
+  `poule_id` int(11) DEFAULT NULL,
+  `equipe_id` int(11) DEFAULT NULL,
+  `utilisateur_id` int(11) NOT NULL,
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_messages_tournoi_id` (`tournoi_id`),
+  KEY `idx_messages_categorie_id` (`categorie_id`),
+  KEY `idx_messages_poule_id` (`poule_id`),
+  KEY `idx_messages_equipe_id` (`equipe_id`),
+  KEY `fk_messages_utilisateur` (`utilisateur_id`),
+  CONSTRAINT `fk_messages_tournoi` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_messages_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `Categorie` (`id_categorie`) ON DELETE CASCADE,
+  CONSTRAINT `fk_messages_poule` FOREIGN KEY (`poule_id`) REFERENCES `Poules` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_messages_equipe` FOREIGN KEY (`equipe_id`) REFERENCES `Equipes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_messages_utilisateur` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE,
+  -- Garantit qu'une seule portée est renseignée à la fois (catégorie XOR poule XOR équipe)
+  CONSTRAINT `chk_messages_une_seule_portee` CHECK (
+    (`categorie_id` IS NOT NULL AND `poule_id` IS NULL AND `equipe_id` IS NULL) OR
+    (`categorie_id` IS NULL AND `poule_id` IS NOT NULL AND `equipe_id` IS NULL) OR
+    (`categorie_id` IS NULL AND `poule_id` IS NULL AND `equipe_id` IS NOT NULL) OR
+    (`categorie_id` IS NULL AND `poule_id` IS NULL AND `equipe_id` IS NULL)
+  )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------------
+-- Table `MessagesVues`
+-- Une ligne par (message, équipe) dès que l'équipe a chargé la
+-- page contenant la cloche ou la liste de messages (statut 'recu'),
+-- puis mise à jour en 'lu' quand l'équipe ouvre le message.
+-- --------------------------------------------------------------
+CREATE TABLE `MessagesVues` (
+  `message_id` INT(11) NOT NULL,
+  `equipe_id` INT(11) NOT NULL,
+  `visiteur_id` VARCHAR(32) NOT NULL DEFAULT '',
+  `statut` ENUM('recu','lu') NOT NULL DEFAULT 'recu',
+  `date_recu` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `date_lu` TIMESTAMP NULL DEFAULT NULL,
+
+  PRIMARY KEY (`message_id`, `visiteur_id`),
+
+  KEY `idx_equipe` (`equipe_id`),
+
+  CONSTRAINT `fk_messagesvues_message`
+    FOREIGN KEY (`message_id`)
+    REFERENCES `Messages` (`id`)
+    ON DELETE CASCADE,
+
+  CONSTRAINT `fk_messagesvues_equipe`
+    FOREIGN KEY (`equipe_id`)
+    REFERENCES `Equipes` (`id`)
+    ON DELETE CASCADE
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
