@@ -6,6 +6,7 @@ require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
+require 'class/planificationDao.class.php';
 
 $pouledao = new PouleManager();
 $rencontreDao = new RencontreDAO();
@@ -38,10 +39,10 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
        
        foreach ($poules as $poule) {
         
-       if ($labelsDao->labelDescriptionExiste($nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], $idTournoi)) {
+       if ($labelsDao->labelDescriptionExiste('🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], $idTournoi)) {
             // Le label existe déjà, ne pas le créer à nouveau
         } else {
-            $labelsDao->ajouterLabel($nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], '#000000',$idTournoi);
+            $labelsDao->ajouterLabel('🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], '#000000',$idTournoi,$categorieId);
         }
        }
       
@@ -122,6 +123,16 @@ if ($rencontresNonTerminees > 0) {
         if (isset($_GET['creerRencontresRetour']) && $_GET['creerRencontresRetour'] == 'true') {
             $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3,true);
         }
+    
+            //il faudrait placer les rencontres de classement a la place des labels.
+          
+            $planificationDao = new planificationDao();
+            $placementAuto = $planificationDao->placerAutomatiquementRencontresType3($_GET['tournoiId'], $_GET['idCategorie']);    
+         
+
+
+
+
         header("Location: " . $_SERVER['HTTP_REFERER']);
 
       //header("Location:  PlacementDesRencontres.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);
@@ -134,6 +145,7 @@ if ($rencontresNonTerminees > 0) {
 if (isset ($_GET['suppressionPoule'])) {
         if ($_GET['suppressionPoule'] == 1) {
             $pouledao->deletePoule($_GET['pouleId']);
+            
             header("Location: " . $_SERVER['HTTP_REFERER']);
         }
 

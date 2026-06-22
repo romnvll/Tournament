@@ -108,7 +108,7 @@ modif 07/05 c'est en prod
 ALTER TABLE Categorie ADD COLUMN afficherClassement INT(1) DEFAULT 1 AFTER Couleur;
 
 
-MODIF 18/06
+MODIF 18/06 c'est en dev pas en prod
 -- ============================================================
 -- Système de messagerie Brackito
 -- Permet à l'organisateur d'envoyer un message à :
@@ -187,3 +187,18 @@ CREATE TABLE `MessagesVues` (
 ) ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
+
+
+22/06 PAS DE DEV, PAS EN PROD
+-- Ajouter le champ telephone dans Tournois (déplacé depuis Gymnases)
+ALTER TABLE Tournois
+ADD COLUMN telephone VARCHAR(32) NULL AFTER heureIsVisible;
+
+-- Ajouter le champ commentaire dans Tournois
+ALTER TABLE Tournois
+ADD COLUMN commentaire TEXT NULL AFTER telephone;
+
+-- Si tu veux retirer telephone de Gymnases (puisqu'il devient un champ de Tournois)
+ALTER TABLE Gymnases
+DROP COLUMN telephone;
+

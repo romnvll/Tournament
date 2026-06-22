@@ -510,6 +510,7 @@
                     <tbody>
                     
                         {% for equipe in RencontreByPoule %}
+                        
                         <tr>
                             <form action="gestionRencontres_traitement.php" method="POST" id="rencontre_{{equipe.rencontre_id}}">
                                 <input type="hidden" value="{{idTournoi}}" name="idTournoi">
@@ -518,7 +519,7 @@
                                 
                                 <td>
                                     <span class="tour-badge {% if equipe.tour is even %}even{% else %}odd{% endif %}">
-                                        Tour N°{{ equipe.tour }}
+                                        Tour N°{{ equipe.r_tour }}
                                     </span>
                                 </td>
                                 

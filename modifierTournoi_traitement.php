@@ -85,6 +85,17 @@ if (isset($_GET['action'])) {
     }
 }
 
+// --- Modifier téléphone / commentaire du tournoi ---
+if (isset($_POST['actionContact'])) {
+    $telephone = trim($_POST['telephone'] ?? '') ?: null;
+    $commentaire = trim($_POST['commentaire'] ?? '') ?: null;
+
+    $tournoiDao->modifierTelephoneCommentaire($tournoiId, $telephone, $commentaire);
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
 // --- Ajouter une personne ---
 if (isset($_GET['addPersonne']) && $_GET['addPersonne'] === 'true') {
     require 'class/personneDao.class.php';

@@ -78,11 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'suppr
 
 // Recharger l'historique après chaque action
 $historiqueMessages = $messageDao->afficherHistoriqueMessages($idTournoi);
-
 // Si on consulte le détail d'un message précis (qui a vu / lu)
 $detailMessageId   = isset($_GET['detail_message']) ? (int)$_GET['detail_message'] : null;
-$detailDestinataires = $detailMessageId ? $messageDao->afficherStatutParEquipePourMessage($detailMessageId) : null;
-
+$detailDestinataires = $detailMessageId ? $messageDao->afficherStatutParEquipePourMessage($detailMessageId, $idTournoi) : null;
 // ── Rendu Twig ───────────────────────────────────────────────────────────────
 echo $template->render([
     'email'               => $userData['email'],

@@ -82,7 +82,8 @@ class MessageDAO {
                     CASE
                         WHEN m.categorie_id IS NOT NULL THEN (SELECT COUNT(*) FROM Equipes WHERE categorie = m.categorie_id)
                         WHEN m.poule_id IS NOT NULL THEN (SELECT COUNT(*) FROM EquipePoule WHERE poule_id = m.poule_id)
-                        ELSE 1
+                        WHEN m.equipe_id IS NOT NULL THEN 1
+                        ELSE (SELECT COUNT(*) FROM Equipes WHERE tournoi_id = :tournoi_id)
                     END
                 ) AS nb_destinataires
             FROM Messages m

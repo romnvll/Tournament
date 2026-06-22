@@ -112,16 +112,34 @@ public function creerLabelsEliminationDirecte(string $nomCategorie, int $nombreE
 
 
     // Méthode pour ajouter un label
-    public function ajouterLabel(string $description, string $couleur, int $tournoi_id): void {
-        $stmt = $this->connexion->prepare("
-            INSERT INTO Labels (description, couleur, tournoi_id) 
-            VALUES (:description, :couleur, :tournoi_id)
-        ");
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':couleur', $couleur);
-        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-        $stmt->execute();
+public function ajouterLabel(string $description,string $couleur,int $tournoi_id,?int $categorie_id = null): void {
+    $stmt = $this->connexion->prepare("
+        INSERT INTO Labels (
+            description,
+            couleur,
+            tournoi_id,
+            categorie_id
+        ) 
+        VALUES (
+            :description,
+            :couleur,
+            :tournoi_id,
+            :categorie_id
+        )
+    ");
+
+    $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':couleur', $couleur);
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+
+    if ($categorie_id === null) {
+        $stmt->bindValue(':categorie_id', null, PDO::PARAM_NULL);
+    } else {
+        $stmt->bindValue(':categorie_id', $categorie_id, PDO::PARAM_INT);
     }
+
+    $stmt->execute();
+}
 
     // Méthode pour récupérer un label par son ID
     public function getLabelById(int $label_id) {
@@ -140,6 +158,22 @@ public function creerLabelsEliminationDirecte(string $nomCategorie, int $nombreE
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+public function getLabelsAvecPlanificationParCategorie(int $categorie_id): array
+{
+    $sql = "
+        SELECT l.*
+        FROM Labels l
+        INNER JOIN Planification p ON p.label_id = l.label_id
+        WHERE l.categorie_id = :categorie_id
+    ";
+
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindParam(':categorie_id', $categorie_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     // Méthode pour récupérer tous les labels d'un tournoi
     public function getLabelsByTournoiId(int $tournoi_id) {

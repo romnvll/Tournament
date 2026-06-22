@@ -14,729 +14,382 @@
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
             --info-color: #06b6d4;
-            --bg-dark: #1f2937;
-            --bg-light: #f9fafb;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --border-radius: 16px;
-        }
-
-        * {
-            box-sizing: border-box;
+            --body-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            background-color: var(--body-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 0.95rem;
         }
 
-        /* Mobile styles */
-        @media (max-width: 767px) {
-            /* Tournois selector */
-            .row:first-of-type .col {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                padding: 16px;
-                margin: 12px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .btn-secondary,
-            .btn-danger {
-                padding: 12px 20px;
-                border-radius: 12px;
-                font-weight: 700;
-                font-size: 0.95rem;
-                border: none;
-                text-decoration: none;
-                display: inline-block;
-                box-shadow: var(--shadow-sm);
-            }
-
-            .btn-secondary {
-                background: linear-gradient(135deg, #6b7280, #4b5563);
-                color: white;
-            }
-
-            .btn-danger {
-                background: linear-gradient(135deg, var(--danger-color), #dc2626);
-                color: white;
-            }
-
-            /* Poules selector */
-            .col-md-6:first-child {
-                padding: 0 12px;
-            }
-
-            .col-md-6:first-child h3 {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                padding: 16px;
-                margin: 12px 0;
-                text-align: center;
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: var(--bg-dark);
-            }
-
-            .badge.bg-secondary {
-                background: linear-gradient(135deg, #6b7280, #4b5563) !important;
-                color: white;
-                padding: 6px 12px;
-                border-radius: 12px;
-                font-size: 0.85rem;
-                font-weight: 700;
-                margin-left: 10px;
-            }
-
-            .btn-primary {
-                padding: 10px 16px;
-                border-radius: 12px;
-                font-weight: 700;
-                font-size: 0.9rem;
-                border: none;
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-                color: white;
-                box-shadow: var(--shadow-sm);
-                margin: 4px;
-            }
-
-            /* Cacher le tableau sur mobile */
-            .table-responsive,
-            .table {
-                display: none;
-            }
-
-            /* Cards pour mobile */
-            .mobile-team-cards {
-                display: block;
-            }
-
-            /* Styles des cartes d'équipes */
-            .team-mobile-card {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                margin-bottom: 16px;
-                overflow: hidden;
-            }
-
-            .team-mobile-header {
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-                color: white;
-                padding: 14px;
-                font-size: 1.1rem;
-                font-weight: 700;
-            }
-
-            .team-mobile-stats {
-                padding: 16px;
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .stat-box {
-                background: var(--bg-light);
-                padding: 12px;
-                border-radius: 10px;
-                text-align: center;
-            }
-
-            .stat-label {
-                font-size: 0.75rem;
-                color: #6b7280;
-                margin-bottom: 4px;
-                font-weight: 600;
-            }
-
-            .stat-value {
-                font-size: 1.3rem;
-                font-weight: 700;
-                color: var(--bg-dark);
-            }
-
-            .team-mobile-actions {
-                padding: 16px;
-                border-top: 2px solid #e5e7eb;
-                background: var(--bg-light);
-            }
-
-            .action-label {
-                font-size: 0.85rem;
-                font-weight: 700;
-                color: #6b7280;
-                margin-bottom: 10px;
-            }
-
-            .action-buttons {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            /* Colonne droite */
-            .col-md-6:last-child h3 {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                padding: 16px;
-                margin: 12px;
-                text-align: center;
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: var(--bg-dark);
-            }
-
-            .col-md-6:last-child .row:first-child {
-                padding: 0 12px;
-            }
-
-            .form-control {
-                width: 100%;
-                padding: 12px;
-                border: 2px solid #e5e7eb;
-                border-radius: 10px;
-                font-size: 1rem;
-                margin: 12px 0;
-            }
-
-            .card {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow-md);
-                margin: 12px;
-                overflow: hidden;
-                border: none;
-            }
-
-            .card-header {
-                background: linear-gradient(135deg, var(--info-color), #0891b2);
-                color: white;
-                padding: 14px;
-                border: none;
-            }
-
-            .card-header .badge {
-                background: white !important;
-                color: var(--info-color);
-                font-weight: 700;
-                padding: 6px 12px;
-                border-radius: 10px;
-            }
-
-            .card-body {
-                padding: 16px;
-            }
-
-            .card-title {
-                font-size: 1rem;
-                font-weight: 700;
-                color: var(--bg-dark);
-                margin-bottom: 12px;
-            }
-
-            .card .table {
-                display: table;
-                font-size: 0.85rem;
-            }
-
-            .card .table th,
-            .card .table td {
-                padding: 8px;
-            }
-
-            .text-success {
-                color: var(--success-color) !important;
-            }
-
-            .text-danger {
-                color: var(--danger-color) !important;
-            }
+        .main-container {
+            padding: 2rem 1rem;
         }
 
-        /* Desktop styles */
-        @media (min-width: 768px) {
-            body {
-                background: #f8f9fa;
-            }
-
-            .mobile-team-cards {
-                display: none;
-            }
-
-            .row {
-                margin: 0;
-            }
-
-            .row:first-of-type {
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                padding: 16px;
-                margin: 20px;
-            }
-
-            .btn-secondary,
-            .btn-danger,
-            .btn-primary {
-                border-radius: 8px;
-                font-weight: 600;
-                padding: 8px 16px;
-                margin: 4px;
-            }
-
-            .col-md-6 h3 {
-                font-size: 1.3rem;
-                font-weight: 700;
-                color: var(--bg-dark);
-                margin: 20px 0;
-            }
-
-            .badge.bg-secondary {
-                background: #6b7280 !important;
-                padding: 6px 12px;
-                border-radius: 8px;
-                margin-left: 10px;
-            }
-
-            .table {
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-
-            .table thead {
-                background: var(--bg-light);
-            }
-
-            .table th {
-                font-weight: 700;
-                color: var(--bg-dark);
-                padding: 12px;
-            }
-
-            .table td {
-                padding: 12px;
-                vertical-align: middle;
-            }
-
-            .table tbody tr:hover {
-                background: var(--bg-light);
-            }
-
-            .card {
-                border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                border: none;
-                margin-bottom: 20px;
-            }
-
-            .card-header {
-                background: linear-gradient(135deg, var(--info-color), #0891b2);
-                color: white;
-                border-radius: 8px 8px 0 0;
-                border: none;
-            }
-
-            .form-control {
-                border-radius: 8px;
-                border: 2px solid #e5e7eb;
-                padding: 10px;
-            }
-
-            .btn-primary {
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-                border: none;
-                padding: 10px 20px;
-                font-weight: 600;
-            }
-
-            .btn-danger {
-                background: linear-gradient(135deg, var(--danger-color), #dc2626);
-                border: none;
-            }
-
-            .badge.rounded-pill {
-                padding: 8px 14px;
-                font-weight: 600;
-            }
-
-            .badge.bg-success {
-                background: var(--success-color) !important;
-            }
-
-            .badge.bg-info {
-                background: var(--info-color) !important;
-            }
-        }
-
-        /* Styles communs */
-        .badge.rounded-pill.bg-success {
-            background: linear-gradient(135deg, var(--success-color), #059669) !important;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-            margin: 4px;
-        }
-
-        .btn-danger.btn-sm {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+        .section-card {
+            background: var(--card-bg);
             border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .poule-nav-btn {
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .table-custom {
+            margin-top: 1rem;
+            vertical-align: middle;
+        }
+
+        .table-custom thead th {
+            background-color: #f9fafb;
+            color: #4b5563;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin: 4px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
         }
 
-        .text-success.fw-bold {
-            color: var(--success-color) !important;
+        .action-zone-yellow {
+            background-color: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            border-radius: 6px;
+            padding: 1rem;
         }
 
-        .text-danger.fw-bold {
-            color: var(--danger-color) !important;
+        /* Responsive Mobile tweaks */
+        @media (max-width: 767px) {
+            .table-desktop-view { display: none; }
+            .mobile-team-cards { display: block; }
+        }
+        @media (min-width: 768px) {
+            .mobile-team-cards { display: none; }
+            .table-desktop-view { display: table; }
         }
     </style>
 </head>
 <body>
     {{ include('header.twig') }}
+    
     {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
     {% set today = "now"|date('Y-m-d')|date %}
 
-    <div class="row">
-        <div class="col">
+    <div class="container-fluid main-container">
+        
+        <!-- BARRE TOP : Sélection des tournois -->
+        <div class="section-card d-flex flex-wrap gap-2 align-items-center">
+            <span class="fw-bold me-2 text-muted text-uppercase small">Tournois :</span>
             {% set lastTournoiIdParent = null %}
             {% for tournoi in TournoisDeBase %}
                 {% if tournoi.isArchived == 0 %}
                     {% set lastTournoiIdParent = tournoi.id %}
-                    {% set btnClass = "btn btn-secondary" %}
-                    {% if idTournoi == tournoi.id %}
-                        {% set btnClass = "btn btn-danger" %}
-                    {% endif %}
-                    <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ tournoi.id }}" class="{{ btnClass }}">{{ tournoi.nom }}</a>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div class="col"></div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h3 class="text-center">
-                Sélection des poules
-                <span class="badge bg-secondary">{{ NombreEquipeParPoules }}</span>
-            </h3>
-          
-                    {% set categoriesDejaAffichees = [] %}
-
-            {# Boucle 1 : boutons de sélection des poules #}
-            {% for poule in afficherLesPoules %}
-                {% set btnClass = "btn btn-primary" %}
-                {% if pouleEnCours == poule.id %}
-                    {% set btnClass = "btn btn-danger" %}
-                {% endif %}
-                <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{ poule.fk_idcategorie }}" 
-                class="{{ btnClass }}" role="button">{{ poule.nom }}</a>
-            {% endfor %}
-
-            {# Boucle 2 : boutons de génération auto, un par catégorie #}
-            <div class="mt-2">
-            {% for poule in afficherLesPoules %}
-            
-                {% if poule.fk_idcategorie not in categoriesDejaAffichees %}
-                    <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
-                    class="btn btn-warning mb-2"
-                    onclick="return confirm('Générer automatiquement les poules de classement pour cette catégorie ?')">
-                        <i class="fas fa-magic"></i> Générer la phase de classement pour les {{ poule.nom | split(' ')[0] }}
+                    <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ tournoi.id }}" 
+                       class="btn {% if idTournoi == tournoi.id %}btn-danger shadow-sm{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill px-3">
+                        <i class="fas fa-trophy me-1"></i> {{ tournoi.nom }}
                     </a>
-                    {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
                 {% endif %}
             {% endfor %}
-            </div>
-            
-
-            <!-- Desktop table -->
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Total des Points</th>
-                        <th>Buts Marqués</th>
-                        <th>Buts Encaissés</th>
-                        <th>Différence de Buts</th>
-                        <th>Ajout dans poule</th>
-                        <th>Poule</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for equipe in ResultatDesPoules %}
-                        <tr>
-                            <td>{{ equipe.nom }}</td>
-                            <td>{{ equipe.TotalDesPoints }}</td>
-                            <td>{{ equipe.nombreButsMarque }}</td>
-                            <td>{{ equipe.nombreButsEncaisse }}</td>
-                            <td>{{ equipe.DifferenceButs }}</td>
-                            <td id="section-{{ equipe.id }}">
-                                {% for poule in afficherLespoulesFinales %}
-                                    {% if equipe.categorie == poule.fk_idcategorie %}
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="text-decoration-none">
-                                            <span class="badge rounded-pill bg-success text-white p-2 d-flex align-items-center">
-                                                <i class="fas fa-plus-circle me-2"></i>
-                                                {{ poule.nom }}
-                                            </span>
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                           
-                                {% for poule in equipe.poules %}
-                                    {% if poule.is_classement == 1 %}
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
-                                            class="btn btn-danger btn-sm d-inline-flex align-items-center"
-                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe de la poule ? Cela supprimera également les rencontres associées.')">
-                                            <i class="fas fa-trash-alt me-2"></i>
-                                            <span>{{ poule.nom }}</span>
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <!-- Mobile cards -->
-            <div class="mobile-team-cards">
-                {% for equipe in ResultatDesPoules %}
-                    <div class="team-mobile-card" id="section-mobile-{{ equipe.id }}">
-                        <div class="team-mobile-header">
-                            {{ equipe.nom }}
-                        </div>
-                        <div class="team-mobile-stats">
-                            <div class="stat-box">
-                                <div class="stat-label">Points</div>
-                                <div class="stat-value">{{ equipe.TotalDesPoints }}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Buts marqués</div>
-                                <div class="stat-value">{{ equipe.nombreButsMarque }}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Buts encaissés</div>
-                                <div class="stat-value">{{ equipe.nombreButsEncaisse }}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Différence</div>
-                                <div class="stat-value">{{ equipe.DifferenceButs }}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="team-mobile-actions">
-                            <div class="action-label">
-                                <i class="fas fa-plus-circle"></i>
-                                
-                            </div>
-                            <div class="action-buttons">
-                          
-                                {% for poule in afficherLespoulesFinales %}
-                                    {% if equipe.categorie == poule.fk_idcategorie %}
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="badge rounded-pill bg-success">
-                                            <i class="fas fa-plus"></i>
-                                            {{ poule.nom }}
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            
-                            {% if equipe.poules|length > 0 %}
-                                <div class="action-label" style="margin-top: 12px;">
-                                    <i class="fas fa-times-circle"></i>
-                                    Retirer de la poule
-                                </div>
-                                <div class="action-buttons">
-                                
-                                    {% for poule in equipe.poules %}
-                                    
-                                        {% if poule.is_classement == 1 %}
-                                            <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe de la poule ?')">
-                                                <i class="fas fa-trash-alt"></i>
-                                                {{ poule.nom }}
-                                            </a>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="row">
-                {% if pouleEnCours is not empty %}
-                    <h3>Poules de classement</h3>
-                    <form action="GestionRencontresPhasesFinalesCreationPoules_traitement.php" method="GET">
-                        <input type="hidden" name="idtournoi" value="{{ idTournoi }}">
-                        <input type="hidden" name="categorie" value="{{ idCategorieEnCours }}">
-                        <input type="text" class="form-control" id="inlineFormInputGroupUsername2" placeholder="Ex:Poule1erU15" name="pouledeClassement">
-                        <button type="submit" class="btn btn-primary mb-2">Créer la poule de classement</button>
-                    </form>
-                {% else %}
-                    <h3><--Choisir une poule</h3>
-                {% endif %}
-            </div>
+        <div class="row g-4">
+            
+            <!-- COLONNE GAUCHE : Poules & Classement Équipes -->
+            <div class="col-lg-7">
+                <div class="section-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="fas fa-cubes text-primary me-2"></i>Sélection des poules
+                        </h4>
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                            Total : <strong>{{ NombreEquipeParPoules }}</strong> Équipes
+                        </span>
+                    </div>
+                  
+                    <!-- Boutons des poules -->
+                    <div class="mb-4">
+                        {% for poule in afficherLesPoules %}
+                            <a href="gestionRencontresPhaseClassement.php?idTournoiBase={{ idTournoi }}&idPoule={{ poule.id }}&idCategorie={{ poule.fk_idcategorie }}" 
+                               class="btn poule-nav-btn {% if pouleEnCours == poule.id %}btn-primary shadow{% else %}btn-light border text-secondary{% endif %} btn-sm rounded" 
+                               role="button">
+                                {{ poule.nom }}
+                            </a>
+                        {% endfor %}
+                    </div>
 
-            <div class="row">
-                {% for poule in afficherLespoulesFinales %}
-                    <div class="card mb-3 {% if poule.fk_idcategorie != idCategorieEnCours %}d-none{% endif %}">
-                        <div class="card-header">
-                            <div class="d-flex align-items-center justify-content-between p-3 border rounded shadow-sm bg-light">
-                              <span class="badge rounded-pill bg-info text-dark fs-6">{{ poule.nom }}</span>
+                    <!-- Zone Actions Automatiques Contextuelles (ex-boutons jaunes massifs) -->
+                    {% set categoriesDejaAffichees = [] %}
+                        <div class="action-zone-yellow mb-4">
+                            <div class="small text-amber-800 fw-bold mb-2">
+                                <i class="fas fa-robot me-1"></i> <strong>Assistant de répartition automatique :</strong>
+                            </div>
+                            <p class="text-muted small mb-3">
+                                En un clic, le système va basculer automatiquement les équipes de cette catégorie vers les poules finales à droite, en regroupant les équipes selon leur position au classement (les 1ers ensemble, les 2èmes ensemble, etc.).
+                            </p>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for poule in afficherLesPoules %}
+                                    {% if poule.fk_idcategorie not in categoriesDejaAffichees %}
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                                        class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm"
+                                        onclick="return confirm('Voulez-vous dispatcher automatiquement toutes les équipes de cette catégorie dans les poules de classement selon leurs résultats actuels ?')">
+                                            <i class="fas fa-magic me-1"></i> Répartir la catégorie {{ poule.nom | split(' ')[0] }}
+                                        </a>
+                                        {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+            
+                    <!-- Tableau de classement (Desktop) -->
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover border align-middle table-desktop-view">
+                            <thead>
+                                <tr>
+                                    <th>Nom de l'équipe</th>
+                                    <th class="text-center">Points</th>
+                                    <th class="text-center">BP</th>
+                                    <th class="text-center">BC</th>
+                                    <th class="text-center">Diff</th>
+                                    <th>Ajouter à la phase</th>
+                                    <th>Poule Actuelle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for equipe in ResultatDesPoules %}
+                                    <tr>
+                                        <td class="fw-bold text-dark">{{ equipe.nom }}</td>
+                                        <td class="text-center fw-bold text-primary">{{ equipe.TotalDesPoints }}</td>
+                                        <td class="text-center text-muted">{{ equipe.nombreButsMarque }}</td>
+                                        <td class="text-center text-muted">{{ equipe.nombreButsEncaisse }}</td>
+                                        <td class="text-center fw-bold {% if equipe.DifferenceButs >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {{ equipe.DifferenceButs > 0 ? '+' : '' }}{{ equipe.DifferenceButs }}
+                                        </td>
+                                        <td id="section-{{ equipe.id }}">
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for poule in afficherLespoulesFinales %}
+                                                    {% if equipe.categorie == poule.fk_idcategorie %}
+                                                        <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" 
+                                                           class="btn btn-xs btn-outline-success py-1 px-2 rounded-pill small" style="font-size: 0.8rem;">
+                                                            <i class="fas fa-plus me-1"></i>{{ poule.nom }}
+                                                        </a>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% for poule in equipe.poules %}
+                                                {% if poule.is_classement == 1 %}
+                                                    <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
+                                                       class="btn btn-outline-danger btn-sm py-1 px-2"
+                                                       onclick="return confirm('Retirer l\'équipe de la poule ?')">
+                                                        <i class="fas fa-times me-1"></i> {{ poule.nom }}
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="form-check mb-0">
-                                            <input class="form-check-input checkbox-retour" type="checkbox" 
-                                                data-target="btnCreer_{{ poule.id }}">
-                                            <label class="form-check-label text-dark">
-                                                Créer les rencontres retour
-                                            </label>
+                    <!-- Mode Mobile Cards -->
+                    <div class="mobile-team-cards mt-3">
+                        {% for equipe in ResultatDesPoules %}
+                            <div class="card border mb-3 shadow-sm rounded-3" id="section-mobile-{{ equipe.id }}">
+                                <div class="card-header bg-light fw-bold d-flex justify-content-between">
+                                    <span>{{ equipe.nom }}</span>
+                                    <span class="text-primary">{{ equipe.TotalDesPoints }} Pts</span>
+                                </div>
+                                <div class="card-body py-2 px-3 small">
+                                    <div class="row text-center text-muted border-bottom pb-2 mb-2">
+                                        <div class="col-4">Marqués: <strong>{{ equipe.nombreButsMarque }}</strong></div>
+                                        <div class="col-4">Encaissés: <strong>{{ equipe.nombreButsEncaisse }}</strong></div>
+                                        <div class="col-4">Diff: <strong class="{% if equipe.DifferenceButs >= 0 %}text-success{% else %}text-danger{% endif %}">{{ equipe.DifferenceButs }}</strong></div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="text-muted mb-1"><i class="fas fa-plus-circle me-1"></i> Ajouter à :</div>
+                                        {% for poule in afficherLespoulesFinales %}
+                                            {% if equipe.categorie == poule.fk_idcategorie %}
+                                                <a href="gestionRencontrePhaseClassement_traitement.php?addpoule=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}#section-{{ equipe.id }}" class="btn btn-sm btn-light border text-success m-1">
+                                                    {{ poule.nom }}
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% if equipe.poules|length > 0 %}
+                                        <div class="border-top pt-2">
+                                            {% for poule in equipe.poules %}
+                                                {% if poule.is_classement == 1 %}
+                                                    <a href="gestionRencontrePhaseClassement_traitement.php?delete=1&idequipe={{ equipe.id }}&pouleId={{ poule.id }}#section-{{ equipe.id }}"
+                                                       class="btn btn-sm btn-danger text-white w-100" onclick="return confirm('Retirer de la poule ?')">
+                                                        <i class="fas fa-trash-alt me-1"></i> Quitter {{ poule.nom }}
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
                                         </div>
-
-                                        <a class="btn btn-primary btn-sm" id="btnCreer_{{ poule.id }}"
-                                        data-base-href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
-                                        href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}&idCategorie={{idCategorieEnCours}}">
-                                            <i class="fas fa-plus-circle me-1"></i> Créer les rencontres
-                                        </a>
-                                    </div>
-                                   
-                                <div class="d-flex align-items-center">
-                                    {% if poule.hasRencontres %}
-                                        <span class="text-success fw-bold me-2">Rencontres créées</span>
-                                        <i class="fas fa-check-circle text-success fs-4"></i>
-                                    {% else %}
-                                        <div style="display:inline-flex; align-items:center; gap:10px; padding:10px 16px; background:#fef2f2; border:1px solid #fca5a5; border-radius:12px;">
-                                        <i class="fas fa-exclamation-circle" style="font-size:16px; color:#ef4444; flex-shrink:0;"></i>
-                                        <span style="font-size:14px; font-weight:500; color:#b91c1c;">Aucune rencontre créée</span>
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
-                                        style="display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; font-size:13px; font-weight:500; color:#b91c1c; text-decoration:none; margin-left:4px;">
-                                            <i class="bi bi-trash" style="font-size:13px;"></i>
-                                            Supprimer la poule
-                                        </a>
-                                    </div>
-
-                                       
-
                                     {% endif %}
                                 </div>
                             </div>
-                            {% if poule.contenu|length == 0 %}
-                                <p class="text-end">
-                                    <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
-                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
-                                        </svg>
-                                    </a>
-                                </p>
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            {% if poule.contenu|length > 0 %}
-                                <h5 class="card-title">Équipes dans la poule</h5>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Nom de l'équipe</th>
-                                            <th scope="col">Total des points</th>
-                                            <th scope="col">Nombre de buts +</th>
-                                            <th scope="col">Nombre de buts -</th>
-                                            <th scope="col">Différence</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% set nbEquipes = poule.contenu|length %}
-                                        {% set nbRencontres = (nbEquipes * (nbEquipes - 1)) // 2 %}
-                                        <tr>
-                                            <td colspan="5" class="text-center fw-bold">
-                                            <!--    {{ nbRencontres }} rencontres à planifier -->
-                                            </td>
-                                        </tr>
-                                        {% for equipe in poule.contenu %}
-                                            <tr>
-                                                <td>{{ equipe.nom }}</td>
-                                                <td>{{ equipe.TotalDesPoints }}</td>
-                                                <td>{{ equipe.nombreButsMarque }}</td>
-                                                <td>{{ equipe.nombreButsEncaisse }}</td>
-                                                <td>{{ equipe.DifferenceButs }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p class="card-text">Aucune équipe dans cette poule.</p>
-                            {% endif %}
-                        </div>
+                        {% endfor %}
                     </div>
-                {% else %}
-                    <p>Aucune poule finale trouvée pour ce tournoi.</p>
-                {% endfor %}
-                <a href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}" class="btn btn-primary">
-                    <i class="fas fa-random"></i> Placer les rencontres
-                </a>
+                </div>
+            </div>
+
+            <!-- COLONNE DROITE : Création & Visualisation des Poules Finales -->
+            <div class="col-lg-5">
+                
+                <!-- Bloc Création de Poule -->
+                <div class="section-card">
+                    <h4 class="fw-bold mb-3"><i class="fas fa-folder-plus text-success me-2"></i>Poules de classement</h4>
+                    {% if pouleEnCours is not empty %}
+                        <form action="GestionRencontresPhasesFinalesCreationPoules_traitement.php" method="GET" class="row g-2">
+                            <input type="hidden" name="idtournoi" value="{{ idTournoi }}">
+                            <input type="hidden" name="categorie" value="{{ idCategorieEnCours }}">
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" placeholder="Ex: Poule1erU15" name="pouledeClassement" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="submit" class="btn btn-success w-100 text-nowrap">Créer la poule</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-info py-2 mb-0" role="alert">
+                            <i class="fas fa-arrow-left me-2"></i> Veuillez d'abord choisir une poule à gauche.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Liste des Poules Finales Existantes -->
+                <div class="d-flex flex-column gap-3">
+                    {% for poule in afficherLespoulesFinales %}
+                        {% set nbEquipes = poule.contenu|length %}
+                        {% set nbRencontresAttendu = (nbEquipes * (nbEquipes - 1)) / 2 %}
+                        {% set nbLabelsPlaces = 0 %}
+                        {% set poNom = poule.nom|trim %}
+
+                        {% for label in nombreLabelsFinal %}
+                            {% set parts = label.description|split(' - ', 2) %}
+                            {% set labelSuffixe = parts[1]|default('')|trim %}
+                            {% if labelSuffixe == poNom %}
+                                {% set nbLabelsPlaces = nbLabelsPlaces + 1 %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="card border-0 shadow-sm rounded-3 {% if poule.fk_idcategorie != idCategorieEnCours %}d-none{% endif %}">
+                            <div class="card-header bg-white border-bottom py-3 px-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <span class="badge bg-indigo bg-primary fs-6 px-3 py-2 rounded shadow-sm">{{ poule.nom }}</span>
+
+                                <span class="text-nowrap">
+                                    Labels placés : {{ nbLabelsPlaces }} / <span id="nbRencontresAttendu_{{ poule.id }}" data-base="{{ nbRencontresAttendu }}">{{ nbRencontresAttendu }}</span>
+                                </span>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input checkbox-retour" type="checkbox" id="switch_{{ poule.id }}" data-target="btnCreer_{{ poule.id }}" data-poule="{{ poule.id }}">
+                                        <label class="form-check-label small text-muted" for="switch_{{ poule.id }}">Matches retour</label>
+                                    </div>
+
+                                    <a class="btn btn-primary btn-sm px-3" id="btnCreer_{{ poule.id }}"
+                                       data-base-href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
+                                       href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}&idCategorie={{idCategorieEnCours}}">
+                                        <i class="fas fa-play me-1"></i> Générer matches
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        {% if poule.hasRencontres %}
+                                            <span class="badge bg-success-soft text-success px-2 py-1 rounded"><i class="fas fa-check-circle me-1"></i> Rencontres générées</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-soft text-danger px-2 py-1 rounded"><i class="fas fa-exclamation-triangle me-1"></i> En attente de génération</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if poule.contenu|length == 0 %}
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}" 
+                                           class="btn btn-link link-danger p-0" title="Supprimer la poule vide">
+                                            <i class="fas fa-trash-alt"></i> Supprimer la poule
+                                        </a>
+                                    {% endif %}
+                                </div>
+
+                                {% if poule.contenu|length > 0 %}
+                                    <table class="table table-sm table-borderless align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr style="font-size: 0.8rem;">
+                                                <th>Équipe</th>
+                                                <th class="text-center">Pts</th>
+                                                <th class="text-center">Buts Diff</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for equipe in poule.contenu %}
+                                                <tr class="border-bottom-dashed">
+                                                    <td class="small fw-semibold">{{ equipe.nom }}</td>
+                                                    <td class="text-center small">{{ equipe.TotalDesPoints }}</td>
+                                                    <td class="text-center small text-muted">{{ equipe.DifferenceButs }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p class="text-muted text-center my-3 small">Aucune équipe affectée à cette poule.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">Aucune poule finale trouvée pour ce tournoi.</p>
+                    {% endfor %}
+                    
+                    <!-- Gros Bouton Principal Tout en Bas à droite -->
+                    <a href="PlacementDesRencontres.php?id_tournoi={{idTournoi}}" class="btn btn-indigo btn-primary py-3 shadow mt-3 fw-bold rounded-3">
+                        <i class="fas fa-random me-2"></i> Placer et Planifier les rencontres
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- SCRIPTS CONSERVÉS POUR LE PARCOURS UTILISATEUR -->
     <script>
-        // Stocker la position de défilement avant de quitter la page
         window.onload = function() {
             if (typeof(sessionStorage) !== 'undefined') {
                 var scrollPosition = sessionStorage.getItem('scrollPosition');
-                if (scrollPosition !== null) {
-                    window.scrollTo(0, scrollPosition);
-                }
+                if (scrollPosition !== null) { window.scrollTo(0, scrollPosition); }
             }
         };
-
         window.onbeforeunload = function() {
             if (typeof(sessionStorage) !== 'undefined') {
                 sessionStorage.setItem('scrollPosition', window.scrollY);
             }
         };
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('checkbox-retour')) {
+                const checkbox = e.target;
+                const btn = document.getElementById(checkbox.dataset.target);
+                const baseHref = btn.dataset.baseHref;
+                btn.href = baseHref + (checkbox.checked ? '&creerRencontresRetour=true' : '');
+
+                // Mise à jour du nombre de rencontres attendu
+                const span = document.getElementById('nbRencontresAttendu_' + checkbox.dataset.poule);
+                if (span) {
+                    const base = parseInt(span.dataset.base, 10);
+                    span.textContent = checkbox.checked ? base * 2 : base;
+                }
+            }
+        });
     </script>
-
-
-<script>
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('checkbox-retour')) {
-            const checkbox = e.target;
-            const btn = document.getElementById(checkbox.dataset.target);
-            const baseHref = btn.dataset.baseHref;
-            btn.href = baseHref + (checkbox.checked ? '&creerRencontresRetour=true' : '');
-        }
-    });
-</script>
-
-
 </body>
 </html>

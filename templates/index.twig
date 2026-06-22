@@ -1067,7 +1067,7 @@
                     {% endif %}
 
                     <div class="card-modern choisirClub">
-
+               
                         {% if gymnaseInfo and infoTournoiEnCours.gestionInformations == 1 %}
                         <div class="modern-card mt-4">
                             <div class="card-header-modern" style="background: linear-gradient(135deg, #0f766e, #0d9488);">
@@ -1078,44 +1078,72 @@
                                 <div class="d-flex flex-column gap-3 mb-5" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px;">
 
                                     {% if gymnaseInfo.adresse or gymnaseInfo.ville or gymnaseInfo.code_postal %}
-                                            {% set adresseComplete = gymnaseInfo.nom ~ ', ' ~ gymnaseInfo.adresse ~ ', ' ~ gymnaseInfo.ville ~ ' ' ~ gymnaseInfo.code_postal %}                                        <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
-                                           target="_blank"
-                                           class="text-decoration-none d-flex align-items-center gap-3">
-                                            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                                <i class="fas fa-map-marker-alt" style="color:white;font-size:1.1rem;"></i>
-                                            </div>
-                                            <div style="font-size:1rem;color:#1f2937;font-weight:500;">
-                                                {% if gymnaseInfo.adresse %}{{ gymnaseInfo.adresse }},{% endif %}
-                                                {% if gymnaseInfo.ville %}{{ gymnaseInfo.ville }}{% endif %}
-                                                {% if gymnaseInfo.code_postal %}{{ gymnaseInfo.code_postal }}{% endif %}
-                                            </div>
-                                        </a>
-                                    {% endif %}
+    {% set adresseComplete = gymnaseInfo.nom ~ ', ' ~ gymnaseInfo.adresse ~ ', ' ~ gymnaseInfo.ville ~ ' ' ~ gymnaseInfo.code_postal %}
+    <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
+       target="_blank"
+       class="text-decoration-none d-flex align-items-center gap-3"
+       style="padding:10px;border-radius:10px;background:rgba(13,148,136,0.06);transition:background 0.2s;">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-map-marker-alt" style="color:white;font-size:1.1rem;"></i>
+        </div>
+        <div style="flex-grow:1;">
+            <div style="font-size:1rem;color:#0d9488;font-weight:600;">
+                {% if gymnaseInfo.adresse %}{{ gymnaseInfo.adresse }},{% endif %}
+                {% if gymnaseInfo.ville %}{{ gymnaseInfo.ville }}{% endif %}
+                {% if gymnaseInfo.code_postal %}{{ gymnaseInfo.code_postal }}{% endif %}
+            </div>
+            <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">
+                <i class="fas fa-location-arrow" style="font-size:0.7rem;"></i>
+                {{ t('ouvrirDansMaps') }}
+            </div>
+        </div>
+        <i class="fas fa-chevron-right" style="color:#0d9488;font-size:0.9rem;flex-shrink:0;"></i>
+    </a>
+{% endif %}
 
                                     {% if gymnaseInfo.adresse and gymnaseInfo.telephone %}
                                         <hr style="margin: 0; border-color: #e5e7eb;">
                                     {% endif %}
 
-                                    {% if gymnaseInfo.telephone %}
-                                        <a href="tel:{{ gymnaseInfo.telephone }}"
-                                           class="text-decoration-none d-flex align-items-center gap-3">
-                                            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#4338ca);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                                <i class="fas fa-phone" style="color:white;font-size:1rem;"></i>
-                                            </div>
-                                            <div style="font-size:1rem;color:#1f2937;font-weight:500;">
-                                                {{ gymnaseInfo.telephone }}
-                                            </div>
-                                        </a>
-                                    {% endif %}
+                                  {% if infoTournoiEnCours.telephone %}
+    <div class="d-flex align-items-center gap-3"
+         style="padding:10px;border-radius:10px;background:rgba(79,70,229,0.06);">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#4338ca);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-phone" style="color:white;font-size:1rem;"></i>
+        </div>
+        <div style="flex-grow:1;">
+            <div style="font-size:1rem;color:#4f46e5;font-weight:600;">
+                {{ infoTournoiEnCours.telephone }}
+            </div>
+            <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">
+                {{ t('contacterPar') }}
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-shrink-0">
+            <a href="tel:{{ infoTournoiEnCours.telephone }}"
+               class="text-decoration-none d-flex align-items-center justify-content-center"
+               style="width:38px;height:38px;border-radius:50%;background:#4f46e5;"
+               title="{{ t('appeler') }}">
+                <i class="fas fa-phone" style="color:white;font-size:0.9rem;"></i>
+            </a>
+            <a href="sms:{{ infoTournoiEnCours.telephone }}"
+               class="text-decoration-none d-flex align-items-center justify-content-center"
+               style="width:38px;height:38px;border-radius:50%;background:#4f46e5;"
+               title="{{ t('envoyerSms') }}">
+                <i class="fas fa-comment-dots" style="color:white;font-size:0.9rem;"></i>
+            </a>
+        </div>
+    </div>
+{% endif %}
 
-                                    {% if gymnaseInfo.commentaire %}
+                                    {% if infoTournoiEnCours.commentaire %}
                                         <hr style="margin: 0; border-color: #e5e7eb;">
                                         <div class="d-flex align-items-center gap-3">
                                             <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                                 <i class="fas fa-comment-alt" style="color:white;font-size:1rem;"></i>
                                             </div>
                                             <div style="font-size:1rem;color:#1f2937;">
-                                                {{ gymnaseInfo.commentaire }}
+                                                {{ infoTournoiEnCours.commentaire }}
                                             </div>
                                         </div>
                                     {% endif %}

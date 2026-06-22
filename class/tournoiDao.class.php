@@ -50,6 +50,26 @@ public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains,
 }
 
 
+/**
+ * Met à jour le téléphone et le commentaire d'un tournoi
+ * @param int $idTournoi ID du tournoi
+ * @param string|null $telephone Numéro de téléphone
+ * @param string|null $commentaire Commentaire libre
+ * @return bool true si la mise à jour a réussi
+ */
+public function modifierTelephoneCommentaire(int $idTournoi, ?string $telephone, ?string $commentaire): bool {
+    $stmt = $this->connexion->prepare("
+        UPDATE Tournois 
+        SET telephone = :telephone, commentaire = :commentaire 
+        WHERE id = :id
+    ");
+    $stmt->execute([
+        ':telephone' => $telephone,
+        ':commentaire' => $commentaire,
+        ':id' => $idTournoi
+    ]);
+    return $stmt->rowCount() > 0;
+}
 
 
 

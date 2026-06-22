@@ -5,6 +5,7 @@ require 'class/tournoiDao.class.php';
 require 'class/rencontreDao.class.php';
 require  'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
+require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
 require 'class/licenceDao.class.php';
 require 'Lang/lang.php';
@@ -116,9 +117,22 @@ $pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);
 
 if (isset ($_GET['idCategorie'])) {
   $categorieEnCours = $_GET['idCategorie'];
+
+  //detecter le nombre de label final placé
+$labelDao = new LabelDao();
+$nombreLabelsFinal = $labelDao->getLabelsAvecPlanificationParCategorie((int)$_GET['idCategorie']);
+$nombreLabelsFinalplaces = count($nombreLabelsFinal);
+$nomDesLabels = $nombreLabelsFinal[0]['description'] ;
+
+
 } else {
-  $categorieEnCours = null;
+$categorieEnCours = null;
+  $nombreLabelsFinal = [];
+  $nombreLabelsFinalplaces = null;
+  $nomDesLabels = null;
 }
+
+
 
 
 echo $template->render([
@@ -146,6 +160,9 @@ echo $template->render([
   'pouleHasRencontres' => $pouleHasRencontres,
   'AfficherLesEquipes' => $listeDesEquipes,
   'licence' => $licence,
+  'nomLabels' => $nomDesLabels,
+  'nombrelabelplaces' => $nombreLabelsFinalplaces,
+  'nombreLabelsFinal' => $nombreLabelsFinal,
   
 ]);
 ?>

@@ -432,32 +432,48 @@ public function getAllPoulesByTournoi(int $idTournoi, $AndIsClassement = false) 
 
 
 
-    public function addEquipeToPoule($equipeId, $pouleId, $tournoiId) {
-      
-    
-        // Vérifier si l'équipe est déjà dans la poule
-        $queryCheck = "SELECT * FROM EquipePoule WHERE equipe_id = :equipeId AND poule_id = :pouleId";
-        $stmtCheck = $this->connexion->prepare($queryCheck);
-        $stmtCheck->bindValue(':equipeId', $equipeId);
-        $stmtCheck->bindValue(':pouleId', $pouleId);
-        $stmtCheck->execute();
-    
-        if ($stmtCheck->fetch(PDO::FETCH_ASSOC)) {
-            throw new Exception("L'équipe est déjà dans cette poule.");
-        }
-    
-        // Insérer l'équipe dans la poule
-        $queryInsert = "INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)";
-        $stmtInsert = $this->connexion->prepare($queryInsert);
-        $stmtInsert->bindValue(':equipeId', $equipeId);
-        $stmtInsert->bindValue(':pouleId', $pouleId);
-    
-        if ($stmtInsert->execute()) {
-            return true; // Retourne vrai si l'insertion est réussie
-        } else {
-            return false; // Retourne faux en cas d'échec
-        }
+    public function addEquipeToPoule($equipeId, $pouleId, $tournoiId, $isMatchRetour = false) {
+
+    // Vérifier si l'équipe est déjà dans la poule
+    $queryCheck = "SELECT * FROM EquipePoule WHERE equipe_id = :equipeId AND poule_id = :pouleId";
+    $stmtCheck = $this->connexion->prepare($queryCheck);
+    $stmtCheck->bindValue(':equipeId', $equipeId);
+    $stmtCheck->bindValue(':pouleId', $pouleId);
+    $stmtCheck->execute();
+
+    if ($stmtCheck->fetch(PDO::FETCH_ASSOC)) {
+        throw new Exception("L'équipe est déjà dans cette poule.");
     }
+
+    // Insérer l'équipe dans la poule
+    $queryInsert = "INSERT INTO EquipePoule (equipe_id, poule_id) VALUES (:equipeId, :pouleId)";
+    $stmtInsert = $this->connexion->prepare($queryInsert);
+    $stmtInsert->bindValue(':equipeId', $equipeId);
+    $stmtInsert->bindValue(':pouleId', $pouleId);
+
+    if (!$stmtInsert->execute()) {
+        return false;
+    }
+
+    // Déterminer si c'est une poule de classement, pour choisir le bon type de rencontre
+    $poule = $this->getPouleById($pouleId);
+    $typeRencontreId = (!empty($poule['is_classement']) && $poule['is_classement'] == 1)
+        ? TYPE_RENCONTRE_CLASSEMENT
+        : TYPE_RENCONTRE_POULE;
+
+    // Générer automatiquement les rencontres manquantes pour cette équipe
+     // adapte le chemin/nom de fichier réel
+    $rencontreDAO = new RencontreDAO();
+    $rencontreDAO->addEquipesToPoule(
+        $pouleId,
+        $tournoiId,
+        [$equipeId],
+        $typeRencontreId,
+        $isMatchRetour
+    );
+
+    return true;
+}
     
     
     

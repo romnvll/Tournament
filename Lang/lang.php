@@ -198,7 +198,16 @@ $allLangs = [
         'Appliquerleretard' => 'Appliquer le retard',
         'presence' => 'Présence',
         'explicationTv' => 'Permet de visualiser les matchs en direct sur un grand écran',
-        'voirSurTv' => 'Voir sur TV'
+        'voirSurTv' => 'Voir sur TV',
+        'ajouterEquipeDernierMoment' => 'Ajouter une équipe à la dernière minute',
+        'choisirTournoi' => 'Choisir un tournoi',
+        'choisirPoule' => 'Choisir une poule',
+        'creerEtAjouterEquipe' => 'Créer et ajouter une équipe',
+        'ajouterCetteEquipe' => 'Ajouter cette équipe',
+        'clubExistant' => 'Club existant',
+        'nouveauClub' => 'Nouveau club',
+        'ouvrirDansMaps' => 'Ouvrir dans Maps'
+        
         
         
         
@@ -389,7 +398,16 @@ $allLangs = [
         'Appliquerleretard' => 'Apply the delay',
         'presence' => 'Presence',
         'explicationTv' => 'Allows you to view live matches on a big screen',
-        'voirSurTv' => 'View on TV'
+        'voirSurTv' => 'View on TV',
+        'ajouterEquipeDernierMoment' => 'Add a team at the last minute',
+        'choisirTournoi' => 'Choose a tournament',
+        'choisirPoule' => 'Choose a pool',
+        'equipesActuellementDansLaPoule' => 'Teams currently in the pool',
+        'creerEtAjouterEquipe' => 'Create and add a team',
+        'ajouterCetteEquipe' => 'Add this team',
+        'clubExistant' => 'Existing club',
+        'nouveauClub' => 'New club',
+        'ouvrirDansMaps' => 'Open in Maps'
 
                 
 

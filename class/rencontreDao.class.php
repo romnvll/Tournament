@@ -1229,6 +1229,146 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+
+/**
+ * Ajoute une ou plusieurs équipes à une poule existante en générant
+ * les rencontres manquantes (nouvelle équipe vs toutes les anciennes,
+ * + nouvelle vs nouvelle si plusieurs ajoutées en même temps).
+ *
+ * Ne touche JAMAIS aux rencontres déjà existantes : les nouveaux matchs
+ * sont placés à partir du tour suivant le dernier tour existant,
+ * en remplissant chaque tour au maximum (une équipe = 1 match max par tour,
+ * en tenant compte de l'occupation réelle déjà en base) avant de passer
+ * au tour suivant.
+ */
+public function addEquipesToPoule(
+    $pouleId,
+    $tournoi_id,
+    array $nouvellesEquipesIds,
+    $typeRencontreId = TYPE_RENCONTRE_POULE,
+    $isMatchRetour = false
+) {
+    $toutesEquipes = $this->getEquipesPresentesByPoule($pouleId);
+
+    $anciennesEquipes = array_values(array_filter($toutesEquipes, function ($e) use ($nouvellesEquipesIds) {
+        return !in_array($e['id'], $nouvellesEquipesIds);
+    }));
+
+    $nouvellesEquipes = array_values(array_filter($toutesEquipes, function ($e) use ($nouvellesEquipesIds) {
+        return in_array($e['id'], $nouvellesEquipesIds);
+    }));
+
+    if (empty($nouvellesEquipes)) {
+        return;
+    }
+
+    // Construire les matchs manquants
+    $matchsAEffectuer = [];
+
+    foreach ($nouvellesEquipes as $nouvelle) {
+        foreach ($anciennesEquipes as $ancienne) {
+            $matchsAEffectuer[] = ['equipe1' => $nouvelle, 'equipe2' => $ancienne];
+            if ($isMatchRetour) {
+                $matchsAEffectuer[] = ['equipe1' => $ancienne, 'equipe2' => $nouvelle];
+            }
+        }
+    }
+
+    for ($i = 0; $i < count($nouvellesEquipes); $i++) {
+        for ($j = $i + 1; $j < count($nouvellesEquipes); $j++) {
+            $matchsAEffectuer[] = ['equipe1' => $nouvellesEquipes[$i], 'equipe2' => $nouvellesEquipes[$j]];
+            if ($isMatchRetour) {
+                $matchsAEffectuer[] = ['equipe1' => $nouvellesEquipes[$j], 'equipe2' => $nouvellesEquipes[$i]];
+            }
+        }
+    }
+
+    if (empty($matchsAEffectuer)) {
+        return;
+    }
+
+    // Occupation réelle de TOUS les tours déjà en base
+    $occupationParTour = $this->getOccupationToursByPoule($pouleId, $typeRencontreId);
+
+    $tourMaxExistant = $this->getTourMaxByPoule($pouleId, $typeRencontreId);
+    $tourCourant      = $tourMaxExistant + 1;
+
+    foreach ($matchsAEffectuer as $match) {
+        $e1 = $match['equipe1']['id'];
+        $e2 = $match['equipe2']['id'];
+
+        // Avancer de tour tant que l'une des deux équipes est déjà occupée
+        // ce tour-ci (en base OU par un match qu'on vient d'ajouter)
+        while (
+            isset($occupationParTour[$tourCourant][$e1]) ||
+            isset($occupationParTour[$tourCourant][$e2])
+        ) {
+            $tourCourant++;
+        }
+
+        if ($this->isRencontreExist($e1, $e2, $tourCourant)) {
+            continue;
+        }
+
+        $this->insertRencontre($e1, $e2, $tournoi_id, $typeRencontreId, $tourCourant, $pouleId);
+
+        $occupationParTour[$tourCourant][$e1] = true;
+        $occupationParTour[$tourCourant][$e2] = true;
+    }
+}
+
+/**
+ * Retourne l'occupation des tours par équipe pour une poule donnée,
+ * à partir des rencontres déjà existantes.
+ *
+ * @return array  [tour => [equipeId => true, ...], ...]
+ */
+private function getOccupationToursByPoule($pouleId, $typeRencontreId)
+{
+    $query = "SELECT equipe1_id, equipe2_id, tour 
+              FROM Rencontres 
+              WHERE poule_id = :pouleId 
+                AND type_rencontre_id = :typeRencontreId
+                AND tour IS NOT NULL";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $occupation = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $occupation[$row['tour']][$row['equipe1_id']] = true;
+        $occupation[$row['tour']][$row['equipe2_id']] = true;
+    }
+
+    return $occupation;
+}
+
+/**
+ * Retourne le numéro de tour le plus élevé déjà utilisé pour une poule donnée.
+ * Retourne 0 si aucune rencontre n'existe encore.
+ */
+private function getTourMaxByPoule($pouleId, $typeRencontreId)
+{
+    $query = "SELECT MAX(tour) AS tour_max 
+              FROM Rencontres 
+              WHERE poule_id = :pouleId 
+                AND type_rencontre_id = :typeRencontreId";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetchColumn();
+
+    return $result !== null ? (int) $result : 0;
+}
+
+
+
+
 public function getRencontreByCategorie($categorieId, $tournoiId, $typeRencontreId = TYPE_RENCONTRE_POULE, $from = 'index')
 {
     $orderBy = ($from === 'tour') ? "r.tour, c.creneau_id, r.id" : "c.creneau_id, r.id";
