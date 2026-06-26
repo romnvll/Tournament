@@ -85,12 +85,14 @@ $listedestournois = $tournois->afficherLesTournois($userData['id']);
   $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
   $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
   $pourcentage = $tournois->pourcentageRencontresTermineesDuTournoi($_GET['id_tournoi']);
+  $getLastCreneau = $creneaux->getCreneauApresDernierCreneauEnCours($_GET['id_tournoi']);
  
   
 }
 
 $utilisateurDao = new utilisateurDao();
 $EffetSonoreUtilisateurDebut = $utilisateurDao->getEffetSonoreByUserId($userData['id']);
+
 
 
 
@@ -117,6 +119,7 @@ echo $template->render([
     'pourcentage' => $pourcentage,
     'effetSonoreDebut' => $EffetSonoreUtilisateurDebut['effetsSonoreDebut'],
     'effetSonoreFin' => $EffetSonoreUtilisateurDebut['effetsSonoreFin'],
+    'getLastCreneau' => $getLastCreneau,
    
 
   

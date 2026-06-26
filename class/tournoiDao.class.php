@@ -18,6 +18,18 @@ public function __construct() {
 }
 
 
+public function toggleAfficherCountdownCoach(int $tournoiId, bool $activer): bool {
+    $stmt = $this->connexion->prepare("
+        UPDATE Tournois SET afficherCountdownCoach = :val WHERE id = :id
+    ");
+    $stmt->execute([
+        ':val' => $activer ? 1 : 0,
+        ':id'  => $tournoiId
+    ]);
+    return $stmt->rowCount() > 0;
+}
+
+
 public function ajouterTournoi(string $nom, string $dateDebut, int $nb_terrains, string $heure_debut, int $isClassement, int $idUser, int $typeSportId, int $pasHoraire = 0): int {
     try {
         $this->connexion->beginTransaction(); // Début de la transaction
@@ -69,6 +81,33 @@ public function modifierTelephoneCommentaire(int $idTournoi, ?string $telephone,
         ':id' => $idTournoi
     ]);
     return $stmt->rowCount() > 0;
+}
+
+public function gestionTempChangement(int $idTournoi, bool $gestionTempsChangement): void {
+        $stmt = $this->connexion->prepare("
+            UPDATE Tournois 
+            SET gestionTempsChangement = :gestionTempsChangement 
+            WHERE id = :idTournoi
+        ");
+        $stmt->bindParam(':gestionTempsChangement', $gestionTempsChangement, PDO::PARAM_BOOL);
+        $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+    public function modifierTempsChangement(
+    int $idTournoi,
+    int $tempsChangementMinutes
+): void {
+
+    $stmt = $this->connexion->prepare("
+        UPDATE Tournois
+        SET tempsChangementMinutes = :temps
+        WHERE id = :idTournoi
+    ");
+
+    $stmt->bindParam(':temps', $tempsChangementMinutes, PDO::PARAM_INT);
+    $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);
+
+    $stmt->execute();
 }
 
 

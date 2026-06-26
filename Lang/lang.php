@@ -206,7 +206,8 @@ $allLangs = [
         'ajouterCetteEquipe' => 'Ajouter cette équipe',
         'clubExistant' => 'Club existant',
         'nouveauClub' => 'Nouveau club',
-        'ouvrirDansMaps' => 'Ouvrir dans Maps'
+        'ouvrirDansMaps' => 'Ouvrir dans Maps',
+        'selectionnerUnClub' => 'Choisir un club',
         
         
         
@@ -407,7 +408,9 @@ $allLangs = [
         'ajouterCetteEquipe' => 'Add this team',
         'clubExistant' => 'Existing club',
         'nouveauClub' => 'New club',
-        'ouvrirDansMaps' => 'Open in Maps'
+        'ouvrirDansMaps' => 'Open in Maps',
+        'choisirUneEquipe' => 'Choose a team',
+        'selectionnerUnClub' => 'Choose a club',
 
                 
 

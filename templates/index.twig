@@ -234,6 +234,24 @@
             justify-content: center;
         }
 
+
+        .match-countdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.match-countdown .fa-hourglass-half,
+.match-countdown .fa-hourglass-end {
+    color: var(--primary-color);
+}
+
         .team-side {
             display: flex;
             flex-direction: column;
@@ -396,6 +414,39 @@
         position: relative;
         transition: transform .15s;
     }
+
+
+    .creneau-badge {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 200;
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-radius: 99px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--bg-dark);
+}
+
+.creneau-badge i {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+    .creneau-badge {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+        top: 10px;
+        left: 10px;
+    }
+}
+
     .bell-button:active { transform: scale(0.94); }
 
     .bell-button i { font-size: 1.2rem; }
@@ -1309,7 +1360,20 @@
                 <!-- Notifications -->
                       
                           {% if IdEquipe is not null %}
-               
+                            {% if creneauEnCours is defined and creneauEnCours is not null %}
+                                <div class="creneau-badge" id="creneauBadge">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Créneau en cours : {{ creneauEnCours.nom|slice(0, -3) }}</span>
+                                    {% if creneauSuivant is defined and creneauSuivant is not null %}
+                                        <span class="creneau-badge-next">
+                                            <i class="fas fa-arrow-right"></i> {{ creneauSuivant.nom|slice(0, -3) }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                   
+                            {% endif %}
+
+
                             <div class="bell-wrapper" id="bellWrapper">
                             <a href="messages.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}"
                             class="bell-button {% if nbMessagesNonLus > 0 %}has-unread{% endif %}">
@@ -1459,6 +1523,9 @@
                                     <tr>
                                         {% if heureIsVisible == 1 %}
                                         <td class="text-muted" style="white-space: nowrap;">{{ equipe.creneau_nom|slice(0,5) }}</td>
+
+                                       
+                                        
                                         {% endif %}
 
                                         {# Équipe 1 #}
@@ -1563,6 +1630,18 @@
                                             <i class="fas fa-clock"></i>
                                             {{ equipe.creneau_nom|slice(0, -3) }}
                                         </div>
+                                        {% if infoTournoiEnCours['gestionTempsChangement'] == 1 and infoTournoiEnCours['afficherCountdownCoach'] == 1 %}
+
+                                            {% if equipe.isTerminated == 2 %}
+                                            <div class="match-countdown" 
+                                                data-heure-debut="{{ equipe.creneau_nom|slice(0, -3) }}"
+                                                data-duree="{{ infoTournoiEnCours['pasHoraire'] }}">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                <span class="countdown-label">Temps restant&nbsp;: </span>
+                                                <span class="countdown-timer">--:--</span>
+                                            </div>
+                                            {% endif %}
+                                        {% endif %}
                                     {% endif %}
 
                                     <div class="match-score">
@@ -1980,11 +2059,12 @@
     <script>
         var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
 
-       setInterval(function () {
-    $('#score').load(location.href + ' #score > *');
+   setInterval(function () {
+    $('#score').load(location.href + ' #score > *', function () {
+        initCountdowns(); // ← relance les timers sur les nouveaux éléments
+    });
     $('#classementTableau').load(location.href + ' #classementTableau > *');
     $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
-
     $('#labels').load(location.href + ' #labels > *', function () {
         if ($.trim($('#labels').text()) === '') {
             $('#labels').hide();
@@ -1992,9 +2072,11 @@
             $('#labels').show();
         }
     });
-
     $('#bellWrapper').load(location.href + ' #bellWrapper > *');
+    $('#creneauBadge').load(location.href + ' #creneauBadge > *');
 }, refreshInterval);
+
+
 
         document.addEventListener("DOMContentLoaded", function () {
             function getUrlParams() {
@@ -2053,5 +2135,58 @@
         });
         {% endif %}
     </script>
+
+<script>
+function initCountdowns() {
+    document.querySelectorAll('.match-countdown').forEach(function (el) {
+        // Évite de réinitialiser un timer déjà actif
+        if (el.dataset.running === '1') return;
+        el.dataset.running = '1';
+
+        const heureDebut = el.dataset.heureDebut;
+        const duree      = parseInt(el.dataset.duree, 10);
+        const timerEl    = el.querySelector('.countdown-timer');
+
+        const [h, m] = heureDebut.split(':').map(Number);
+        const fin = new Date();
+        fin.setHours(h, m + duree, 0, 0);
+
+        function update() {
+            // Si l'élément a été retiré du DOM par le refresh, on arrête
+            if (!document.contains(el)) return;
+
+            const reste = Math.floor((fin - Date.now()) / 1000);
+
+            if (reste <= 0) {
+                timerEl.textContent = '00:00';
+                timerEl.style.color = '#e74c3c';
+                el.querySelector('.fa-hourglass-half')
+                  ?.classList.replace('fa-hourglass-half', 'fa-hourglass-end');
+                return;
+            }
+
+            const mm = String(Math.floor(reste / 60)).padStart(2, '0');
+            const ss = String(reste % 60).padStart(2, '0');
+            timerEl.textContent = `${mm}:${ss}`;
+
+            if (reste <= 60) {
+                timerEl.style.color = '#e74c3c';
+            } else if (reste <= 180) {
+                timerEl.style.color = '#f39c12';
+            } else {
+                timerEl.style.color = '';
+            }
+
+            setTimeout(update, 1000);
+        }
+
+        update();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initCountdowns);
+</script>
+
+
 </body>
 </html>

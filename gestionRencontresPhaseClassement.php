@@ -122,7 +122,15 @@ if (isset ($_GET['idCategorie'])) {
 $labelDao = new LabelDao();
 $nombreLabelsFinal = $labelDao->getLabelsAvecPlanificationParCategorie((int)$_GET['idCategorie']);
 $nombreLabelsFinalplaces = count($nombreLabelsFinal);
+
+
+if ($nombreLabelsFinal) {
 $nomDesLabels = $nombreLabelsFinal[0]['description'] ;
+}else {
+  
+  $nomDesLabels = null;
+}
+
 
 
 } else {

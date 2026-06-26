@@ -1,4 +1,5 @@
 <?php
+
 require 'security.php';
 require 'class/tournoiDao.class.php';
 
@@ -197,7 +198,8 @@ if (isset($_POST['idPersonneTable'])) {
 // ─────────────────────────────────────────────
 
 if (isset($_POST['nom'])) {
-
+    $gestionTempsChangement =    isset($_POST['gestionTempsChangement']) ? 1 : 0;
+    $afficherCountdownCoach = isset($_POST['afficherCountdownCoach']) ? 1 : 0; // ← ajouté
     $isArchived         = isset($_POST['isArchived'])         ? 1 : 0;
     $heureIsVisible     = isset($_POST['heureIsVisible'])     ? 1 : 0;
     $isVisible          = isset($_POST['isVisible'])          ? 1 : 0;
@@ -210,6 +212,18 @@ if (isset($_POST['nom'])) {
     $gestionRepas       = isset($_POST['gestionRepas'])       ? 1 : 0;
 
     $isClassement = (!empty($_POST['idParent'])) ? 1 : 0;
+
+        $tournoiDao->gestionTempChangement(
+    $tournoiId,
+    $gestionTempsChangement
+);
+if (isset($_POST['tempsChangementMinutes'])) {
+    $tournoiDao->modifierTempsChangement(
+        $tournoiId,
+        (int)$_POST['tempsChangementMinutes']
+    );
+}
+                $tournoiDao->toggleAfficherCountdownCoach($tournoiId, $afficherCountdownCoach); // ← ajouté
 
     $tournoiDao->toggleEffetsSonores($tournoiId, isset($_POST['effetsSonores']) ? 1 : 0);
 

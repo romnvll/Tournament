@@ -388,7 +388,7 @@
                             <div id="bloc-club-existant">
                                 <select name="club_id" class="form-select">
                                     <option value="">{{ t('selectionnerUnClub') }}</option>
-                                    {% for club in listeClubs %}
+                                    {% for club in listeClubs|sort((a, b) => a.nom <=> b.nom) %}
                                         <option value="{{ club.id }}">{{ club.nom }}</option>
                                     {% endfor %}
                                 </select>

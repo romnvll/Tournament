@@ -418,7 +418,7 @@ details > summary::-webkit-details-marker {
 	transition: all 0.3s;
 }
 
-.modern-table tbody tr:hover {
+.modern-table tbody tr:hover:not(.changement-row):hover {
 	background: var(--bg-light);
 }
 
@@ -465,6 +465,49 @@ details > summary::-webkit-details-marker {
 
 .time-action.add {
 	color: var(--success-color);
+}
+
+/* Bande de changement entre créneaux */
+.changement-row {
+	background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+	border-top: 2px solid var(--primary-color);
+	border-bottom: 2px solid var(--primary-color);
+	height: 50px;
+}
+
+.changement-cell {
+	background: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: white;
+	padding: 8px 12px;
+	gap: 8px;
+}
+
+.changement-input {
+	padding: 4px 8px;
+	border: 1px solid var(--primary-color);
+	border-radius: 4px;
+	width: 60px;
+	text-align: center;
+	font-weight: 600;
+	background: white;
+	color: var(--bg-dark);
+}
+
+.changement-input:focus {
+	outline: none;
+	border-color: var(--primary-hover);
+	box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.changement-label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
 }
 
 /* Match/Label cards */
@@ -816,6 +859,7 @@ details > summary::-webkit-details-marker {
 							</label>
 							<input type="number" id="modifPasHoraire" name="modifPasHoraire" min="0" value="{{ tournoiInfo['pasHoraire'] }}" class="modern-input" oninput="this.value = this.value < 0 ? 0 : this.value;" onchange="this.form.submit()">
 						</div>
+						
 
 						<input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
 						<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
@@ -1058,8 +1102,8 @@ details > summary::-webkit-details-marker {
 										<input type="text" name="creneau" class="time-input" value="{{ creneau.nom|slice(0, -3) }}" hx-post="PlacementDesRencontresTraitement.php" hx-trigger="change" hx-target="this" hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}' pattern="^([01]\d|2[0-3]):[0-5]\d$" title="Format HH:MM">
 
 										<input type="hidden" name="idTournoi" value="{{idTournoi}}">
-
-										<a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire}}" data-bs-toggle="tooltip" title="{{t('insererCreneau')}}" class="time-action add">
+			
+										<a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire + tournoiInfo.tempsChangementMinutes }}" data-bs-toggle="tooltip" title="{{t('insererCreneau')}}" class="time-action add">
 											<i class="fa fa-plus-circle"></i>
 										</a>
 									</div>
@@ -1308,6 +1352,30 @@ details > summary::-webkit-details-marker {
 									</td>
 								{% endfor %}
 							</tr>
+
+							<!-- Bande de changement entre créneaux -->
+							{% if not loop.last and tournoiInfo.gestionTempsChangement %}
+							<tr class="changement-row">
+								<td class="changement-cell">
+									<div class="changement-label">
+										<i class="fas fa-hourglass-half"></i>
+										Changement avant {{ creneau.nom|slice(0, -3) }}
+									</div>
+									<form action="PlacementDesRencontresTraitement.php" method="post" style="display: flex; align-items: center; gap: 4px;">
+										<input type="hidden" name="action" value="modifierTempsChangement">
+										<input type="hidden" name="idTournoi" value="{{idTournoi}}">
+										<input type="hidden" name="creneau_id" value="{{creneau.creneau_id}}">
+										<input type="number" name="tempsChangementMinutes" class="changement-input" value="{{ creneau.tempsChangementMinutes }}" min="0" max="180">
+										<span style="font-size: 0.8rem; color: white; font-weight: 600;">min</span>
+										<button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 4px 8px;" title="Mettre à jour">
+											<i class="fas fa-check"></i>
+										</button>
+									</form>
+								</td>
+								
+							</tr>
+							{% endif %}
+
 						{% endfor %}
 					</tbody>
 					<tfoot>

@@ -663,6 +663,7 @@
                                 {% endif %}
                                 {% set rankInPoule = 0 %}
                                 {% for eq in pouleData.classement %}
+                                
                                     {% set rankInPoule = rankInPoule + 1 %}
                                     <tr class="{% if rankInPoule == 1 %}rank-1{% elseif rankInPoule == 2 %}rank-2{% elseif rankInPoule == 3 %}rank-3{% endif %}">
                                         <td><span class="rank-pos {% if rankInPoule == 1 %}gold{% elseif rankInPoule == 2 %}silver{% elseif rankInPoule == 3 %}bronze{% endif %}">{{ rankInPoule }}</span></td>

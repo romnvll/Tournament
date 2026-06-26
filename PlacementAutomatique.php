@@ -44,6 +44,7 @@ $listCreneaux = $creneauxDao->afficherCreneaux($idTournoi);
 $rencontresAP = $planificationDao->afficherRencontresSansPlanification($idTournoi);
 $categories   = $categorieDao->obtenirCategoriesDuTournoi($idTournoi);
 
+
 $erreurs = [];
 
 // ── Session : persistance des contraintes ───────────────────────────────────
@@ -264,9 +265,8 @@ foreach ($listCreneaux as $cr) {
         }
 
         $lastCreneau  = $listCreneaux[array_key_last($listCreneaux)];
-        $pasHoraire   = (int)($tournoiInfo['pasHoraire'] ?? 30);
-        $uneCategorie = !empty($contraintesTerrain['une_categorie_par_creneau']);
-
+        $pasHoraire = (int)($tournoiInfo['pasHoraire'] + ($tournoiInfo['tempsChangementMinutes'] ?? 30));        $uneCategorie = !empty($contraintesTerrain['une_categorie_par_creneau']);
+        
         // ── 5. Placer chaque rencontre ───────────────────────────────────────
         foreach ($rencontresAP as $rencontre) {
             $placed = false;

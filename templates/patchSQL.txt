@@ -202,3 +202,17 @@ ADD COLUMN commentaire TEXT NULL AFTER telephone;
 ALTER TABLE Gymnases
 DROP COLUMN telephone;
 
+
+ALTER TABLE Tournois
+ADD COLUMN gestionTempsChangement tinyint(1) DEFAULT 0;
+ADD COLUMN tempsChangementMinutes INT NOT NULL DEFAULT 0;
+
+ALTER TABLE Creneaux
+ADD COLUMN tempsChangementMinutes INT NOT NULL DEFAULT 0;
+UPDATE Creneaux c
+JOIN Tournois t ON t.id = c.tournoi_id
+SET c.tempsChangementMinutes = t.tempsChangementMinutes;
+
+ALTER TABLE Tournois
+ADD COLUMN afficherCountdownCoach TINYINT(1) NOT NULL DEFAULT 0;
+

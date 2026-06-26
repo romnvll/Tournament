@@ -13,6 +13,9 @@ require 'class/licenceDao.class.php';
 require 'class/categorie.class.php';
 require 'class/gymnaseDao.class.php';
 require 'class/messageDao.class.php';
+require 'class/creneauxDao.class.php';
+
+
 require 'Lang/lang.php';
 
 /* COOKIE des messages */
@@ -60,6 +63,7 @@ $equipeDao = new EquipeDAO();
 $licenceDao = new LicenceDAO();
 $categorieDao = new CategorieDao();
 $gymnaseDao = new GymnaseDAO();
+$creneauxDao = new creneauxDao();
 
 
 
@@ -71,17 +75,21 @@ $terrain = new TerrainDao();
 $planTournoi = null;
 $classementFinal = null;
 
-
+$creneauEnCours = null;
+$creneauSuivant = null;
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
-    
+  $creneauEnCours = $creneauxDao->getCreneauEnCours((int)$_GET['id_tournoi']);
+ 
+  if ($creneauEnCours !== null) {
+    $creneauSuivant = $creneauxDao->getCreneauSuivant((int)$_GET['id_tournoi'], $creneauEnCours['nom']);
+}
+
     
   
    
   if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
   $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
-
-
 
 
   }
@@ -377,6 +385,8 @@ echo $template->render([
      'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
       'gymnaseInfo' => $gymnaseInfo,
       'nbMessagesNonLus' => $nbMessagesNonLus,
+      'creneauEnCours' => $creneauEnCours,
+      'creneauSuivant' => $creneauSuivant,
       
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),

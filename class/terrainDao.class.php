@@ -45,6 +45,8 @@ class TerrainDao {
         $stmt->execute();
     }
 
+    
+
     public function supprimerTerrainsParTournoi(int $idTournoi): void {
         $stmt = $this->connexion->prepare("DELETE FROM Terrains WHERE fk_idTournoi = :idTournoi");
         $stmt->bindParam(':idTournoi', $idTournoi, PDO::PARAM_INT);

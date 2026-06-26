@@ -119,8 +119,7 @@ if (!$timeDebut) {
     throw new Exception("Le format de l'heure est invalide : " . $lastCreneau['nom']);
 }
 
-$pasHoraire = $tournoiInfo['pasHoraire']; // Valeur des minutes à ajouter
-
+$pasHoraire = $tournoiInfo['pasHoraire'] + $tournoiInfo['tempsChangementMinutes']; // Valeur des minutes à ajouter
 // Ajouter le pas horaire
 $timeNextCreneau = $timeDebut->add(new DateInterval('PT' . $pasHoraire . 'M'));
 

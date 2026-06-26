@@ -6,7 +6,7 @@ require 'class/equipeDao.class.php';
 
 require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
-
+require 'class/creneauxDao.class.php';
 require 'class/pouleManagerDao.class.php';
 require 'vendor/autoload.php';
 require 'Lang/lang.php';
@@ -27,6 +27,7 @@ $tournoi = new tournoiDao();
 $poulemanager = new PouleManager();
 $rencontre = new RencontreDAO();
 $equipeDao = new EquipeDAO();
+$creneauxDao = new CreneauxDAO();
 
 
 
@@ -48,16 +49,12 @@ if (
 
 
 
-
+$creneauApresDernierTermine = $creneauxDao->getCreneauApresDernierCreneauEnCours($_GET['idTournoi']);
 if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
   $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],1,true);
   
 }
 
-else {
-  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],1);
- 
-}
 
 
 
@@ -84,6 +81,7 @@ echo $template->render([
   'resultatRencontres' => $GetResultatDesPoules,
   'NombreEquipeParPoules' => $equipeDao->countEquipesPresentesInPoule($_GET['idPoule']),
   'InfoPoule' => $poulemanager->getInfoPoule($_GET['idPoule']),
+  'getNextCreneau' => $creneauApresDernierTermine,
 
 ]);
 

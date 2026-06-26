@@ -41,26 +41,26 @@ public function countRencontresNonTermineesByCategorie(int $tournoiId, int $cate
 }
 
 
-   public function createRencontreByPoule($pouleId, $tournoi_id, $typeRencontreId = TYPE_RENCONTRE_POULE, $isMatchRetour = false)
+public function createRencontreByPoule($pouleId, $tournoi_id, $typeRencontreId = TYPE_RENCONTRE_POULE, $isMatchRetour = false)
 {
-    // Récupérer uniquement les équipes de cette poule dont le champ 'IsPresent' est vrai
     $equipesPresentes = $this->getEquipesPresentesByPoule($pouleId);
 
-    // Vérifier s'il y a au moins deux équipes présentes pour créer des rencontres
-    if (count($equipesPresentes) >= 2) {
+    if (count($equipesPresentes) < 2) {
+        return;
+    }
 
-        // Générer les rencontres avec l'algorithme du round-robin
+    // Vérifier si l'ALLER existe déjà pour cette poule
+    $alleExisteDeja = $this->alleExisteDejaPourPoule($pouleId, $typeRencontreId);
+
+    if (!$alleExisteDeja) {
+        // Génération initiale complète (aller, + retour si demandé d'emblée)
         $rencontres = $this->generateRoundRobin($equipesPresentes, $isMatchRetour);
 
-        // Insérer les rencontres dans la table Rencontres
         foreach ($rencontres as $rencontre) {
-
-            // Vérifier si la rencontre existe déjà
             if ($this->isRencontreExist($rencontre['equipe1']['id'], $rencontre['equipe2']['id'], $rencontre['tour'])) {
                 continue;
             }
 
-            // Insérer la rencontre avec la référence à la poule
             $this->insertRencontre(
                 $rencontre['equipe1']['id'],
                 $rencontre['equipe2']['id'],
@@ -70,6 +70,104 @@ public function countRencontresNonTermineesByCategorie(int $tournoiId, int $cate
                 $pouleId
             );
         }
+        return;
+    }
+
+    // L'aller existe déjà : on ne touche pas à l'aller.
+    // Si on demande les retours et qu'ils n'existent pas encore, on les ajoute à la suite.
+    if ($isMatchRetour && !$this->retourExisteDejaPourPoule($pouleId, $typeRencontreId)) {
+        $this->ajouterMatchsRetour($pouleId, $tournoi_id, $typeRencontreId);
+    }
+    // Sinon (aller déjà fait, pas de retour demandé, ou retour déjà fait) : on ne fait rien.
+}
+
+/**
+ * Vérifie si l'aller (round-robin simple) existe déjà pour une poule donnée.
+ */
+private function alleExisteDejaPourPoule($pouleId, $typeRencontreId)
+{
+    $query = "SELECT COUNT(*) FROM Rencontres 
+              WHERE poule_id = :pouleId AND type_rencontre_id = :typeRencontreId";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchColumn() > 0;
+}
+
+/**
+ * Vérifie si les matchs retour existent déjà (heuristique : plus de rencontres
+ * que pour un aller simple => les retours existent déjà).
+ */
+private function retourExisteDejaPourPoule($pouleId, $typeRencontreId)
+{
+    $equipes = $this->getEquipesPresentesByPoule($pouleId);
+    $n = count($equipes);
+
+    if ($n < 2) {
+        return false;
+    }
+
+    $query = "SELECT COUNT(*) FROM Rencontres 
+              WHERE poule_id = :pouleId AND type_rencontre_id = :typeRencontreId";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $nbRencontres  = (int) $stmt->fetchColumn();
+    $nbAllerSimple = ($n * ($n - 1)) / 2;
+
+    return $nbRencontres > $nbAllerSimple;
+}
+
+/**
+ * Ajoute les matchs retour pour toutes les paires qui n'ont qu'un match
+ * (l'aller) en base, sans toucher aux rencontres existantes.
+ * Place chaque retour au tour suivant le tour max existant.
+ */
+private function ajouterMatchsRetour($pouleId, $tournoi_id, $typeRencontreId)
+{
+    $equipes = $this->getEquipesPresentesByPoule($pouleId);
+    $n = count($equipes);
+
+    if ($n < 2) {
+        return;
+    }
+
+    // Construire toutes les paires retour nécessaires : pour chaque match aller
+    // déjà existant (equipe1 vs equipe2), créer le retour (equipe2 vs equipe1)
+    $query = "SELECT equipe1_id, equipe2_id FROM Rencontres 
+              WHERE poule_id = :pouleId AND type_rencontre_id = :typeRencontreId";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+    $matchsAller = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $occupationParTour = $this->getOccupationToursByPoule($pouleId, $typeRencontreId);
+    $tourCourant = $this->getTourMaxByPoule($pouleId, $typeRencontreId) + 1;
+
+    foreach ($matchsAller as $match) {
+        $e1 = (int) $match['equipe2_id']; // on inverse pour le retour
+        $e2 = (int) $match['equipe1_id'];
+
+        while (
+            isset($occupationParTour[$tourCourant][$e1]) ||
+            isset($occupationParTour[$tourCourant][$e2])
+        ) {
+            $tourCourant++;
+        }
+
+        if ($this->isRencontreExist($e1, $e2, $tourCourant)) {
+            continue;
+        }
+
+        $this->insertRencontre($e1, $e2, $tournoi_id, $typeRencontreId, $tourCourant, $pouleId);
+
+        $occupationParTour[$tourCourant][$e1] = true;
+        $occupationParTour[$tourCourant][$e2] = true;
     }
 }
 
@@ -110,9 +208,8 @@ public function getWinner($rencontreId)
 }
 
 
-    private function isRencontreExist($equipe1Id, $equipe2Id, $tour)
+    private function isRencontreExist(int $equipe1Id, int $equipe2Id, int $tour)
 {
-    // Vérifier si la rencontre existe
     $query = "SELECT COUNT(*) FROM Rencontres WHERE ((equipe1_id = :equipe1Id OR equipe2_id = :equipe1Id) AND (equipe1_id = :equipe2Id OR equipe2_id = :equipe2Id)) AND tour = :tour";
     $stmt = $this->connexion->prepare($query);
     $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
@@ -120,15 +217,7 @@ public function getWinner($rencontreId)
     $stmt->bindValue(':tour', $tour, PDO::PARAM_INT);
     $stmt->execute();
 
-    $count = $stmt->fetchColumn();
-
-    // Si la rencontre existe plus d'une fois, retourner vrai (la rencontre ne doit pas être créée à nouveau)
-    if ($count > 1) {
-        return true;
-    }
-
-    // Sinon, retourner faux (la rencontre peut être créée)
-    return false;
+    return $stmt->fetchColumn() > 0;
 }
 
 
@@ -1235,11 +1324,11 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
  * les rencontres manquantes (nouvelle équipe vs toutes les anciennes,
  * + nouvelle vs nouvelle si plusieurs ajoutées en même temps).
  *
- * Ne touche JAMAIS aux rencontres déjà existantes : les nouveaux matchs
- * sont placés à partir du tour suivant le dernier tour existant,
- * en remplissant chaque tour au maximum (une équipe = 1 match max par tour,
- * en tenant compte de l'occupation réelle déjà en base) avant de passer
- * au tour suivant.
+ * Ne touche JAMAIS aux rencontres déjà existantes (ni leur tour, ni leurs
+ * adversaires). Pour chaque nouveau match, on cherche d'abord un tour déjà
+ * existant où les deux équipes sont libres (pour combler les "trous" issus
+ * d'un nombre impair d'équipes) ; si aucun tour existant ne convient, on
+ * crée un nouveau tour à la suite du tour maximum.
  */
 public function addEquipesToPoule(
     $pouleId,
@@ -1287,42 +1376,46 @@ public function addEquipesToPoule(
         return;
     }
 
-    // Occupation réelle de TOUS les tours déjà en base
-    $occupationParTour = $this->getOccupationToursByPoule($pouleId, $typeRencontreId);
-
-    $tourMaxExistant = $this->getTourMaxByPoule($pouleId, $typeRencontreId);
-    $tourCourant      = $tourMaxExistant + 1;
+    $occupationParTour  = $this->getOccupationToursByPoule($pouleId, $typeRencontreId);
+    $tourMaxExistant     = $this->getTourMaxByPoule($pouleId, $typeRencontreId);
+    $prochainTourLibre   = $tourMaxExistant + 1;
 
     foreach ($matchsAEffectuer as $match) {
         $e1 = $match['equipe1']['id'];
         $e2 = $match['equipe2']['id'];
 
-        // Avancer de tour tant que l'une des deux équipes est déjà occupée
-        // ce tour-ci (en base OU par un match qu'on vient d'ajouter)
-        while (
-            isset($occupationParTour[$tourCourant][$e1]) ||
-            isset($occupationParTour[$tourCourant][$e2])
-        ) {
-            $tourCourant++;
+        $tourChoisi = null;
+
+        // 1. Chercher un trou dans les tours existants (1 à tourMaxExistant)
+        for ($t = 1; $t <= $tourMaxExistant; $t++) {
+            if (!isset($occupationParTour[$t][$e1]) && !isset($occupationParTour[$t][$e2])) {
+                $tourChoisi = $t;
+                break;
+            }
         }
 
-        if ($this->isRencontreExist($e1, $e2, $tourCourant)) {
+        // 2. Sinon, avancer dans les tours créés au-delà du max
+        if ($tourChoisi === null) {
+            while (
+                isset($occupationParTour[$prochainTourLibre][$e1]) ||
+                isset($occupationParTour[$prochainTourLibre][$e2])
+            ) {
+                $prochainTourLibre++;
+            }
+            $tourChoisi = $prochainTourLibre;
+        }
+
+        if ($this->isRencontreExist($e1, $e2, $tourChoisi)) {
             continue;
         }
 
-        $this->insertRencontre($e1, $e2, $tournoi_id, $typeRencontreId, $tourCourant, $pouleId);
+        $this->insertRencontre($e1, $e2, $tournoi_id, $typeRencontreId, $tourChoisi, $pouleId);
 
-        $occupationParTour[$tourCourant][$e1] = true;
-        $occupationParTour[$tourCourant][$e2] = true;
+        $occupationParTour[$tourChoisi][$e1] = true;
+        $occupationParTour[$tourChoisi][$e2] = true;
     }
 }
 
-/**
- * Retourne l'occupation des tours par équipe pour une poule donnée,
- * à partir des rencontres déjà existantes.
- *
- * @return array  [tour => [equipeId => true, ...], ...]
- */
 private function getOccupationToursByPoule($pouleId, $typeRencontreId)
 {
     $query = "SELECT equipe1_id, equipe2_id, tour 
@@ -1365,7 +1458,6 @@ private function getTourMaxByPoule($pouleId, $typeRencontreId)
 
     return $result !== null ? (int) $result : 0;
 }
-
 
 
 

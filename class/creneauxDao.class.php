@@ -36,6 +36,8 @@ class creneauxDao {
         INSERT INTO Creneaux (nom, tournoi_id, ordre)
         VALUES (:nom, :tournoi_id, :ordre)
     ");
+
+    
     $stmtInsert->bindParam(':nom', $nom);
     $stmtInsert->bindParam(':tournoi_id', $tournoi_id);
     $stmtInsert->bindParam(':ordre', $ordre);
@@ -71,12 +73,11 @@ ORDER BY T.terrain_id
 
 
 
-
 public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMinutes): void
 {
-    // Récupérer l'heure du créneau précédent
+    // Récupérer l'heure ET le temps de changement du créneau précédent
     $stmtPrev = $this->connexion->prepare("
-        SELECT nom
+        SELECT nom, tempsChangementMinutes
         FROM Creneaux
         WHERE tournoi_id = :tournoi_id AND ordre = :ordreAvant
     ");
@@ -92,16 +93,17 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
     }
 
     $heurePrecedente = $result['nom'];
+    $tempsChangementHerite = (int) $result['tempsChangementMinutes'];
 
-    // Ajouter X minutes (pas horaire) pour obtenir la nouvelle heure
+    // Calculer la nouvelle heure = heure précédente + pas horaire
     $interval = new DateInterval('PT' . $pasMinutes . 'M');
     $nouvelleHeure = (new DateTime($heurePrecedente))->add($interval)->format('H:i:s');
 
-    // Commencer la transaction
+    // Démarrer la transaction
     $this->connexion->beginTransaction();
 
     try {
-        // Récupérer les créneaux suivants
+        // Récupérer les créneaux suivants pour les décaler
         $stmtSuivants = $this->connexion->prepare("
             SELECT creneau_id, nom
             FROM Creneaux
@@ -115,8 +117,8 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
 
         $creneauxSuivants = $stmtSuivants->fetchAll(PDO::FETCH_ASSOC);
 
-        // Décaler les heures et les ordres
-        foreach ($creneauxSuivants as $index => $creneau) {
+        // Décaler les heures et les ordres des créneaux suivants
+        foreach ($creneauxSuivants as $creneau) {
             $newTime = (new DateTime($creneau['nom']))->add($interval)->format('H:i:s');
 
             $stmtUpdate = $this->connexion->prepare("
@@ -132,13 +134,14 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
 
         // Insérer le nouveau créneau à l'ordre suivant
         $stmtInsert = $this->connexion->prepare("
-            INSERT INTO Creneaux (nom, tournoi_id, ordre)
-            VALUES (:nom, :tournoi_id, :ordre)
+            INSERT INTO Creneaux (nom, tournoi_id, ordre, tempsChangementMinutes)
+            VALUES (:nom, :tournoi_id, :ordre, :tcm)
         ");
         $stmtInsert->execute([
             ':nom' => $nouvelleHeure,
             ':tournoi_id' => $tournoi_id,
-            ':ordre' => $ordreAvant + 1
+            ':ordre' => $ordreAvant + 1,
+            ':tcm' => $tempsChangementHerite,
         ]);
 
         $this->connexion->commit();
@@ -149,7 +152,87 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
 }
 
 
-    
+public function getCreneauApresDernierCreneauEnCours(int $tournoi_id): ?array
+{
+    // 1. Chercher d'abord s'il existe un créneau avec des rencontres EN COURS (isTerminated = 2)
+    $sql = "
+        SELECT c1.creneau_id, c1.nom
+        FROM Creneaux c1
+        WHERE c1.tournoi_id = :tournoi_id
+        AND EXISTS (
+            SELECT 1
+            FROM Planification p
+            INNER JOIN Rencontres r ON r.id = p.rencontre_id
+            WHERE p.creneau_id = c1.creneau_id
+            AND r.isTerminated = 2
+        )
+        ORDER BY c1.nom DESC
+        LIMIT 1
+    ";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    $dernierEnCours = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($dernierEnCours) {
+        // Il y a un créneau en cours → retourner le suivant
+        $stmt = $this->connexion->prepare("
+            SELECT * FROM Creneaux
+            WHERE tournoi_id = :tournoi_id
+            AND nom > :nom
+            ORDER BY nom ASC
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':tournoi_id' => $tournoi_id,
+            ':nom'        => $dernierEnCours['nom'],
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    // 2. Aucune rencontre en cours → chercher le dernier créneau avec des rencontres TERMINÉES
+    $stmt = $this->connexion->prepare("
+        SELECT c1.creneau_id, c1.nom
+        FROM Creneaux c1
+        WHERE c1.tournoi_id = :tournoi_id
+        AND EXISTS (
+            SELECT 1
+            FROM Planification p
+            INNER JOIN Rencontres r ON r.id = p.rencontre_id
+            WHERE p.creneau_id = c1.creneau_id
+            AND r.isTerminated = 1
+        )
+        ORDER BY c1.nom DESC
+        LIMIT 1
+    ");
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    $dernierTermine = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($dernierTermine) {
+        // Retourner le créneau suivant le dernier terminé
+        $stmt = $this->connexion->prepare("
+            SELECT * FROM Creneaux
+            WHERE tournoi_id = :tournoi_id
+            AND nom > :nom
+            ORDER BY nom ASC
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':tournoi_id' => $tournoi_id,
+            ':nom'        => $dernierTermine['nom'],
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    // 3. Rien de terminé ni en cours → retourner le premier créneau
+    $stmt = $this->connexion->prepare("
+        SELECT * FROM Creneaux
+        WHERE tournoi_id = :tournoi_id
+        ORDER BY nom ASC
+        LIMIT 1
+    ");
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
     
 
     public function mettreAJourIntervalle($tournoi_id, $intervalle) {
@@ -212,7 +295,90 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
     }
     
     
-    
+    /**
+ * Décale tous les créneaux situés APRES le créneau donné (ordre strictement supérieur)
+ * d'un delta en minutes (positif ou négatif).
+ */
+public function decalerCreneauxApres(int $tournoi_id, int $ordreReference, int $deltaMinutes): void
+{
+    if ($deltaMinutes === 0) {
+        return; // rien à faire
+    }
+
+    $stmt = $this->connexion->prepare("
+        SELECT creneau_id, nom
+        FROM Creneaux
+        WHERE tournoi_id = :tournoi_id AND ordre > :ordre
+        ORDER BY ordre ASC
+    ");
+    $stmt->execute([
+        ':tournoi_id' => $tournoi_id,
+        ':ordre'      => $ordreReference,
+    ]);
+    $creneauxSuivants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $this->connexion->beginTransaction();
+    try {
+        $interval = new DateInterval('PT' . abs($deltaMinutes) . 'M');
+
+        foreach ($creneauxSuivants as $c) {
+            $dt = new DateTime($c['nom']);
+            if ($deltaMinutes > 0) {
+                $dt->add($interval);
+            } else {
+                $dt->sub($interval);
+            }
+
+            $stmtUpdate = $this->connexion->prepare("
+                UPDATE Creneaux
+                SET nom = :nom
+                WHERE creneau_id = :id
+            ");
+            $stmtUpdate->execute([
+                ':nom' => $dt->format('H:i:s'),
+                ':id'  => $c['creneau_id'],
+            ]);
+        }
+
+        $this->connexion->commit();
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
+    }
+}
+
+public function getTempsChangement(int $creneau_id): int
+{
+    $stmt = $this->connexion->prepare("
+        SELECT tempsChangementMinutes FROM Creneaux WHERE creneau_id = :id
+    ");
+    $stmt->execute([':id' => $creneau_id]);
+    return (int) $stmt->fetchColumn();
+}
+
+public function modifierTempsChangementCreneau(int $creneau_id, int $minutes): void
+{
+    $stmt = $this->connexion->prepare("
+        UPDATE Creneaux
+        SET tempsChangementMinutes = :minutes
+        WHERE creneau_id = :id
+    ");
+    $stmt->execute([
+        ':minutes' => $minutes,
+        ':id'      => $creneau_id,
+    ]);
+}
+
+public function getOrdreParId(int $creneau_id): ?array
+{
+    $stmt = $this->connexion->prepare("
+        SELECT creneau_id, ordre, tournoi_id
+        FROM Creneaux
+        WHERE creneau_id = :id
+    ");
+    $stmt->execute([':id' => $creneau_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
     
     
     
@@ -240,6 +406,101 @@ public function ajouterCreneauEntre(int $tournoi_id, int $ordreAvant, int $pasMi
         }
     }
     
+
+    /**
+ * Recalcule tous les horaires des créneaux d'un tournoi en fonction
+ * du nouveau pas horaire, en respectant le tempsChangementMinutes
+ * propre à chaque créneau.
+ */
+public function recalculerCreneauxAvecNouveauPas(int $tournoi_id, int $nouveauPasHoraire): void
+{
+    $stmt = $this->connexion->prepare("
+        SELECT creneau_id, nom, ordre, tempsChangementMinutes
+        FROM Creneaux
+        WHERE tournoi_id = :tournoi_id
+        ORDER BY ordre ASC
+    ");
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    $creneaux = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($creneaux)) {
+        return;
+    }
+
+    $this->connexion->beginTransaction();
+
+    try {
+        // Le premier créneau garde son heure de départ
+        $heureCourante = new DateTime($creneaux[0]['nom']);
+
+        $stmtUpdate = $this->connexion->prepare("
+            UPDATE Creneaux SET nom = :nom WHERE creneau_id = :id
+        ");
+
+        // On met à jour le premier (au cas où son heure aurait besoin d'être réécrite identique, pas grave)
+        $stmtUpdate->execute([
+            ':nom' => $heureCourante->format('H:i:s'),
+            ':id'  => $creneaux[0]['creneau_id'],
+        ]);
+
+        for ($i = 1; $i < count($creneaux); $i++) {
+            $tempsChangementPrecedent = (int) $creneaux[$i - 1]['tempsChangementMinutes'];
+            $pasTotal = $nouveauPasHoraire + $tempsChangementPrecedent;
+
+            $heureCourante->add(new DateInterval('PT' . $pasTotal . 'M'));
+
+            $stmtUpdate->execute([
+                ':nom' => $heureCourante->format('H:i:s'),
+                ':id'  => $creneaux[$i]['creneau_id'],
+            ]);
+        }
+
+        $this->connexion->commit();
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
+    }
+}
+
+public function getCreneauSuivant(int $tournoi_id, string $nomCreneauEnCours): ?array
+{
+    $stmt = $this->connexion->prepare("
+        SELECT creneau_id, nom
+        FROM Creneaux
+        WHERE tournoi_id = :tournoi_id
+        AND nom > :nom
+        ORDER BY nom ASC
+        LIMIT 1
+    ");
+    $stmt->execute([
+        ':tournoi_id' => $tournoi_id,
+        ':nom'        => $nomCreneauEnCours,
+    ]);
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
+
+
+public function getCreneauEnCours(int $tournoi_id): ?array
+{
+    // Le créneau "en cours" est celui qui a au moins une rencontre avec isTerminated = 2
+    $sql = "
+        SELECT c.creneau_id, c.nom, c.tempsChangementMinutes
+        FROM Creneaux c
+        WHERE c.tournoi_id = :tournoi_id
+        AND EXISTS (
+            SELECT 1
+            FROM Planification p
+            INNER JOIN Rencontres r ON r.id = p.rencontre_id
+            WHERE p.creneau_id = c.creneau_id
+            AND r.isTerminated = 2
+        )
+        ORDER BY c.nom DESC
+        LIMIT 1
+    ";
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
 
     
     

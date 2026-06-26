@@ -32,6 +32,28 @@
 				min-height: 100vh;
 				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 			}
+			@keyframes scorePulse {
+    0% {
+        transform: scale(1);
+        background-color: white;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+    30% {
+        transform: scale(1.25);
+        background-color: #d1fae5;
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.3);
+        border-color: var(--success-color);
+    }
+    100% {
+        transform: scale(1);
+        background-color: white;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.score-input.score-updated {
+    animation: scorePulse 1s ease;
+}
 
 			.main-container {
 				background: white;
@@ -205,6 +227,17 @@
 				box-shadow: var(--shadow-md);
 				position: relative;
 			}
+		.creneau-countdown {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--danger-color);
+    margin: 8px 0;
+    display: none; /* caché tant qu'il n'a pas démarré */
+}
+
+.creneau-countdown.actif {
+    display: block;
+}
 
 			.table-wrapper {
 				overflow-x: auto;
@@ -639,6 +672,52 @@
 			.modern-table tbody tr {
 				animation: fadeIn 0.3s ease;
 			}
+
+			/* Bande de changement entre créneaux */
+			.changement-row {
+				background: linear-gradient(90deg, rgba(79, 70, 229, 0.08), rgba(79, 70, 229, 0.04));
+				border-top: 2px solid #ddd;
+				border-bottom: 2px solid #ddd;
+				height: 50px;
+			}
+			.changement-row td {
+				width: 100%;
+			}
+
+			.changement-cell {
+				background: rgba(79, 70, 229, 0.05);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 0.85rem;
+				font-weight: 600;
+				color: var(--primary-color);
+				padding: 8px 12px;
+				gap: 8px;
+			}
+
+			.changement-input {
+				padding: 4px 8px;
+				border: 1px solid var(--primary-color);
+				border-radius: 4px;
+				width: 60px;
+				text-align: center;
+				font-weight: 600;
+				background: white;
+				color: var(--bg-dark);
+			}
+
+			.changement-input:focus {
+				outline: none;
+				border-color: var(--primary-hover);
+				box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+			}
+
+			.changement-label {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
 		</style>
 	</head>
 
@@ -660,7 +739,6 @@
 					{% endif %}
 				{% endfor %}
 			</div>
-
 			<!-- Barre de progression -->
 			<div class="progress-container no-print">
 				<div class="d-flex justify-content-between align-items-center mb-2">
@@ -691,8 +769,9 @@
 				<div class="clock-display">
 					<i class="fas fa-clock"></i>
 					<span id="horloge"></span>
+					
 				</div>
-
+				
 				<button class="modern-btn btn-primary-modern" onclick="window.print()">
 					<i class="fas fa-print"></i> Imprimer
 				</button>
@@ -733,13 +812,13 @@
 								{% endfor %}
 							</tr>
 						</thead>
-						
+		
 						<tbody>
 							{% for creneau in listCreneaux %}
 								<tr>
 									<td class="timeslot-cell">
 										<div class="text-center mb-3">
-											<div class="mb-2">{{ creneau.nom|slice(0, -3) }}</div>
+											Début de rencontre: <div class="mb-2">{{ creneau.nom|slice(0, -3) }}</div>
 											<div class="status-buttons">
 												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;">
 													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
@@ -748,15 +827,28 @@
 													        title="Passer les rencontres à 'à venir '" ></button>
 												</form>
 
-												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;"
-												{% if tournoiInfo.effetsSonores == 1 %}onsubmit="ouvrirEffetSonore('debut');"{% endif %}> 
+															
 												
+												{% set creneau_suivant = listCreneaux[loop.index] ?? null %}													
+													
+										
+													<form method="POST" action="gestionRencontres_traitement.php" 
+													style="display: inline;"
+													class="form-demarrer-creneau"
+													data-creneau-id="{{ creneau.creneau_id }}"
+													data-heure-suivante="{{ creneau_suivant ? creneau_suivant.nom : '' }}"
+													data-heure-debut="{{ creneau.nom }}"
+													data-temps-changement="{{ tournoiInfo.gestionTempsChangement ? creneau.tempsChangementMinutes : 0 }}"
+													{% if tournoiInfo.effetsSonores == 1 %}data-effets-sonores="1"{% endif %}>
 													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
 													<input type="hidden" name="etatTotal" value="enCours">
 													<button type="submit" class="status-dot orange no-print" 
-													        title="Passer les rencontres à 'en cours'{% if tournoiInfo.effetsSonores == 1 %} et lancer l'effet sonore{% endif %}">{% if tournoiInfo.effetsSonores == 1 %}{% if effetSonoreDebut is null %} 🔇  {% else %} 📢{% endif %} {% endif %}</button>
+															title="Passer les rencontres à 'en cours'">
+														{% if tournoiInfo.effetsSonores == 1 %}
+															{% if effetSonoreDebut is null %} 🔇 {% else %} 📢{% endif %}
+														{% endif %}
+													</button>
 												</form>
-
 												<form method="POST" action="gestionRencontres_traitement.php" style="display: inline;"
 												{% if tournoiInfo.effetsSonores == 1 %}onsubmit="ouvrirEffetSonore('fin');"{% endif %}
 												>
@@ -766,6 +858,8 @@
 													        title="Passer les rencontres à 'terminée'{% if tournoiInfo.effetsSonores == 1 %} et lancer l'effet sonore{% endif %}">{% if tournoiInfo.effetsSonores == 1 %} {% if effetSonoreFin is null %} 🔇  {% else %} 📢{% endif %}{% endif %}</button>
 												</form>
 											</div>
+											Temps restant&nbsp;: <div class="creneau-countdown" id="countdown-{{ creneau.creneau_id }}"> --:--</div>
+
 											
 											{% if tournoiInfo.gestionVoix == 1 %}
 												<button onclick="ouvrirLectureAudio({{creneau.creneau_id }})" 
@@ -861,7 +955,7 @@
 																<div class="text-center mb-2">
 																	<small class="text-muted">Terrain <strong>{{planification.terrain_nom}}</strong></small>
 																</div>
-
+							
 																<div class="text-center">
 																	<div class="d-flex align-items-center justify-content-center gap-2 mb-2">
 																		<span class="fw-bold">{{ planification.equipe1_nom }} {% if planification.equipe1_isPresent == 0 %}(Absente){% endif %}</span>
@@ -901,7 +995,7 @@
 													{% elseif planification.label_id is not null %}
 														<div class="match-card" style="background: #9ca3af; color: white;">
 															<div class="text-center fw-bold">
-																{{ planification.label_description }}
+																 {{ planification.label_description }}
 															</div>
 														</div>
 													{% endif %}
@@ -910,6 +1004,32 @@
 										</td>
 									{% endfor %}
 								</tr>
+
+								
+								<!-- Bande de changement entre créneaux -->
+								{% if not loop.last and tournoiInfo.gestionTempsChangement %}
+									<tr class="changement-row">
+										<td colspan="{{ terrains|length + 1 }}" style="padding: 8px 12px;">
+											<div class="changement-cell">
+												<div class="changement-label">
+													<i class="fas fa-hourglass-half"></i>
+													Changement&nbsp;:
+												</div>
+												<form action="PlacementDesRencontresTraitement.php" method="post" class="no-print" style="display: flex; align-items: center; gap: 4px;">
+													<input type="hidden" name="action" value="modifierTempsChangement">
+													<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+													<input type="number" name="tempsChangementMinutes" class="changement-input" value="{{ creneau.tempsChangementMinutes }}" min="0" max="180">
+													<span style="font-size: 0.8rem;">min</span>
+													<button type="submit" style="background: none; border: none; color: var(--primary-color); cursor: pointer; padding: 4px 8px;" title="Mettre à jour">
+														<i class="fas fa-check"></i>
+													</button>
+												</form>
+											</div>
+										</td>
+									</tr>
+								{% endif %}
+
 							{% endfor %}
 						</tbody>
 					</table>
@@ -1044,18 +1164,122 @@
 
 
 
-		<script>
-			function majHorloge() {
-				const maintenant = new Date();
-				const heures = String(maintenant.getHours()).padStart(2, '0');
-				const minutes = String(maintenant.getMinutes()).padStart(2, '0');
-				const secondes = String(maintenant.getSeconds()).padStart(2, '0');
-				document.getElementById("horloge").textContent = `${heures}:${minutes}:${secondes}`;
-			}
+<script>
+function majHorloge() {
+    const maintenant = new Date();
+    const heures = String(maintenant.getHours()).padStart(2, '0');
+    const minutes = String(maintenant.getMinutes()).padStart(2, '0');
+    const secondes = String(maintenant.getSeconds()).padStart(2, '0');
+    document.getElementById("horloge").textContent = `${heures}:${minutes}:${secondes}`;
+}
+majHorloge();
+setInterval(majHorloge, 1000);
+</script>
 
-			majHorloge();
-			setInterval(majHorloge, 1000);
-		</script>
+<script>
+const pasHoraireSecondes = {{ tournoiInfo.pasHoraire }} * 60;
+const countdownIntervals = {};
+
+// Intercepter les soumissions des formulaires "démarrer créneau"
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 1. Attacher le handler sur chaque formulaire orange
+    document.querySelectorAll('.form-demarrer-creneau').forEach(function (form) {
+     form.addEventListener('submit', function () {
+    const creneauId       = form.dataset.creneauId;
+    const heureSuivante   = form.dataset.heureSuivante;
+    const heureDebut      = form.dataset.heureDebut;
+    const tempsChangement = parseInt(form.dataset.tempsChangement, 10) || 0;
+
+    if (!creneauId) return;
+
+    let finChrono;
+
+    if (heureSuivante) {
+        const parts = heureSuivante.split(':').map(Number);
+        const h = parts[0];
+        const m = parts[1];
+        const s = parts[2] ?? 0;
+
+        finChrono = new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate(),
+            h, m, s, 0
+        ).getTime() - (tempsChangement * 60 * 1000);
+
+    } else {
+        const parts = heureDebut.split(':').map(Number);
+        const h = parts[0];
+        const m = parts[1];
+        const s = parts[2] ?? 0;
+
+        finChrono = new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate(),
+            h, m, s, 0
+        ).getTime() + (pasHoraireSecondes * 1000);
+    }
+
+    sessionStorage.setItem('countdown-' + creneauId, finChrono);
+
+    if (form.dataset.effetsSonores === '1') {
+        ouvrirEffetSonore('debut');
+    }
+});
+});
+
+    // 2. Restaurer les countdowns actifs après rechargement
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (!key || !key.startsWith('countdown-')) continue;
+
+        const creneauId = key.replace('countdown-', '');
+        const finChrono = parseInt(sessionStorage.getItem(key), 10);
+
+        if (finChrono > Date.now()) {
+            _lancerCountdown(creneauId, finChrono);
+        } else {
+            sessionStorage.removeItem(key);
+        }
+    }
+});
+
+function _lancerCountdown(creneauId, finChrono) {
+    const el = document.getElementById('countdown-' + creneauId);
+    if (!el) return;
+
+    if (countdownIntervals[creneauId]) {
+        clearInterval(countdownIntervals[creneauId]);
+    }
+
+    el.classList.add('actif');
+
+    function tick() {
+        let resteSec = Math.round((finChrono - Date.now()) / 1000);
+
+        if (resteSec <= 0) {
+            resteSec = 0;
+            clearInterval(countdownIntervals[creneauId]);
+        }
+
+        const m = String(Math.floor(resteSec / 60)).padStart(2, '0');
+        const s = String(resteSec % 60).padStart(2, '0');
+        el.textContent = m + ':' + s;
+
+        el.style.color = resteSec <= 60
+            ? 'var(--danger-color)'
+            : resteSec <= 120
+                ? 'var(--warning-color)'
+                : 'inherit';
+    }
+
+    tick();
+    countdownIntervals[creneauId] = setInterval(tick, 1000);
+}
+</script>
+
 
 		<script>
 			// Gérer l'indicateur de scroll sur mobile
@@ -1086,8 +1310,16 @@
 				}
 			});
 		
-
-
+function animerScore(input) {
+    input.classList.remove('score-updated'); // reset si l'animation est déjà en cours
+    // forcer un reflow pour pouvoir rejouer l'animation même si la classe était déjà présente
+    void input.offsetWidth;
+    input.classList.add('score-updated');
+    input.addEventListener('animationend', function handler() {
+        input.classList.remove('score-updated');
+        input.removeEventListener('animationend', handler);
+    });
+}
 
 function rafraichirScores() {
     const idTournoi = {{ idTournoi }};
@@ -1105,10 +1337,19 @@ function rafraichirScores() {
                 );
 
                 if (input1 && document.activeElement !== input1) {
-                    input1.value = data.score1 ?? '';
+                   const nouvelleValeur1 = data.score1 ?? '';
+					if (input1.value !== String(nouvelleValeur1)) {
+						input1.value = nouvelleValeur1;
+						animerScore(input1);
+					}
                 }
                 if (input2 && document.activeElement !== input2) {
-                    input2.value = data.score2 ?? '';
+                   
+					const nouvelleValeur2 = data.score2 ?? '';
+					if (input2.value !== String(nouvelleValeur2)) {
+						input2.value = nouvelleValeur2;
+						animerScore(input2);
+					}
                 }
 
                 // Mettre à jour le label de statut
