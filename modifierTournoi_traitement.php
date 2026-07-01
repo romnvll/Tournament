@@ -2,6 +2,7 @@
 
 require 'security.php';
 require 'class/tournoiDao.class.php';
+require 'class/creneauxDao.class.php';
 
 // ─────────────────────────────────────────────
 // 1. Résolution de l'ID du tournoi
@@ -15,6 +16,7 @@ if (isset($_POST['idTournoi']) && is_numeric($_POST['idTournoi'])) {
 }
 
 $tournoiDao = new tournoiDao();
+$creneauxDao = new creneauxDao();
 
 // Vérification des droits
 if ($tournoiDao->droitTournoiClub($tournoiId, $userData['id']) === null) {
@@ -222,8 +224,10 @@ if (isset($_POST['tempsChangementMinutes'])) {
         $tournoiId,
         (int)$_POST['tempsChangementMinutes']
     );
+
+    $creneauxDao->fixerTempsChangementPourTournoi($tournoiId,(int)$_POST['tempsChangementMinutes']);
 }
-                $tournoiDao->toggleAfficherCountdownCoach($tournoiId, $afficherCountdownCoach); // ← ajouté
+    $tournoiDao->toggleAfficherCountdownCoach($tournoiId, $afficherCountdownCoach); 
 
     $tournoiDao->toggleEffetsSonores($tournoiId, isset($_POST['effetsSonores']) ? 1 : 0);
 

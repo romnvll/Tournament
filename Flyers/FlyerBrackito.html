@@ -9,13 +9,13 @@
             size: A4 landscape;
             margin: 0;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
         }
-        
+
         .page {
             width: 297mm;
             height: 210mm;
@@ -23,7 +23,7 @@
             flex-direction: row;
             page-break-after: always;
         }
-        
+
         .flyer {
             width: 148.5mm;
             height: 210mm;
@@ -32,11 +32,11 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .flyer:first-child {
             border-right: 1px dashed #999;
         }
-        
+
         /* RECTO */
         .recto-flyer {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -47,13 +47,13 @@
             align-items: center;
             text-align: center;
         }
-        
+
         .logo {
             width: 180px;
             margin-bottom: 20px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
         }
-        
+
         .recto-flyer h1 {
             font-size: 38px;
             margin: 0 0 18px 0;
@@ -61,66 +61,71 @@
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
+
         .trophy {
             font-size: 70px;
             margin: 18px 0;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
-        
+
         .subtitle {
             font-size: 22px;
             margin: 12px 0;
             font-weight: 300;
         }
-        
+
         .tagline {
             font-size: 15px;
             font-style: italic;
             margin-top: 25px;
             opacity: 0.9;
         }
-        
+
         /* VERSO */
         .verso-flyer {
             background: #f8f9fa;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        
+
         .verso-flyer h2 {
             color: #667eea;
-            font-size: 26px;
+            font-size: 25px;
             margin: 0 0 18px 0;
             text-align: center;
             border-bottom: 3px solid #667eea;
             padding-bottom: 8px;
         }
-        
-        .feature-box {
+
+        .benefits-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
             background: white;
             border-left: 4px solid #764ba2;
-            padding: 12px;
-            margin: 12px 0;
+            padding: 9px 12px;
+            margin: 8px 0;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 12.5px;
+            line-height: 1.4;
         }
-        
-        .feature-box h3 {
-            color: #667eea;
-            margin: 0 0 8px 0;
-            font-size: 16px;
+
+        .check {
+            color: #2ecc71;
+            font-weight: bold;
+            font-size: 15px;
+            flex-shrink: 0;
         }
-        
-        .feature-box p {
-            margin: 0 0 5px 0;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        
-        .feature-box p:last-child {
-            margin-bottom: 0;
-        }
-        
+
         .contact-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -129,17 +134,17 @@
             margin-top: 15px;
             text-align: center;
         }
-        
+
         .contact-section h3 {
             margin: 0 0 8px 0;
             font-size: 18px;
         }
-        
+
         .contact-section p {
             margin: 4px 0;
             font-size: 13px;
         }
-        
+
         @media print {
             body {
                 margin: 0;
@@ -157,48 +162,33 @@
             <img src="Logo.png" alt="Brackito Logo" class="logo">
             <div class="trophy">🏆</div>
             <h1>Gestion de<br>Tournoi</h1>
-            <div class="subtitle">Solution Complète</div>
-            <div class="tagline">Organisez vos compétitions de type bracket en toute simplicité</div>
+            <div class="subtitle">Gagnez plusieurs heures dans l'organisation de votre tournoi.</div>
+            <div class="tagline">Brackito automatise les tâches les plus chronophages pour vous permettre de vous concentrer sur votre événement.</div>
         </div>
-        
+
         <div class="flyer recto-flyer">
             <img src="Logo.png" alt="Brackito Logo" class="logo">
             <div class="trophy">🏆</div>
             <h1>Gestion de<br>Tournoi</h1>
-            <div class="subtitle">Solution Complète</div>
-            <div class="tagline">Organisez vos compétitions de type bracket en toute simplicité</div>
+            <div class="subtitle">Gagnez plusieurs heures dans l'organisation de votre tournoi.</div>
+            <div class="tagline">Brackito automatise les tâches les plus chronophages pour vous permettre de vous concentrer sur votre événement.</div>
         </div>
     </div>
-    
-    <!-- PAGE 2 : VERSO (2 flyers inversés pour bord long) -->
+
+    <!-- PAGE 2 : VERSO (2 flyers côte à côte) -->
     <div class="page">
         <div class="flyer verso-flyer">
-            <h2>Fonctionnalités</h2>
-            
-            <div class="feature-box">
-                <h3>📋 Organisation Simplifiée</h3>
-                <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🤖 Placement automatique</h3>
-                <p>Gangez du temps avec le placement automatique des rencontres.</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>👥 Gestion des Participants</h3>
-                <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>📊 Tableaux & Classements</h3>
-                <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
-                <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>🫣 Vous êtes timide?</h3>
-                <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous 🔉</p>    
-            </div>
+            <h2>Organisez un tournoi sans stress</h2>
+
+            <ul class="benefits-list">
+                <li><span class="check">✅</span><span>Préparez votre tournoi jusqu'à 10 fois plus rapidement.</span></li>
+                <li><span class="check">✅</span><span>Réduisez les erreurs de planning et les changements de dernière minute.</span></li>
+                <li><span class="check">✅</span><span>Tenez les coachs et les familles informés en temps réel.</span></li>
+                <li><span class="check">✅</span><span>Confiez facilement des tâches à vos bénévoles grâce à une interface mobile simple.</span></li>
+                <li><span class="check">✅</span><span>Adaptez votre organisation en quelques clics en cas d'imprévu.</span></li>
+                <li><span class="check">✅</span><span>Mettez en valeur vos sponsors auprès de tous les participants.</span></li>
+                <li><span class="check">✅</span><span>Centralisez toute la gestion de votre tournoi sur une seule plateforme.</span></li>
+            </ul>
 
             <div class="contact-section">
                 <h3>Contactez-nous</h3>
@@ -207,34 +197,19 @@
                 <p>🌐 www.brackito.net</p>
             </div>
         </div>
-        
+
         <div class="flyer verso-flyer">
-            <h2>Fonctionnalités</h2>
-            
-            <div class="feature-box">
-                <h3>📋 Organisation Simplifiée</h3>
-                <p>Créez et gérez vos tournois en quelques clics. Interface intuitive et rapide.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🤖 Placement automatique</h3>
-                <p>Gangez du temps avec le placement automatique des rencontres.</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>👥 Gestion des Participants</h3>
-                <p>Inscrivez facilement les équipes et les joueurs. Gestion des absences d'équipes.</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>📊 Tableaux & Classements</h3>
-                <p>Génération automatique des matchs et mise à jour instantanée des résultats.</p>
-                <p>Suivi en temps réel des scores et classements pour les coachs et la famille</p>
-            </div>
-            
-            <div class="feature-box">
-                <h3>🫣 Vous êtes timide?</h3>
-                <p>Ne parlez plus au micro pour annoncer les rencontres, le logiciel le fait pour vous 🔉</p>    
-            </div>
+            <h2>Organisez un tournoi sans stress</h2>
+
+            <ul class="benefits-list">
+                <li><span class="check">✅</span><span>Préparez votre tournoi jusqu'à 10 fois plus rapidement.</span></li>
+                <li><span class="check">✅</span><span>Réduisez les erreurs de planning et les changements de dernière minute.</span></li>
+                <li><span class="check">✅</span><span>Tenez les coachs et les familles informés en temps réel.</span></li>
+                <li><span class="check">✅</span><span>Confiez facilement des tâches à vos bénévoles grâce à une interface mobile simple.</span></li>
+                <li><span class="check">✅</span><span>Adaptez votre organisation en quelques clics en cas d'imprévu.</span></li>
+                <li><span class="check">✅</span><span>Mettez en valeur vos sponsors auprès de tous les participants.</span></li>
+                <li><span class="check">✅</span><span>Centralisez toute la gestion de votre tournoi sur une seule plateforme.</span></li>
+            </ul>
 
             <div class="contact-section">
                 <h3>Contactez-nous</h3>

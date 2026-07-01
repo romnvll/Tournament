@@ -31,16 +31,24 @@ class creneauxDao {
     $stmtCount->execute();
     $ordre = (int)$stmtCount->fetchColumn() + 1;
 
-    // Insérer le nouveau créneau avec ordre
+    // Récupérer la valeur par défaut du temps de changement depuis le tournoi
+    $stmtDefault = $this->connexion->prepare("
+        SELECT tempsChangementMinutes FROM Tournois WHERE id = :tournoi_id
+    ");
+    $stmtDefault->bindParam(':tournoi_id', $tournoi_id);
+    $stmtDefault->execute();
+    $tempsChangementParDefaut = (int) $stmtDefault->fetchColumn();
+
+    // Insérer le nouveau créneau avec ordre et temps de changement
     $stmtInsert = $this->connexion->prepare("
-        INSERT INTO Creneaux (nom, tournoi_id, ordre)
-        VALUES (:nom, :tournoi_id, :ordre)
+        INSERT INTO Creneaux (nom, tournoi_id, ordre, tempsChangementMinutes)
+        VALUES (:nom, :tournoi_id, :ordre, :tcm)
     ");
 
-    
     $stmtInsert->bindParam(':nom', $nom);
     $stmtInsert->bindParam(':tournoi_id', $tournoi_id);
     $stmtInsert->bindParam(':ordre', $ordre);
+    $stmtInsert->bindParam(':tcm', $tempsChangementParDefaut, PDO::PARAM_INT);
     $stmtInsert->execute();
 }
 
@@ -299,14 +307,27 @@ public function getCreneauApresDernierCreneauEnCours(int $tournoi_id): ?array
  * Décale tous les créneaux situés APRES le créneau donné (ordre strictement supérieur)
  * d'un delta en minutes (positif ou négatif).
  */
-public function decalerCreneauxApres(int $tournoi_id, int $ordreReference, int $deltaMinutes): void
+public function decalerCreneauxApres(int $tournoi_id, int $ordreReference, int $pasHoraire): void
 {
-    if ($deltaMinutes === 0) {
-        return; // rien à faire
+    // Récupérer le créneau de référence
+    $stmt = $this->connexion->prepare("
+        SELECT creneau_id, nom, tempsChangementMinutes
+        FROM Creneaux
+        WHERE tournoi_id = :tournoi_id AND ordre = :ordre
+    ");
+    $stmt->execute([
+        ':tournoi_id' => $tournoi_id,
+        ':ordre'      => $ordreReference,
+    ]);
+    $creneauRef = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$creneauRef) {
+        return;
     }
 
+    // Récupérer tous les créneaux suivants
     $stmt = $this->connexion->prepare("
-        SELECT creneau_id, nom
+        SELECT creneau_id, nom, tempsChangementMinutes
         FROM Creneaux
         WHERE tournoi_id = :tournoi_id AND ordre > :ordre
         ORDER BY ordre ASC
@@ -317,27 +338,26 @@ public function decalerCreneauxApres(int $tournoi_id, int $ordreReference, int $
     ]);
     $creneauxSuivants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    if (empty($creneauxSuivants)) {
+        return;
+    }
+
     $this->connexion->beginTransaction();
     try {
-        $interval = new DateInterval('PT' . abs($deltaMinutes) . 'M');
+        $heureCourante = new DateTime($creneauRef['nom']);
+        $heureCourante->add(new DateInterval('PT' . ($pasHoraire + (int)$creneauRef['tempsChangementMinutes']) . 'M'));
+
+        $stmtUpdate = $this->connexion->prepare("
+            UPDATE Creneaux SET nom = :nom WHERE creneau_id = :id
+        ");
 
         foreach ($creneauxSuivants as $c) {
-            $dt = new DateTime($c['nom']);
-            if ($deltaMinutes > 0) {
-                $dt->add($interval);
-            } else {
-                $dt->sub($interval);
-            }
-
-            $stmtUpdate = $this->connexion->prepare("
-                UPDATE Creneaux
-                SET nom = :nom
-                WHERE creneau_id = :id
-            ");
             $stmtUpdate->execute([
-                ':nom' => $dt->format('H:i:s'),
+                ':nom' => $heureCourante->format('H:i:s'),
                 ':id'  => $c['creneau_id'],
             ]);
+
+            $heureCourante->add(new DateInterval('PT' . ($pasHoraire + (int)$c['tempsChangementMinutes']) . 'M'));
         }
 
         $this->connexion->commit();
@@ -346,7 +366,6 @@ public function decalerCreneauxApres(int $tournoi_id, int $ordreReference, int $
         throw $e;
     }
 }
-
 public function getTempsChangement(int $creneau_id): int
 {
     $stmt = $this->connexion->prepare("
@@ -460,6 +479,20 @@ public function recalculerCreneauxAvecNouveauPas(int $tournoi_id, int $nouveauPa
         $this->connexion->rollBack();
         throw $e;
     }
+}
+
+public function fixerTempsChangementPourTournoi(int $tournoi_id, int $minutes): int
+{
+    $stmt = $this->connexion->prepare("
+        UPDATE Creneaux
+        SET tempsChangementMinutes = :minutes
+        WHERE tournoi_id = :tournoi_id
+    ");
+    $stmt->bindParam(':minutes', $minutes, PDO::PARAM_INT);
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->rowCount();
 }
 
 public function getCreneauSuivant(int $tournoi_id, string $nomCreneauEnCours): ?array

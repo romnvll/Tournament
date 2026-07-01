@@ -7,6 +7,7 @@
 		<link href="style/fixHeaderTable.css" rel="stylesheet">
 		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="js/synchroHorloge.js"></script>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 		<title>Gestion rencontre</title>
@@ -227,13 +228,7 @@
 				box-shadow: var(--shadow-md);
 				position: relative;
 			}
-		.creneau-countdown {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--danger-color);
-    margin: 8px 0;
-    display: none; /* caché tant qu'il n'a pas démarré */
-}
+
 
 .creneau-countdown.actif {
     display: block;
@@ -858,7 +853,74 @@
 													        title="Passer les rencontres à 'terminée'{% if tournoiInfo.effetsSonores == 1 %} et lancer l'effet sonore{% endif %}">{% if tournoiInfo.effetsSonores == 1 %} {% if effetSonoreFin is null %} 🔇  {% else %} 📢{% endif %}{% endif %}</button>
 												</form>
 											</div>
-											Temps restant&nbsp;: <div class="creneau-countdown" id="countdown-{{ creneau.creneau_id }}"> --:--</div>
+											<!-- 
+												compte à rebours
+
+											-->
+												{% if tournoiInfo.gestionTempsChangement == 1 and tournoiInfo.afficherCountdownCoach == 1 %}
+													<div class="countdown-wrapper" id="countdown-wrapper-{{ creneau.creneau_id }}" style="display: none;">
+														<div style="
+															display: flex;
+															flex-direction: column;
+															align-items: center;
+															justify-content: center;
+															gap: 4px;
+															margin-top: 10px;
+															padding: 10px 16px;
+															background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(79,70,229,0.04));
+															border-radius: 8px;
+															border: 1px solid rgba(79,70,229,0.2);
+														">
+															<div style="
+																display: flex;
+																align-items: center;
+																gap: 6px;
+																font-size: 0.78rem;
+																font-weight: 700;
+																color: var(--bg-dark);
+																text-transform: uppercase;
+																letter-spacing: 0.08em;
+															">
+																<i class="fas fa-hourglass-half" style="color: var(--primary-color);"></i>
+																Temps restant
+															</div>
+															<div class="creneau-countdown" id="countdown-{{ creneau.creneau_id }}" style="
+																font-size: 1.8rem;
+																font-weight: 800;
+																color: var(--primary-color);
+																letter-spacing: 3px;
+																font-variant-numeric: tabular-nums;
+																line-height: 1;
+															">--:--</div>
+														</div>
+													</div>
+													{% else %}
+													<div class="countdown-wrapper" id="countdown-wrapper-{{ creneau.creneau_id }}" style="display: none;">
+														<div style="
+															display: flex;
+															align-items: center;
+															justify-content: center;
+															gap: 8px;
+															margin-top: 10px;
+															padding: 8px 12px;
+															background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(79,70,229,0.04));
+															border-radius: 8px;
+															border: 1px solid rgba(79,70,229,0.2);
+														">
+															<i class="fas fa-hourglass-half" style="color: var(--primary-color); font-size: 0.85rem;"></i>
+															<span style="font-size: 0.8rem; font-weight: 600; color: var(--text-light);">Temps restant</span>
+															<div class="creneau-countdown actif" id="countdown-{{ creneau.creneau_id }}" style="
+																font-size: 1.4rem;
+																font-weight: 800;
+																color: var(--primary-color);
+																letter-spacing: 2px;
+																margin: 0;
+																font-variant-numeric: tabular-nums;
+															">--:--</div>
+														</div>
+													</div>
+													{% endif %}
+
 
 											
 											{% if tournoiInfo.gestionVoix == 1 %}
@@ -1015,13 +1077,13 @@
 													<i class="fas fa-hourglass-half"></i>
 													Changement&nbsp;:
 												</div>
-												<form action="PlacementDesRencontresTraitement.php" method="post" class="no-print" style="display: flex; align-items: center; gap: 4px;">
+												<form action="PlacementDesRencontresTraitement.php" method="post" style="display: flex; align-items: center; gap: 4px;">
 													<input type="hidden" name="action" value="modifierTempsChangement">
-													<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
-													<input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+													<input type="hidden" name="idTournoi" value="{{idTournoi}}">
+													<input type="hidden" name="creneau_id" value="{{creneau.creneau_id}}">
 													<input type="number" name="tempsChangementMinutes" class="changement-input" value="{{ creneau.tempsChangementMinutes }}" min="0" max="180">
-													<span style="font-size: 0.8rem;">min</span>
-													<button type="submit" style="background: none; border: none; color: var(--primary-color); cursor: pointer; padding: 4px 8px;" title="Mettre à jour">
+													<span style="font-size: 0.8rem; color: white; font-weight: 600;">min</span>
+													<button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 4px 8px;" title="Mettre à jour">
 														<i class="fas fa-check"></i>
 													</button>
 												</form>
@@ -1195,32 +1257,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let finChrono;
 
-    if (heureSuivante) {
-        const parts = heureSuivante.split(':').map(Number);
-        const h = parts[0];
-        const m = parts[1];
-        const s = parts[2] ?? 0;
+   if (heureSuivante) {
+    const parts = heureSuivante.split(':').map(Number);
+    const h = parts[0], m = parts[1], s = parts[2] ?? 0;
 
-        finChrono = new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate(),
-            h, m, s, 0
-        ).getTime() - (tempsChangement * 60 * 1000);
+    const cibleLocale = new Date(
+        new Date().getFullYear(), new Date().getMonth(), new Date().getDate(),
+        h, m, s, 0
+    ).getTime();
 
-    } else {
-        const parts = heureDebut.split(':').map(Number);
-        const h = parts[0];
-        const m = parts[1];
-        const s = parts[2] ?? 0;
+    // Convertir la cible locale en temps serveur
+    finChrono = cibleLocale - _serverOffset - (tempsChangement * 60 * 1000);
 
-        finChrono = new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate(),
-            h, m, s, 0
-        ).getTime() + (pasHoraireSecondes * 1000);
-    }
+} else {
+    const parts = heureDebut.split(':').map(Number);
+    const h = parts[0], m = parts[1], s = parts[2] ?? 0;
+
+    const cibleLocale = new Date(
+        new Date().getFullYear(), new Date().getMonth(), new Date().getDate(),
+        h, m, s, 0
+    ).getTime();
+
+    finChrono = cibleLocale - _serverOffset + (pasHoraireSecondes * 1000);
+}
 
     sessionStorage.setItem('countdown-' + creneauId, finChrono);
 
@@ -1238,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const creneauId = key.replace('countdown-', '');
         const finChrono = parseInt(sessionStorage.getItem(key), 10);
 
-        if (finChrono > Date.now()) {
+        if (finChrono > serverNow()) {
             _lancerCountdown(creneauId, finChrono);
         } else {
             sessionStorage.removeItem(key);
@@ -1248,13 +1307,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function _lancerCountdown(creneauId, finChrono) {
     const el = document.getElementById('countdown-' + creneauId);
+    const wrapper = document.getElementById('countdown-wrapper-' + creneauId);
     if (!el) return;
 
     if (countdownIntervals[creneauId]) {
         clearInterval(countdownIntervals[creneauId]);
     }
 
-    el.classList.add('actif');
+    // Afficher le wrapper au démarrage
+    if (wrapper) wrapper.style.display = 'block';
 
     function tick() {
         let resteSec = Math.round((finChrono - Date.now()) / 1000);
@@ -1272,7 +1333,7 @@ function _lancerCountdown(creneauId, finChrono) {
             ? 'var(--danger-color)'
             : resteSec <= 120
                 ? 'var(--warning-color)'
-                : 'inherit';
+                : 'var(--primary-color)';
     }
 
     tick();

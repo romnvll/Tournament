@@ -1246,8 +1246,34 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
                 AND   l.tournoi_id   = r.tournoi_id
                 AND   l.description LIKE 'EliminationDirect%'
             ) THEN 1 ELSE 0
-        END AS equipe2_has_phase_finale
+        
+         END AS equipe2_has_phase_finale,
+
+         (
+            SELECT GROUP_CONCAT(
+                CONCAT(
+                    l.label_id,
+                    '|',
+                    REPLACE(l.description, '|', '/'),
+                    '|',
+                    l.couleur,
+                    '|',
+                    COALESCE(lc.nom, ''),
+                    '|',
+                    COALESCE(lt.nom, '')
+                )
+                ORDER BY l.label_id
+                SEPARATOR '||'
+            )
+            FROM Labels l
+            LEFT JOIN Planification lp ON lp.label_id = l.label_id
+            LEFT JOIN Creneaux lc ON lp.creneau_id = lc.creneau_id
+            LEFT JOIN Terrains lt ON lp.terrain_id = lt.terrain_id
+            WHERE l.categorie_id = equipe1.categorie
+              AND l.tournoi_id = r.tournoi_id
+        ) AS categorie_labels
     ";
+    
 
     $joins = "
         JOIN      Equipes     equipe1      ON r.equipe1_id    = equipe1.id
@@ -1596,6 +1622,8 @@ public function getRencontreByCategorie($categorieId, $tournoiId, $typeRencontre
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
 
 
     public function updateStatusByCreneau(int $idCreneau, int $status): void

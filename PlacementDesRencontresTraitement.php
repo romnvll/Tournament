@@ -141,7 +141,9 @@ if (isset ($_POST['modifHeureDebut'])) {
 
 if (isset($_POST['action']) && $_POST['action'] === 'modifierTempsChangement') {
     require_once 'class/creneauxDao.class.php';
-    $creneau = new creneauxDao();
+    require_once 'class/tournoiDao.class.php';
+    $creneau  = new creneauxDao();
+    $tournoi  = new tournoiDao();
 
     $idTournoi    = (int) $_POST['idTournoi'];
     $creneauId    = (int) $_POST['creneau_id'];
@@ -153,14 +155,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'modifierTempsChangement') {
         exit;
     }
 
-    $ancienTemps = $creneau->getTempsChangement($creneauId);
-    $delta = $nouveauTemps - $ancienTemps;
-
     // Sauvegarder la nouvelle valeur SUR CE créneau précis
     $creneau->modifierTempsChangementCreneau($creneauId, $nouveauTemps);
 
-    // Décaler uniquement les créneaux suivants par le delta
-    $creneau->decalerCreneauxApres($idTournoi, $infosCreneau['ordre'], $delta);
+    // Recalculer tous les créneaux suivants en partant de l'heure réelle du créneau modifié
+    $tournoiInfo = $tournoi->getTournoiById($idTournoi);
+    $creneau->decalerCreneauxApres($idTournoi, $infosCreneau['ordre'], (int)$tournoiInfo['pasHoraire']);
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit;

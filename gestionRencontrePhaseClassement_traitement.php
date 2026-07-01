@@ -56,6 +56,28 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
     exit();
 }
 
+if (isset($_GET['autoHauteBasse']) && $_GET['autoHauteBasse'] == 1) {
+    $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
+    $nomCategorie = $categorieDao->obtenirCategorie($categorieId);
+
+    if ($categorieId && $idTournoi) {
+        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId);
+
+        foreach ($poules as $poule) {
+            $libelleLabel = '🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'];
+
+            if ($labelsDao->labelDescriptionExiste($libelleLabel, $idTournoi)) {
+                // Le label existe déjà, ne pas le créer à nouveau
+            } else {
+                $labelsDao->ajouterLabel($libelleLabel, '#000000', $idTournoi, $categorieId);
+            }
+        }
+    }
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
 
 if (isset($_GET['addpoule'])) {
     $pouledao->addEquipeToPoule($_GET['idequipe'], $_GET['pouleId'], $_GET['tournoiId']);

@@ -114,16 +114,17 @@ if (isset($_POST['btn-login'])) {
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            min-height: 100vh;
-            font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
+      body {
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;   /* remplace overflow: hidden */
+    overflow-y: auto;     /* autorise le scroll vertical */
+    position: relative;
+}
 
         /* ── Fond animé ── */
         .bg-blobs {
@@ -133,6 +134,30 @@ if (isset($_POST['btn-login'])) {
             z-index: 0;
             overflow: hidden;
         }
+        .mobile-warning {
+    display: none;   /* seule déclaration ici */
+    position: relative;
+    z-index: 10;
+    max-width: 440px;
+    margin: 0 auto 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #92400e;
+    gap: 10px;
+    align-items: center;
+    /* on retire le display: flex; ici */
+}
+
+@media (max-width: 480px) {
+    .mobile-warning {
+        display: flex;   /* uniquement appliqué sous 480px */
+    }
+}
+
 
         .blob {
             position: absolute;
@@ -522,7 +547,10 @@ if (isset($_POST['btn-login'])) {
         <i class="fas fa-shield-halved sport-icon" style="top:88%; left:15%; animation-duration:6s; animation-delay:0.8s;"></i>
         <i class="fas fa-ranking-star sport-icon"  style="top:15%; left:75%; animation-duration:9s; animation-delay:3.5s;"></i>
     </div>
-
+<div class="mobile-warning">
+    <i class="fas fa-circle-info" style="color:#f59e0b; font-size:1.1rem; flex-shrink:0;"></i>
+    <span>L'espace organisateur est conçu pour ordinateur. Sur téléphone, certaines fonctionnalités peuvent être plus difficiles à utiliser.</span>
+</div>
     <!-- Card de connexion -->
     <div class="login-wrapper">
         <div class="login-card">

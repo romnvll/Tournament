@@ -597,6 +597,85 @@
             color: var(--text-light);
             margin-top: 5px;
         }
+        /* Bandeau étape suivante */
+        .next-step-banner {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-top: 20px;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            animation: pulseBanner 2.5s ease-in-out infinite;
+        }
+
+        .next-step-banner:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 24px rgba(16, 185, 129, 0.35);
+            color: white;
+            text-decoration: none;
+        }
+
+        .next-step-icon {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .next-step-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .next-step-text strong {
+            font-size: 1.15rem;
+        }
+
+        .next-step-text span {
+            font-size: 0.92rem;
+            opacity: 0.95;
+        }
+
+        .next-step-arrow {
+            font-size: 1.3rem;
+            transition: transform 0.3s;
+        }
+
+        .next-step-banner:hover .next-step-arrow {
+            transform: translateX(6px);
+        }
+
+        @keyframes pulseBanner {
+            0%, 100% { box-shadow: var(--shadow-lg); }
+            50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15), var(--shadow-lg); }
+        }
+
+        @media (max-width: 768px) {
+            .next-step-banner {
+                flex-wrap: wrap;
+                padding: 16px 18px;
+            }
+
+            .next-step-text strong {
+                font-size: 1rem;
+            }
+
+            .next-step-text span {
+                font-size: 0.85rem;
+            }
+        }
 
         /* Audio controls */
         .audio-controls {
@@ -1253,6 +1332,26 @@
                         </table>
                         <div class="scroll-indicator"></div>
                     </div>
+                <div class="scroll-indicator"></div>
+                    </div>
+                </div>
+
+                <!-- Bandeau étape suivante : créer les poules -->
+                <a href="gestionPoules.php?id_tournoi={{idTournoi}}" class="next-step-banner">
+                    <div class="next-step-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="next-step-text">
+                        <strong>{{t('etapeSuivante')|default('Étape suivante')}}</strong>
+                        <span>{{t('creerVosPoulesMessage')|default("Une fois vos équipes entrées, créez vos poules pour lancer votre tournoi.")}}</span>
+                    </div>
+                    <div class="next-step-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+
+
                 </div>
             </div>
         </div>

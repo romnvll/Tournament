@@ -62,6 +62,79 @@ class PouleManager {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     return $result['count'] / 2 > 0;
 }
+
+
+/**
+ * Génère automatiquement les poules "Haute" / "Basse" pour une catégorie.
+ * Découpe chaque poule initiale en deux : la moitié supérieure du classement
+ * (Haute) et la moitié inférieure (Basse). Si nombre impair, l'équipe du
+ * milieu va en Haute.
+ */
+public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categorieId): array {
+
+    $stmt = $this->connexion->prepare("
+        SELECT id FROM Poules 
+        WHERE tournoi_id = :tournoiId 
+          AND fk_idcategorie = :categorieId 
+          AND is_classement = 0
+    ");
+    $stmt->execute([':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+    $poulesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($poulesIds)) {
+        return [];
+    }
+
+    $poulesCreees = [];
+
+    foreach ($poulesIds as $pouleSourceId) {
+        $classement = $this->getClassementPoule($pouleSourceId);
+        $nbEquipes  = count($classement);
+
+        if ($nbEquipes === 0) {
+            continue;
+        }
+
+        // Moitié haute = ceil(n/2) équipes (inclut l'équipe du milieu si nombre impair)
+        $nbHaute = (int) ceil($nbEquipes / 2);
+
+        $equipesHaute = array_slice($classement, 0, $nbHaute);
+        $equipesBasse = array_slice($classement, $nbHaute);
+
+        $pouleSource = $this->getPouleById($pouleSourceId);
+        $nomBase     = $pouleSource['nom']; // ex: "Poule 1"
+
+        foreach ([
+            'Haute' => $equipesHaute,
+            'Basse' => $equipesBasse,
+        ] as $suffixe => $equipes) {
+
+            if (empty($equipes)) {
+                continue;
+            }
+
+            $nomPouleClassement = "{$nomBase} {$suffixe}"; // ex: "Poule 1 Haute"
+
+            $pouleId = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPouleClassement);
+
+            foreach ($equipes as $equipe) {
+                try {
+                    $this->addEquipeToPoule($equipe['id'], $pouleId, $tournoiId);
+                } catch (Exception $e) {
+                    // déjà dans la poule
+                }
+            }
+
+            $poulesCreees[$nomPouleClassement] = [
+                'pouleId' => $pouleId,
+                'nom'     => $nomPouleClassement,
+                'equipes' => array_column($equipes, 'id'),
+            ];
+        }
+    }
+
+    return $poulesCreees;
+}
     
     
 
