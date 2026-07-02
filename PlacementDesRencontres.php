@@ -266,48 +266,6 @@ foreach ($equipeMatchs as $key => $creneaux) {
 }
 
 
-// Regroupe par créneau + ressource, en gardant les planification_id concernés
-$parCreneauEquipes  = []; // [creneau_id][equipe_id] = [planification_id, ...]
-$parCreneauArbitres = []; // [creneau_id][arbitre_id] = [planification_id, ...]
-
-foreach ($ToutesPlanification as $p) {
-    if ($p['rencontre_id'] !== null) {
-        if (!empty($p['equipe1_id'])) {
-            $parCreneauEquipes[$p['creneau_id']][$p['equipe1_id']][] = $p['planification_id'];
-        }
-        if (!empty($p['equipe2_id'])) {
-            $parCreneauEquipes[$p['creneau_id']][$p['equipe2_id']][] = $p['planification_id'];
-        }
-    }
-    if (!empty($p['arbitre_id'])) {
-        $parCreneauArbitres[$p['creneau_id']][$p['arbitre_id']][] = $p['planification_id'];
-    }
-}
-
-// Ne garde que les planification_id impliqués dans un doublon (même équipe/arbitre, même créneau, terrain différent)
-$planifsEnConflitEquipe = [];
-foreach ($parCreneauEquipes as $equipesDuCreneau) {
-    foreach ($equipesDuCreneau as $planifIds) {
-        if (count(array_unique($planifIds)) > 1) {
-            foreach ($planifIds as $pid) {
-                $planifsEnConflitEquipe[$pid] = true;
-            }
-        }
-    }
-}
-
-$planifsEnConflitArbitre = [];
-foreach ($parCreneauArbitres as $arbitresDuCreneau) {
-    foreach ($arbitresDuCreneau as $planifIds) {
-        if (count(array_unique($planifIds)) > 1) {
-            foreach ($planifIds as $pid) {
-                $planifsEnConflitArbitre[$pid] = true;
-            }
-        }
-    }
-}
-
-
 
 
 echo $template->render([
@@ -333,8 +291,6 @@ echo $template->render([
     'licence' => $licence,
     'AfficherLesEquipes' => $listeDesEquipes,
     'statsParCategorie' => $statsParCategorie,
-    'planifsEnConflitEquipe'  => $planifsEnConflitEquipe,
-    'planifsEnConflitArbitre' => $planifsEnConflitArbitre,
 
     
 
