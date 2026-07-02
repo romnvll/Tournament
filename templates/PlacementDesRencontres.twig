@@ -8,7 +8,6 @@
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-		<script src="js/synchroHorloge.js"></script>
 		 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		 <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 
@@ -45,6 +44,31 @@ body {
 		background-color: rgba(239, 68, 68, 0.22);
 		border-color: rgba(239, 68, 68, 0.9);
 	}
+}
+
+.conflit-ressource {
+	outline: 3px solid var(--danger-color);
+	outline-offset: 2px;
+	position: relative;
+}
+.conflit-ressource::after {
+	content: '⚠️ Conflit créneau';
+	position: absolute;
+	top: -10px;
+	right: -6px;
+	background: var(--danger-color);
+	color: white;
+	font-size: 0.65rem;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 6px;
+	white-space: nowrap;
+	z-index: 5;
+}
+.equipe-en-conflit {
+	text-decoration: underline wavy var(--danger-color);
+	text-decoration-thickness: 2px;
+	font-weight: 700;
 }
 
 .match-card[draggable] {
@@ -1139,8 +1163,7 @@ details > summary::-webkit-details-marker {
 
 													<!-- Arbitre -->
 													{% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
-														<div class="arbitre-card">
-															<a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="delete-match-btn">
+															<div class="arbitre-card {% if planification.planification_id in planifsEnConflitArbitre %}conflit-ressource{% endif %}">															<a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="delete-match-btn">
 																<i class="fas fa-calendar-times"></i>
 															</a>
 															<div>
@@ -1175,8 +1198,12 @@ details > summary::-webkit-details-marker {
 													<!-- Rencontre -->
 													{% if planification.rencontre_id is not null %}
 
-														<div class="match-card" draggable="true" data-planif-id="{{ planification.planification_id }}" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}" data-categorie="{{ planification.equipe1_categorie_nom|lower }}">
-														
+																		<div class="match-card {% if planification.planification_id in planifsEnConflitEquipe %}conflit-ressource{% endif %}"
+																			draggable="true"
+																			data-planif-id="{{ planification.planification_id }}"
+																			data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+																			data-creneau-id="{{ creneau.creneau_id }}"
+																			data-categorie="{{ planification.equipe1_categorie_nom|lower }}">														
 
 															<div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
 
@@ -1222,9 +1249,13 @@ details > summary::-webkit-details-marker {
 																	-
 																	{{planification.equipe1_categorie_nom}}<br>
 																	{{planification.equipe1_nom_categorie}}
-																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span>
+																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %} {% if planification.planification_id in planifsEnConflitEquipe %}equipe-en-conflit{% endif %}">
+																		{{planification.equipe1_nom}}
+																	</span>
 																	<strong>vs</strong>
-																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
+																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %} {% if planification.planification_id in planifsEnConflitEquipe %}equipe-en-conflit{% endif %}">
+																		{{planification.equipe2_nom}}
+																	</span>
 																	<small class="text-muted">{{ planification.poule_nom }}</small>
 
 																{% elseif planification.type_rencontre_id == 1 %}
