@@ -101,7 +101,10 @@ usort($poulesFinales, function($a, $b) {
 foreach ($poulesFinales as &$poule) {
   $poule['contenu'] = $poulemanager->getEquipesInPoule($poule['id']);
   $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],3);
-  
+  $nbEquipes = count($poule['contenu']);
+  $nbRencontresAttendu = ($nbEquipes * ($nbEquipes - 1)) / 2;
+  $poule['nbRencontresProgrammees'] = $poulemanager->NbreRencontreParPouleProgrammee($poule['id'], $tournoiId);
+  $poule['rencontresRatio'] = $nbRencontresAttendu > 0 ? ($poule['nbRencontresProgrammees'] / $nbRencontresAttendu) * 100 : 0;
 }
 
 
@@ -109,8 +112,10 @@ foreach ($poulesFinales as &$poule) {
 if (isset ($_GET['idPoule'])) {
   $idPoule = $_GET['idPoule'];
 $pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);
+//$pouleHasRencontresProgrammees = $poulemanager->NbreRencontreParPouleProgrammee($_GET['idPoule'], $tournoiId);
 } else {
   $pouleHasRencontres = false;
+  $pouleHasRencontresProgrammees = false;
   $idPoule = null;
 }
 
@@ -171,6 +176,8 @@ echo $template->render([
   'nomLabels' => $nomDesLabels,
   'nombrelabelplaces' => $nombreLabelsFinalplaces,
   'nombreLabelsFinal' => $nombreLabelsFinal,
+   'poulesFinales' => $poulesFinales,
+   //'pouleHasRencontresProgrammees' => $pouleHasRencontresProgrammees,
   
 ]);
 ?>

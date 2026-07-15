@@ -35,7 +35,12 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
 
 
     if ($categorieId && $idTournoi) {
-       $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId);
+
+    if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
+        $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId,1);
+    } else {
+       $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId,0);
+    }
        
        foreach ($poules as $poule) {
         
@@ -61,8 +66,12 @@ if (isset($_GET['autoHauteBasse']) && $_GET['autoHauteBasse'] == 1) {
     $nomCategorie = $categorieDao->obtenirCategorie($categorieId);
 
     if ($categorieId && $idTournoi) {
-        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId);
 
+    if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
+        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId,1);
+    } else {
+        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId,0);
+    }
         foreach ($poules as $poule) {
             $libelleLabel = '🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'];
 
@@ -140,7 +149,7 @@ if ($rencontresNonTerminees > 0) {
 
 
 
-        $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3);
+        $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3,false);
 
         if (isset($_GET['creerRencontresRetour']) && $_GET['creerRencontresRetour'] == 'true') {
             $rencontreDao->createRencontreByPoule($_GET['pouleId'],$_GET['tournoiId'],3,true);
@@ -167,6 +176,8 @@ if ($rencontresNonTerminees > 0) {
 if (isset ($_GET['suppressionPoule'])) {
         if ($_GET['suppressionPoule'] == 1) {
             $pouledao->deletePoule($_GET['pouleId']);
+            
+            $labelsDao->supprimerLabelParNomEtTournoiId($_GET['pouleNom'], $_GET['tournoiId']);
             
             header("Location: " . $_SERVER['HTTP_REFERER']);
         }

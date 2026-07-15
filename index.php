@@ -67,7 +67,7 @@ $creneauxDao = new creneauxDao();
 
 
 
-$listeDesTournois = $tournoiDao->afficherTousLesTournois();
+
 $RencontreByPoule=null;
 $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
@@ -81,9 +81,9 @@ if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
   $creneauEnCours = $creneauxDao->getCreneauEnCours((int)$_GET['id_tournoi']);
  
-  if ($creneauEnCours !== null) {
-    $creneauSuivant = $creneauxDao->getCreneauSuivant((int)$_GET['id_tournoi'], $creneauEnCours['nom']);
-}
+  $timers = $creneauxDao->getCreneauEnCoursEtSuivant((int)$_GET['id_tournoi']);
+    $creneauEnCours = $timers['en_cours'];
+    $creneauSuivant = $timers['suivant'];
 
     
   
@@ -349,7 +349,7 @@ if (isset ($_GET['idCategorie'])) {
 
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
-    'ListeDesTournois' => $listeDesTournois,
+    
     'afficherLesPoules' => $listePoulesParEquipe ,
     'RencontreByPoule' => $RencontreByPoule,
     'IdPoules' => $idPoule,

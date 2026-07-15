@@ -65,12 +65,15 @@ class PouleManager {
 
 
 /**
- * Génère automatiquement les poules "Haute" / "Basse" pour une catégorie.
- * Découpe chaque poule initiale en deux : la moitié supérieure du classement
- * (Haute) et la moitié inférieure (Basse). Si nombre impair, l'équipe du
- * milieu va en Haute.
+ * Génère automatiquement les poules "Haute" / "Basse".
+ * Si createPouleOnly = 1 : crée uniquement les poules.
+ * Si createPouleOnly = 0 : crée les poules + affecte les équipes.
  */
-public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categorieId): array {
+public function genererPoulesHauteBasseAutomatique(
+    int $tournoiId,
+    int $categorieId,
+    int $createPouleOnly = 0
+): array {
 
     $stmt = $this->connexion->prepare("
         SELECT id FROM Poules 
@@ -78,7 +81,12 @@ public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categori
           AND fk_idcategorie = :categorieId 
           AND is_classement = 0
     ");
-    $stmt->execute([':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+
+    $stmt->execute([
+        ':tournoiId' => $tournoiId,
+        ':categorieId' => $categorieId
+    ]);
+
     $poulesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     if (empty($poulesIds)) {
@@ -88,6 +96,7 @@ public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categori
     $poulesCreees = [];
 
     foreach ($poulesIds as $pouleSourceId) {
+
         $classement = $this->getClassementPoule($pouleSourceId);
         $nbEquipes  = count($classement);
 
@@ -95,14 +104,13 @@ public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categori
             continue;
         }
 
-        // Moitié haute = ceil(n/2) équipes (inclut l'équipe du milieu si nombre impair)
         $nbHaute = (int) ceil($nbEquipes / 2);
 
         $equipesHaute = array_slice($classement, 0, $nbHaute);
         $equipesBasse = array_slice($classement, $nbHaute);
 
         $pouleSource = $this->getPouleById($pouleSourceId);
-        $nomBase     = $pouleSource['nom']; // ex: "Poule 1"
+        $nomBase     = $pouleSource['nom'];
 
         foreach ([
             'Haute' => $equipesHaute,
@@ -113,22 +121,36 @@ public function genererPoulesHauteBasseAutomatique(int $tournoiId, int $categori
                 continue;
             }
 
-            $nomPouleClassement = "{$nomBase} {$suffixe}"; // ex: "Poule 1 Haute"
+            $nomPouleClassement = "{$nomBase} {$suffixe}";
 
-            $pouleId = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPouleClassement);
+            $pouleId = $this->creerOuRecupererPouleClassement(
+                $tournoiId,
+                $categorieId,
+                $nomPouleClassement
+            );
 
-            foreach ($equipes as $equipe) {
-                try {
-                    $this->addEquipeToPoule($equipe['id'], $pouleId, $tournoiId);
-                } catch (Exception $e) {
-                    // déjà dans la poule
+            // 🔥 NOUVELLE LOGIQUE ICI
+            if ($createPouleOnly == 0) {
+
+                foreach ($equipes as $equipe) {
+                    try {
+                        $this->addEquipeToPoule(
+                            $equipe['id'],
+                            $pouleId,
+                            $tournoiId
+                        );
+                    } catch (Exception $e) {
+                        // déjà dans la poule
+                    }
                 }
             }
 
             $poulesCreees[$nomPouleClassement] = [
                 'pouleId' => $pouleId,
                 'nom'     => $nomPouleClassement,
-                'equipes' => array_column($equipes, 'id'),
+                'equipes' => ($createPouleOnly == 0)
+                    ? array_column($equipes, 'id')
+                    : []
             ];
         }
     }
@@ -302,16 +324,29 @@ public function getClassementFinal(int $tournoiId, int $categorieId): array {
 
 /**
  * Génère automatiquement les poules de classement pour une catégorie.
+ *
+ * @param bool $createPouleOnly
+ *      false : crée les poules et y ajoute les équipes.
+ *      true  : crée uniquement les poules.
  */
-public function genererPoulesClassementAutomatique(int $tournoiId, int $categorieId): array {
+public function genererPoulesClassementAutomatique(
+    int $tournoiId,
+    int $categorieId,
+    bool $createPouleOnly = false
+): array {
 
     $stmt = $this->connexion->prepare("
-        SELECT id FROM Poules 
-        WHERE tournoi_id = :tournoiId 
-          AND fk_idcategorie = :categorieId 
+        SELECT id FROM Poules
+        WHERE tournoi_id = :tournoiId
+          AND fk_idcategorie = :categorieId
           AND is_classement = 0
     ");
-    $stmt->execute([':tournoiId' => $tournoiId, ':categorieId' => $categorieId]);
+
+    $stmt->execute([
+        ':tournoiId' => $tournoiId,
+        ':categorieId' => $categorieId
+    ]);
+
     $poulesIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     if (empty($poulesIds)) {
@@ -320,75 +355,114 @@ public function genererPoulesClassementAutomatique(int $tournoiId, int $categori
 
     $nbPoules = count($poulesIds);
 
-    // ── CAS SPÉCIAL : une seule poule ──────────────────────────────────────
-    // On crée des poules "1vs2", "3vs4", etc. à partir du classement
+    // ───────────────────────────────────────────────────────────────
+    // CAS : UNE SEULE POULE
+    // ───────────────────────────────────────────────────────────────
     if ($nbPoules === 1) {
+
         $classement = $this->getClassementPoule($poulesIds[0]);
         $poulesCreees = [];
 
-        // Regrouper par paires consécutives : [0,1], [2,3], [4,5]...
         $chunks = array_chunk($classement, 2);
 
         foreach ($chunks as $index => $paire) {
-            $rang1 = $index * 2 + 1;           // ex: 1, 3, 5...
-            $rang2 = min($rang1 + 1, count($classement)); // ex: 2, 4, 6...
+
+            $rang1 = $index * 2 + 1;
+            $rang2 = min($rang1 + 1, count($classement));
 
             if ($rang1 === $rang2) {
-                // Nombre impair d'équipes, la dernière n'a pas d'adversaire
                 break;
             }
 
             $nomPoule = "{$rang1}-{$rang2}ème place";
-            $pouleId  = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPoule);
 
-            foreach ($paire as $equipe) {
-                try {
-                    $this->addEquipeToPoule($equipe['id'], $pouleId, $tournoiId);
-                } catch (Exception $e) {
-                    // déjà dans la poule
+            $pouleId = $this->creerOuRecupererPouleClassement(
+                $tournoiId,
+                $categorieId,
+                $nomPoule
+            );
+
+            if (!$createPouleOnly) {
+
+                foreach ($paire as $equipe) {
+                    try {
+                        $this->addEquipeToPoule(
+                            $equipe['id'],
+                            $pouleId,
+                            $tournoiId
+                        );
+                    } catch (Exception $e) {
+                        // déjà dans la poule
+                    }
                 }
+
             }
 
             $poulesCreees[$rang1] = [
                 'pouleId' => $pouleId,
                 'nom'     => $nomPoule,
-                'equipes' => array_column($paire, 'id'),
+                'equipes' => $createPouleOnly
+                    ? []
+                    : array_column($paire, 'id'),
             ];
         }
 
         return $poulesCreees;
     }
 
-    // ── CAS NORMAL : plusieurs poules ─────────────────────────────────────
-    // Regrouper les équipes par rang (1ers ensemble, 2èmes ensemble...)
+    // ───────────────────────────────────────────────────────────────
+    // CAS : PLUSIEURS POULES
+    // ───────────────────────────────────────────────────────────────
+
     $equipesByRang = [];
 
     foreach ($poulesIds as $pouleId) {
+
         $classement = $this->getClassementPoule($pouleId);
+
         foreach ($classement as $rang => $equipe) {
             $equipesByRang[$rang + 1][] = $equipe['id'];
         }
     }
 
-    $poulesCreees = [];
     ksort($equipesByRang);
 
-    foreach ($equipesByRang as $rang => $equipes) {
-        $nomPoule = $this->nomPouleClassement($rang, $nbPoules);
-        $pouleId  = $this->creerOuRecupererPouleClassement($tournoiId, $categorieId, $nomPoule);
+    $poulesCreees = [];
 
-        foreach ($equipes as $equipeId) {
-            try {
-                $this->addEquipeToPoule($equipeId, $pouleId, $tournoiId);
-            } catch (Exception $e) {
-                // déjà dans la poule
+    foreach ($equipesByRang as $rang => $equipes) {
+
+        $nomPoule = $this->nomPouleClassement($rang, $nbPoules);
+
+        $pouleId = $this->creerOuRecupererPouleClassement(
+            $tournoiId,
+            $categorieId,
+            $nomPoule
+        );
+
+        if (!$createPouleOnly) {
+
+            foreach ($equipes as $equipeId) {
+
+                try {
+                    $this->addEquipeToPoule(
+                        $equipeId,
+                        $pouleId,
+                        $tournoiId
+                    );
+                } catch (Exception $e) {
+                    // déjà dans la poule
+                }
+
             }
+
         }
 
         $poulesCreees[$rang] = [
             'pouleId' => $pouleId,
             'nom'     => $nomPoule,
-            'equipes' => $equipes,
+            'equipes' => $createPouleOnly
+                ? []
+                : $equipes,
         ];
     }
 
@@ -826,6 +900,25 @@ public function pouleHasRencontreProgrammee(int $pouleId, int $idTournoi): bool 
     $stmt->execute();
 
     return $stmt->fetchColumn() > 0;
+}
+
+public function NbreRencontreParPouleProgrammee(int $pouleId, int $idTournoi): int {
+    $query = "
+        SELECT COUNT(*) 
+        FROM Rencontres r
+        JOIN Planification p ON r.id = p.rencontre_id
+        WHERE r.poule_id = :pouleId
+        AND p.tournoi_id = :idTournoi
+        AND p.terrain_id IS NOT NULL
+        AND p.creneau_id IS NOT NULL
+    ";
+
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':idTournoi', $idTournoi, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return (int) $stmt->fetchColumn();
 }
 
 

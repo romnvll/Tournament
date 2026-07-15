@@ -132,10 +132,10 @@
 
         /* ── MAIN ────────────────────────────────────────────── */
         .tv-main {
-            display: grid;
-            grid-template-columns: 280px 1fr 500px;
-            overflow: hidden;
-        }
+    display: grid;
+    grid-template-columns: 380px 1fr 500px;  /* Augmenté de 280px à 350px */
+    overflow: hidden;
+}
 
         /* ── PANNEAU GAUCHE ──────────────────────────────────── */
         .panel-matches {
@@ -629,7 +629,16 @@
         </div>{# /panneau gauche #}
 
         {# ── Panneau centre : classement ── #}
-        <div class="panel-right" style="border-right: 2px solid var(--border);">
+        {% set afficherClassementFinal = false %}
+
+            {% if poulesFinales is not empty %}
+                {% for poule in poulesFinales %}
+                    {% if poule.hasRencontres %}
+                        {% set afficherClassementFinal = true %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+                    <div class="panel-right" style="border-right: 2px solid var(--border);">
 
             <div class="ranking-block">
                 <div class="section-title">
@@ -647,74 +656,118 @@
                     <div class="ranking-scroll-track" id="rankingTrack">
 
                         <table class="ranking" id="rankingOriginal">
-                            <thead>
-                                <tr>
-                                    <th>#</th><th>Équipe</th>
-                                    <th>Pts</th><th>+</th><th>–</th><th>Diff</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            
-                            {% for pouleData in donneesCat.classementsPoules|sort %}
-                                {% if donneesCat.classementsPoules|length > 1 %}
-                                <tr><td colspan="6" class="poule-divider">
-                                    {% if pouleData.is_classement == 1 %}<i class="fas fa-medal"></i> {% endif %}{{ pouleData.poule.nom }}
-                                </td></tr>
-                                {% endif %}
-                                {% set rankInPoule = 0 %}
-                                {% for eq in pouleData.classement %}
-                                
-                                    {% set rankInPoule = rankInPoule + 1 %}
-                                    <tr class="{% if rankInPoule == 1 %}rank-1{% elseif rankInPoule == 2 %}rank-2{% elseif rankInPoule == 3 %}rank-3{% endif %}">
-                                        <td><span class="rank-pos {% if rankInPoule == 1 %}gold{% elseif rankInPoule == 2 %}silver{% elseif rankInPoule == 3 %}bronze{% endif %}">{{ rankInPoule }}</span></td>
-                                        <td>
-                                            <div class="rank-team">
-                                                {% if eq.club_logo %}<img src="{{ eq.club_logo }}" class="team-logo-sm" alt="{{ eq.nom }}" loading="lazy">{% endif %}
-                                                <span class="rank-team-name">{{ eq.nom|upper }}</span>
-                                            </div>
-                                        </td>
-                                        <td><span class="pts-badge">{{ eq.TotalDesPoints ?? 0 }}</span></td>
-                                        <td style="color:var(--win);font-weight:600;">{{ eq.nombreButsMarque ?? 0 }}</td>
-                                        <td style="color:var(--loss);font-weight:600;">{{ eq.nombreButsEncaisse ?? 0 }}</td>
-                                        <td style="font-weight:600;color:{{ (eq.DifferenceButs ?? 0) >= 0 ? 'var(--win)' : 'var(--loss)' }};">
-                                            {{ (eq.DifferenceButs ?? 0) >= 0 ? '+' : '' }}{{ eq.DifferenceButs ?? 0 }}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
+
+{% set afficherClassementFinal = false %}
+
+{% if poulesFinales is not empty %}
+    {% for poule in poulesFinales %}
+        {% if poule.hasRencontres %}
+            {% set afficherClassementFinal = true %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% set classements = afficherClassementFinal ? poulesFinales : donneesCat.classementsPoules %}
+
+<tbody>
+
+{% for poule in classements %}
+
+    {% if classements|length > 1 %}
+    <tr>
+        <td colspan="6" class="poule-divider">
+            <i class="fas fa-medal"></i>
+            {{ afficherClassementFinal ? poule.nom : poule.poule.nom }}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% set equipes = afficherClassementFinal ? poule.contenu : poule.classement %}
+    {% set rang = 1 %}
+
+    {% for eq in equipes %}
+    <tr class="{% if rang == 1 %}rank-1{% elseif rang == 2 %}rank-2{% elseif rang == 3 %}rank-3{% endif %}">
+        <td><span class="rank-pos {% if rang == 1 %}gold{% elseif rang == 2 %}silver{% elseif rang == 3 %}bronze{% endif %}">{{ rang }}</span></td>
+        <td>
+            <div class="rank-team">
+                {% if eq.club_logo is defined and eq.club_logo %}
+                    <img src="{{ eq.club_logo }}" class="team-logo-sm">
+                {% endif %}
+                <span class="rank-team-name">{{ eq.nom|upper }}</span>
+            </div>
+        </td>
+        <td><span class="pts-badge">{{ eq.TotalDesPoints ?? 0 }}</span></td>
+        <td>{{ eq.nombreButsMarque ?? 0 }}</td>
+        <td>{{ eq.nombreButsEncaisse ?? 0 }}</td>
+        <td style="font-weight:600;color:{{ (eq.DifferenceButs ?? 0) >= 0 ? 'var(--win)' : 'var(--loss)' }}">
+            {{ (eq.DifferenceButs ?? 0) >= 0 ? '+' : '' }}{{ eq.DifferenceButs ?? 0 }}
+        </td>
+    </tr>
+    {% set rang = rang + 1 %}
+    {% endfor %}
+
+{% endfor %}
+
+</tbody>
+
+</table>
 
                         <table class="ranking" id="rankingClone" style="display:none;">
-                            <tbody>
-                            {% for pouleData in donneesCat.classementsPoules %}
-                                {% if donneesCat.classementsPoules|length > 1 %}
-                                <tr><td colspan="6" class="poule-divider">
-                                    {% if pouleData.is_classement == 1 %}<i class="fas fa-medal"></i> {% endif %}{{ pouleData.poule.nom }}
-                                </td></tr>
-                                {% endif %}
-                                {% set rankInPoule = 0 %}
-                                {% for eq in pouleData.classement %}
-                                    {% set rankInPoule = rankInPoule + 1 %}
-                                    <tr class="{% if rankInPoule == 1 %}rank-1{% elseif rankInPoule == 2 %}rank-2{% elseif rankInPoule == 3 %}rank-3{% endif %}">
-                                        <td><span class="rank-pos {% if rankInPoule == 1 %}gold{% elseif rankInPoule == 2 %}silver{% elseif rankInPoule == 3 %}bronze{% endif %}">{{ rankInPoule }}</span></td>
-                                        <td>
-                                            <div class="rank-team">
-                                                {% if eq.club_logo %}<img src="{{ eq.club_logo }}" class="team-logo-sm" alt="{{ eq.nom }}" loading="lazy">{% endif %}
-                                                <span class="rank-team-name">{{ eq.nom|upper }}</span>
-                                            </div>
-                                        </td>
-                                        <td><span class="pts-badge">{{ eq.TotalDesPoints ?? 0 }}</span></td>
-                                        <td style="color:var(--win);font-weight:600;">{{ eq.nombreButsMarque ?? 0 }}</td>
-                                        <td style="color:var(--loss);font-weight:600;">{{ eq.nombreButsEncaisse ?? 0 }}</td>
-                                        <td style="font-weight:600;color:{{ (eq.DifferenceButs ?? 0) >= 0 ? 'var(--win)' : 'var(--loss)' }};">
-                                            {{ (eq.DifferenceButs ?? 0) >= 0 ? '+' : '' }}{{ eq.DifferenceButs ?? 0 }}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
+
+{% set afficherClassementFinal = false %}
+
+{% if poulesFinales is not empty %}
+    {% for poule in poulesFinales %}
+        {% if poule.hasRencontres %}
+            {% set afficherClassementFinal = true %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% set classements = afficherClassementFinal ? poulesFinales : donneesCat.classementsPoules %}
+
+<tbody>
+
+{% for poule in classements %}
+
+    {% if classements|length > 1 %}
+    <tr>
+        <td colspan="6" class="poule-divider">
+            <i class="fas fa-medal"></i>
+            {{ afficherClassementFinal ? poule.nom : poule.poule.nom }}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% set equipes = afficherClassementFinal ? poule.contenu : poule.classement %}
+    {% set rang = 1 %}
+
+    {% for eq in equipes %}
+    <tr class="{% if rang == 1 %}rank-1{% elseif rang == 2 %}rank-2{% elseif rang == 3 %}rank-3{% endif %}">
+        <td><span class="rank-pos {% if rang == 1 %}gold{% elseif rang == 2 %}silver{% elseif rang == 3 %}bronze{% endif %}">{{ rang }}</span></td>
+        <td>
+            <div class="rank-team">
+                {% if eq.club_logo is defined and eq.club_logo %}
+                    <img src="{{ eq.club_logo }}" class="team-logo-sm">
+                {% endif %}
+                <span class="rank-team-name">{{ eq.nom|upper }}</span>
+            </div>
+        </td>
+        <td><span class="pts-badge">{{ eq.TotalDesPoints ?? 0 }}</span></td>
+        <td>{{ eq.nombreButsMarque ?? 0 }}</td>
+        <td>{{ eq.nombreButsEncaisse ?? 0 }}</td>
+        <td style="font-weight:600;color:{{ (eq.DifferenceButs ?? 0) >= 0 ? 'var(--win)' : 'var(--loss)' }}">
+            {{ (eq.DifferenceButs ?? 0) >= 0 ? '+' : '' }}{{ eq.DifferenceButs ?? 0 }}
+        </td>
+    </tr>
+    {% set rang = rang + 1 %}
+    {% endfor %}
+
+{% endfor %}
+
+</tbody>
+
+</table>
 
                     </div>
                     <div class="ranking-fade-bot"></div>

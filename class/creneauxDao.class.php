@@ -760,6 +760,89 @@ public function retirerArbitresDuCreneau(int $creneau_id): void {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+ * Récupère le créneau en cours ET le créneau suivant en UNE SEULE requête
+ * Optimisé pour les rafraîchissements fréquents
+ */
+public function getCreneauEnCoursEtSuivant(int $tournoi_id): ?array
+{
+    $sql = "
+        SELECT 
+            -- Créneau EN COURS (celui avec au moins 1 rencontre isTerminated=2)
+            (SELECT c.creneau_id FROM Creneaux c
+             WHERE c.tournoi_id = :tournoi_id
+             AND EXISTS (
+                 SELECT 1 FROM Planification p
+                 INNER JOIN Rencontres r ON r.id = p.rencontre_id
+                 WHERE p.creneau_id = c.creneau_id AND r.isTerminated = 2
+             )
+             ORDER BY c.ordre DESC LIMIT 1) AS creneau_id_en_cours,
+            
+            (SELECT c.nom FROM Creneaux c
+             WHERE c.tournoi_id = :tournoi_id
+             AND EXISTS (
+                 SELECT 1 FROM Planification p
+                 INNER JOIN Rencontres r ON r.id = p.rencontre_id
+                 WHERE p.creneau_id = c.creneau_id AND r.isTerminated = 2
+             )
+             ORDER BY c.ordre DESC LIMIT 1) AS creneau_nom_en_cours,
+             
+            (SELECT c.tempsChangementMinutes FROM Creneaux c
+             WHERE c.tournoi_id = :tournoi_id
+             AND EXISTS (
+                 SELECT 1 FROM Planification p
+                 INNER JOIN Rencontres r ON r.id = p.rencontre_id
+                 WHERE p.creneau_id = c.creneau_id AND r.isTerminated = 2
+             )
+             ORDER BY c.ordre DESC LIMIT 1) AS creneau_tempsChangement,
+            
+            -- Créneau SUIVANT
+            (SELECT c.creneau_id FROM Creneaux c
+             WHERE c.tournoi_id = :tournoi_id
+             AND c.nom > IFNULL((
+                 SELECT c2.nom FROM Creneaux c2
+                 WHERE c2.tournoi_id = :tournoi_id
+                 AND EXISTS (
+                     SELECT 1 FROM Planification p
+                     INNER JOIN Rencontres r ON r.id = p.rencontre_id
+                     WHERE p.creneau_id = c2.creneau_id AND r.isTerminated = 2
+                 )
+                 ORDER BY c2.ordre DESC LIMIT 1
+             ), '00:00:00')
+             ORDER BY c.nom ASC LIMIT 1) AS creneau_id_suivant,
+             
+            (SELECT c.nom FROM Creneaux c
+             WHERE c.tournoi_id = :tournoi_id
+             AND c.nom > IFNULL((
+                 SELECT c2.nom FROM Creneaux c2
+                 WHERE c2.tournoi_id = :tournoi_id
+                 AND EXISTS (
+                     SELECT 1 FROM Planification p
+                     INNER JOIN Rencontres r ON r.id = p.rencontre_id
+                     WHERE p.creneau_id = c2.creneau_id AND r.isTerminated = 2
+                 )
+                 ORDER BY c2.ordre DESC LIMIT 1
+             ), '00:00:00')
+             ORDER BY c.nom ASC LIMIT 1) AS creneau_nom_suivant
+    ";
+    
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->execute([':tournoi_id' => $tournoi_id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $row ? [
+        'en_cours' => $row['creneau_id_en_cours'] ? [
+            'creneau_id' => $row['creneau_id_en_cours'],
+            'nom' => $row['creneau_nom_en_cours'],
+            'tempsChangementMinutes' => $row['creneau_tempsChangement']
+        ] : null,
+        'suivant' => $row['creneau_id_suivant'] ? [
+            'creneau_id' => $row['creneau_id_suivant'],
+            'nom' => $row['creneau_nom_suivant']
+        ] : null
+    ] : ['en_cours' => null, 'suivant' => null];
+}
+
 
 public function afficherCreneauxOccupes(int $tournoi_id): array
 {

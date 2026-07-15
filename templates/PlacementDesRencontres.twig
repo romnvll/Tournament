@@ -758,6 +758,25 @@ details > summary::-webkit-details-marker {
 		transform: translateY(0);
 	}
 }
+/* Animation de clignotement pour les erreurs de validation */
+/* Animation de clignotement pour les erreurs de validation */
+@keyframes blink-error {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.row-validation-error td {
+    border-top: 3px solid #ef4444;
+    animation: blink-error 1.2s ease-in-out infinite;
+}
+
+.validation-error-icon {
+    animation: blink-error 1.2s ease-in-out infinite;
+}
 
 .match-card,
 .stat-item {

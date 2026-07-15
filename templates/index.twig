@@ -996,6 +996,11 @@
             .organisateur-club { display: flex; align-items: center; justify-content: center; gap: 1rem; }
             .organisateur-logo { width: 50px; height: 50px; object-fit: contain; background: white; border-radius: 50%; padding: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
             .organisateur-nom { font-size: 1.3rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            .organisateur-info > div:last-child {
+    padding-top: 15px;
+    margin-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
         }
 
         @media (min-width: 768px) {
@@ -1034,11 +1039,10 @@
             </div>
         {% else %}
             {% set countVisibleTournois = 0 %}
-            {% for tournoi in ListeDesTournois %}
-                {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
-                    {% set countVisibleTournois = countVisibleTournois + 1 %}
-                {% endif %}
-            {% endfor %}
+
+            {% if infoTournoiEnCours.isVisible == 1 and infoTournoiEnCours.isArchived == 0 %}
+                {% set countVisibleTournois = countVisibleTournois + 1 %}
+            {% endif %}
 
             {% if infoTournoiEnCours|length == 0 %}
                 {% include ('accueil.twig') %}
@@ -1057,47 +1061,60 @@
                 {% set visibility = 0 %}
                 {% set IsRankingView = 0 %}
                 {% set gestionArbitres = 0 %}
-                {% for tournoi in ListeDesTournois %}
-                    {% if tournoi.id == idTournoi %}
-                        {% if tournoi.isVisible == 1 %}
-                            {% set visibility = 1 %}
-                        {% endif %}
-                        {% if tournoi.IsRankingView == 1 and getCategorieCourante['afficherClassement'] == 1 %}
-                            {% set IsRankingView = 1 %}
-                        {% endif %}
-                        {% if tournoi.gestionArbitres == 1 %}
-                            {% set gestionArbitres = 1 %}
-                        {% endif %}
-                        {% if tournoi.heureIsVisible == 1 %}
-                            {% set heureIsVisible = 1 %}
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
+                
+                {% if infoTournoiEnCours.isVisible == 1 %}
+                    {% set visibility = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.IsRankingView == 1 and getCategorieCourante['afficherClassement'] == 1 %}
+                    {% set IsRankingView = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.gestionArbitres == 1 %}
+                    {% set gestionArbitres = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.heureIsVisible == 1 %}
+                    {% set heureIsVisible = 1 %}
+                {% endif %}
+
+
+
+                
 
                 <!-- Header Logo -->
                 {% if IdClub is not null or idIdPoules is not null or IdEquipe is not null %}
-                    <div class="card-modern organisateur-info">
-                        <div class="organisateur-content">
-                            <a href="index.php?id_tournoi={{ infoTournoiEnCours.id }}" 
-                            style="text-decoration: none; color: inherit; display: block;">
-                                <div class="organisateur-content">
-                                    <span class="organisateur-label">
-                                        <i class="fas fa-trophy"></i>
-                                        Tournoi organisé par
-                                    </span>
-                                    <div class="organisateur-club">
-                                        {% if infoTournoiEnCours.logo_club %}
-                                            <img src="{{ infoTournoiEnCours.logo_club }}" 
-                                                alt="{{ infoTournoiEnCours.nom_club }}" 
-                                                loading="lazy" 
-                                                class="organisateur-logo">
-                                        {% endif %}
-                                        <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                   <div class="card-modern organisateur-info">
+                   <div style="margin-top: 12px; text-align: center; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05);">
+        <small style="color: #999; font-size: 0.85em;">
+            Conçu par <img src="logos/Logo.png" 
+                alt="Brackito" 
+                style="height: 16px; margin-right: 6px; vertical-align: middle;">
+           
+        </small>
+    </div>
+    <div class="organisateur-content">
+         <!-- Badge Brackito -->
+    
+
+
+        <a href="index.php?id_tournoi={{ infoTournoiEnCours.id }}" 
+        style="text-decoration: none; color: inherit; display: block;">
+            <span class="organisateur-label">
+                <i class="fas fa-trophy"></i>
+                Tournoi organisé par
+            </span>
+            <div class="organisateur-club">
+                {% if infoTournoiEnCours.logo_club %}
+                    <img src="{{ infoTournoiEnCours.logo_club }}" 
+                        alt="{{ infoTournoiEnCours.nom_club }}" 
+                        loading="lazy" 
+                        class="organisateur-logo">
+                {% endif %}
+                <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+            </div>
+        </a>
+    </div>
+    
+   
+</div>
                 {% endif %}
 
                 <!-- Club Selection -->
@@ -1105,6 +1122,18 @@
 
                     {% if infoTournoiEnCours.nom_club %}
                         <div class="card-modern organisateur-info">
+                            <div style="margin-top: 12px; text-align: center; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.05);">
+        <small style="color: #999; font-size: 0.85em;">
+        Conçu par
+            <img src="logos/Logo.png" 
+                alt="Brackito" 
+                style="height: 16px; margin-right: 6px; vertical-align: middle;">
+            
+        </small>
+    </div>
+
+
+
                             <div class="organisateur-content">
                                 <span class="organisateur-label">
                                     <i class="fas fa-trophy"></i>
@@ -1120,6 +1149,7 @@
                                     <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
                                 </div>
                             </div>
+                          
                         </div>
                     {% endif %}
 

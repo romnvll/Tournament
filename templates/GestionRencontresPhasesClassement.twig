@@ -149,10 +149,14 @@
                                 <div class="d-flex flex-wrap gap-2">
                                     {% for poule in afficherLesPoules %}
                                         {% if poule.fk_idcategorie not in categoriesDejaAffichees %}
-                                            <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                                            <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}&createPouleOnly=1"
+                                            class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm">
+                                                <i class="fas fa-magic me-1"></i> Créer les poules et placer les labels {{ poule.nom | split(' ')[0] }}
+                                            </a>
+                                             <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
                                             class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm"
                                             onclick="return confirm('Voulez-vous dispatcher automatiquement toutes les équipes de cette catégorie dans les poules de classement selon leurs résultats actuels ?')">
-                                                <i class="fas fa-magic me-1"></i> Répartir la catégorie {{ poule.nom | split(' ')[0] }}
+                                                <i class="fas fa-magic me-1"></i> Placer les équipes {{ poule.nom | split(' ')[0] }}
                                             </a>
                                             {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
                                         {% endif %}
@@ -174,10 +178,16 @@
                                     {% set categoriesDejaAfficheesHB = [] %}
                                     {% for poule in afficherLesPoules %}
                                         {% if poule.fk_idcategorie not in categoriesDejaAfficheesHB %}
-                                            <a href="gestionRencontrePhaseClassement_traitement.php?autoHauteBasse=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                                            <a href="gestionRencontrePhaseClassement_traitement.php?autoHauteBasse=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}&createPouleOnly=1"
                                             class="btn btn-info btn-sm text-dark fw-semibold shadow-sm"
                                             onclick="return confirm('Voulez-vous répartir automatiquement les équipes de cette catégorie en Poule Haute / Poule Basse selon leurs résultats actuels ?')">
-                                                <i class="fas fa-arrows-alt-v me-1"></i> Haute/Basse {{ poule.nom | split(' ')[0] }}
+                                                <i class="fas fa-arrows-alt-v me-1"></i> Créer les poules Haute/Basse et placer les labels {{ poule.nom | split(' ')[0] }}
+                                            </a>
+
+                                             <a href="gestionRencontrePhaseClassement_traitement.php?autoHauteBasse=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                                            class="btn btn-info btn-sm text-dark fw-semibold shadow-sm"
+                                            onclick="return confirm('Voulez-vous répartir automatiquement les équipes de cette catégorie en Poule Haute / Poule Basse selon leurs résultats actuels ?')">
+                                                <i class="fas fa-arrows-alt-v me-1"></i> Placez les équipes {{ poule.nom | split(' ')[0] }}
                                             </a>
                                             {% set categoriesDejaAfficheesHB = categoriesDejaAfficheesHB|merge([poule.fk_idcategorie]) %}
                                         {% endif %}
@@ -322,13 +332,22 @@
                                 {% set nbLabelsPlaces = nbLabelsPlaces + 1 %}
                             {% endif %}
                         {% endfor %}
+                         <!-- Appel pour CETTE poule -->
+    {% set nbRencontresProgrammees = poulemanager.NbreRencontreParPouleProgrammee(poule.id, tournoiId) %}
+
 
                         <div class="card border-0 shadow-sm rounded-3 {% if poule.fk_idcategorie != idCategorieEnCours %}d-none{% endif %}">
                             <div class="card-header bg-white border-bottom py-3 px-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                                 <span class="badge bg-indigo bg-primary fs-6 px-3 py-2 rounded shadow-sm">{{ poule.nom }}</span>
 
-                                <span class="text-nowrap">
-                                    Labels placés : {{ nbLabelsPlaces }} / <span id="nbRencontresAttendu_{{ poule.id }}" data-base="{{ nbRencontresAttendu }}">{{ nbRencontresAttendu }}</span>
+                                <span class="text-nowrap d-flex align-items-center gap-2">
+                                    {% if poule.rencontresRatio == 100 %}
+                                        <span class="badge bg-success">✓ Rencontres planifiées</span>
+                                    {% elseif poule.rencontresRatio > 0 %}
+                                        <span class="badge bg-warning">{{ poule.nbRencontresProgrammees }}/{{ nbRencontresAttendu|round }} planifiées</span>
+                                    {% else %}
+                                        <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}"><span class="badge bg-secondary">À planifier</span></a>
+                                    {% endif %}
                                 </span>
 
                                 <div class="d-flex align-items-center gap-2">
@@ -355,7 +374,7 @@
                                         {% endif %}
                                     </div>
                                     {% if poule.contenu|length == 0 %}
-                                        <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}" 
+                                        <a href="gestionRencontrePhaseClassement_traitement.php?suppressionPoule=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}&pouleNom={{ poule.nom }}" 
                                            class="btn btn-link link-danger p-0" title="Supprimer la poule vide">
                                             <i class="fas fa-trash-alt"></i> Supprimer la poule
                                         </a>

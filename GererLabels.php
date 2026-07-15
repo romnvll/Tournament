@@ -35,7 +35,7 @@ if (isset($_POST['labelModif']) && $_POST['labelModif'] == true) {
 }
 
 
-$listeDesLabels = $labels->getLabelsByTournoiId((int)$_GET['id_tournoi']);
+$listeDesLabels = $labels->getLabelsByTournoiId((int)$_GET['id_tournoi'],false);
 
 
 //bouton retour

@@ -176,13 +176,30 @@ public function getLabelsAvecPlanificationParCategorie(int $categorie_id): array
 }
 
     // Méthode pour récupérer tous les labels d'un tournoi
-    public function getLabelsByTournoiId(int $tournoi_id) {
-        $stmt = $this->connexion->prepare("SELECT * FROM Labels WHERE tournoi_id = :tournoi_id");
-        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  public function getLabelsByTournoiId(int $tournoi_id, ?bool $withCategory = null) {
+    $query = "SELECT * FROM Labels WHERE tournoi_id = :tournoi_id";
+    
+    if ($withCategory === true) {
+        $query .= " AND categorie_id IS NOT NULL";
+    } elseif ($withCategory === false) {
+        $query .= " AND categorie_id IS NULL";
     }
+    
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+public function supprimerLabelParNomEtTournoiId(string $description, int $tournoi_id) {
+    $stmt = $this->connexion->prepare("DELETE FROM Labels WHERE description LIKE :description AND tournoi_id = :tournoi_id");
+    $stmt->bindValue(':description', "%{$description}", PDO::PARAM_STR);
+    $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    
+    return $stmt->execute();
+}
 
 
     //methode qui permet d'afficher les labels

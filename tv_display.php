@@ -137,6 +137,15 @@ if (!empty($infoTournoi['gestionPartenaires'])) {
     $partenaires = $sponsorDao->getSponsorsActifParClub($infoTournoi['utilisateur_id']);
 }
 
+
+$poulesFinales = $pouleManager->getAllPoulesFinalesByTournoi($idTournoi);
+foreach ($poulesFinales as &$poule) {
+  $poule['contenu'] = $pouleManager->getEquipesInPoule($poule['id']);
+  $poule['hasRencontres'] = $pouleManager->checkRencontresInPoule($poule['id'],3);
+}
+
+
+
 // ── Navigation entre catégories ───────────────────────────────────────────────
 $nbCategories = count($donneesCategories);
 $catIndex     = $nbCategories > 0 ? $catIndex % $nbCategories : 0;
@@ -160,4 +169,5 @@ echo $template->render([
     'donneesCat'                 => $donneesCat,
     'nombreRencontresPlanifiees' => $nombreRencontresPlanifiees,
     'nombreRencontresTerminees'  => $nombreTerminees,
+    'poulesFinales' => $poulesFinales,
 ]);
