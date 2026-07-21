@@ -108,7 +108,7 @@ modif 07/05 c'est en prod
 ALTER TABLE Categorie ADD COLUMN afficherClassement INT(1) DEFAULT 1 AFTER Couleur;
 
 
-MODIF 18/06 c'est en dev pas en prod
+MODIF 18/06 c'est en dev pas en prod ( c'est en dev )
 -- ============================================================
 -- Système de messagerie Brackito
 -- Permet à l'organisateur d'envoyer un message à :
@@ -205,6 +205,7 @@ DROP COLUMN telephone;
 
 ALTER TABLE Tournois
 ADD COLUMN gestionTempsChangement tinyint(1) DEFAULT 0;
+ALTER TABLE Tournois
 ADD COLUMN tempsChangementMinutes INT NOT NULL DEFAULT 0;
 
 ALTER TABLE Creneaux

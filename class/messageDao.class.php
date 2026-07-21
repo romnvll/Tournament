@@ -111,7 +111,7 @@ class MessageDAO {
  * Liste des messages visibles par une équipe donnée, avec le statut de
  * lecture PROPRE AU VISITEUR (cookie), pas à l'équipe.
  */
-public function afficherMessagesParEquipe(int $equipeId, string $visiteurId): array {
+public function afficherMessagesParEquipe(int $equipeId, string $visiteurId, int $tournoiId): array {
     $stmt = $this->connexion->prepare("
         SELECT DISTINCT
             m.id,
@@ -132,10 +132,12 @@ public function afficherMessagesParEquipe(int $equipeId, string $visiteurId): ar
             OR m.categorie_id = eq.categorie
             OR ep.poule_id IS NOT NULL
             OR (m.categorie_id IS NULL AND m.poule_id IS NULL AND m.equipe_id IS NULL)
+            AND m.tournoi_id = :tournoi_id
         ORDER BY m.date_creation DESC
     ");
     $stmt->bindParam(':equipe_id', $equipeId, PDO::PARAM_INT);
     $stmt->bindParam(':visiteur_id', $visiteurId);
+    $stmt->bindParam(':tournoi_id', $tournoiId, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

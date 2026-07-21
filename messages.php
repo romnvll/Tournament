@@ -57,7 +57,7 @@ if (isset($_GET['marquer_lu'])) {
     $messageDao->marquerLu((int)$_GET['marquer_lu'], $idEquipe,getVisiteurId());
 }
 
-$messagesEquipe = $messageDao->afficherMessagesParEquipe($idEquipe,getVisiteurId());
+$messagesEquipe = $messageDao->afficherMessagesParEquipe($idEquipe,getVisiteurId(),$idTournoi);
 
 // Cette page dédiée constitue une consultation explicite : tous les messages
 // listés ici sont donc marqués "lus" (et pas seulement "reçus" comme le ferait
@@ -68,7 +68,7 @@ foreach ($messagesEquipe as $msg) {
 
 // On recharge la liste pour que l'affichage reflète immédiatement le statut "lu"
 // (sinon le badge "non lu" resterait affiché sur ce premier chargement).
-$messagesEquipe = $messageDao->afficherMessagesParEquipe($idEquipe, getVisiteurId());
+$messagesEquipe = $messageDao->afficherMessagesParEquipe($idEquipe, getVisiteurId(), $idTournoi);
 
 echo $template->render([
     'idTournoi'    => $idTournoi,
