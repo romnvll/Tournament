@@ -212,6 +212,7 @@ $allLangs = [
         'etapeSuivante' => 'Étape suivante',
         'creerVosPoulesMessage' => 'Créez vos poules automatiquement en quelques clics',
         'equipesActuellementDansLaPoule' => 'Equipes actuellement dans la poule',
+        'nombreDeTerrainConseille' => 'Nombre de terrains conseillé',
         
         
         
@@ -417,6 +418,7 @@ $allLangs = [
 'indexTypePoule' => '✔️ Designed for pool and round-robin tournaments.',
 'etapeSuivante' => 'Next step',
 'creerVosPoulesMessage' => 'Create your pools automatically in just a few clicks',
+'nombreDeTerrainConseille' => 'Number of recommended fields',
 
 
 

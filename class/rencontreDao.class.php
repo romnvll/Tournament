@@ -1363,11 +1363,11 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
  * crée un nouveau tour à la suite du tour maximum.
  */
 public function addEquipesToPoule(
-    $pouleId,
-    $tournoi_id,
+    int $pouleId,
+    int $tournoi_id,
     array $nouvellesEquipesIds,
-    $typeRencontreId = TYPE_RENCONTRE_POULE,
-    $isMatchRetour = false
+    int $typeRencontreId = TYPE_RENCONTRE_POULE,
+    bool $isMatchRetour = false
 ) {
     $toutesEquipes = $this->getEquipesPresentesByPoule($pouleId);
 
@@ -1383,71 +1383,69 @@ public function addEquipesToPoule(
         return;
     }
 
-    // Construire les matchs manquants
-    $matchsAEffectuer = [];
+    // 1. Insérer les nouvelles rencontres manquantes (sans tour pour l'instant)
+    $matchsAInserer = [];
 
     foreach ($nouvellesEquipes as $nouvelle) {
         foreach ($anciennesEquipes as $ancienne) {
-            $matchsAEffectuer[] = ['equipe1' => $nouvelle, 'equipe2' => $ancienne];
+            $matchsAInserer[] = ['equipe1' => $nouvelle, 'equipe2' => $ancienne];
             if ($isMatchRetour) {
-                $matchsAEffectuer[] = ['equipe1' => $ancienne, 'equipe2' => $nouvelle];
+                $matchsAInserer[] = ['equipe1' => $ancienne, 'equipe2' => $nouvelle];
             }
         }
     }
 
     for ($i = 0; $i < count($nouvellesEquipes); $i++) {
         for ($j = $i + 1; $j < count($nouvellesEquipes); $j++) {
-            $matchsAEffectuer[] = ['equipe1' => $nouvellesEquipes[$i], 'equipe2' => $nouvellesEquipes[$j]];
+            $matchsAInserer[] = ['equipe1' => $nouvellesEquipes[$i], 'equipe2' => $nouvellesEquipes[$j]];
             if ($isMatchRetour) {
-                $matchsAEffectuer[] = ['equipe1' => $nouvellesEquipes[$j], 'equipe2' => $nouvellesEquipes[$i]];
+                $matchsAInserer[] = ['equipe1' => $nouvellesEquipes[$j], 'equipe2' => $nouvellesEquipes[$i]];
             }
         }
     }
 
-    if (empty($matchsAEffectuer)) {
-        return;
+    foreach ($matchsAInserer as $match) {
+        // Insérer sans tour (null) — sera assigné lors du recalcul
+        $this->insertRencontre(
+            $match['equipe1']['id'],
+            $match['equipe2']['id'],
+            $tournoi_id,
+            $typeRencontreId,
+            null,
+            $pouleId
+        );
     }
 
-    $occupationParTour  = $this->getOccupationToursByPoule($pouleId, $typeRencontreId);
-    $tourMaxExistant     = $this->getTourMaxByPoule($pouleId, $typeRencontreId);
-    $prochainTourLibre   = $tourMaxExistant + 1;
+    // 2. Générer le planning théorique complet pour toutes les équipes
+    $planningTheorique = $this->generateRoundRobin($toutesEquipes, $isMatchRetour);
 
-    foreach ($matchsAEffectuer as $match) {
-        $e1 = $match['equipe1']['id'];
-        $e2 = $match['equipe2']['id'];
+    // 3. Récupérer toutes les rencontres en base pour cette poule
+    $query = "SELECT id, equipe1_id, equipe2_id FROM Rencontres 
+              WHERE poule_id = :pouleId AND type_rencontre_id = :typeRencontreId";
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $stmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
+    $stmt->execute();
+    $rencontresEnBase = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $tourChoisi = null;
+    // Indexer les rencontres en base par paire (ordre indépendant)
+    $indexBase = [];
+    foreach ($rencontresEnBase as $r) {
+        $cle = min($r['equipe1_id'], $r['equipe2_id']) . '-' . max($r['equipe1_id'], $r['equipe2_id']);
+        $indexBase[$cle] = (int) $r['id'];
+    }
 
-        // 1. Chercher un trou dans les tours existants (1 à tourMaxExistant)
-        for ($t = 1; $t <= $tourMaxExistant; $t++) {
-            if (!isset($occupationParTour[$t][$e1]) && !isset($occupationParTour[$t][$e2])) {
-                $tourChoisi = $t;
-                break;
-            }
+    // 4. Pour chaque rencontre théorique, mettre à jour le tour en base
+    foreach ($planningTheorique as $rencontre) {
+        $e1  = $rencontre['equipe1']['id'];
+        $e2  = $rencontre['equipe2']['id'];
+        $cle = min($e1, $e2) . '-' . max($e1, $e2);
+
+        if (isset($indexBase[$cle])) {
+            $this->updateTour($indexBase[$cle], $rencontre['tour']);
         }
-
-        // 2. Sinon, avancer dans les tours créés au-delà du max
-        if ($tourChoisi === null) {
-            while (
-                isset($occupationParTour[$prochainTourLibre][$e1]) ||
-                isset($occupationParTour[$prochainTourLibre][$e2])
-            ) {
-                $prochainTourLibre++;
-            }
-            $tourChoisi = $prochainTourLibre;
-        }
-
-        if ($this->isRencontreExist($e1, $e2, $tourChoisi, $pouleId)) {
-            continue;
-        }
-
-        $this->insertRencontre($e1, $e2, $tournoi_id, $typeRencontreId, $tourChoisi, $pouleId);
-
-        $occupationParTour[$tourChoisi][$e1] = true;
-        $occupationParTour[$tourChoisi][$e2] = true;
     }
 }
-
 private function getOccupationToursByPoule($pouleId, $typeRencontreId)
 {
     $query = "SELECT equipe1_id, equipe2_id, tour 

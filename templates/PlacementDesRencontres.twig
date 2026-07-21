@@ -697,6 +697,53 @@ details > summary::-webkit-details-marker {
 	display: none;
 }
 
+.bulk-action-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	flex-wrap: wrap;
+	background: var(--bg-light);
+	border-radius: 10px;
+	padding: 15px 20px;
+}
+
+.bulk-step {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bulk-step-title {
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.bulk-step-controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.bulk-step-separator {
+	color: var(--text-light);
+	font-size: 1.3rem;
+	align-self: center;
+}
+
+@media (max-width: 768px) {
+	.bulk-action-wrapper {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.bulk-step-separator {
+		display: none;
+	}
+}
+
 /* Responsive */
 @media(max-width: 768px) {
 	.modern-table-container {
@@ -812,56 +859,66 @@ details > summary::-webkit-details-marker {
 			<div
 				class="control-card">
 				<!-- Section des contrôles -->
-				<div
-					class="control-section">
+				<div class="control-section">
 					<!-- Action groupée -->
-					<form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post" class="control-group">
+					<!-- Action groupée : Sélection + Action, réorganisées en 2 blocs -->
+						<form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post">
+							<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
 
-					<select id="categorieSelector" class="modern-select" style="max-width: 250px;">
-							<option value="">Sélectionner une catégorie</option>
+							<div class="bulk-action-wrapper">
 
-							{% set categories = [] %}
+								<!-- Bloc 1 : Sélection -->
+								<div class="bulk-step">
+									<span class="bulk-step-title">
+										<i class="bi bi-check2-square"></i> 1. Sélection
+									</span>
 
-							{% for planification in afficherPlanification %}
-								{% if planification.equipe1_categorie_nom not in categories %}
-									{% set categories = categories|merge([planification.equipe1_categorie_nom]) %}
-									<option value="{{ planification.equipe1_categorie_nom|lower }}">
-										{{ planification.equipe1_categorie_nom }}
-									</option>
-								{% endif %}
-							{% endfor %}
-						</select>
+									<div class="bulk-step-controls">
+										<select id="categorieSelector" class="modern-select" style="max-width: 220px;">
+											<option value="">Toutes les catégories</option>
+											{% set categories = [] %}
+											{% for planification in afficherPlanification %}
+												{% if planification.equipe1_categorie_nom not in categories %}
+													{% set categories = categories|merge([planification.equipe1_categorie_nom]) %}
+													<option value="{{ planification.equipe1_categorie_nom|lower }}">
+														{{ planification.equipe1_categorie_nom }}
+													</option>
+												{% endif %}
+											{% endfor %}
+										</select>
 
-						<button type="button"
-								class="modern-btn"
-								style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;"
-								onclick="cocherCategorie()">
-							<i class="bi bi-collection"></i>
-							Sélectionner
-						</button>
+										<button type="button" class="modern-btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;" onclick="cocherCategorie()">
+											<i class="bi bi-collection"></i> Cocher la catégorie
+										</button>
 
+										<button type="button" class="modern-btn" id="btnToutCocher" style="background: linear-gradient(135deg, #10b981, #059669); color: white;" onclick="toggleToutCocher(this)">
+											<i class="bi bi-check2-all"></i> Tout cocher
+										</button>
+									</div>
+								</div>
 
+								<div class="bulk-step-separator"><i class="bi bi-arrow-right"></i></div>
 
+								<!-- Bloc 2 : Action -->
+								<div class="bulk-step">
+									<span class="bulk-step-title">
+										<i class="bi bi-lightning-fill"></i> 2. Action
+									</span>
 
-						<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
-						<label for="bulkAction" class="control-label">
-							<i class="bi bi-check2-square"></i>
-							{{t('actionGroupee')}}
-						</label>
-						<select name="action" id="bulkAction" class="modern-select" required>
-							<option value="" disabled selected>{{t('actionGroupee')}}</option>
-							<option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
-						</select>
-						
-						<button type="submit" class="modern-btn btn-primary-modern">
-							<i class="bi bi-check-lg"></i>
-							{{t('valider')}}
-						</button>
-						<button type="button" class="modern-btn" id="btnToutCocher" style="background: linear-gradient(135deg, #10b981, #059669); color: white;" onclick="toggleToutCocher(this)">
-							<i class="bi bi-check2-all"></i>
-							Tout cocher
-						</button>
-					</form>
+									<div class="bulk-step-controls">
+										<select name="action" id="bulkAction" class="modern-select" required>
+											<option value="" disabled selected>{{t('actionGroupee')}}</option>
+											<option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
+										</select>
+
+										<button type="submit" class="modern-btn btn-primary-modern">
+											<i class="bi bi-check-lg"></i> {{t('valider')}}
+										</button>
+									</div>
+								</div>
+
+							</div>
+						</form>
 
 					<!-- Modification des horaires -->
 					<form action="PlacementDesRencontresTraitement.php" method="post" style="display: contents;">
@@ -1300,7 +1357,7 @@ details > summary::-webkit-details-marker {
 																<i class="fas fa-calendar-times"></i>
 															</a>
 															<div>
-																{{ planification.label_description }}
+																🏷️{{ planification.label_description }}
 															</div>
 														</div>
 														{% set creneauOqp = true %}
@@ -1362,7 +1419,7 @@ details > summary::-webkit-details-marker {
 														{% endfor %}
 														{% for label in libelleParTournoi %}
 															<option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>
-																{{t('label')}}:
+																🏷️{{t('label')}}:
 																{{label.description}}
 															</option>
 														{% endfor %}

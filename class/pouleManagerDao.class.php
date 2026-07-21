@@ -579,7 +579,7 @@ public function getAllPoulesByTournoi(int $idTournoi, $AndIsClassement = false) 
 
 
 
-    public function addEquipeToPoule($equipeId, $pouleId, $tournoiId, $isMatchRetour = false) {
+    public function addEquipeToPoule(int $equipeId, int $pouleId, int $tournoiId, bool $isMatchRetour = false) {
 
     // Vérifier si l'équipe est déjà dans la poule
     $queryCheck = "SELECT * FROM EquipePoule WHERE equipe_id = :equipeId AND poule_id = :pouleId";

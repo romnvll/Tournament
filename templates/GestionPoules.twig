@@ -553,6 +553,7 @@
                                                 <th>{{ t('matchsParEquipe') }}</th>
                                                 <th>{{ t('nombreDeTour') }}</th>
                                                 <th>{{ t('nombreDeRencontresParTour') }}</th>
+                                                <th>{{ t('nombreDeTerrainConseille') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -597,6 +598,11 @@
                                                 <td>
                                                     <div class="stat-badge">
                                                         {{ poule.equipes|length - 1 }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="stat-badge">
+                                                        {{ poule.equipes|length // 2 }}
                                                     </div>
                                                 </td>
                                                 <td>
