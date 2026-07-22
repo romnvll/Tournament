@@ -213,6 +213,7 @@ $allLangs = [
         'creerVosPoulesMessage' => 'Créez vos poules automatiquement en quelques clics',
         'equipesActuellementDansLaPoule' => 'Equipes actuellement dans la poule',
         'nombreDeTerrainConseille' => 'Nombre de terrains conseillé',
+        'gestionInformations' => 'Gestion des informations',
         
         
         
@@ -419,6 +420,7 @@ $allLangs = [
 'etapeSuivante' => 'Next step',
 'creerVosPoulesMessage' => 'Create your pools automatically in just a few clicks',
 'nombreDeTerrainConseille' => 'Number of recommended fields',
+'gestionInformations' => 'Information management',
 
 
 

@@ -63,6 +63,16 @@ class PouleManager {
     return $result['count'] / 2 > 0;
 }
 
+public function getCategorieNom(int $categorieId): string {
+    $stmt = $this->connexion->prepare("
+        SELECT Nom_categorie FROM Categorie 
+        WHERE id_categorie = :categorieId
+    ");
+    $stmt->bindValue(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchColumn() ?: 'Catégorie inconnue';
+}
+
 
 /**
  * Génère automatiquement les poules "Haute" / "Basse".
@@ -93,10 +103,11 @@ public function genererPoulesHauteBasseAutomatique(
         return [];
     }
 
-    $poulesCreees = [];
+    // Étape 1 : Récupérer TOUS les classements et les fusionner
+    $equipesHauteGlobale = [];
+    $equipesBassaGlobale = [];
 
     foreach ($poulesIds as $pouleSourceId) {
-
         $classement = $this->getClassementPoule($pouleSourceId);
         $nbEquipes  = count($classement);
 
@@ -109,55 +120,61 @@ public function genererPoulesHauteBasseAutomatique(
         $equipesHaute = array_slice($classement, 0, $nbHaute);
         $equipesBasse = array_slice($classement, $nbHaute);
 
-        $pouleSource = $this->getPouleById($pouleSourceId);
-        $nomBase     = $pouleSource['nom'];
+        // Fusionner dans les listes globales
+        $equipesHauteGlobale = array_merge($equipesHauteGlobale, $equipesHaute);
+        $equipesBassaGlobale = array_merge($equipesBassaGlobale, $equipesBasse);
+    }
 
-        foreach ([
-            'Haute' => $equipesHaute,
-            'Basse' => $equipesBasse,
-        ] as $suffixe => $equipes) {
+    if (empty($equipesHauteGlobale) && empty($equipesBassaGlobale)) {
+        return [];
+    }
 
-            if (empty($equipes)) {
-                continue;
-            }
+    // Étape 2 : Créer UNE SEULE poule Haute et UNE SEULE poule Basse
+    $poulesCreees = [];
 
-            $nomPouleClassement = "{$nomBase} {$suffixe}";
+    foreach ([
+        'Haute' => $equipesHauteGlobale,
+        'Basse' => $equipesBassaGlobale,
+    ] as $suffixe => $equipes) {
 
-            $pouleId = $this->creerOuRecupererPouleClassement(
-                $tournoiId,
-                $categorieId,
-                $nomPouleClassement
-            );
+        if (empty($equipes)) {
+            continue;
+        }
 
-            // 🔥 NOUVELLE LOGIQUE ICI
-            if ($createPouleOnly == 0) {
+        $nomCategorie = $this->getCategorieNom($categorieId); // À implémenter si nécessaire
+        $nomPouleClassement = "{$nomCategorie} {$suffixe}";
 
-                foreach ($equipes as $equipe) {
-                    try {
-                        $this->addEquipeToPoule(
-                            $equipe['id'],
-                            $pouleId,
-                            $tournoiId
-                        );
-                    } catch (Exception $e) {
-                        // déjà dans la poule
-                    }
+        $pouleId = $this->creerOuRecupererPouleClassement(
+            $tournoiId,
+            $categorieId,
+            $nomPouleClassement
+        );
+
+        if ($createPouleOnly == 0) {
+            foreach ($equipes as $equipe) {
+                try {
+                    $this->addEquipeToPoule(
+                        $equipe['id'],
+                        $pouleId,
+                        $tournoiId
+                    );
+                } catch (Exception $e) {
+                    // déjà dans la poule
                 }
             }
-
-            $poulesCreees[$nomPouleClassement] = [
-                'pouleId' => $pouleId,
-                'nom'     => $nomPouleClassement,
-                'equipes' => ($createPouleOnly == 0)
-                    ? array_column($equipes, 'id')
-                    : []
-            ];
         }
+
+        $poulesCreees[$nomPouleClassement] = [
+            'pouleId' => $pouleId,
+            'nom'     => $nomPouleClassement,
+            'equipes' => ($createPouleOnly == 0)
+                ? array_column($equipes, 'id')
+                : []
+        ];
     }
 
     return $poulesCreees;
 }
-    
     
 
 
