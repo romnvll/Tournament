@@ -1371,7 +1371,7 @@ details > summary::-webkit-details-marker {
 
 
 												<form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
-
+											
 													<select class="empty-select" name="Addevent">
 														<option value="">{{t('choisirRencontreOuLabel')}}</option>
 														{% for planif in planificationSansCreneauNiTerrain %}
@@ -1394,9 +1394,9 @@ details > summary::-webkit-details-marker {
 																	{{planif.equipe1_nom}}
 																	vs
 																	{{planif.equipe2_nom}}
-																	{{ planif.equipe1_poule_nom|split(' - ')[1] }}
+																	{{ planif.equipe2_poule_nom|split(' - ')[1] }}
 																</option>
-
+				
 															{% elseif planif.type_rencontre_id == 3 %}
 																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
 																	🏆PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }}

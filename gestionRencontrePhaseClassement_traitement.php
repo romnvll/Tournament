@@ -31,35 +31,68 @@ if (
 if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
     $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
     $nomCategorie = $categorieDao->obtenirCategorie($categorieId);
-   
-
 
     if ($categorieId && $idTournoi) {
 
-    if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
-        $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId,1);
-    } else {
-       $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId,0);
-    }
-       
-       foreach ($poules as $poule) {
-        
-       if ($labelsDao->labelDescriptionExiste('🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], $idTournoi)) {
-            // Le label existe déjà, ne pas le créer à nouveau
+        if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
+            $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId, 1);
         } else {
-            $labelsDao->ajouterLabel('🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'], '#000000',$idTournoi,$categorieId);
+            $poules = $pouledao->genererPoulesClassementAutomatique($idTournoi, $categorieId, 0);
         }
-       }
-      
-         
-        
-        
-       
+
+        // 🔥 Récupérer le nombre d'équipes des poules initiales
+        $totalEquipes = $pouledao->compterTotalEquipesByCategorie($idTournoi, $categorieId);
+
+        if ($totalEquipes === 0) {
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit();
+        }
+
+        foreach ($poules as $poule) {
+            $pouleId = $poule['pouleId'];
+            
+            // Nombre d'équipes par poule de classement
+            // (1er de chaque poule, 2eme de chaque poule, etc...)
+            $nombrePouleInitiales = $pouledao->compterPoulesInitiales($idTournoi, $categorieId);
+            $equipesParPouleClassement = $nombrePouleInitiales; // 4 poules initiales = 4 équipes dans la poule de classement
+            var_dump($nombrePouleInitiales);
+            if ($equipesParPouleClassement === 0) {
+                continue;
+            }
+            
+            // Déterminer le type de rencontre (Aller simple ou Aller-retour)
+            $estAller_retour = false; // À MODIFIER selon ta config
+            
+            // Nombre de tours
+            $nombreToursAller = $equipesParPouleClassement - 1;
+            $nombreTours = $estAller_retour ? $nombreToursAller * 2 : $nombreToursAller;
+            
+            // Nombre de rencontres par tour
+            $rencontresParTour = floor($equipesParPouleClassement / 2);
+
+            // ──────────────────────────────────────────────────────
+            // Créer les labels pour chaque tour
+            // ──────────────────────────────────────────────────────
+            for ($tour = 1; $tour <= $nombreTours; $tour++) {
+                $nomTour = ($tour <= $nombreToursAller) ? $tour : $tour - $nombreToursAller;
+                $suffixe = ($tour > $nombreToursAller) ? ' (Retour)' : '';
+                
+                // Créer une rencontre par match du tour
+                for ($rencontre = 1; $rencontre <= $rencontresParTour; $rencontre++) {
+                    $libelleLabel = 'Rencontre ' . $rencontre . ' tour ' . $nomTour . ' ' . $nomCategorie['Nom_categorie'] . ' ' . $poule['nom'] . $suffixe;
+                    
+                    if (!$labelsDao->labelDescriptionExiste($libelleLabel, $idTournoi)) {
+                       $labelsDao->ajouterLabel($libelleLabel, '#000000', $idTournoi, $categorieId);
+                    }
+                }
+            }
+        }
     }
- 
-  header("Location: " . $_SERVER['HTTP_REFERER']);
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
 }
+
 
 if (isset($_GET['autoHauteBasse']) && $_GET['autoHauteBasse'] == 1) {
     $categorieId = filter_input(INPUT_GET, 'categorieId', FILTER_VALIDATE_INT);
@@ -67,21 +100,50 @@ if (isset($_GET['autoHauteBasse']) && $_GET['autoHauteBasse'] == 1) {
 
     if ($categorieId && $idTournoi) {
 
-    if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
-        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId,1);
-    } else {
-        $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId,0);
-    }
-        foreach ($poules as $poule) {
-            $libelleLabel = '🏆 ' . $nomCategorie['Nom_categorie'] . ' - ' . $poule['nom'];
+        if (isset($_GET['createPouleOnly']) && $_GET['createPouleOnly'] == 1) {
+            $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId, 1);
+        } else {
+            $poules = $pouledao->genererPoulesHauteBasseAutomatique($idTournoi, $categorieId, 0);
+        }
 
-            if ($labelsDao->labelDescriptionExiste($libelleLabel, $idTournoi)) {
-                // Le label existe déjà, ne pas le créer à nouveau
-            } else {
-                $labelsDao->ajouterLabel($libelleLabel, '#000000', $idTournoi, $categorieId);
+        // 🔥 Récupérer le nombre d'équipes par poule INITIALE
+        $totalEquipes = $pouledao->compterTotalEquipesByCategorie($idTournoi, $categorieId);
+
+        if ($totalEquipes === 0) {
+            return;
+        }
+
+        // Calculer le nombre de tours (chaque poule Haute/Basse aura totalEquipes/2 équipes)
+        $equipesParPouleHauteBasse = ceil($totalEquipes / 2);
+        $estAller_retour = FALSE; // À MODIFIER selon ta config
+        
+        $nombreToursAller = $equipesParPouleHauteBasse - 1;
+        $nombreTours = $estAller_retour ? $nombreToursAller * 2 : $nombreToursAller;
+        
+        // Nombre de rencontres par tour
+        $rencontresParTour = floor($equipesParPouleHauteBasse / 2);
+
+        foreach ($poules as $poule) {
+            // ──────────────────────────────────────────────────────
+            // Créer les labels pour chaque tour
+            // ──────────────────────────────────────────────────────
+            for ($tour = 1; $tour <= $nombreTours; $tour++) {
+                $nomTour = ($tour <= $nombreToursAller) ? $tour : $tour - $nombreToursAller;
+                $suffixe = ($tour > $nombreToursAller) ? ' (Retour)' : '';
+                
+                // 🔥 Créer une rencontre par match du tour
+                for ($rencontre = 1; $rencontre <= $rencontresParTour; $rencontre++) {
+                    $libelleLabel = 'Rencontre ' . $rencontre . ' tour ' . $nomTour . ' ' . $nomCategorie['Nom_categorie'] . ' ' . $poule['nom'] . $suffixe;
+                    
+                    if (!$labelsDao->labelDescriptionExiste($libelleLabel, $idTournoi)) {
+                        $labelsDao->ajouterLabel($libelleLabel, '#000000', $idTournoi, $categorieId);
+                    }
+                }
             }
         }
     }
+
+
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
@@ -164,9 +226,8 @@ if ($rencontresNonTerminees > 0) {
 
 
 
-        header("Location: " . $_SERVER['HTTP_REFERER']);
+       header("Location: " . $_SERVER['HTTP_REFERER']);
 
-      //header("Location:  PlacementDesRencontres.php?id_tournoi=".$_GET['tournoiId']."&redirect=" . $_SERVER['HTTP_REFERER']);
 
         }
 

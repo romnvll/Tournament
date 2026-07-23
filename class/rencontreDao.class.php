@@ -70,8 +70,9 @@ public function createRencontreByPoule(int $pouleId, int $tournoi_id, int $typeR
                 $pouleId
             );
         }
-        return;
+        
     }
+   
 
     // L'aller existe déjà : on ne touche pas à l'aller.
     // Si on demande les retours et qu'ils n'existent pas encore, on les ajoute à la suite.
@@ -916,6 +917,7 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
                WHERE tournoi_id = :tournoi_id 
                  AND type_rencontre_id = :typeRencontreId
                  AND poule_id = :pouleId
+                  AND tour = :tour
                  AND ((equipe1_id = :equipe1Id AND equipe2_id = :equipe2Id)
                    OR (equipe1_id = :equipe2Id AND equipe2_id = :equipe1Id))";
     
@@ -925,6 +927,7 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
     $checkStmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
     $checkStmt->bindValue(':typeRencontreId', $typeRencontreId, PDO::PARAM_INT);
     $checkStmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
+    $checkStmt->bindValue(':tour', $tour, PDO::PARAM_INT);
     $checkStmt->execute();
 
     if ($checkStmt->fetch()) {

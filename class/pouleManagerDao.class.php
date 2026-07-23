@@ -20,6 +20,44 @@ class PouleManager {
         }
     }
 
+/**
+ * Compte le nombre de poules initiales (is_classement = 0) d'une catégorie
+ */
+public function compterPoulesInitiales(int $tournoiId, int $categorieId): int {
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(*) AS nb_poules
+        FROM Poules
+        WHERE tournoi_id = :tournoiId
+          AND fk_idcategorie = :categorieId
+          AND is_classement = 0
+    ");
+    $stmt->execute([
+        ':tournoiId' => $tournoiId,
+        ':categorieId' => $categorieId
+    ]);
+    return (int) $stmt->fetchColumn();
+}
+
+
+    /**
+ * Compte le nombre total d'équipes dans les poules initiales d'une catégorie
+ */
+public function compterTotalEquipesByCategorie(int $tournoiId, int $categorieId): int {
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(DISTINCT ep.equipe_id) AS total_equipes
+        FROM EquipePoule ep
+        JOIN Poules p ON ep.poule_id = p.id
+        WHERE p.tournoi_id = :tournoiId 
+          AND p.fk_idcategorie = :categorieId 
+          AND p.is_classement = 0
+    ");
+    $stmt->execute([
+        ':tournoiId' => $tournoiId,
+        ':categorieId' => $categorieId
+    ]);
+    return (int) $stmt->fetchColumn();
+}
+
     public function createPoule($nomPoule, $idTournoi, $categorie, $is_classement = 0) {
         // Utiliser la méthode pouleExists pour vérifier si la poule existe déjà
         //if ($this->pouleExists($nomPoule, $idTournoi)) {
@@ -974,7 +1012,7 @@ public function getPremierePouleIdParEquipe(int $equipeId): ?int {
 
 
 
-public function compterEquipesParPoule($poule_id) {
+public function compterEquipesParPoule(int $poule_id) {
     
     // Utilisez une requête SQL pour compter le nombre d'équipes dans la poule donnée
     $query = "SELECT COUNT(*) AS nombre_equipes FROM EquipePoule WHERE poule_id = :poule_id";
@@ -987,49 +1025,65 @@ public function compterEquipesParPoule($poule_id) {
     return (int) $result['nombre_equipes'];
 }
 
-public function calculerNombreTours($nombre_equipes) {
+public function calculerNombreTours(int $nombre_equipes) {
     // Utilisez log2 pour calculer le nombre de tours
     return ceil(log($nombre_equipes, 2));
 }
 
+/**
+ * Récupère les infos complètes d'une poule (équipes, rencontres, tours)
+ */
 public function getInfoPoule($poule_id) {
-    // Utilisez une requête SQL pour compter le nombre d'équipes dans la poule donnée
+    // Compter le nombre d'équipes dans la poule donnée
     $queryEquipes = "SELECT COUNT(*) AS nombre_equipes FROM EquipePoule WHERE poule_id = :poule_id";
     $stmtEquipes = $this->connexion->prepare($queryEquipes);
     $stmtEquipes->bindParam(':poule_id', $poule_id, PDO::PARAM_INT);
     $stmtEquipes->execute();
 
-    // Récupérez le résultat de la requête pour le nombre d'équipes
     $resultEquipes = $stmtEquipes->fetch(PDO::FETCH_ASSOC);
     $nombre_equipes = (int) $resultEquipes['nombre_equipes'];
 
-    // Utilisez une requête SQL pour compter le nombre de rencontres dans la poule donnée
-    $queryRencontres = "SELECT COUNT(*) AS nombre_rencontres FROM Rencontres 
-                        WHERE equipe1_id IN (SELECT equipe_id FROM EquipePoule WHERE poule_id = :poule_id) 
-                        AND equipe2_id IN (SELECT equipe_id FROM EquipePoule WHERE poule_id = :poule_id)";
+    if ($nombre_equipes === 0) {
+        return array(
+            'nombre_equipes' => 0,
+            'nombre_rencontres' => 0,
+            'nombre_tours' => 0,
+            'nombre_rencontres_par_tour' => 0,
+            'type_rencontre' => 'Aller simple'
+        );
+    }
+
+    // Compter le nombre de rencontres de poule (type_rencontre_id = 1) dans cette poule
+    // ✅ FILTRAGE PAR poule_id ET type_rencontre_id
+    $queryRencontres = "
+        SELECT COUNT(*) AS nombre_rencontres 
+        FROM Rencontres r
+        WHERE r.poule_id = :poule_id 
+          AND r.type_rencontre_id = :typePoule
+    ";
     $stmtRencontres = $this->connexion->prepare($queryRencontres);
     $stmtRencontres->bindParam(':poule_id', $poule_id, PDO::PARAM_INT);
+    $stmtRencontres->bindValue(':typePoule', TYPE_RENCONTRE_POULE, PDO::PARAM_INT);
     $stmtRencontres->execute();
 
-    // Récupérez le résultat de la requête pour le nombre de rencontres
     $resultRencontres = $stmtRencontres->fetch(PDO::FETCH_ASSOC);
     $nombre_rencontres = (int) $resultRencontres['nombre_rencontres'];
 
-    // Calculer le nombre de tours nécessaires
-    $nombre_tours = $this->calculerNombreTours($nombre_equipes);
+    // Nombre de rencontres théorique en aller simple (round-robin)
+    $rencontres_aller_simple = $nombre_equipes * ($nombre_equipes - 1) / 2;
 
     // Déterminer le type de rencontre
-    $type_rencontre = ($nombre_rencontres == $nombre_equipes * ($nombre_equipes - 1) / 2) ? "Aller simple" : "Aller-retour";
+    $type_rencontre = ($nombre_rencontres == $rencontres_aller_simple) ? "Aller simple" : "Aller-retour";
 
-    // Calculer le nombre de rencontres par tour
-    if ($type_rencontre === "Aller-retour") {
-        $nombre_rencontres_par_tour = ceil($nombre_equipes / 2);
-    } else {
-        // Pour les matchs aller simple, le nombre de rencontres par tour est le nombre d'équipes divisé par 2
-        $nombre_rencontres_par_tour = ceil($nombre_equipes / 2);
-    }
+    // Nombre de tours
+    $nombre_toursAller = $nombre_equipes - 1;
+    $nombre_tours = ($type_rencontre === "Aller-retour") 
+        ? $nombre_toursAller * 2 
+        : $nombre_toursAller;
 
-    // Retournez un tableau associatif contenant le nombre d'équipes, le nombre de rencontres, le nombre de tours, le nombre de rencontres par tour et le type de rencontre
+    // Nombre de rencontres par tour
+    $nombre_rencontres_par_tour = ceil($nombre_equipes / 2);
+
     return array(
         'nombre_equipes' => $nombre_equipes,
         'nombre_rencontres' => $nombre_rencontres,

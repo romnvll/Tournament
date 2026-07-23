@@ -356,9 +356,10 @@
                                         <label class="form-check-label small text-muted" for="switch_{{ poule.id }}">Matches retour</label>
                                     </div>
 
-                                    <a class="btn btn-primary btn-sm px-3" id="btnCreer_{{ poule.id }}"
-                                       data-base-href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
-                                       href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}&idCategorie={{idCategorieEnCours}}">
+                                   <a class="btn btn-primary btn-sm px-3" id="btnCreer_{{ poule.id }}"
+                                    data-base-href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}"
+                                    data-id-categorie="{{ idCategorieEnCours }}"
+                                    href="gestionRencontrePhaseClassement_traitement.php?CreerRencontre=1&pouleId={{ poule.id }}&tournoiId={{ idTournoi }}&idCategorie={{idCategorieEnCours}}">
                                         <i class="fas fa-play me-1"></i> Générer matches
                                     </a>
                                 </div>
@@ -434,20 +435,27 @@
         };
 
         document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('checkbox-retour')) {
-                const checkbox = e.target;
-                const btn = document.getElementById(checkbox.dataset.target);
-                const baseHref = btn.dataset.baseHref;
-                btn.href = baseHref + (checkbox.checked ? '&creerRencontresRetour=true' : '');
+    if (e.target.classList.contains('checkbox-retour')) {
+        const checkbox = e.target;
+        const btn = document.getElementById(checkbox.dataset.target);
+        const baseHref = btn.dataset.baseHref;
+        
+        // 🔥 Récupérer idCategorie depuis le bouton et l'ajouter
+        const idCategorie = btn.dataset.idCategorie || document.querySelector('input[name="idCategorie"]')?.value || '';
+        
+        btn.href = baseHref + (checkbox.checked ? '&creerRencontresRetour=true' : '');
+        if (idCategorie) {
+            btn.href += '&idCategorie=' + idCategorie;
+        }
 
-                // Mise à jour du nombre de rencontres attendu
-                const span = document.getElementById('nbRencontresAttendu_' + checkbox.dataset.poule);
-                if (span) {
-                    const base = parseInt(span.dataset.base, 10);
-                    span.textContent = checkbox.checked ? base * 2 : base;
-                }
-            }
-        });
+        // Mise à jour du nombre de rencontres attendu
+        const span = document.getElementById('nbRencontresAttendu_' + checkbox.dataset.poule);
+        if (span) {
+            const base = parseInt(span.dataset.base, 10);
+            span.textContent = checkbox.checked ? base * 2 : base;
+        }
+    }
+});
     </script>
 </body>
 </html>

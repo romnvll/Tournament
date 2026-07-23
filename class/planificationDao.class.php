@@ -118,18 +118,16 @@ public function nettoyerPlanificationsVides(int $tournoi_id): int {
  * Place automatiquement les rencontres de type_rencontre_id = 3 (phases finales)
  * à la place des labels correspondants dans la table Planification, pour une
  * catégorie donnée, en respectant :
- *   - la poule indiquée dans le texte du label (la description du label doit
- *     contenir le nom de la poule, ex: "? Seniors F - Haute" -> poule "Haute")
+ *   - le tour indiqué dans le label (ex: "Rencontre 1 tour 3 U11F U11F Haute")
+ *   - la poule indiquée dans le label (ex: "U11F Haute" ou "U11F Basse")
  *   - la contrainte qu'une équipe ne peut pas jouer deux fois sur le même creneau_id
  *
  * @param int $tournoi_id
  * @param int $categorie_id
- * @return array Liste des planifications (label) qui n'ont pas pu être traitées,
- *               avec le motif ('poule_introuvable', 'aucune_rencontre_disponible' ou 'conflit_creneau').
+ * @return array Liste des planifications (label) qui n'ont pas pu être traitées
  */
 public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categorie_id): array {
-    // 1. Récupérer les planifications avec un label de cette catégorie, pour les rencontres de type 3,
-    //    triées par creneau puis terrain (ordre de traitement = ordre chronologique)
+    // 1. Récupérer les planifications avec un label de cette catégorie
     $stmt = $this->connexion->prepare("
         SELECT 
             p.planification_id,
@@ -143,6 +141,7 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
           AND p.label_id IS NOT NULL
           AND l.tournoi_id = :tournoi_id
           AND l.categorie_id = :categorie_id
+          AND l.description LIKE '%Rencontre%'
         ORDER BY p.creneau_id ASC, p.terrain_id ASC
     ");
     $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
@@ -154,7 +153,7 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
         return [];
     }
 
-    // 2. Récupérer toutes les poules de cette catégorie (pour matcher le texte du label)
+    // 2. Récupérer toutes les poules de cette catégorie
     $stmtPoules = $this->connexion->prepare("
         SELECT id, nom
         FROM Poules
@@ -166,26 +165,45 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
     $stmtPoules->execute();
     $poules = $stmtPoules->fetchAll(PDO::FETCH_ASSOC);
 
-    // Préparer la requête des rencontres dispo pour une poule donnée (réutilisée en boucle)
-    $stmtRencontres = $this->connexion->prepare("
+    // 3. Récupérer les rencontres de type 3 groupées par poule et tour
+    $stmtAllRencontres = $this->connexion->prepare("
         SELECT 
             r.id AS rencontre_id,
             r.equipe1_id,
-            r.equipe2_id
+            r.equipe2_id,
+            r.poule_id,
+            r.tour AS tour
         FROM Rencontres r
-        LEFT JOIN Planification pl ON r.id = pl.rencontre_id
         WHERE r.tournoi_id = :tournoi_id
           AND r.type_rencontre_id = 3
-          AND r.poule_id = :poule_id
-          AND pl.rencontre_id IS NULL
-        ORDER BY r.id ASC
+          AND r.poule_id IN (SELECT id FROM Poules WHERE fk_idcategorie = :categorie_id)
+        ORDER BY r.poule_id ASC, r.tour ASC
     ");
+    $stmtAllRencontres->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmtAllRencontres->bindParam(':categorie_id', $categorie_id, PDO::PARAM_INT);
+    $stmtAllRencontres->execute();
+    $allRencontres = $stmtAllRencontres->fetchAll(PDO::FETCH_ASSOC);
 
-    // File d'attente de rencontres dispo, indexée par poule_id (chargée à la demande)
-    $queueParPoule = [];
+    // Index par poule_id et tour
+    $rencontresParPouleEtTour = [];
+    $rencontresUtilisees = [];
 
-    // 3. Récupérer les occupations déjà existantes par creneau (équipes déjà engagées
-    //    sur ce créneau via une planification ayant déjà une rencontre_id)
+    foreach ($allRencontres as $rencontre) {
+        $pouleId = $rencontre['poule_id'];
+        $tour = $rencontre['tour'];
+
+        if (!isset($rencontresParPouleEtTour[$pouleId])) {
+            $rencontresParPouleEtTour[$pouleId] = [];
+        }
+        if (!isset($rencontresParPouleEtTour[$pouleId][$tour])) {
+            $rencontresParPouleEtTour[$pouleId][$tour] = [];
+        }
+
+        $rencontresParPouleEtTour[$pouleId][$tour][] = $rencontre;
+        $rencontresUtilisees[$rencontre['rencontre_id']] = false;
+    }
+
+    // 4. Récupérer les occupations par creneau
     $stmtOccupations = $this->connexion->prepare("
         SELECT p.creneau_id, r.equipe1_id, r.equipe2_id
         FROM Planification p
@@ -197,7 +215,6 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
     $stmtOccupations->execute();
     $occupationsBrutes = $stmtOccupations->fetchAll(PDO::FETCH_ASSOC);
 
-    // equipesOccupeesParCreneau[creneau_id] = [equipe_id => true, ...]
     $equipesOccupeesParCreneau = [];
     foreach ($occupationsBrutes as $o) {
         if ($o['equipe1_id'] !== null) {
@@ -208,7 +225,7 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
         }
     }
 
-    // Préparer la requête de mise à jour
+    // 5. Préparer la requête de mise à jour
     $updateStmt = $this->connexion->prepare("
         UPDATE Planification
         SET rencontre_id = :rencontre_id, label_id = NULL
@@ -217,59 +234,66 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
 
     $nonTraites = [];
 
-    // 4. Traiter chaque planification (label) dans l'ordre creneau/terrain
+    // 6. Traiter chaque planification (label)
     foreach ($planifications as $planification) {
         $creneauId = $planification['creneau_id'];
         $description = $planification['description'];
 
-        // 4a. Trouver la poule dont le nom est contenu dans la description du label
+        // Extraire le tour depuis le label (format: "Rencontre X tour Y ...")
+        $tour = null;
+        if (preg_match('/tour\s+(\d+)/i', $description, $matches)) {
+            $tour = (int) $matches[1];
+        }
+
+        // Trouver la poule
         $pouleTrouvee = null;
         foreach ($poules as $poule) {
             if (mb_stripos($description, $poule['nom']) !== false) {
-                // En cas d'ambiguïté (plusieurs noms de poule inclus l'un dans l'autre),
-                // on garde le nom le plus long (le plus spécifique)
                 if ($pouleTrouvee === null || mb_strlen($poule['nom']) > mb_strlen($pouleTrouvee['nom'])) {
                     $pouleTrouvee = $poule;
                 }
             }
         }
 
-        if ($pouleTrouvee === null) {
+        if ($pouleTrouvee === null || $tour === null) {
+            $motif = $pouleTrouvee === null ? 'poule_introuvable' : 'tour_introuvable';
             $nonTraites[] = [
                 'planification_id' => $planification['planification_id'],
-                'creneau_id'       => $creneauId,
-                'terrain_id'       => $planification['terrain_id'],
                 'label_id'         => $planification['label_id'],
-                'categorie_id'     => $categorie_id,
-                'motif'            => 'poule_introuvable',
+                'description'      => $description,
+                'motif'            => $motif,
             ];
             continue;
         }
 
         $pouleId = $pouleTrouvee['id'];
 
-        // 4b. Charger la file d'attente des rencontres dispo pour cette poule (une seule fois)
-        if (!isset($queueParPoule[$pouleId])) {
-            $stmtRencontres->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-            $stmtRencontres->bindValue(':poule_id', $pouleId, PDO::PARAM_INT);
-            $stmtRencontres->execute();
-            $queueParPoule[$pouleId] = $stmtRencontres->fetchAll(PDO::FETCH_ASSOC);
+        // Vérifier s'il y a des rencontres pour cette poule et ce tour
+        if (!isset($rencontresParPouleEtTour[$pouleId][$tour])) {
+            $nonTraites[] = [
+                'planification_id' => $planification['planification_id'],
+                'label_id'         => $planification['label_id'],
+                'description'      => $description,
+                'motif'            => 'aucune_rencontre_disponible',
+            ];
+            continue;
         }
 
-        $queue = &$queueParPoule[$pouleId];
-
-        // 4c. Chercher la première rencontre dispo sans conflit de créneau
+        // Chercher une rencontre dispo sans conflit
         $rencontreChoisie = null;
         $indexChoisi = null;
 
-        foreach ($queue as $index => $rencontre) {
+        foreach ($rencontresParPouleEtTour[$pouleId][$tour] as $index => $rencontre) {
+            // Vérifier si pas déjà utilisée
+            if ($rencontresUtilisees[$rencontre['rencontre_id']]) {
+                continue;
+            }
+
             $equipe1 = $rencontre['equipe1_id'];
             $equipe2 = $rencontre['equipe2_id'];
 
-            $equipe1Occupee = $equipe1 !== null
-                && isset($equipesOccupeesParCreneau[$creneauId][$equipe1]);
-            $equipe2Occupee = $equipe2 !== null
-                && isset($equipesOccupeesParCreneau[$creneauId][$equipe2]);
+            $equipe1Occupee = $equipe1 !== null && isset($equipesOccupeesParCreneau[$creneauId][$equipe1]);
+            $equipe2Occupee = $equipe2 !== null && isset($equipesOccupeesParCreneau[$creneauId][$equipe2]);
 
             if (!$equipe1Occupee && !$equipe2Occupee) {
                 $rencontreChoisie = $rencontre;
@@ -279,25 +303,25 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
         }
 
         if ($rencontreChoisie === null) {
-            $motif = empty($queue) ? 'aucune_rencontre_disponible' : 'conflit_creneau';
             $nonTraites[] = [
                 'planification_id' => $planification['planification_id'],
-                'creneau_id'       => $creneauId,
-                'terrain_id'       => $planification['terrain_id'],
                 'label_id'         => $planification['label_id'],
-                'categorie_id'     => $categorie_id,
-                'motif'            => $motif,
+                'description'      => $description,
+                'motif'            => 'conflit_creneau',
             ];
             continue;
         }
 
-        // Assigner la rencontre à la planification
+        // Assigner la rencontre
         $updateStmt->bindValue(':rencontre_id', $rencontreChoisie['rencontre_id'], PDO::PARAM_INT);
         $updateStmt->bindValue(':planification_id', $planification['planification_id'], PDO::PARAM_INT);
         $updateStmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
         $updateStmt->execute();
 
-        // Marquer les équipes comme occupées sur ce créneau
+        // Marquer comme utilisée
+        $rencontresUtilisees[$rencontreChoisie['rencontre_id']] = true;
+
+        // Marquer les équipes comme occupées
         if ($rencontreChoisie['equipe1_id'] !== null) {
             $equipesOccupeesParCreneau[$creneauId][$rencontreChoisie['equipe1_id']] = true;
         }
@@ -305,9 +329,8 @@ public function placerAutomatiquementRencontresType3(int $tournoi_id, int $categ
             $equipesOccupeesParCreneau[$creneauId][$rencontreChoisie['equipe2_id']] = true;
         }
 
-        // Retirer la rencontre de la file d'attente de sa poule
-        unset($queue[$indexChoisi]);
-        $queue = array_values($queue);
+        // Retirer de la liste dispo
+        unset($rencontresParPouleEtTour[$pouleId][$tour][$indexChoisi]);
     }
 
     return $nonTraites;
@@ -629,7 +652,8 @@ public function afficherRencontresSansPlanification(int $tournoi_id, bool $onlyP
        c2.nom AS club2_nom,
        e1_cat.ordrePlacementAuto AS equipe1_categorie_ordre, 
        c2.logo AS club2_logo,
-       MIN(p1.nom) AS equipe1_poule_nom
+       MIN(p1.nom) AS equipe1_poule_nom,
+       MAX(p1.nom) AS equipe2_poule_nom
 
 FROM Rencontres r
 LEFT JOIN phases_finales pf ON r.phase_finale_id = pf.id
@@ -664,23 +688,28 @@ AND r.tournoi_id = :tournoi_id";
 }
 
 
-public function listerLabelsParTournoi(int $tournoi_id): array {
+/**
+ * Récupère les labels non planifiés contenant "Rencontre"
+ */
+public function listerLabelsParTournoi(int $tournoiId): array {
     $stmt = $this->connexion->prepare("
-        SELECT 
-            l.label_id,
-            l.description,
-            l.couleur,
-            l.tournoi_id
-        FROM 
-            Labels l
-        WHERE 
-            l.tournoi_id = :tournoi_id
+        SELECT l.label_id, l.description, l.couleur, l.categorie_id
+        FROM Labels l
+        LEFT JOIN Planification p ON l.label_id = p.label_id 
+                                   AND p.tournoi_id = :tournoiId
+        WHERE l.tournoi_id = :tournoiId
+          AND (
+            -- Labels contenant 'Rencontre' : uniquement si non planifiés
+            (l.description LIKE '%Rencontre%' AND p.label_id IS NULL)
+            -- OU labels ne contenant PAS 'Rencontre' : toujours
+            OR l.description NOT LIKE '%Rencontre%'
+          )
+       order by l.label_id ASC;
     ");
-    $stmt->bindParam(':tournoi_id', $tournoi_id);
+    $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 
 public function retireArbitre(int $tournoi_id, int $planification_id): void {
     try {
