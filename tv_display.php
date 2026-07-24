@@ -122,13 +122,26 @@ foreach ($categories as $cat) {
     $enCours = array_values(array_filter($rencontresActives, fn($r) => (int)$r['isTerminated'] === 2));
     $aVenir  = array_values(array_filter($rencontresActives, fn($r) => (int)$r['isTerminated'] === 0));
 
+    // Poules finales propres à cette catégorie uniquement
+    $poulesFinalesCat = array_values(array_filter(
+        $pouleManager->getAllPoulesFinalesByTournoi($idTournoi),
+        fn($p) => (int)$p['fk_idcategorie'] === $catId
+    ));
+    foreach ($poulesFinalesCat as &$pf) {
+        $pf['contenu']       = $pouleManager->getEquipesInPoule($pf['id']);
+        $pf['hasRencontres'] = $pouleManager->checkRencontresInPoule($pf['id'], 3);
+    }
+    unset($pf);
+
     $donneesCategories[] = [
         'categorie'         => $cat,
         'classementsPoules' => array_values($classementsPoules),
         'enCours'           => $enCours,
         'aVenir'            => $aVenir,
+        'poulesFinales'     => $poulesFinalesCat,
     ];
 }
+    
 
 // ── Partenaires ───────────────────────────────────────────────────────────────
 $partenaires = [];
@@ -137,13 +150,13 @@ if (!empty($infoTournoi['gestionPartenaires'])) {
     $partenaires = $sponsorDao->getSponsorsActifParClub($infoTournoi['utilisateur_id']);
 }
 
-
+/*
 $poulesFinales = $pouleManager->getAllPoulesFinalesByTournoi($idTournoi);
 foreach ($poulesFinales as &$poule) {
   $poule['contenu'] = $pouleManager->getEquipesInPoule($poule['id']);
   $poule['hasRencontres'] = $pouleManager->checkRencontresInPoule($poule['id'],3);
 }
-
+*/
 
 
 // ── Navigation entre catégories ───────────────────────────────────────────────
@@ -169,5 +182,5 @@ echo $template->render([
     'donneesCat'                 => $donneesCat,
     'nombreRencontresPlanifiees' => $nombreRencontresPlanifiees,
     'nombreRencontresTerminees'  => $nombreTerminees,
-    'poulesFinales' => $poulesFinales,
+    //'poulesFinales' => $poulesFinales,
 ]);

@@ -631,8 +631,8 @@
         {# ── Panneau centre : classement ── #}
         {% set afficherClassementFinal = false %}
 
-            {% if poulesFinales is not empty %}
-                {% for poule in poulesFinales %}
+            {% if donneesCat.poulesFinales is not empty %}
+                {% for poule in donneesCat.poulesFinales %}
                     {% if poule.hasRencontres %}
                         {% set afficherClassementFinal = true %}
                     {% endif %}
@@ -716,15 +716,15 @@
 
 {% set afficherClassementFinal = false %}
 
-{% if poulesFinales is not empty %}
-    {% for poule in poulesFinales %}
+{% if donneesCat.poulesFinales is not empty %}
+    {% for poule in donneesCat.poulesFinales %}
         {% if poule.hasRencontres %}
             {% set afficherClassementFinal = true %}
         {% endif %}
     {% endfor %}
 {% endif %}
 
-{% set classements = afficherClassementFinal ? poulesFinales : donneesCat.classementsPoules %}
+{% set classements = afficherClassementFinal ? donneesCat.poulesFinales : donneesCat.classementsPoules %}
 
 <tbody>
 
