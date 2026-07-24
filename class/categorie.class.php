@@ -167,6 +167,33 @@ public function creerCategorie(string $nom, string $couleur, int $fk_id_user, in
     return (int) $this->connexion->lastInsertId();
 }
 
+/**
+ * Retourne le nombre maximal d'équipes dans une poule initiale d'une catégorie donnée
+ */
+public function getNombreMaxEquipesParPouleInitiale(int $tournoiId, int $categorieId): int
+{
+    $query = "
+        SELECT MAX(nombre_equipes) AS max_equipes
+        FROM (
+            SELECT COUNT(ep.equipe_id) AS nombre_equipes
+            FROM Poules p
+            LEFT JOIN EquipePoule ep ON p.id = ep.poule_id
+            WHERE p.tournoi_id = :tournoiId
+              AND p.fk_idcategorie = :categorieId
+              AND p.is_classement = 0
+            GROUP BY p.id
+        ) AS counts
+    ";
+    
+    $stmt = $this->connexion->prepare($query);
+    $stmt->bindValue(':tournoiId', $tournoiId, PDO::PARAM_INT);
+    $stmt->bindValue(':categorieId', $categorieId, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $result = $stmt->fetchColumn();
+    return $result ? (int) $result : 0;
+}
+
 
    public function supprimerCategorie(int $id, int $utilisateur_id): void
 {

@@ -54,8 +54,12 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
             // Nombre d'équipes par poule de classement
             // (1er de chaque poule, 2eme de chaque poule, etc...)
             $nombrePouleInitiales = $pouledao->compterPoulesInitiales($idTournoi, $categorieId);
-            $equipesParPouleClassement = $nombrePouleInitiales; // 4 poules initiales = 4 équipes dans la poule de classement
-            var_dump($nombrePouleInitiales);
+            $equipesParPouleClassement = $pouledao->compterEquipesParPoule($pouleId);
+
+            
+    $equipesParPouleClassement = $categorieDao->getNombreMaxEquipesParPouleInitiale($idTournoi, $categorieId);
+   
+           
             if ($equipesParPouleClassement === 0) {
                 continue;
             }
@@ -64,7 +68,7 @@ if (isset($_GET['autoClassement']) && $_GET['autoClassement'] == 1) {
             $estAller_retour = false; // À MODIFIER selon ta config
             
             // Nombre de tours
-            $nombreToursAller = $equipesParPouleClassement - 1;
+            $nombreToursAller = (int)(($nombrePouleInitiales)/2);
             $nombreTours = $estAller_retour ? $nombreToursAller * 2 : $nombreToursAller;
             
             // Nombre de rencontres par tour

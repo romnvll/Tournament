@@ -195,7 +195,7 @@ public function getLabelsAvecPlanificationParCategorie(int $categorie_id): array
 
 public function supprimerLabelParNomEtTournoiId(string $description, int $tournoi_id) {
     $stmt = $this->connexion->prepare("DELETE FROM Labels WHERE description LIKE :description AND tournoi_id = :tournoi_id");
-    $stmt->bindValue(':description', "%{$description}", PDO::PARAM_STR);
+    $stmt->bindValue(':description', "Rencontre%{$description}", PDO::PARAM_STR);
     $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
     
     return $stmt->execute();
