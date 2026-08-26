@@ -2151,7 +2151,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script>
         var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
-
+/*
    setInterval(function () {
     $('#score').load(location.href + ' #score > *', function () {
         initCountdowns(); // ← relance les timers sur les nouveaux éléments
@@ -2169,7 +2169,88 @@
     $('#creneauBadge').load(location.href + ' #creneauBadge > *');
 }, refreshInterval);
 
+*/
+function connectSSE(idTournoi, idPoule, idEquipe, idCategorie) {
 
+    let url = `sse.php?id_tournoi=${idTournoi}`;
+
+    if (idPoule) {
+        url += `&idPoule=${idPoule}`;
+    }
+
+    if (idEquipe) {
+        url += `&id_equipe=${idEquipe}`;
+    }
+
+    if (idCategorie) {
+        url += `&idCategorie=${idCategorie}`;
+    }
+
+    const evtSource = new EventSource(url);
+
+    evtSource.addEventListener('score_update', function () {
+        $('#score').load(location.href + ' #score > *', function () {
+            initCountdowns();
+        });
+    });
+
+    evtSource.addEventListener('ranking_update', function () {
+        $('#classementTableau').load(location.href + ' #classementTableau > *');
+    });
+
+    evtSource.addEventListener('classement_final_update', function () {
+        $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
+    });
+
+    evtSource.addEventListener('finale_update', function () {
+
+    $('#phase-finale').load(
+        location.href + ' #phase-finale > *',
+        function () {
+            initCountdowns();
+        }
+    );
+
+});
+
+    evtSource.addEventListener('bell_update', function (e) {
+        const data = JSON.parse(e.data);
+        const bellButton = document.querySelector('.bell-button');
+        if (!bellButton) return;
+
+        bellButton.classList.toggle('has-unread', data.nbMessagesNonLus > 0);
+
+        let badge = bellButton.querySelector('.bell-badge');
+        if (data.nbMessagesNonLus > 0) {
+            const label = data.nbMessagesNonLus > 9 ? '9+' : data.nbMessagesNonLus;
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'bell-badge';
+                bellButton.appendChild(badge);
+            }
+            badge.textContent = label;
+        } else if (badge) {
+            badge.remove();
+        }
+    });
+
+    evtSource.addEventListener('creneau_update', function () {
+        $('#creneauBadge').load(location.href + ' #creneauBadge > *');
+    });
+
+    evtSource.onerror = function () {
+        // reconnexion automatique par le navigateur
+    };
+
+    return evtSource;
+}
+
+const evtSource = connectSSE(
+    {{ idTournoi }},
+    {{ IdPoules ?? 'null' }},
+    {{ IdEquipe ?? 'null' }},
+    {{ idCategorie ?? 'null' }}
+);
 
         document.addEventListener("DOMContentLoaded", function () {
             function getUrlParams() {

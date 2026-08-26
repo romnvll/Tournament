@@ -112,34 +112,33 @@ if (isset($_POST['btn-login'])) {
             --border: #e5e7eb;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-      body {
-    min-height: 100vh;
-    font-family: 'DM Sans', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-x: hidden;   /* remplace overflow: hidden */
-    overflow-y: auto;     /* autorise le scroll vertical */
-    position: relative;
+    html {
+    overflow-y: scroll; /* force le scroll sur iOS */
 }
 
-        /* ── Fond animé ── */
-        .bg-blobs {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .mobile-warning {
-    display: none;   /* seule déclaration ici */
-    position: relative;
-    z-index: 10;
+html, body {
+    height: auto;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    min-height: 100vh;
+}
+
+.bg-blobs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+      .mobile-warning {
+    display: none;
     max-width: 440px;
-    margin: 0 auto 12px;
+    width: 100%;
+    margin-bottom: 12px;
     padding: 12px 16px;
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(245, 158, 11, 0.4);
@@ -149,13 +148,21 @@ if (isset($_POST['btn-login'])) {
     color: #92400e;
     gap: 10px;
     align-items: center;
-    /* on retire le display: flex; ici */
 }
 
 @media (max-width: 480px) {
     .mobile-warning {
-        display: flex;   /* uniquement appliqué sous 480px */
+        display: flex;
     }
+}
+
+.login-wrapper {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 440px;
+    /* supprimer le padding: 20px — géré par le wrapper parent */
+    animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 
@@ -217,14 +224,7 @@ if (isset($_POST['btn-login'])) {
         }
 
         /* ── Card ── */
-        .login-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
-            animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
+       
 
         @keyframes cardIn {
             from { opacity: 0; transform: translateY(40px) scale(0.95); }
@@ -547,6 +547,19 @@ if (isset($_POST['btn-login'])) {
         <i class="fas fa-shield-halved sport-icon" style="top:88%; left:15%; animation-duration:6s; animation-delay:0.8s;"></i>
         <i class="fas fa-ranking-star sport-icon"  style="top:15%; left:75%; animation-duration:9s; animation-delay:3.5s;"></i>
     </div>
+
+<div style="
+  display: block;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+">
+
+
 <div class="mobile-warning">
     <i class="fas fa-circle-info" style="color:#f59e0b; font-size:1.1rem; flex-shrink:0;"></i>
     <span>L'espace organisateur est conçu pour ordinateur. Sur téléphone, certaines fonctionnalités peuvent être plus difficiles à utiliser.</span>
@@ -661,6 +674,7 @@ if (isset($_POST['btn-login'])) {
 
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
