@@ -859,7 +859,18 @@ public function afficherCreneauxOccupes(int $tournoi_id): array
                       AND r.isTerminated = 1
                 ) THEN 1 
                 ELSE 0 
-            END as hasTerminatedRencontre
+            END as hasTerminatedRencontre,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM Planification p2
+                    INNER JOIN Rencontres r ON p2.rencontre_id = r.id
+                    WHERE p2.creneau_id = c.creneau_id 
+                      AND p2.tournoi_id = c.tournoi_id
+                      AND r.isTerminated = 2
+                ) THEN 1 
+                ELSE 0 
+            END as isEnCours
         FROM Creneaux c
         INNER JOIN Planification p 
             ON p.creneau_id = c.creneau_id 
@@ -877,7 +888,6 @@ public function afficherCreneauxOccupes(int $tournoi_id): array
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 
 
 

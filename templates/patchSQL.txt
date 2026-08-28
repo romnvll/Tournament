@@ -109,6 +109,7 @@ ALTER TABLE Categorie ADD COLUMN afficherClassement INT(1) DEFAULT 1 AFTER Coule
 
 
 MODIF 18/06 c'est en dev pas en prod ( c'est en dev )
+MODIF 26/08 ( PROD et DEV )
 -- ============================================================
 -- Système de messagerie Brackito
 -- Permet à l'organisateur d'envoyer un message à :
@@ -189,7 +190,7 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
 
-22/06 PAS DE DEV, PAS EN PROD
+22/06 PROD et DEV ( 26/08)
 -- Ajouter le champ telephone dans Tournois (déplacé depuis Gymnases)
 ALTER TABLE Tournois
 ADD COLUMN telephone VARCHAR(32) NULL AFTER heureIsVisible;
