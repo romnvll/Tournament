@@ -147,21 +147,22 @@
                                     En un clic, le système va basculer automatiquement les équipes de cette catégorie vers les poules finales à droite, en regroupant les équipes selon leur position au classement (les 1ers ensemble, les 2èmes ensemble, etc.).
                                 </p>
                                 <div class="d-flex flex-wrap gap-2">
-                                    {% for poule in afficherLesPoules %}
-                                        {% if poule.fk_idcategorie not in categoriesDejaAffichees %}
-                                            <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}&createPouleOnly=1"
-                                            class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm">
-                                                <i class="fas fa-magic me-1"></i> Créer les poules et placer les labels {{ poule.nom | split(' ')[0] }}
-                                            </a>
-                                             <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
-                                            class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm"
-                                            onclick="return confirm('Voulez-vous dispatcher automatiquement toutes les équipes de cette catégorie dans les poules de classement selon leurs résultats actuels ?')">
-                                                <i class="fas fa-magic me-1"></i> Placer les équipes {{ poule.nom | split(' ')[0] }}
-                                            </a>
-                                            {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
+                                        {% for poule in afficherLesPoules %}
+                                     
+                                            {% if poule.fk_idcategorie not in categoriesDejaAffichees and poule.fk_idcategorie == idCategorieEnCours %}
+                                                <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}&createPouleOnly=1"
+                                                class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm">
+                                                    <i class="fas fa-magic me-1"></i> Créer les poules et placer les labels {{ poule.nom | split(' ')[0] }}
+                                                </a>
+                                                <a href="gestionRencontrePhaseClassement_traitement.php?autoClassement=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}"
+                                                class="btn btn-warning btn-sm text-dark fw-semibold shadow-sm"
+                                                onclick="return confirm('Voulez-vous dispatcher automatiquement toutes les équipes de cette catégorie dans les poules de classement selon leurs résultats actuels ?')">
+                                                    <i class="fas fa-magic me-1"></i> Placer les équipes {{ poule.nom | split(' ')[0] }}
+                                                </a>
+                                                {% set categoriesDejaAffichees = categoriesDejaAffichees|merge([poule.fk_idcategorie]) %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                             </div>
                         </div>
 
@@ -177,7 +178,7 @@
                                 <div class="d-flex flex-wrap gap-2">
                                     {% set categoriesDejaAfficheesHB = [] %}
                                     {% for poule in afficherLesPoules %}
-                                        {% if poule.fk_idcategorie not in categoriesDejaAfficheesHB %}
+                                        {% if poule.fk_idcategorie not in categoriesDejaAfficheesHB and poule.fk_idcategorie == idCategorieEnCours %}
                                             <a href="gestionRencontrePhaseClassement_traitement.php?autoHauteBasse=1&tournoiId={{ idTournoi }}&categorieId={{ poule.fk_idcategorie }}&createPouleOnly=1"
                                             class="btn btn-info btn-sm text-dark fw-semibold shadow-sm"
                                             onclick="return confirm('Voulez-vous répartir automatiquement les équipes de cette catégorie en Poule Haute / Poule Basse selon leurs résultats actuels ?')">
