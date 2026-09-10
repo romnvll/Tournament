@@ -160,6 +160,24 @@
             animation: pulse 0.5s infinite;
         }
 
+        .retour-toggle {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: #e5e7eb;
+            color: var(--bg-dark);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .retour-toggle.active {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            color: white;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -392,6 +410,16 @@
                 padding: 15px;
             }
 
+            .section-header {
+                flex-wrap: wrap;
+            }
+
+            .section-header > .ms-auto {
+                width: 100%;
+                margin-left: 0 !important;
+                flex-wrap: wrap;
+            }
+
             .section-title {
                 font-size: 1.2rem;
             }
@@ -468,9 +496,15 @@
                 <i class="fas fa-layer-group"></i>
             </div>
             <h3 class="section-title">Sélection des poules</h3>
-            <small class="text-muted ms-auto" style="font-size: 0.85rem;">
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <button type="button" id="retour-toggle" class="retour-toggle" aria-pressed="false" title="Activer la création des rencontres retours">
+                    <i class="fas fa-rotate-right"></i>
+                    <span>Rencontres retours</span>
+                </button>
+                <small class="text-muted" style="font-size: 0.85rem;">
                 <i class="fas fa-info-circle"></i> Maintenez <kbd>R</kbd> pour créer les rencontres retours
-            </small>
+                </small>
+            </div>
         </div>
 
         <div class="poule-buttons">
@@ -657,9 +691,22 @@
     <script>
         // Sélectionner tous les liens ayant la classe 'poule-link'
         const liensRencontres = document.querySelectorAll('.poule-link');
+        const boutonRetour = document.getElementById('retour-toggle');
         let rPressed = false;
 
-        // Fonction pour restaurer le lien à son état d'origine
+        function mettreEnModeRetour() {
+            rPressed = true;
+            liensRencontres.forEach(lien => {
+                const idTournoi = '{{ idTournoi }}';
+                const idPoule = lien.dataset.pouleId;
+                const url = `gestionRencontres.php?idTournoi=${idTournoi}&idPoule=${idPoule}&rencontreRetour=true`;
+                lien.setAttribute('href', url);
+                lien.classList.add('r-pressed');
+            });
+            boutonRetour.classList.add('active');
+            boutonRetour.setAttribute('aria-pressed', 'true');
+        }
+
         function restaurerLien() {
             liensRencontres.forEach(lien => {
                 const idTournoi = '{{ idTournoi }}';
@@ -669,7 +716,17 @@
                 lien.classList.remove('r-pressed');
             });
             rPressed = false;
+            boutonRetour.classList.remove('active');
+            boutonRetour.setAttribute('aria-pressed', 'false');
         }
+
+        boutonRetour.addEventListener('click', function() {
+            if (rPressed) {
+                restaurerLien();
+            } else {
+                mettreEnModeRetour();
+            }
+        });
 
         // Ajouter un écouteur d'événements pour détecter le relâchement de la touche "r"
         document.addEventListener('keyup', function(event) {
@@ -681,14 +738,7 @@
         // Ajouter un écouteur d'événements pour détecter la pression sur la touche "r"
         document.addEventListener('keydown', function(event) {
             if ((event.key === 'r' || event.key === 'R') && !rPressed) {
-                rPressed = true;
-                liensRencontres.forEach(lien => {
-                    const idTournoi = '{{ idTournoi }}';
-                    const idPoule = lien.dataset.pouleId;
-                    const url = `gestionRencontres.php?idTournoi=${idTournoi}&idPoule=${idPoule}&rencontreRetour=true`;
-                    lien.setAttribute('href', url);
-                    lien.classList.add('r-pressed');
-                });
+                mettreEnModeRetour();
             }
         });
 
