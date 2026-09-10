@@ -1,1708 +1,1287 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Placez vos rencontres</title>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-		<link rel="stylesheet" href="style/validation_schedule.css">
-		<script src="js/synchroHorloge.js"></script>
-		<script src="js/validation_schedule.js"></script>
-		 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		 <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-
-		<style>:root
-{
-	--primary-color: #4f46e5;
-	--primary-hover: #4338ca;
-	--danger-color: #ef4444;
-	--warning-color: #f59e0b;
-	--success-color: #10b981;
-	--info-color: #06b6d4;
-	--bg-dark: #1f2937;
-	--bg-light: #f9fafb;
-	--text-light: #6b7280;
-	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-	--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-	--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-	--border-radius: 12px;
-}
-
-body {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	min-height: 100vh;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-/* Clignotement si équipe absente */
-@keyframes pulseWarning {
-	0,
-	100% {
-		background-color: rgba(239, 68, 68, 0.08);
-		border-color: rgba(239, 68, 68, 0.4);
-	}
-	50% {
-		background-color: rgba(239, 68, 68, 0.22);
-		border-color: rgba(239, 68, 68, 0.9);
-	}
-}
-
-.match-card[draggable] {
-	cursor: grab;
-}
-.match-card[draggable]:active {
-	cursor: grabbing;
-}
-.match-card.dragging {
-	opacity: 0.4;
-	pointer-events: none;
-}
-
-.drop-zone.drag-over {
-	background: rgba(55, 138, 221, 0.08);
-	border: 2px dashed #378ADD;
-	border-radius: 8px;
-}
-
-.match-not-ready {
-	animation: pulseWarning 1.4s ease-in-out infinite;
-	border: 2px solid rgba(239, 68, 68, 0.6);
-	border-radius: 8px;
-	padding: 6px 10px;
-}
-
-.absent-warning {
-	font-size: 0.78rem;
-	font-weight: 700;
-	color: #dc2626;
-	margin-bottom: 4px;
-	letter-spacing: 0.02em;
-}
-.team-absent {
-	color: #dc2626;
-	font-weight: 700;
-	text-decoration: underline wavy #dc2626;
-}
-
-details[open] #attente-chevron {
-    transform: rotate(180deg);
-}
-details > summary::-webkit-details-marker {
-    display: none;
-}
-
-.main-container {
-	background: white;
-	border-radius: var(--border-radius);
-	box-shadow: var(--shadow-lg);
-	margin: 20px;
-	padding: 30px;
-}
-
-/* Boutons de tournois */
-.tournament-buttons {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
-	margin-bottom: 25px;
-}
-
-.tournament-btn {
-	padding: 12px 24px;
-	border-radius: 30px;
-	font-weight: 600;
-	border: none;
-	transition: all 0.3s ease;
-	box-shadow: var(--shadow-sm);
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	text-decoration: none;
-}
-
-.tournament-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--shadow-md);
-}
-
-.tournament-btn.active {
-	background: linear-gradient(135deg, var(--danger-color), #dc2626);
-	color: white;
-}
-
-.tournament-btn:not(.active) {
-	background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-	color: white;
-}
-
-/* Card de contrôle moderne */
-.control-card {
-	background: white;
-	border-radius: var(--border-radius);
-	box-shadow: var(--shadow-md);
-	padding: 25px;
-	margin-bottom: 25px;
-}
-
-.control-section {
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-	padding-bottom: 20px;
-	border-bottom: 2px solid var(--bg-light);
-}
-
-.control-group {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	width: 100%;
-}
-
-.control-label {
-	font-weight: 600;
-	color: var(--bg-dark);
-	font-size: 0.9rem;
-	margin: 0;
-	min-width: 180px;
-}
-
-.modern-input {
-	padding: 8px 15px;
-	border: 2px solid #e5e7eb;
-	border-radius: 8px;
-	transition: all 0.3s;
-	font-size: 0.95rem;
-	flex: 1;
-	max-width: 200px;
-}
-
-.modern-input:focus {
-	outline: none;
-	border-color: var(--primary-color);
-	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.modern-select {
-	padding: 8px 15px;
-	border: 2px solid #e5e7eb;
-	border-radius: 8px;
-	transition: all 0.3s;
-	font-size: 0.95rem;
-	background: white;
-	cursor: pointer;
-	flex: 1;
-	max-width: 300px;
-}
-
-.modern-select:focus {
-	outline: none;
-	border-color: var(--primary-color);
-	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.modern-btn {
-	padding: 8px 20px;
-	border-radius: 8px;
-	font-weight: 600;
-	border: none;
-	cursor: pointer;
-	transition: all 0.3s;
-	box-shadow: var(--shadow-sm);
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.modern-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--shadow-md);
-}
-
-.btn-primary-modern {
-	background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-	color: white;
-}
-
-/* Stats section */
-.stats-section {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 15px;
-	padding-top: 20px;
-}
-
-.stat-item {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 12px 20px;
-	background: linear-gradient(135deg, var(--bg-light), white);
-	border-radius: 10px;
-	box-shadow: var(--shadow-sm);
-	transition: all 0.3s;
-}
-
-.stat-item:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--shadow-md);
-}
-
-.stat-icon {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 1.2rem;
-}
-
-.stat-icon.info {
-	background: rgba(6, 182, 212, 0.2);
-	color: var(--info-color);
-}
-
-.stat-icon.success {
-	background: rgba(16, 185, 129, 0.2);
-	color: var(--success-color);
-}
-
-.stat-icon.warning {
-	background: rgba(245, 158, 11, 0.2);
-	color: var(--warning-color);
-}
-
-.stat-text {
-	display: flex;
-	flex-direction: column;
-}
-
-.stat-label {
-	font-size: 0.85rem;
-	color: var(--success-color);
-}
-
-.stat-value {
-	font-size: 1.1rem;
-	font-weight: 700;
-	color: var(--bg-dark);
-}
-
-/* Filter input */
-.filter-container {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	z-index: 1000;
-	animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-	from {
-		transform: translateY(100px);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0);
-		opacity: 1;
-	}
-}
-
-.filter-input {
-	padding: 12px 20px;
-	border: 2px solid var(--primary-color);
-	border-radius: 30px;
-	background: white;
-	box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
-	font-size: 0.95rem;
-	width: 220px;
-	transition: all 0.3s ease;
-}
-
-.filter-input:focus {
-	outline: none;
-	border-color: var(--primary-hover);
-	width: 280px;
-	box-shadow: 0 12px 32px rgba(79, 70, 229, 0.4);
-}
-
-.filter-input::placeholder {
-	color: var(--text-light);
-}
-
-/* Table moderne */
-.modern-table-container {
-	background: white;
-	border-radius: var(--border-radius);
-	overflow-x: auto;
-	overflow-y: visible;
-	box-shadow: var(--shadow-md);
-	margin-top: 25px;
-	-webkit-overflow-scrolling: touch;
-	position: relative;
-}
-
-.modern-table {
-	width: 100%;
-	min-width: 600px;
-	border-collapse: separate;
-	border-spacing: 0;
-}
-
-.modern-table thead {
-	background: linear-gradient(135deg, var(--bg-dark), #374151);
-	color: white;
-}
-
-.modern-table thead th {
-	padding: 20px 15px;
-	font-weight: 600;
-	text-align: center;
-	position: sticky;
-	top: 0;
-	z-index: 10;
-}
-
-.terrain-header {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	align-items: center;
-}
-
-.terrain-input {
-	padding: 6px 12px;
-	border: 2px solid rgba(255, 255, 255, 0.3);
-	border-radius: 6px;
-	background: rgba(255, 255, 255, 0.1);
-	color: white;
-	text-align: center;
-	transition: all 0.3s;
-	max-width: 120px;
-}
-
-.terrain-input:focus {
-	outline: none;
-	background: rgba(255, 255, 255, 0.2);
-	border-color: rgba(255, 255, 255, 0.5);
-}
-
-.terrain-delete {
-	color: var(--danger-color);
-	transition: all 0.3s;
-	text-decoration: none;
-	font-size: 1.2rem;
-}
-
-.terrain-delete:hover {
-	transform: scale(1.2);
-}
-
-.add-terrain-btn {
-	background: none;
-	border: none;
-	color: var(--success-color);
-	font-size: 2rem;
-	cursor: pointer;
-	transition: all 0.3s;
-}
-
-.add-terrain-btn:hover {
-	transform: scale(1.2) rotate(90deg);
-}
-
-.modern-table tbody td {
-	padding: 15px;
-	border-bottom: 1px solid #e5e7eb;
-	vertical-align: top;
-	transition: all 0.3s;
-}
-
-.modern-table tbody tr:hover:not(.changement-row):hover {
-	background: var(--bg-light);
-}
-
-/* Time slot cell */
-.timeslot-cell {
-	background: linear-gradient(135deg, var(--bg-light), white);
-	font-weight: 600;
-	color: var(--bg-dark);
-}
-
-.timeslot-controls {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 10px;
-}
-
-.time-input {
-	padding: 8px;
-	border: 2px solid #e5e7eb;
-	border-radius: 8px;
-	text-align: center;
-	font-weight: 600;
-	width: 80px;
-	transition: all 0.3s;
-}
-
-.time-input:focus {
-	outline: none;
-	border-color: var(--primary-color);
-	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.time-action {
-	color: var(--danger-color);
-	transition: all 0.3s;
-	text-decoration: none;
-	font-size: 1.3rem;
-}
-
-.time-action:hover {
-	transform: scale(1.2);
-}
-
-.time-action.add {
-	color: var(--success-color);
-}
-
-/* Bande de changement entre créneaux */
-.changement-row {
-	background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
-	border-top: 2px solid var(--primary-color);
-	border-bottom: 2px solid var(--primary-color);
-	height: 50px;
-}
-
-.changement-cell {
-	background: transparent;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 0.85rem;
-	font-weight: 600;
-	color: white;
-	padding: 8px 12px;
-	gap: 8px;
-}
-
-.changement-input {
-	padding: 4px 8px;
-	border: 1px solid var(--primary-color);
-	border-radius: 4px;
-	width: 60px;
-	text-align: center;
-	font-weight: 600;
-	background: white;
-	color: var(--bg-dark);
-}
-
-.changement-input:focus {
-	outline: none;
-	border-color: var(--primary-hover);
-	box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-}
-
-.changement-label {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-}
-
-/* Match/Label cards */
-.planif-cell {
-	min-height: 80px;
-	padding: 10px;
-	transition: all 0.3s;
-	cursor: pointer;
-}
-
-.planif-cell:hover {
-	background: rgba(79, 70, 229, 0.05);
-}
-
-.match-card {
-	background: white;
-	border-radius: 10px;
-	padding: 12px;
-	box-shadow: var(--shadow-sm);
-	transition: all 0.3s;
-	border: 2px solid transparent;
-	position: relative;
-}
-
-.match-card:hover {
-	box-shadow: var(--shadow-md);
-	transform: translateY(-2px);
-}
-
-.match-header-bar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 8px 12px;
-	border-radius: 8px;
-	margin-bottom: 10px;
-	color: white;
-	font-weight: 600;
-	font-size: 0.85rem;
-}
-
-.match-text {
-	font-size: 0.9rem;
-	line-height: 1.4;
-	margin: 8px 0;
-}
-
-.match-actions {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-top: 10px;
-}
-
-.match-checkbox {
-	width: 20px;
-	height: 20px;
-	cursor: pointer;
-	border-radius: 4px;
-}
-
-.delete-match-btn {
-	color: var(--danger-color);
-	font-size: 1.3rem;
-	transition: all 0.3s;
-	text-decoration: none;
-}
-
-.delete-match-btn:hover {
-	transform: scale(1.2) rotate(90deg);
-}
-
-.arbitre-card {
-	background: var(--bg-dark);
-	color: white;
-	border-radius: 10px;
-	padding: 12px;
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-bottom: 10px;
-}
-
-.label-card {
-	background: var(--bg-dark);
-	color: var(--warning-color);
-	border-radius: 10px;
-	padding: 12px;
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.empty-select {
-	width: 100%;
-	padding: 10px;
-	border: 2px dashed #e5e7eb;
-	border-radius: 8px;
-	background: white;
-	cursor: pointer;
-	transition: all 0.3s;
-}
-
-.empty-select:hover {
-	border-color: var(--primary-color);
-	background: var(--bg-light);
-}
-
-.empty-select:focus {
-	outline: none;
-	border-color: var(--primary-color);
-	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.hidden {
-	display: none;
-}
-
-/* Alert moderne */
-.modern-alert {
-	border-radius: var(--border-radius);
-	padding: 20px;
-	margin-top: 25px;
-	box-shadow: var(--shadow-sm);
-	display: flex;
-	align-items: center;
-	gap: 15px;
-}
-
-.modern-alert.danger {
-	background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-	border-left: 4px solid var(--danger-color);
-}
-
-.modern-alert.warning {
-	background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
-	border-left: 4px solid var(--warning-color);
-}
-
-.alert-icon {
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 1.5rem;
-}
-
-.alert-icon.danger {
-	background: rgba(239, 68, 68, 0.2);
-	color: var(--danger-color);
-}
-
-.alert-icon.warning {
-	background: rgba(245, 158, 11, 0.2);
-	color: var(--warning-color);
-}
-
-.modern-table-container::after {
-	content: '→';
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 2rem;
-	color: var(--primary-color);
-	opacity: 0.5;
-	pointer-events: none;
-	animation: slideHint 2s infinite;
-}
-
-@keyframes slideHint {
-	0,
-	100% {
-		transform: translateY(-50%) translateX(0);
-	}
-	50% {
-		transform: translateY(-50%) translateX(10px);
-	}
-}
-
-.modern-table-container.scrolled::after {
-	display: none;
-}
-
-.bulk-action-wrapper {
-	display: flex;
-	align-items: center;
-	gap: 20px;
-	flex-wrap: wrap;
-	background: var(--bg-light);
-	border-radius: 10px;
-	padding: 15px 20px;
-}
-
-.bulk-step {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
-.bulk-step-title {
-	font-size: 0.8rem;
-	font-weight: 700;
-	color: var(--primary-color);
-	text-transform: uppercase;
-	letter-spacing: 0.03em;
-}
-
-.bulk-step-controls {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	flex-wrap: wrap;
-}
-
-.bulk-step-separator {
-	color: var(--text-light);
-	font-size: 1.3rem;
-	align-self: center;
-}
-
-@media (max-width: 768px) {
-	.bulk-action-wrapper {
-		flex-direction: column;
-		align-items: stretch;
-	}
-	.bulk-step-separator {
-		display: none;
-	}
-}
-
-/* Responsive */
-@media(max-width: 768px) {
-	.modern-table-container {
-		position: relative;
-	}
-
-	.modern-table thead th:first-child,
-	.modern-table tbody td:first-child {
-		position: sticky;
-		left: 0;
-		z-index: 2;
-		background: white;
-		box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-	}
-
-	.modern-table thead th:first-child {
-		z-index: 3;
-		background: linear-gradient(135deg, var(--bg-dark), #374151);
-	}
-
-	.timeslot-cell {
-		background: linear-gradient(135deg, var(--bg-light), white) !important;
-	}
-
-	.main-container {
-		margin: 10px;
-		padding: 15px;
-	}
-
-	.control-section,
-	.stats-section {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.filter-container {
-		bottom: 15px;
-		right: 15px;
-	}
-
-	.filter-input {
-		width: 180px;
-		font-size: 0.85rem;
-	}
-
-	.filter-input:focus {
-		width: 220px;
-	}
-}
-
-/* Animation de chargement */
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-/* Animation de clignotement pour les erreurs de validation */
-/* Animation de clignotement pour les erreurs de validation */
-@keyframes blink-error {
-    0%, 100% {
-        opacity: 0.8;
-    }
-    50% {
-        opacity: 1;
-    }
-}
-
-.row-validation-error td {
-    border-top: 3px solid #ef4444;
-    animation: blink-error 1.2s ease-in-out infinite;
-}
-
-.validation-error-icon {
-    animation: blink-error 1.2s ease-in-out infinite;
-}
-
-.match-card,
-.stat-item {
-	animation: fadeIn 0.3s ease;
-}
-</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placez vos rencontres</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style/validation_schedule.css">
+    <script src="js/synchroHorloge.js"></script>
+    <script src="js/validation_schedule.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+
+    <style>
+        /* ── Variables ── */
+        :root {
+            --primary:      #4f46e5;
+            --primary-dark: #4338ca;
+            --danger:       #ef4444;
+            --warning:      #f59e0b;
+            --success:      #10b981;
+            --info:         #06b6d4;
+            --bg-dark:      #1f2937;
+            --bg-light:     #f9fafb;
+            --text-muted:   #6b7280;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.1);
+            --shadow-md:    0 4px 6px rgba(0,0,0,.1);
+            --shadow-lg:    0 10px 15px rgba(0,0,0,.1);
+            --radius:       12px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ── Layout ── */
+        .main-container {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            margin: 20px;
+            padding: 30px;
+        }
+
+        /* ── Boutons tournoi ── */
+        .tournament-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .tournament-btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            border: none;
+            transition: all .3s ease;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        .tournament-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+        .tournament-btn.active {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        /* ── Card de contrôle ── */
+        .control-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .control-label {
+            font-weight: 600;
+            color: var(--bg-dark);
+            font-size: .9rem;
+            margin: 0;
+            min-width: 180px;
+        }
+
+        /* ── Inputs ── */
+        .modern-input {
+            padding: 8px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all .3s;
+            font-size: .95rem;
+            flex: 1;
+            max-width: 200px;
+        }
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+        }
+        .modern-select {
+            padding: 8px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all .3s;
+            font-size: .95rem;
+            background: white;
+            cursor: pointer;
+            flex: 1;
+            max-width: 300px;
+        }
+        .modern-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+        }
+        .modern-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all .3s;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        /* ── Stats ── */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding-top: 20px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+            transition: all .3s;
+        }
+        .stat-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+        }
+        .stat-icon.info    { background: rgba(6,182,212,.2);   color: var(--info); }
+        .stat-icon.success { background: rgba(16,185,129,.2);  color: var(--success); }
+        .stat-icon.warning { background: rgba(245,158,11,.2);  color: var(--warning); }
+        .stat-text { display: flex; flex-direction: column; }
+        .stat-label { font-size: .85rem; color: var(--success); }
+        .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--bg-dark); }
+
+        /* ── Action groupée ── */
+        .bulk-action-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+        .bulk-step { display: flex; flex-direction: column; gap: 8px; }
+        .bulk-step-title {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: .03em;
+        }
+        .bulk-step-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .bulk-step-separator { color: var(--text-muted); font-size: 1.3rem; align-self: center; }
+
+        /* ── Table ── */
+        .modern-table-container {
+            background: white;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            overflow-y: visible;
+            box-shadow: var(--shadow-md);
+            margin-top: 25px;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+        .modern-table-container::after {
+            content: '→';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: .5;
+            pointer-events: none;
+            animation: slideHint 2s infinite;
+        }
+        .modern-table-container.scrolled::after { display: none; }
+
+        @keyframes slideHint {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50%       { transform: translateY(-50%) translateX(10px); }
+        }
+
+        .modern-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .modern-table thead {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+        }
+        .modern-table thead th {
+            padding: 20px 15px;
+            font-weight: 600;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .modern-table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+            transition: all .3s;
+        }
+        .modern-table tbody tr:hover:not(.changement-row) { background: var(--bg-light); }
+
+        /* ── En-tête terrain ── */
+        .terrain-header { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .terrain-input {
+            padding: 6px 12px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,.1);
+            color: white;
+            text-align: center;
+            transition: all .3s;
+            max-width: 120px;
+        }
+        .terrain-input:focus {
+            outline: none;
+            background: rgba(255,255,255,.2);
+            border-color: rgba(255,255,255,.5);
+        }
+        .terrain-delete { color: var(--danger); transition: all .3s; text-decoration: none; font-size: 1.2rem; }
+        .terrain-delete:hover { transform: scale(1.2); }
+        .add-terrain-btn { background: none; border: none; color: var(--success); font-size: 2rem; cursor: pointer; transition: all .3s; }
+        .add-terrain-btn:hover { transform: scale(1.2) rotate(90deg); }
+
+        /* ── Créneau ── */
+        .timeslot-cell {
+            background: linear-gradient(135deg, var(--bg-light), white);
+            font-weight: 600;
+            color: var(--bg-dark);
+        }
+        .timeslot-controls { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .time-input {
+            padding: 8px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            width: 80px;
+            transition: all .3s;
+        }
+        .time-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+        }
+        .time-action { color: var(--danger); transition: all .3s; text-decoration: none; font-size: 1.3rem; }
+        .time-action:hover { transform: scale(1.2); }
+        .time-action.add { color: var(--success); }
+
+        /* ── Bande changement ── */
+        .changement-row {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-top: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
+            height: 50px;
+        }
+        .changement-cell {
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            font-weight: 600;
+            color: white;
+            padding: 8px 12px;
+            gap: 8px;
+        }
+        .changement-input {
+            padding: 4px 8px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            background: white;
+            color: var(--bg-dark);
+        }
+        .changement-input:focus { outline: none; border-color: var(--primary-dark); box-shadow: 0 0 0 2px rgba(79,70,229,.1); }
+        .changement-label { display: flex; align-items: center; gap: 4px; }
+
+        /* ── Cellule de planification ── */
+        .planif-cell {
+            min-height: 80px;
+            padding: 10px;
+            transition: all .3s;
+            cursor: pointer;
+        }
+        .planif-cell:hover { background: rgba(79,70,229,.05); }
+
+        /* ── Drag & Drop ── */
+        .match-card[draggable],
+        .label-card[draggable] { cursor: grab; }
+        .match-card[draggable]:active,
+        .label-card[draggable]:active { cursor: grabbing; }
+        .match-card.dragging,
+        .label-card.dragging { opacity: .4; pointer-events: none; }
+        .drop-zone.drag-over {
+            background: rgba(55,138,221,.08);
+            border: 2px dashed #378ADD;
+            border-radius: 8px;
+        }
+
+        /* ── Match card ── */
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all .3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .match-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .match-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: .85rem;
+        }
+        .match-text { font-size: .9rem; line-height: 1.4; margin: 8px 0; }
+        .match-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+        .match-checkbox { width: 20px; height: 20px; cursor: pointer; border-radius: 4px; }
+        .delete-match-btn { color: var(--danger); font-size: 1.3rem; transition: all .3s; text-decoration: none; }
+        .delete-match-btn:hover { transform: scale(1.2) rotate(90deg); }
+
+        /* ── Absence ── */
+        @keyframes pulseWarning {
+            0%, 100% { background-color: rgba(239,68,68,.08); border-color: rgba(239,68,68,.4); }
+            50%       { background-color: rgba(239,68,68,.22); border-color: rgba(239,68,68,.9); }
+        }
+        .match-not-ready {
+            animation: pulseWarning 1.4s ease-in-out infinite;
+            border: 2px solid rgba(239,68,68,.6);
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+        .absent-warning { font-size: .78rem; font-weight: 700; color: #dc2626; margin-bottom: 4px; letter-spacing: .02em; }
+        .team-absent { color: #dc2626; font-weight: 700; text-decoration: underline wavy #dc2626; }
+
+        /* ── Arbitre card ── */
+        .arbitre-card {
+            background: var(--bg-dark);
+            color: white;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* ── Label card ── */
+        .label-card {
+            background: var(--bg-dark);
+            color: var(--warning);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            /* même apparence qu'avant + curseur drag */
+        }
+
+        /* ── Sélecteur vide ── */
+        .empty-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all .3s;
+        }
+        .empty-select:hover  { border-color: var(--primary); background: var(--bg-light); }
+        .empty-select:focus  { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+
+        /* ── Filtres ── */
+        .filter-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideUp .3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
+        }
+        .filter-input {
+            padding: 12px 20px;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            background: white;
+            box-shadow: 0 8px 24px rgba(79,70,229,.3);
+            font-size: .95rem;
+            width: 220px;
+            transition: all .3s ease;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            width: 280px;
+            box-shadow: 0 12px 32px rgba(79,70,229,.4);
+        }
+        .filter-input::placeholder { color: var(--text-muted); }
+
+        /* ── Alertes ── */
+        .modern-alert {
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .modern-alert.danger  { background: linear-gradient(135deg, rgba(239,68,68,.1),rgba(220,38,38,.1));  border-left: 4px solid var(--danger); }
+        .modern-alert.warning { background: linear-gradient(135deg, rgba(245,158,11,.1),rgba(217,119,6,.1)); border-left: 4px solid var(--warning); }
+        .alert-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .alert-icon.danger  { background: rgba(239,68,68,.2);  color: var(--danger); }
+        .alert-icon.warning { background: rgba(245,158,11,.2); color: var(--warning); }
+
+        /* ── Validation errors ── */
+        @keyframes blink-error { 0%, 100% { opacity: .8; } 50% { opacity: 1; } }
+        .row-validation-error td { border-top: 3px solid #ef4444; animation: blink-error 1.2s ease-in-out infinite; }
+        .validation-error-icon   { animation: blink-error 1.2s ease-in-out infinite; }
+
+        /* ── Misc ── */
+        .hidden { display: none; }
+        details[open] #attente-chevron { transform: rotate(180deg); }
+        details > summary::-webkit-details-marker { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .match-card, .stat-item { animation: fadeIn .3s ease; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .modern-table thead th:first-child,
+            .modern-table tbody td:first-child {
+                position: sticky; left: 0; z-index: 2;
+                background: white;
+                box-shadow: 2px 0 4px rgba(0,0,0,.1);
+            }
+            .modern-table thead th:first-child { z-index: 3; background: linear-gradient(135deg, var(--bg-dark), #374151); }
+            .timeslot-cell { background: linear-gradient(135deg, var(--bg-light), white) !important; }
+            .main-container { margin: 10px; padding: 15px; }
+            .bulk-action-wrapper { flex-direction: column; align-items: stretch; }
+            .bulk-step-separator { display: none; }
+            .filter-input { width: 180px; font-size: .85rem; }
+            .filter-input:focus { width: 220px; }
+        }
+    </style>
 </head>
 
-	<body>
-	{{ include('header.twig') }}
+<body>
+{{ include('header.twig') }}
 
-		<div
-		class="main-container"> <!-- Boutons de tournois -->
-		<div class="tournament-buttons">
-			{% for tournoi in ListeDesTournois %}
-				{% if tournoi.isArchived == 0 %}
-					<a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}" class="tournament-btn {% if tournoi.id == idTournoi %}active{% endif %}">
-						<i class="fas fa-trophy"></i>
-						{{ tournoi.nom }}
-					</a>
-				{% endif %}
-			{% endfor %}
-		</div>
-		<a href="PlacementAutomatique.php?id_tournoi={{ idTournoi }}" class="tournament-btn">
-			<i class="fas fa-robot"></i>
-			Placement auto
-		</a>
-		{% set dateFin = licence['date_fin']|date('Y-m-d') %}
-		{% set today = "now"|date('Y-m-d') %}
+<div class="main-container">
 
-		<!-- Card de contrôle -->
-		{% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
-			<div
-				class="control-card">
-				<!-- Section des contrôles -->
-				<div class="control-section">
-					<!-- Action groupée -->
-					<!-- Action groupée : Sélection + Action, réorganisées en 2 blocs -->
-						<form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post">
-							<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
-
-							<div class="bulk-action-wrapper">
-
-								<!-- Bloc 1 : Sélection -->
-								<div class="bulk-step">
-									<span class="bulk-step-title">
-										<i class="bi bi-check2-square"></i> 1. Sélection
-									</span>
-
-									<div class="bulk-step-controls">
-										<select id="categorieSelector" class="modern-select" style="max-width: 220px;">
-											<option value="">Toutes les catégories</option>
-											{% set categories = [] %}
-											{% for planification in afficherPlanification %}
-												{% if planification.equipe1_categorie_nom not in categories %}
-													{% set categories = categories|merge([planification.equipe1_categorie_nom]) %}
-													<option value="{{ planification.equipe1_categorie_nom|lower }}">
-														{{ planification.equipe1_categorie_nom }}
-													</option>
-												{% endif %}
-											{% endfor %}
-										</select>
-
-										<button type="button" class="modern-btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;" onclick="cocherCategorie()">
-											<i class="bi bi-collection"></i> Cocher la catégorie
-										</button>
-
-										<button type="button" class="modern-btn" id="btnToutCocher" style="background: linear-gradient(135deg, #10b981, #059669); color: white;" onclick="toggleToutCocher(this)">
-											<i class="bi bi-check2-all"></i> Tout cocher
-										</button>
-									</div>
-								</div>
-
-								<div class="bulk-step-separator"><i class="bi bi-arrow-right"></i></div>
-
-								<!-- Bloc 2 : Action -->
-								<div class="bulk-step">
-									<span class="bulk-step-title">
-										<i class="bi bi-lightning-fill"></i> 2. Action
-									</span>
-
-									<div class="bulk-step-controls">
-										<select name="action" id="bulkAction" class="modern-select" required>
-											<option value="" disabled selected>{{t('actionGroupee')}}</option>
-											<option value="deplanifier">{{t('deplanifierCesRencontres')}}</option>
-										</select>
-
-										<button type="submit" class="modern-btn btn-primary-modern">
-											<i class="bi bi-check-lg"></i> {{t('valider')}}
-										</button>
-									</div>
-								</div>
-
-							</div>
-						</form>
-
-					<!-- Modification des horaires -->
-					<form action="PlacementDesRencontresTraitement.php" method="post" style="display: contents;">
-						<div class="control-group">
-							<label for="modifMinutes" class="control-label">
-								<i class="bi bi-clock-history"></i>
-								{{t('retarderLesRencontres')}}
-							</label>
-							<input type="number" id="modifMinutes" name="modifMinutes" placeholder="Minutes" class="modern-input">
-							<input type="submit" value="{{t('Appliquerleretard')}}" class="modern-btn btn-primary-modern">
-						</div>
-
-						<div class="control-group">
-							<label for="modifPasHoraire" class="control-label">
-								<i class="bi bi-hourglass-split"></i>
-								{{t('dureeRencontre')}}
-							</label>
-							<input type="number" id="modifPasHoraire" name="modifPasHoraire" min="0" value="{{ tournoiInfo['pasHoraire'] }}" class="modern-input" oninput="this.value = this.value < 0 ? 0 : this.value;" onchange="this.form.submit()">
-						</div>
-						
-
-						<input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
-						<input type="hidden" name="idTournoi" value="{{ idTournoi }}">
-					</form>
-
-					<div class="stat-item">
-						<div class="stat-icon info">
-							<i class="bi bi-tag"></i>
-						</div>
-						<div class="stat-text">
-							<span class="stat-label">
-								<a href="GererLabels.php?id_tournoi={{idTournoi}}" style="text-decoration: none;">{{t('labels')}}</a>
-							</span>
-							<span class="stat-value">{{nombreDeLabel | length}}</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Section des statistiques -->
-				<div class="stats-section">
-					<div class="stat-item">
-						<div class="stat-icon info">
-							<i class="bi bi-calendar-check"></i>
-						</div>
-						<div class="stat-text">
-							<span class="stat-label">{{t('planifiee')}}</span>
-							<span class="stat-value">{{ nombreDeRencontresPlanifiee }}</span>
-						</div>
-					</div>
-
-
-					<div class="stat-item">
-						<div class="stat-icon success">
-							<i class="bi bi-list-ol"></i>
-						</div>
-						<div class="stat-text">
-							<span class="stat-label">{{t('total')}}</span>
-							<span class="stat-value">{{ nombreRencontreAPlanifier }}</span>
-						</div>
-					</div>
-
-
-
-
-
-{# ── Affichage ── #}
-{% if statsParCategorie|length > 0 %}
-<div class="stat-item" style="flex-direction: column; align-items: flex-start; gap: 12px; grid-column: 1 / -1; padding: 0;">
-
-    <details style="width: 100%;">
-        <summary style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; cursor: pointer; list-style: none; user-select: none;">
-            <div class="stat-icon warning">
-                <i class="bi bi-hourglass-split"></i>
-            </div>
-            <span style="font-weight: 700; color: var(--bg-dark); font-size: 0.95rem;">
-                Temps d'attente entre les matchs
-            </span>
-            <i class="bi bi-chevron-down" style="margin-left: auto; color: var(--text-light); transition: transform 0.2s;" id="attente-chevron"></i>
-        </summary>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
-        
-        {% for categorie, stats in statsParCategorie %}
-            {% set moyenneCategorie = (stats.totalEcart / stats.nbEquipes)|round %}
-
-            <div style="
-                background: var(--bg-light);
-                border-radius: 10px;
-                padding: 12px 16px;
-                min-width: 220px;
-                flex: 1;
-                border-left: 4px solid var(--primary-color);
-                box-shadow: var(--shadow-sm);
-            ">
-                
-                <div style="font-weight: 700; color: var(--primary-color); margin-bottom: 8px; font-size: 0.9rem;">
-                    {{ categorie }}
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 5px; font-size: 0.85rem; color: var(--bg-dark);">
-                    
-                    <div>
-                        <i class="bi bi-clock" style="color: var(--info-color);"></i>
-                        <strong>Moyenne :</strong>
-                        {% if moyenneCategorie >= 60 %}
-                            {{ (moyenneCategorie / 60)|round }}h{{ moyenneCategorie % 60 }}min
-                        {% else %}
-                            {{ moyenneCategorie }} min
-                        {% endif %}
-                    </div>
-
-                    <div style="color: var(--danger-color);">
-						<i class="bi bi-arrow-up-circle"></i>
-						<strong>Plus longue attente :</strong>
-
-						{% if stats.maxAttente == tournoiInfo.pasHoraire %}
-							pas d'anomalie detectée
-
-						{% else %}
-							{{ stats.maxEquipe }}
-
-							(
-							{% if stats.maxAttente >= 60 %}
-								{{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min
-							{% else %}
-								{{ stats.maxAttente + tournoiInfo.pasHoraire  }} min
-							{% endif %}
-							)
-
-							{% if stats.maxEquipeDe is not empty %}
-								<span style="color: var(--text-light); font-size: 0.8rem;">
-									— entre {{ stats.maxEquipeDe  }} et {{ stats.maxEquipeA }}
-								</span>
-							{% endif %}
-
-							{# ← NOUVEAU : détail par équipe #}
-							{% if stats.detailEquipes is not empty %}
-								<div style="margin-top: 8px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px;">
-									{% for e in stats.detailEquipes|sort((a, b) => b.attente <=> a.attente) %}
-										<div style="display: flex; justify-content: space-between; padding: 4px 8px; background: rgba(239,68,68,0.05); border-radius: 6px;">
-											<span>{{ e.equipe }}</span>
-											<span>
-												{% if e.attente == 0 %}
-													✅ 0 min
-												{% elseif e.attente >= 60 %}
-													{{ (e.attente / 60)|round }}h{{ e.attente % 60 }}min
-												{% else %}
-													{{ e.attente }} min
-												{% endif %}
-												{% if e.de is not empty %}
-													{% set heure = e.de|replace({'h': ':'}) %}
-													{% set heureModifiee = ('today ' ~ heure)|date_modify('+' ~ tournoiInfo.pasHoraire ~ ' minutes') %}
-
-													<span style="opacity: 0.6;">
-														— entre {{ heureModifiee|date('H\\hi') }} et {{ e.a }}
-													</span>
-												{% endif %}
-											</span>
-										</div>
-									{% endfor %}
-								</div>
-							{% endif %}
-
-						{% endif %}
-					</div>
-						
-                
-
-					{% if stats.enchaînements is not empty %}
-						<div style="color: var(--warning-color); margin-top: 6px;">
-							<i class="bi bi-lightning-fill"></i>
-							<strong>Enchaînements détectés :</strong>
-							{% for e in stats.enchaînements %}
-								<div style="font-size: 0.8rem; margin-left: 20px;">
-									{{ e.equipe }} — à {{ e.horaires|join(', ') }}
-								</div>
-							{% endfor %}
-						</div>
-					{% endif %}
-
-                </div>
-            </div>
+    {# ── Boutons de tournois ── #}
+    <div class="tournament-buttons">
+        {% for tournoi in ListeDesTournois %}
+            {% if tournoi.isArchived == 0 %}
+                <a href="PlacementDesRencontres.php?id_tournoi={{ tournoi.id }}"
+                   class="tournament-btn {% if tournoi.id == idTournoi %}active{% endif %}">
+                    <i class="fas fa-trophy"></i>
+                    {{ tournoi.nom }}
+                </a>
+            {% endif %}
         {% endfor %}
     </div>
-	</details>
+    <a href="PlacementAutomatique.php?id_tournoi={{ idTournoi }}" class="tournament-btn">
+        <i class="fas fa-robot"></i>
+        Placement auto
+    </a>
+
+    {% set dateFin = licence['date_fin']|date('Y-m-d') %}
+    {% set today   = "now"|date('Y-m-d') %}
+
+    {# ── Card de contrôle ── #}
+    {% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
+        <div class="control-card">
+            <div class="control-section">
+
+                {# ── Action groupée ── #}
+                <form id="bulkForm" action="PlacementDesRencontresTraitement.php" method="post">
+                    <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                    <div class="bulk-action-wrapper">
+
+                        <div class="bulk-step">
+                            <span class="bulk-step-title"><i class="bi bi-check2-square"></i> 1. Sélection</span>
+                            <div class="bulk-step-controls">
+                                <select id="categorieSelector" class="modern-select" style="max-width: 220px;">
+                                    <option value="">Toutes les catégories</option>
+                                    {% set categories = [] %}
+                                    {% for planification in afficherPlanification %}
+                                        {% if planification.equipe1_categorie_nom not in categories %}
+                                            {% set categories = categories|merge([planification.equipe1_categorie_nom]) %}
+                                            <option value="{{ planification.equipe1_categorie_nom|lower }}">
+                                                {{ planification.equipe1_categorie_nom }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="modern-btn"
+                                        style="background: linear-gradient(135deg,#6366f1,#4f46e5); color: white;"
+                                        onclick="cocherCategorie()">
+                                    <i class="bi bi-collection"></i> Cocher la catégorie
+                                </button>
+                                <button type="button" class="modern-btn" id="btnToutCocher"
+                                        style="background: linear-gradient(135deg,#10b981,#059669); color: white;"
+                                        onclick="toggleToutCocher(this)">
+                                    <i class="bi bi-check2-all"></i> Tout cocher
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bulk-step-separator"><i class="bi bi-arrow-right"></i></div>
+
+                        <div class="bulk-step">
+                            <span class="bulk-step-title"><i class="bi bi-lightning-fill"></i> 2. Action</span>
+                            <div class="bulk-step-controls">
+                                <select name="action" id="bulkAction" class="modern-select" required>
+                                    <option value="" disabled selected>{{ t('actionGroupee') }}</option>
+                                    <option value="deplanifier">{{ t('deplanifierCesRencontres') }}</option>
+                                </select>
+                                <button type="submit" class="modern-btn btn-primary-modern">
+                                    <i class="bi bi-check-lg"></i> {{ t('valider') }}
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+                {# ── Modification des horaires ── #}
+                <form action="PlacementDesRencontresTraitement.php" method="post" style="display: contents;">
+                    <div class="control-group">
+                        <label for="modifMinutes" class="control-label">
+                            <i class="bi bi-clock-history"></i> {{ t('retarderLesRencontres') }}
+                        </label>
+                        <input type="number" id="modifMinutes" name="modifMinutes" placeholder="Minutes" class="modern-input">
+                        <input type="submit" value="{{ t('Appliquerleretard') }}" class="modern-btn btn-primary-modern">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="modifPasHoraire" class="control-label">
+                            <i class="bi bi-hourglass-split"></i> {{ t('dureeRencontre') }}
+                        </label>
+                        <input type="number" id="modifPasHoraire" name="modifPasHoraire" min="0"
+                               value="{{ tournoiInfo['pasHoraire'] }}" class="modern-input"
+                               oninput="this.value = this.value < 0 ? 0 : this.value;"
+                               onchange="this.form.submit()">
+                    </div>
+
+                    <input type="hidden" name="modifHeureDebut" value="{{ tournoiInfo['heure_debut'] }}">
+                    <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                </form>
+
+                <div class="stat-item">
+                    <div class="stat-icon info"><i class="bi bi-tag"></i></div>
+                    <div class="stat-text">
+                        <span class="stat-label">
+                            <a href="GererLabels.php?id_tournoi={{ idTournoi }}" style="text-decoration: none;">
+                                {{ t('labels') }}
+                            </a>
+                        </span>
+                        <span class="stat-value">{{ nombreDeLabel|length }}</span>
+                    </div>
+                </div>
+
+            </div>{# /control-section #}
+
+            {# ── Statistiques ── #}
+            <div class="stats-section">
+
+                <div class="stat-item">
+                    <div class="stat-icon info"><i class="bi bi-calendar-check"></i></div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{ t('planifiee') }}</span>
+                        <span class="stat-value">{{ nombreDeRencontresPlanifiee }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon success"><i class="bi bi-list-ol"></i></div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{ t('total') }}</span>
+                        <span class="stat-value">{{ nombreRencontreAPlanifier }}</span>
+                    </div>
+                </div>
+
+                {# ── Temps d'attente par catégorie ── #}
+                {% if statsParCategorie|length > 0 %}
+                <div class="stat-item" style="flex-direction: column; align-items: flex-start; gap: 12px; grid-column: 1 / -1; padding: 0;">
+                    <details style="width: 100%;">
+                        <summary style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; cursor: pointer; list-style: none; user-select: none;">
+                            <div class="stat-icon warning"><i class="bi bi-hourglass-split"></i></div>
+                            <span style="font-weight: 700; color: var(--bg-dark); font-size: .95rem;">Temps d'attente entre les matchs</span>
+                            <i class="bi bi-chevron-down" style="margin-left: auto; color: var(--text-muted); transition: transform .2s;" id="attente-chevron"></i>
+                        </summary>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
+                            {% for categorie, stats in statsParCategorie %}
+                                {% set moyenneCategorie = (stats.totalEcart / stats.nbEquipes)|round %}
+                                <div style="background: var(--bg-light); border-radius: 10px; padding: 12px 16px; min-width: 220px; flex: 1; border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm);">
+                                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; font-size: .9rem;">{{ categorie }}</div>
+                                    <div style="display: flex; flex-direction: column; gap: 5px; font-size: .85rem; color: var(--bg-dark);">
+                                        <div>
+                                            <i class="bi bi-clock" style="color: var(--info);"></i>
+                                            <strong>Moyenne :</strong>
+                                            {% if moyenneCategorie >= 60 %}
+                                                {{ (moyenneCategorie / 60)|round }}h{{ moyenneCategorie % 60 }}min
+                                            {% else %}
+                                                {{ moyenneCategorie }} min
+                                            {% endif %}
+                                        </div>
+
+                                        <div style="color: var(--danger);">
+                                            <i class="bi bi-arrow-up-circle"></i>
+                                            <strong>Plus longue attente :</strong>
+                                            {% if stats.maxAttente == tournoiInfo.pasHoraire %}
+                                                pas d'anomalie détectée
+                                            {% else %}
+                                                {{ stats.maxEquipe }}
+                                                ({% if stats.maxAttente >= 60 %}{{ (stats.maxAttente / 60)|round }}h{{ stats.maxAttente % 60 }}min{% else %}{{ stats.maxAttente + tournoiInfo.pasHoraire }} min{% endif %})
+                                                {% if stats.maxEquipeDe is not empty %}
+                                                    <span style="color: var(--text-muted); font-size: .8rem;">— entre {{ stats.maxEquipeDe }} et {{ stats.maxEquipeA }}</span>
+                                                {% endif %}
+                                                {% if stats.detailEquipes is not empty %}
+                                                    <div style="margin-top: 8px; font-size: .8rem; display: flex; flex-direction: column; gap: 4px;">
+                                                        {% for e in stats.detailEquipes|sort((a, b) => b.attente <=> a.attente) %}
+                                                            <div style="display: flex; justify-content: space-between; padding: 4px 8px; background: rgba(239,68,68,.05); border-radius: 6px;">
+                                                                <span>{{ e.equipe }}</span>
+                                                                <span>
+                                                                    {% if e.attente == 0 %}✅ 0 min
+                                                                    {% elseif e.attente >= 60 %}{{ (e.attente / 60)|round }}h{{ e.attente % 60 }}min
+                                                                    {% else %}{{ e.attente }} min{% endif %}
+                                                                    {% if e.de is not empty %}
+                                                                        {% set heure = e.de|replace({'h': ':'}) %}
+                                                                        {% set heureModifiee = ('today ' ~ heure)|date_modify('+' ~ tournoiInfo.pasHoraire ~ ' minutes') %}
+                                                                        <span style="opacity: .6;">— entre {{ heureModifiee|date('H\\hi') }} et {{ e.a }}</span>
+                                                                    {% endif %}
+                                                                </span>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                        {% if stats.enchaînements is not empty %}
+                                            <div style="color: var(--warning); margin-top: 6px;">
+                                                <i class="bi bi-lightning-fill"></i>
+                                                <strong>Enchaînements détectés :</strong>
+                                                {% for e in stats.enchaînements %}
+                                                    <div style="font-size: .8rem; margin-left: 20px;">{{ e.equipe }} — à {{ e.horaires|join(', ') }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </details>
+                </div>
+                {% endif %}
+
+                <div class="stat-item">
+                    <div class="stat-icon warning"><i class="bi bi-exclamation-circle"></i></div>
+                    <div class="stat-text">
+                        <span class="stat-label">{{ t('restantes') }}</span>
+                        <span class="stat-value">{{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-icon info"><i class="bi bi-clock"></i></div>
+                    <div class="stat-text">
+                        <span class="stat-label">
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Le temps estimé est calculé en multipliant le nombre de rencontres à planifier par le pas horaire du tournoi et le tout divisé par le nombre de terrain"
+                               style="text-decoration: none; color: inherit;">
+                                {{ t('tempsEstimeDuTournoi') }}
+                            </a>
+                        </span>
+                        <span class="stat-value">
+                            {% set timeInMinutes = (nombreRencontreAPlanifier * tournoiInfo.pasHoraire) / terrains|length %}
+                            {{ timeInMinutes // 60 }}h{{ timeInMinutes % 60 }}min
+                        </span>
+                    </div>
+                </div>
+
+            </div>{# /stats-section #}
+        </div>{# /control-card #}
+
+        {# ══════════════════════════════════════════════
+           TABLE DE PLANIFICATION
+        ══════════════════════════════════════════════ #}
+        <div class="modern-table-container">
+            <table class="modern-table" id="planification-table">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">{{ t('heureDesRencontres') }}</th>
+                        {% for i in 0..terrains|length - 1 %}
+                            <th>
+                                <div class="terrain-header">
+                                    <form id="terrain{{ i }}">
+                                        <input type="hidden" name="terrain_id" value="{{ terrains[i]['terrain_id'] }}">
+                                        <input type="text" class="terrain-input"
+                                               value="{{ terrains[i]['nom'] }}" name="nomTerrain" maxlength="10"
+                                               hx-post="PlacementDesRencontresTraitement.php"
+                                               hx-trigger="change"
+                                               hx-include="#terrain{{ i }} [name='terrain_id'], #terrain{{ i }} [name='nomTerrain']">
+                                        <a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{ terrains[i]['terrain_id'] }}&idTournoi={{ idTournoi }}"
+                                           class="terrain-delete">
+                                            <i class="fa fa-minus-circle"></i>
+                                        </a>
+                                    </form>
+                                </div>
+                            </th>
+                        {% endfor %}
+                        <th>
+                            <a href="PlacementDesRencontresTraitement.php?action=addTerrain&idTournoi={{ idTournoi }}"
+                               class="add-terrain-btn">
+                                <i class="fa fa-plus-circle"></i>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for creneau in listCreneaux %}
+                        <tr>
+                            {# ── Cellule créneau ── #}
+                            <td class="timeslot-cell">
+                                <div class="timeslot-controls">
+                                    <a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{ creneau.creneau_id }}&tournoiId={{ idTournoi }}&pas={{ tournoiInfo.pasHoraire }}"
+                                       data-bs-toggle="tooltip" title="{{ t('supprimerCreneau') }}" class="time-action">
+                                        <i class="fa fa-minus-circle"></i>
+                                    </a>
+                                    <input type="text" name="creneau" class="time-input"
+                                           value="{{ creneau.nom|slice(0, -3) }}"
+                                           hx-post="PlacementDesRencontresTraitement.php"
+                                           hx-trigger="change"
+                                           hx-target="this"
+                                           hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}'
+                                           pattern="^([01]\d|2[0-3]):[0-5]\d$"
+                                           title="Format HH:MM">
+                                    <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                                    <a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{ idTournoi }}&CreneauOrdre={{ creneau.ordre }}&pas={{ tournoiInfo.pasHoraire + tournoiInfo.tempsChangementMinutes }}"
+                                       data-bs-toggle="tooltip" title="{{ t('insererCreneau') }}" class="time-action add">
+                                        <i class="fa fa-plus-circle"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                            {# ── Cellules terrains ── #}
+                            {% for j in 0..terrains|length - 1 %}
+                                {% set couleurDeFond = '#ffffff' %}
+                                {% for planification in afficherPlanification %}
+                                    {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+                                        {% if planification.label_couleur is not empty %}
+                                            {% set couleurDeFond = planification.label_couleur %}
+                                        {% else %}
+                                            {% set couleurDeFond = planification.equipe1_categorie_couleur %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                    style="background-color: {{ couleurDeFond }}"
+                                    data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                    data-creneau-id="{{ creneau.creneau_id }}"
+                                    class="planif-cell planif-item drop-zone">
+
+                                    {% set planificationFound = false %}
+                                    {% set creneauOqp = false %}
+
+                                    {% for planification in afficherPlanification %}
+                                        {% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+                                            {% set planificationFound = true %}
+
+                                            {% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null %}
+
+                                                {# ── Arbitre ── #}
+                                                {% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
+                                                    <div class="arbitre-card">
+                                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                           class="delete-match-btn">
+                                                            <i class="fas fa-calendar-times"></i>
+                                                        </a>
+                                                        <div>
+                                                            <i class="fas fa-user-tie"></i>
+                                                            <i class="material-icons" style="font-size: 20px;">sports</i>
+                                                            {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
+                                                        </div>
+                                                    </div>
+                                                {% elseif tournoiInfo.gestionArbitres == 1 %}
+                                                    <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
+                                                        <select class="empty-select" name="Addevent">
+                                                            <option value="">{{ t('choisirArbitre') }}</option>
+                                                            {% for arbitre in listeDesArbitres %}
+                                                                <option value='{"idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idarbitre":"{{ arbitre.arbitre_id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                                    {% if arbitre.nom is not empty %}{{ t('arbitre') }}: {{ arbitre.nom }} ({{ arbitre.nombre_matchs }}){% endif %}
+                                                                    {{ t('club') }}: {{ arbitre.club_nom }} ({{ arbitre.nombre_matchs_club }})
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </form>
+                                                {% endif %}
+
+                                                {# ── Rencontre ── #}
+                                                {% if planification.rencontre_id is not null %}
+                                                    <div class="match-card"
+                                                         draggable="true"
+                                                         data-planif-id="{{ planification.planification_id }}"
+                                                         data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                                         data-creneau-id="{{ creneau.creneau_id }}"
+                                                         data-categorie="{{ planification.equipe1_categorie_nom|lower }}"
+                                                         data-type="rencontre">
+
+                                                        <div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
+                                                            {% if planification.type_rencontre_id == 4 %}
+                                                                <span><i class="fa fa-star"></i> Match amical</span>
+                                                            {% elseif planification.type_rencontre_id == 3 %}
+                                                                <span><i class="fa fa-trophy"></i> Phase finale</span>
+                                                            {% elseif planification.type_rencontre_id == 2 %}
+                                                                <span><i class="fa fa-trophy"></i> Phase finale Eliminatoire</span>
+                                                            {% else %}
+                                                                <span>{{ planification.poule_nom }}</span>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="match-text {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}match-not-ready{% endif %}">
+                                                            {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
+                                                                <div class="absent-warning">
+                                                                    ⚠️
+                                                                    {% if planification.equipe1_isPresent == 0 and planification.equipe2_isPresent == 0 %}
+                                                                        Les deux équipes sont absentes / en retard
+                                                                    {% elseif planification.equipe1_isPresent == 0 %}
+                                                                        {{ planification.equipe1_nom }} est absente / en retard
+                                                                    {% else %}
+                                                                        {{ planification.equipe2_nom }} est absente / en retard
+                                                                    {% endif %}
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if planification.phase_finale_id is not null %}
+                                                                <strong>Elimination-Direct</strong> {{ planification.phase_finale_libelle }} - {{ planification.equipe1_categorie_nom }}<br>
+                                                                {{ planification.equipe1_nom_categorie }}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe1_nom }}</span>
+                                                                <strong>vs</strong>
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe2_nom }}</span><br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+
+                                                            {% elseif planification.type_rencontre_id == 1 %}
+                                                                <strong>Tour {{ planification.tour }}</strong> - {{ planification.equipe1_categorie_nom }}<br>
+                                                                {{ planification.equipe1_nom_categorie }}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe1_nom }}</span>
+                                                                <strong>vs</strong>
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe2_nom }}</span><br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+
+                                                            {% elseif planification.type_rencontre_id == 3 %}
+                                                                <strong>PF Tour {{ planification.tour }}</strong> - {{ planification.equipe1_categorie_nom }}<br>
+                                                                {{ planification.equipe1_nom_categorie }}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe1_nom }}</span>
+                                                                <strong>vs</strong>
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe2_nom }}</span><br>
+                                                                <small class="text-muted">{{ planification.poule_nom }}</small>
+
+                                                            {% elseif planification.type_rencontre_id == 4 %}
+                                                                <strong>Rencontre amicale</strong> - {{ planification.equipe1_categorie_nom }}<br>
+                                                                {{ planification.equipe1_nom_categorie }}
+                                                                <span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe1_nom }}</span>
+                                                                <strong>vs</strong>
+                                                                <span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{ planification.equipe2_nom }}</span>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="match-actions">
+                                                            <input type="checkbox"
+                                                                   class="match-checkbox form-check-input"
+                                                                   id="rencontreCheck{{ planification.planification_id }}"
+                                                                   name="rencontreCheck[]"
+                                                                   value="{{ planification.planification_id }}"
+                                                                   form="bulkForm">
+                                                            <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}&rencontreId={{ planification.rencontre_id }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                               class="delete-match-btn"
+                                                               data-bs-toggle="tooltip" title="Supprimer cette planification">
+                                                                <i class="fas fa-calendar-times"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    {% set creneauOqp = true %}
+                                                {% endif %}
+
+                                                {# ── Label — DRAGGABLE ── #}
+                                                {% if planification.label_id is not null %}
+                                                    <div class="label-card"
+                                                         draggable="true"
+                                                         data-planif-id="{{ planification.planification_id }}"
+                                                         data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                                         data-creneau-id="{{ creneau.creneau_id }}"
+                                                         data-type="label">
+                                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                           class="delete-match-btn">
+                                                            <i class="fas fa-calendar-times"></i>
+                                                        </a>
+                                                        <div>🏷️ {{ planification.label_description }}</div>
+                                                    </div>
+                                                    {% set creneauOqp = true %}
+                                                {% endif %}
+
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {# ── Sélecteur vide ── #}
+                                    {% if creneauOqp == false %}
+                                        <form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
+                                            <select class="empty-select" name="Addevent">
+                                                <option value="">{{ t('choisirRencontreOuLabel') }}</option>
+                                                {% for planif in planificationSansCreneauNiTerrain %}
+                                                    {% if planif.phase_finale_id is not null %}
+                                                        <option value='{"idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idrencontre":"{{ planif.id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                            Elimination-Direct - {{ planif.phase_finale_libelle }} - {{ planif.equipe1_categorie_nom }} {{ planif.equipe1_nom }} vs {{ planif.equipe2_nom }}
+                                                        </option>
+                                                    {% elseif planif.type_rencontre_id == 1 %}
+                                                        <option value='{"idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idrencontre":"{{ planif.id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                            tour{{ planif.tour }}-{{ planif.equipe1_categorie_nom }} {{ planif.equipe1_nom }} vs {{ planif.equipe2_nom }} {{ planif.equipe2_poule_nom|split(' - ')[1] }}
+                                                        </option>
+                                                    {% elseif planif.type_rencontre_id == 3 %}
+                                                        <option value='{"idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idrencontre":"{{ planif.id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                            🏆PF-tour{{ planif.tour }}-{{ planif.equipe1_categorie_nom }} {{ planif.equipe1_nom }} vs {{ planif.equipe2_nom }} {{ planif.equipe1_poule_nom }}
+                                                        </option>
+                                                    {% elseif planif.type_rencontre_id == 4 %}
+                                                        <option value='{"idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idrencontre":"{{ planif.id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                            ⭐ Match amical - {{ planif.equipe1_categorie_nom }} {{ planif.equipe1_nom }} vs {{ planif.equipe2_nom }}
+                                                        </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% for label in libelleParTournoi %}
+                                                    <option value='{"idlabel":"{{ label.label_id }}","idterrain":"{{ terrains[j]['terrain_id'] }}","idcreneau":"{{ creneau.creneau_id }}","idtournoi":"{{ idTournoi }}"}'>
+                                                        🏷️ {{ t('label') }}: {{ label.description }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    {% endif %}
+
+                                </td>
+                            {% endfor %}
+
+                        </tr>
+
+                        {# ── Bande changement ── #}
+                        {% if not loop.last and tournoiInfo.gestionTempsChangement %}
+                            <tr class="changement-row">
+                                <td class="changement-cell">
+                                    <div class="changement-label">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        Changement avant {{ creneau.nom|slice(0, -3) }}
+                                    </div>
+                                    <form action="PlacementDesRencontresTraitement.php" method="post"
+                                          style="display: flex; align-items: center; gap: 4px;">
+                                        <input type="hidden" name="action" value="modifierTempsChangement">
+                                        <input type="hidden" name="idTournoi" value="{{ idTournoi }}">
+                                        <input type="hidden" name="creneau_id" value="{{ creneau.creneau_id }}">
+                                        <input type="number" name="tempsChangementMinutes" class="changement-input"
+                                               value="{{ creneau.tempsChangementMinutes }}" min="0" max="180">
+                                        <span style="font-size: .8rem; color: white; font-weight: 600;">min</span>
+                                        <button type="submit"
+                                                style="background: none; border: none; color: white; cursor: pointer; padding: 4px 8px;"
+                                                title="Mettre à jour">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="100%">
+                            <div style="text-align: center; padding: 20px;">
+                                <a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{ idTournoi }}&startTime={{ lastCreneau['nom']|slice(0, -3) }}&newTime={{ timeNextCreneau }}"
+                                   class="add-terrain-btn">
+                                    <i class="fa fa-plus-circle"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    {% endif %}{# /licence check #}
+
+    {# ── Alertes ── #}
+    {% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}
+        <div class="modern-alert danger">
+            <div class="alert-icon danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div><strong>{{ t('attention') }}</strong> {{ t('limiteAtteinteMessage') }}.</div>
+        </div>
+    {% endif %}
+
+    {% if dateFin < today %}
+        <div class="modern-alert warning">
+            <div class="alert-icon warning"><i class="bi bi-exclamation-circle-fill"></i></div>
+            <div>
+                <strong>Attention :</strong>
+                La date de fin de votre licence est dépassée. Vous ne pouvez plus planifier de rencontres.
+            </div>
+        </div>
+    {% endif %}
+
+</div>{# /main-container #}
+
+{# ── Filtre flottant ── #}
+<div class="filter-container">
+    <input type="text" id="filter-input" class="filter-input" placeholder="🔍 {{ t('filtre') }}...">
 </div>
-{% endif %}
 
+{# ══════════════════════════════════════════════
+   SCRIPTS
+══════════════════════════════════════════════ #}
 
-					<div class="stat-item">
-						<div class="stat-icon warning">
-							<i class="bi bi-exclamation-circle"></i>
-						</div>
-						<div class="stat-text">
-							<span class="stat-label">{{t('restantes')}}</span>
-							<span class="stat-value">{{ nombreRencontreAPlanifier - nombreDeRencontresPlanifiee }}</span>
-						</div>
-					</div>
+{# -- Filtre localStorage -- #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const filterInput = document.getElementById('filter-input');
+    const stored = localStorage.getItem('filterValue');
+    if (stored) { filterInput.value = stored; filterOptions(stored.toLowerCase()); }
+    filterInput.addEventListener('input', function () {
+        localStorage.setItem('filterValue', this.value);
+        filterOptions(this.value.toLowerCase());
+    });
+});
+function filterOptions(filter) {
+    document.querySelectorAll('select option').forEach(function (option) {
+        option.classList.toggle('hidden', !option.text.toLowerCase().includes(filter));
+    });
+}
+</script>
 
-					<div class="stat-item">
-						<div class="stat-icon info">
-							<i class="bi bi-clock"></i>
-						</div>
-						<div class="stat-text">
-							<span class="stat-label">
-								<a href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Le temps estimé est calculé en multipliant le nombre de rencontres à planifier par le pas horaire du tournoi et le tout divisé par le nombre de terrain" style="text-decoration: none; color: inherit;">
-									{{t('tempsEstimeDuTournoi')}}
-								</a>
-							</span>
-							<span class="stat-value">
-								{% set timeInMinutes = (nombreRencontreAPlanifier * tournoiInfo.pasHoraire) / terrains|length %}
-								{% set hours = timeInMinutes // 60 %}
-								{% set minutes = timeInMinutes % 60 %}
-								{{ hours }}h
-								{{ minutes }}min
-							</span>
+{# -- Sélecteurs (rencontre + arbitre) -- #}
+<script>
+$(document).ready(function () {
+    $('.rencontreLabel .empty-select, .arbitreForm .empty-select').on('change', function () {
+        var $form = $(this).closest('form');
+        $.post($form.attr('action'), $form.serialize(), function () { location.reload(); });
+    });
+});
+</script>
 
-
-						</div>
-
-					</div>
-				</div>
-			</div>
-
-			<!-- Table de planification -->
-			<div class="modern-table-container">
-				<table class="modern-table" id="planification-table">
-					<thead>
-						<tr>
-							<th style="width: 120px;">{{t('heureDesRencontres')}}</th>
-							{% for i in 0..terrains|length - 1 %}
-								<th>
-									<div class="terrain-header">
-										<form id="terrain{{i}}">
-											<input type="hidden" name="terrain_id" value="{{terrains[i]['terrain_id']}}">
-											<input type="text" class="terrain-input" value="{{terrains[i]['nom']}}" name="nomTerrain" maxlength="10" hx-post="PlacementDesRencontresTraitement.php" hx-trigger="change" hx-include="#terrain{{i}} [name='terrain_id'], #terrain{{i}} [name='nomTerrain']">
-											<a href="PlacementDesRencontresTraitement.php?action=delTerrain&terrain_id={{terrains[i]['terrain_id']}}&idTournoi={{idTournoi}}" class="terrain-delete">
-												<i class="fa fa-minus-circle"></i>
-											</a>
-										</form>
-									</div>
-								</th>
-							{% endfor %}
-							<th>
-								<a href="PlacementDesRencontresTraitement.php?action=addTerrain&idTournoi={{idTournoi}}" class="add-terrain-btn">
-									<i class="fa fa-plus-circle"></i>
-								</a>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for creneau in listCreneaux %}
-							<tr>
-								<td class="timeslot-cell">
-									<div class="timeslot-controls">
-										<a href="PlacementDesRencontresTraitement.php?action=delCreneau&creneauId={{creneau.creneau_id}}&tournoiId={{idTournoi}}&pas={{tournoiInfo.pasHoraire}}" data-bs-toggle="tooltip" title="{{t('supprimerCreneau')}}" class="time-action">
-											<i class="fa fa-minus-circle"></i>
-										</a>
-
-										<input type="text" name="creneau" class="time-input" value="{{ creneau.nom|slice(0, -3) }}" hx-post="PlacementDesRencontresTraitement.php" hx-trigger="change" hx-target="this" hx-vals='{"creneau_id": "{{ creneau.creneau_id }}", "action": "updateCreneau"}' pattern="^([01]\d|2[0-3]):[0-5]\d$" title="Format HH:MM">
-
-										<input type="hidden" name="idTournoi" value="{{idTournoi}}">
-			
-										<a href="PlacementDesRencontresTraitement.php?action=ajouterCreneauEntre&idTournoi={{idTournoi}}&CreneauOrdre={{ creneau.ordre }}&pas={{tournoiInfo.pasHoraire + tournoiInfo.tempsChangementMinutes }}" data-bs-toggle="tooltip" title="{{t('insererCreneau')}}" class="time-action add">
-											<i class="fa fa-plus-circle"></i>
-										</a>
-									</div>
-								</td>
-
-								{% for j in 0..terrains|length - 1 %}
-									{% set couleurDeFond = '#ffffff' %}
-									{% for planification in afficherPlanification %}
-										{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
-											{% if planification.label_couleur is not empty %}
-												{% set couleurDeFond = planification.label_couleur %}
-											{% else %}
-												{% set couleurDeFond = planification.equipe1_categorie_couleur %}
-											{% endif %}
-										{% endif %}
-									{% endfor %}
-
-									<td id="planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" style="background-color: {{ couleurDeFond }}" 
-									
-									data-terrain-id="{{ terrains[j]['terrain_id'] }}"
-    								data-creneau-id="{{ creneau.creneau_id }}"
-									class="planif-cell planif-item drop-zone">
-
-										{% set planificationFound = false %}
-										{% set creneauOqp = false %}
-
-										{% for planification in afficherPlanification %}
-											{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
-												{% set planificationFound = true %}
-
-												{% if planification.rencontre_id is not null or planification.arbitre_id is not null or planification.label_id is not null %}
-
-													<!-- Arbitre -->
-													{% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
-														<div class="arbitre-card">
-															<a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="delete-match-btn">
-																<i class="fas fa-calendar-times"></i>
-															</a>
-															<div>
-																<i class="fas fa-user-tie"></i>
-																<i class="material-icons" style="font-size: 20px;">sports</i>
-																{{ planification.arbitre_nom }}
-																{{ planification.club_nom_arbitre }}
-															</div>
-														</div>
-													{% else %}
-														{% if tournoiInfo.gestionArbitres == 1 %}
-															<form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
-																<select class="empty-select" name="Addevent">
-																	<option value="">{{t('choisirArbitre')}}</option>
-																	{% for arbitre in listeDesArbitres %}
-																		<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idarbitre":"{{arbitre.arbitre_id}}","idtournoi":"{{idTournoi}}"}'>
-																			{% if arbitre.nom is not empty %}
-																				{{t('arbitre')}}:
-																				{{arbitre.nom}}
-																				({{arbitre.nombre_matchs}})
-																			{% endif %}
-																			{{t('club')}}:
-																			{{arbitre.club_nom}}
-																			({{arbitre.nombre_matchs_club}})
-																		</option>
-																	{% endfor %}
-																</select>
-															</form>
-														{% endif %}
-													{% endif %}
-
-													<!-- Rencontre -->
-													{% if planification.rencontre_id is not null %}
-
-														<div class="match-card" draggable="true" data-planif-id="{{ planification.planification_id }}" data-terrain-id="{{ terrains[j]['terrain_id'] }}" data-creneau-id="{{ creneau.creneau_id }}" data-categorie="{{ planification.equipe1_categorie_nom|lower }}">
-														
-
-															<div class="match-header-bar" style="background: {{ planification.equipe1_categorie_couleur }};">
-
-																{% if planification.type_rencontre_id == 4 %}
-																	<span>
-																		<i class="fa fa-star"></i>
-																		Match amical</span>
-																{% elseif planification.type_rencontre_id == 3 %}
-																	<span>
-																		<i class="fa fa-trophy"></i>
-																		Phase finale</span>
-																{% elseif planification.type_rencontre_id == 2 %}
-																	<span>
-																		<i class="fa fa-trophy"></i>
-																		Phase finale Eliminatoire</span>
-																{% else %}
-																	<span>{{ planification.poule_nom }}</span>
-																{% endif %}
-
-															</div>
-
-															<div class="match-text {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}match-not-ready{% endif %}">
-
-																{% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
-																	<div class="absent-warning">
-																		⚠️
-																		{% if planification.equipe1_isPresent == 0 and planification.equipe2_isPresent == 0 %}
-																			Les deux équipes sont absentes / en retard
-																		{% elseif planification.equipe1_isPresent == 0 %}
-																			{{ planification.equipe1_nom }}
-																			est absente / en retard
-																		{% else %}
-																			{{ planification.equipe2_nom }}
-																			est absente / en retard
-																		{% endif %}
-																	</div>
-																{% endif %}
-
-
-																{% if planification.phase_finale_id is not null %}
-																	<strong>Elimination-Direct</strong>
-																	{{planification.phase_finale_libelle}}
-																	-
-																	{{planification.equipe1_categorie_nom}}<br>
-																	{{planification.equipe1_nom_categorie}}
-																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span>
-																	<strong>vs</strong>
-																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
-																	<small class="text-muted">{{ planification.poule_nom }}</small>
-
-																{% elseif planification.type_rencontre_id == 1 %}
-																	<strong>Tour
-																		{{planification.tour}}</strong>
-																	-
-																	{{planification.equipe1_categorie_nom}}<br>
-																	{{planification.equipe1_nom_categorie}}
-																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span>
-																	<strong>vs</strong>
-																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
-																	<small class="text-muted">{{ planification.poule_nom }}</small>
-
-																{% elseif planification.type_rencontre_id == 3 %}
-																	<strong>PF Tour
-																		{{planification.tour}}</strong>
-																	-
-																	{{planification.equipe1_categorie_nom}}<br>
-																	{{planification.equipe1_nom_categorie}}
-																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span>
-																	<strong>vs</strong>
-																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
-																	<small class="text-muted">{{ planification.poule_nom }}</small>
-
-																{% elseif planification.type_rencontre_id == 4 %}
-																	<strong>Rencontre amicale</strong>
-																	-
-																	{{planification.equipe1_categorie_nom}}<br>
-																	{{planification.equipe1_nom_categorie}}
-																	<span class="{% if planification.equipe1_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe1_nom}}</span>
-																	<strong>vs</strong>
-																	<span class="{% if planification.equipe2_isPresent == 0 %}team-absent{% endif %}">{{planification.equipe2_nom}}</span><br>
-
-																{% endif %}
-															</div>
-
-															<div class="match-actions">
-																<input type="checkbox" class="match-checkbox form-check-input" id="rencontreCheck{{ planification.planification_id }}" name="rencontreCheck[]" value="{{ planification.planification_id }}" form="bulkForm">
-
-																<a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}&rencontreId={{ planification.rencontre_id }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="delete-match-btn" data-bs-toggle="tooltip" title="Supprimer cette planification">
-																	<i class="fas fa-calendar-times"></i>
-																</a>
-															</div>
-														</div>
-														{% set creneauOqp = true %}
-													{% endif %}
-
-													<!-- Label -->
-													{% if planification.label_id is not null %}
-														<div class="label-card">
-															<a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}" class="delete-match-btn">
-																<i class="fas fa-calendar-times"></i>
-															</a>
-															<div>
-																🏷️{{ planification.label_description }}
-															</div>
-														</div>
-														{% set creneauOqp = true %}
-													{% endif %}
-												{% endif %}
-											{% endif %}
-										{% endfor %}
-
-										<!-- Sélecteur vide -->
-										{% if creneauOqp == false %}
-
-
-												<form action="PlacementDesRencontresTraitement.php" method="post" class="rencontreLabel">
-											
-													<select class="empty-select" name="Addevent">
-														<option value="">{{t('choisirRencontreOuLabel')}}</option>
-														{% for planif in planificationSansCreneauNiTerrain %}
-
-															{% if planif.phase_finale_id is not null %}
-																{# Option pour phase finale à élimination directe #}
-																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
-																	Elimination-Direct -
-																	{{ planif.phase_finale_libelle }}
-																	-
-																	{{ planif.equipe1_categorie_nom }}
-																	{{planif.equipe1_nom}}
-																	vs
-																	{{planif.equipe2_nom}}
-																</option>
-
-															{% elseif planif.type_rencontre_id == 1 %}
-																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
-																	tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }}
-																	{{planif.equipe1_nom}}
-																	vs
-																	{{planif.equipe2_nom}}
-																	{{ planif.equipe2_poule_nom|split(' - ')[1] }}
-																</option>
-				
-															{% elseif planif.type_rencontre_id == 3 %}
-																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
-																	🏆PF-tour{{planif.tour}}-{{ planif.equipe1_categorie_nom }}
-																	{{planif.equipe1_nom}}
-																	vs
-																	{{planif.equipe2_nom}}
-																	{{ planif.equipe1_poule_nom }}
-																</option>
-															{% elseif planif.type_rencontre_id == 4 %}
-																<option value='{"idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idrencontre":"{{planif.id}}","idtournoi":"{{idTournoi}}"}'>
-																	⭐ Match amical -
-																	{{ planif.equipe1_categorie_nom }}
-																	{{planif.equipe1_nom}}
-																	vs
-																	{{planif.equipe2_nom}}
-																</option>
-
-															{% endif %}
-
-														{% endfor %}
-														{% for label in libelleParTournoi %}
-															<option value='{"idlabel":"{{label.label_id}}","idterrain":"{{terrains[j]['terrain_id']}}","idcreneau":"{{creneau.creneau_id}}","idtournoi":"{{idTournoi}}"}'>
-																🏷️{{t('label')}}:
-																{{label.description}}
-															</option>
-														{% endfor %}
-													</select>
-												</form>
-
-											
-										{% endif %}
-									</td>
-								{% endfor %}
-							</tr>
-
-							<!-- Bande de changement entre créneaux -->
-							{% if not loop.last and tournoiInfo.gestionTempsChangement %}
-							<tr class="changement-row">
-								<td class="changement-cell">
-									<div class="changement-label">
-										<i class="fas fa-hourglass-half"></i>
-										Changement avant {{ creneau.nom|slice(0, -3) }}
-									</div>
-									<form action="PlacementDesRencontresTraitement.php" method="post" style="display: flex; align-items: center; gap: 4px;">
-										<input type="hidden" name="action" value="modifierTempsChangement">
-										<input type="hidden" name="idTournoi" value="{{idTournoi}}">
-										<input type="hidden" name="creneau_id" value="{{creneau.creneau_id}}">
-										<input type="number" name="tempsChangementMinutes" class="changement-input" value="{{ creneau.tempsChangementMinutes }}" min="0" max="180">
-										<span style="font-size: 0.8rem; color: white; font-weight: 600;">min</span>
-										<button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 4px 8px;" title="Mettre à jour">
-											<i class="fas fa-check"></i>
-										</button>
-									</form>
-								</td>
-								
-							</tr>
-							{% endif %}
-
-						{% endfor %}
-					</tbody>
-					<tfoot>
-						<tr>
-							<td colspan="100%">
-								<div style="text-align: center; padding: 20px;">
-									<a href="PlacementDesRencontresTraitement.php?action=addCreneau&idTournoi={{idTournoi}}&startTime={{lastCreneau['nom']|slice(0, -3)}}&newTime={{timeNextCreneau}}" class="add-terrain-btn">
-										<i class="fa fa-plus-circle"></i>
-									</a>
-								</div>
-							</td>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-		{% endif %}
-
-		<!-- Alertes -->
-		{% if AfficherLesEquipes['nombre'] >= licence.limite_equipes and today > dateFin %}
-			<div class="modern-alert danger">
-				<div class="alert-icon danger">
-					<i class="bi bi-exclamation-triangle-fill"></i>
-				</div>
-				<div>
-					<strong>{{t('attention')}}</strong>
-					{{t('limiteAtteinteMessage')}}.
-				</div>
-			</div>
-		{% endif %}
-
-		{% if dateFin < today %}
-			<div class="modern-alert warning">
-				<div class="alert-icon warning">
-					<i class="bi bi-exclamation-circle-fill"></i>
-				</div>
-				<div>
-					<strong>Attention :</strong>
-					La date de fin de votre licence est dépassée. Vous ne pouvez plus planifier de rencontres.
-				</div>
-			</div>
-		{% endif %}
-	</div>
-
-	<!-- Filter input -->
-	<div class="filter-container">
-		<input type="text" id="filter-input" class="filter-input" placeholder="🔍 {{t('filtre')}}...">
-	</div>
-
-	<!-- Scripts -->
-
- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterInput = document.getElementById('filter-input');
-            const storedFilter = localStorage.getItem('filterValue');
-            if (storedFilter) {
-                filterInput.value = storedFilter;
-                filterOptions(storedFilter.toLowerCase());
-            }
-
-            filterInput.addEventListener('input', function() {
-                const filter = this.value.toLowerCase();
-                localStorage.setItem('filterValue', this.value);
-                filterOptions(filter);
-            });
-        });
-
-        function filterOptions(filter) {
-            const selects = document.querySelectorAll('select');
-            selects.forEach(select => {
-                const options = select.querySelectorAll('option');
-                options.forEach(option => {
-                    if (option.text.toLowerCase().includes(filter)) {
-                        option.classList.remove('hidden');
-                    } else {
-                        option.classList.add('hidden');
-                    }
-                });
-            });
+{# -- Validation format HH:MM -- #}
+<script>
+document.querySelectorAll('input[name="creneau"]').forEach(function (input) {
+    input.addEventListener('input', function (e) {
+        const value = e.target.value;
+        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value) && value.length >= 5) {
+            alert('Veuillez entrer une heure au format HH:MM (ex: 09:12 ou 14:30).');
+            e.target.value = value.slice(0, -1);
         }
-    </script>
+    });
+});
+</script>
 
-	 <script>
-		        $(document).ready(function() {
-		            $('.rencontreLabel .form-select, .rencontreLabel .empty-select').on('change', function() {
-		                var $form = $(this).closest('form');
-		                var formAction = $form.attr('action');
-		                var formData = $form.serialize();
-		
-		                $.post(formAction, formData, function() {
-		                    location.reload();
-		                });
-		            });
-		
-		            $('.arbitreForm .form-select, .arbitreForm .empty-select').on('change', function() {
-		                var $form = $(this).closest('form');
-		                var formAction = $form.attr('action');
-		                var formData = $form.serialize();
-		
-		                $.post(formAction, formData, function() {
-		                    location.reload();
-		                });
-		            });
-		        });
-		    </script>
+{# -- Tooltips Bootstrap -- #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        .forEach(function (el) { new bootstrap.Tooltip(el); });
+});
+</script>
 
-	 <script>
-		        document.querySelectorAll('input[name="creneau"]').forEach(function(input) {
-		            input.addEventListener('input', function(e) {
-		                const value = e.target.value;
-		                const regex = /^([01]\d|2[0-3]):[0-5]\d$/;
-		                if (!regex.test(value) && value.length >= 5) {
-		                    alert('Veuillez entrer une heure au format HH:MM (ex: 09:12 ou 14:30).');
-		                    e.target.value = value.slice(0, -1);
-		                }
-		            });
-		        });
-		    </script>
+{# -- Sauvegarde position de scroll -- #}
+<script>
+window.onload = function () {
+    var pos = sessionStorage.getItem('scrollPosition');
+    if (pos !== null) window.scrollTo(0, pos);
+};
+window.onbeforeunload = function () {
+    sessionStorage.setItem('scrollPosition', window.scrollY);
+};
+</script>
 
-	 <script>
-		        document.addEventListener('DOMContentLoaded', function () {
-		            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-		            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-		                return new bootstrap.Tooltip(tooltipTriggerEl)
-		            })
-		        });
-		    </script>
+{# -- Clic sur la cellule → coche la checkbox -- #}
+<script>
+document.querySelectorAll('.planif-item').forEach(function (item) {
+    var checkbox = item.querySelector('input[type="checkbox"]');
+    if (!checkbox) return;
+    item.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return;
+        if (e.target.tagName === 'SELECT') return;
+        if (e.target.type === 'checkbox') return;
+        checkbox.checked = !checkbox.checked;
+    });
+});
+</script>
 
-	 <script>
-		        window.onload = function() {
-		            if (typeof(sessionStorage) !== 'undefined') {
-		                var scrollPosition = sessionStorage.getItem('scrollPosition');
-		                if (scrollPosition !== null) {
-		                    window.scrollTo(0, scrollPosition);
-		                }
-		            }
-		        };
-		
-		        window.onbeforeunload = function() {
-		            if (typeof(sessionStorage) !== 'undefined') {
-		                sessionStorage.setItem('scrollPosition', window.scrollY);
-		            }
-		        };
-		    </script>
+{# -- Indicateur de scroll horizontal -- #}
+<script>
+(function () {
+    var container = document.querySelector('.modern-table-container');
+    if (container) {
+        container.addEventListener('scroll', function () {
+            this.classList.toggle('scrolled', this.scrollLeft > 0);
+        });
+    }
+})();
+</script>
 
-	 <script>
-		        document.querySelectorAll('.planif-item').forEach(item => {
-		            const checkbox = item.querySelector('input[type="checkbox"]');
-		            
-		            if (checkbox) {
-		                item.addEventListener('click', e => {
-		                    if (e.target.closest('a')) return;
-		                    if (e.target.tagName === 'SELECT') return;
-		                    if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') return;
-		                    
-		                    checkbox.checked = !checkbox.checked;
-		                });
-		            }
-		        });
-		    </script>
+{# -- Tout cocher / décocher -- #}
+<script>
+function toggleToutCocher(btn) {
+    var checkboxes = document.querySelectorAll('input[name="rencontreCheck[]"]');
+    var allChecked = Array.from(checkboxes).every(function (cb) { return cb.checked; });
+    checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+    btn.innerHTML = allChecked
+        ? '<i class="bi bi-check2-all"></i> Tout cocher'
+        : '<i class="bi bi-x-square"></i> Tout décocher';
+}
+</script>
 
-	 <script>
-		        // Détecter le scroll horizontal pour masquer l'indicateur
-		        const tableContainer = document.querySelector('.modern-table-container');
-		        if (tableContainer) {
-		            tableContainer.addEventListener('scroll', function() {
-		                if (this.scrollLeft > 0) {
-		                    this.classList.add('scrolled');
-		                } else {
-		                    this.classList.remove('scrolled');
-		                }
-		            });
-		        }
-		    </script>
+{# -- Cocher par catégorie -- #}
+<script>
+function cocherCategorie() {
+    var categorie = document.getElementById('categorieSelector').value.toLowerCase();
+    if (!categorie) return;
+    document.querySelectorAll('.match-card').forEach(function (card) {
+        if ((card.dataset.categorie || '').toLowerCase() === categorie) {
+            var cb = card.querySelector('input[name="rencontreCheck[]"]');
+            if (cb) cb.checked = true;
+        }
+    });
+}
+</script>
 
-	 <script>
-		    function toggleToutCocher(btn) {
-		        const checkboxes = document.querySelectorAll('input[name="rencontreCheck[]"]');
-		        const toutCoche = Array.from(checkboxes).every(cb => cb.checked);
-		        checkboxes.forEach(cb => cb.checked = !toutCoche);
-		        btn.innerHTML = toutCoche
-		            ? '<i class="bi bi-check2-all"></i> Tout cocher'
-		            : '<i class="bi bi-x-square"></i> Tout décocher';
-		    }
-		</script>
+{# ══════════════════════════════════════════════
+   DRAG & DROP — Rencontres ET Labels
+   Un seul bloc, une seule variable `dragged`.
+   Les deux types de cartes partagent la même
+   logique : data-planif-id, data-terrain-id,
+   data-creneau-id sont présents sur les deux.
+══════════════════════════════════════════════ #}
+<script>
+(function () {
+    var dragged = null;
 
-	 <script>
-(function() {
-    let dragged = null;
+    /* Sélecteur unique : match-card ET label-card draggables */
+    var draggableSelector = '.match-card[draggable], .label-card[draggable]';
 
-    document.querySelectorAll('.match-card[draggable]').forEach(card => {
-        card.addEventListener('dragstart', e => {
+    document.querySelectorAll(draggableSelector).forEach(function (card) {
+        card.addEventListener('dragstart', function (e) {
             dragged = card;
-            setTimeout(() => card.classList.add('dragging'), 0);
+            setTimeout(function () { card.classList.add('dragging'); }, 0);
             e.dataTransfer.effectAllowed = 'move';
         });
-        card.addEventListener('dragend', () => {
+        card.addEventListener('dragend', function () {
             card.classList.remove('dragging');
             dragged = null;
-            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+            document.querySelectorAll('.drop-zone').forEach(function (z) {
+                z.classList.remove('drag-over');
+            });
         });
     });
 
-    document.querySelectorAll('.drop-zone').forEach(zone => {
-
-        zone.addEventListener('dragover', e => {
+    document.querySelectorAll('.drop-zone').forEach(function (zone) {
+        zone.addEventListener('dragover', function (e) {
             e.preventDefault();
             zone.classList.add('drag-over');
             e.dataTransfer.dropEffect = 'move';
         });
-
-        zone.addEventListener('dragleave', e => {
-            if (!zone.contains(e.relatedTarget)) {
-                zone.classList.remove('drag-over');
-            }
+        zone.addEventListener('dragleave', function (e) {
+            if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
         });
-
-        zone.addEventListener('drop', e => {
+        zone.addEventListener('drop', function (e) {
             e.preventDefault();
             zone.classList.remove('drag-over');
             if (!dragged) return;
 
-            const planifId   = dragged.dataset.planifId;
-            const newTerrain = zone.dataset.terrainId;
-            const newCreneau = zone.dataset.creneauId;
+            var planifId      = dragged.dataset.planifId;
+            var originTerrain = dragged.dataset.terrainId;
+            var originCreneau = dragged.dataset.creneauId;
+            var newTerrain    = zone.dataset.terrainId;
+            var newCreneau    = zone.dataset.creneauId;
 
-            // Récupère la carte déjà présente dans la zone cible (si elle existe)
-            const targetCard = zone.querySelector('.match-card:not(.dragging)');
-            const targetPlanifId = targetCard ? targetCard.dataset.planifId : null;
-
-            // Récupère terrain/créneau d'origine de la carte glissée
-            const originTerrain = dragged.dataset.terrainId;
-            const originCreneau = dragged.dataset.creneauId;
+            /* Carte déjà présente dans la zone cible (pour le swap) */
+            var targetCard      = zone.querySelector('.match-card:not(.dragging), .label-card:not(.dragging)');
+            var targetPlanifId  = targetCard ? targetCard.dataset.planifId : '';
 
             fetch('PlacementDesRencontresTraitement.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
-                    action:          'deplacerPlanification',
-                    planifId:        planifId,
-                    newTerrain:      newTerrain,
-                    newCreneau:      newCreneau,
-                    idTournoi:       '{{ idTournoi }}',
-                    // Infos pour le swap
-                    targetPlanifId:  targetPlanifId ?? '',
-                    originTerrain:   originTerrain,
-                    originCreneau:   originCreneau,
+                    action:         'deplacerPlanification',
+                    planifId:       planifId,
+                    newTerrain:     newTerrain,
+                    newCreneau:     newCreneau,
+                    idTournoi:      '{{ idTournoi }}',
+                    targetPlanifId: targetPlanifId,
+                    originTerrain:  originTerrain,
+                    originCreneau:  originCreneau,
                 })
-            }).then(r => {
+            }).then(function (r) {
                 if (r.ok) location.reload();
                 else alert('Erreur lors du déplacement.');
             });
@@ -1711,32 +1290,5 @@ details > summary::-webkit-details-marker {
 })();
 </script>
 
-<script>
-function cocherCategorie() {
-
-    const categorie = document
-        .getElementById('categorieSelector')
-        .value
-        .toLowerCase();
-
-    if (!categorie) return;
-
-    document.querySelectorAll('.match-card').forEach(card => {
-
-        const cardCategorie = (card.dataset.categorie || '').toLowerCase();
-
-        if (cardCategorie === categorie) {
-
-            const checkbox = card.querySelector(
-                'input[name="rencontreCheck[]"]'
-            );
-
-            if (checkbox) {
-                checkbox.checked = true;
-            }
-        }
-    });
-}
-</script>
-
-</body></html>
+</body>
+</html>
