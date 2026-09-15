@@ -33,7 +33,7 @@ $equipeDao = new EquipeDAO();
     $nomEquipe = strtoupper($nomEquipe);
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
 
-    var_dump($_POST);
+    
     try {
             $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs'], $_POST['Coach']);            } catch (Exception $e) {
                 // Redirige avec message d'erreur

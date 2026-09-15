@@ -62,7 +62,7 @@ $labelsDao->ajouterLabel("Pause","#000000",$dernierId);
 
 
 
-header("location: modifierTournoi.php?idTournoi=".$dernierId);
+header("location: ajoutEquipe.php?idTournoi=".$dernierId);
 
 
 
