@@ -123,7 +123,7 @@ echo $template->render([
     //'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
     'idTournoi' => $_GET['id_tournoi'],
     'idPoule' => $_GET['id_poule'] ?? null,
-    'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']??null),
+    //'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']??null),
     'message' => $message??null,
     'afficherEquipeParPoule' => $equipes??null,
     'RencontresExistesDansPoules'=>$pouleHasRencontre,
