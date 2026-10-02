@@ -5,7 +5,11 @@ require 'class/tournoiDao.class.php';
 require 'class/rencontreDao.class.php';
 require  'class/pouleManagerDao.class.php';
 require 'class/equipeDao.class.php';
+require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
+require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
+
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -14,6 +18,7 @@ $twig = new \Twig\Environment($loader, [
 ]);
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('GestionRencontresPhasesClassement.twig');
 $poulemanager = new PouleManager();
 $rencontreDao = new RencontreDAO();
@@ -22,24 +27,34 @@ $equipeDao = new EquipeDAO();
 $categorie = new CategorieDao();
 
 
+
+
 if (!isset ($_GET['idTournoiBase']) || $_GET['idTournoiBase'] == 0) {
   echo "Aucun tournoi actif en cours.";
   header("Refresh:3; url=ajoutTournoi.php");
   exit();
 }
 
-if ($tournoiDao->droitTournoiClub($_GET['idTournoiBase'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['idTournoiBase']) ? (int) $_GET['idTournoiBase'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
+
+
+$licenceDao = new LicenceDao();
+$licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
+$equipe = new EquipeDAO();
+$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['idTournoiBase']);
 
 //afficher les phase de classement uniquement:
 
 
 if (isset ($_GET['idTournoiBase'])){
-$tournoiId = $_GET['idTournoiBase']; // Remplacez cela par l'ID du tournoi pour lequel vous souhaitez créer les rencontres
-//$tournoiEnCours = $tournoiDao->getIdTournoiParIdParent($tournoiId);
-
+$tournoiId = $_GET['idTournoiBase']; 
 }
 
 
@@ -63,6 +78,10 @@ if (isset ($_GET['idPoule'])) {
  
  }
 
+ else {
+  $GetResultatDesPoules = [];
+ }
+
 
  foreach ($GetResultatDesPoules  as &$equipe) {
  
@@ -81,17 +100,57 @@ usort($poulesFinales, function($a, $b) {
 });
 foreach ($poulesFinales as &$poule) {
   $poule['contenu'] = $poulemanager->getEquipesInPoule($poule['id']);
-  $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],1);
+  $poule['hasRencontres'] = $poulemanager->checkRencontresInPoule($poule['id'],3);
+  $nbEquipes = count($poule['contenu']);
+  $nbRencontresAttendu = ($nbEquipes * ($nbEquipes - 1)) / 2;
+  $poule['nbRencontresProgrammees'] = $poulemanager->NbreRencontreParPouleProgrammee($poule['id'], $tournoiId);
+  $poule['rencontresRatio'] = $nbRencontresAttendu > 0 ? ($poule['nbRencontresProgrammees'] / $nbRencontresAttendu) * 100 : 0;
 }
 
 
-//Savoir si une poule contient des rencontre
+//Savoir si une poule contient des rencontres
+if (isset ($_GET['idPoule'])) {
+  $idPoule = $_GET['idPoule'];
 $pouleHasRencontres = $poulemanager->checkRencontresInPoule($_GET['idPoule'],1);
+//$pouleHasRencontresProgrammees = $poulemanager->NbreRencontreParPouleProgrammee($_GET['idPoule'], $tournoiId);
+} else {
+  $pouleHasRencontres = false;
+  $pouleHasRencontresProgrammees = false;
+  $idPoule = null;
+}
+
+
+if (isset ($_GET['idCategorie'])) {
+  $categorieEnCours = $_GET['idCategorie'];
+
+  //detecter le nombre de label final placé
+$labelDao = new LabelDao();
+$nombreLabelsFinal = $labelDao->getLabelsAvecPlanificationParCategorie((int)$_GET['idCategorie']);
+$nombreLabelsFinalplaces = count($nombreLabelsFinal);
+
+
+if ($nombreLabelsFinal) {
+$nomDesLabels = $nombreLabelsFinal[0]['description'] ;
+}else {
+  
+  $nomDesLabels = null;
+}
+
+
+
+} else {
+$categorieEnCours = null;
+  $nombreLabelsFinal = [];
+  $nombreLabelsFinalplaces = null;
+  $nomDesLabels = null;
+}
+
+
 
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
+
   
   'pageEnCours' => 'GestionDesRencontres',
   //'categorieEnCours' => $_GET['categorie'],
@@ -100,17 +159,25 @@ echo $template->render([
   'afficherLespoulesFinales' => $poulesFinales,
   //'afficherlecontenudespoules' => $poulemanager->getEquipesInPoule($idpoule),
   'PouleDuTournoi' => $poulemanager->getAllPoulesByTournoi($tournoiId),
-  'pouleEnCours' => $_GET['idPoule'],
+  'pouleEnCours' => $idPoule,
  
   
   'ResultatDesPoules' =>$GetResultatDesPoules,
   //'resultatPoules' => $GetResultatDesPoules,
   'idTournoi' => $tournoiId,
   //'RencontresByPoulephase1' => $rencontreDao->GetEquipesClasseesParPoule($tournoiId),
-  'idCategorieEnCours' => $_GET['idCategorie'],
+  'idCategorieEnCours' => $categorieEnCours,
   //'TournoiDeClassement' => $tournoiDao ->afficherLesTournoisDeClassement(),
-  'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
+  'TournoisDeBase' => $tournoiDao->afficherLesTournois($userData['id']),
+  //'TournoisDeBase' => $tournoiDao->afficherLesTournoisQuiNeSontPasClassement($tournoiId),
   'pouleHasRencontres' => $pouleHasRencontres,
+  'AfficherLesEquipes' => $listeDesEquipes,
+  'licence' => $licence,
+  'nomLabels' => $nomDesLabels,
+  'nombrelabelplaces' => $nombreLabelsFinalplaces,
+  'nombreLabelsFinal' => $nombreLabelsFinal,
+   'poulesFinales' => $poulesFinales,
+   //'pouleHasRencontresProgrammees' => $pouleHasRencontresProgrammees,
   
 ]);
 ?>

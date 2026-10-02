@@ -4,19 +4,43 @@ require ('class/tournoiDao.class.php');
 
 
 
-
-
-
-
 if (isset ($_POST['nomTerrain'])) {
     require ('class/terrainDao.class.php');
     $terrain = new TerrainDao();
     $terrain->modifierNomTerrain($_POST['terrain_id'],$_POST['nomTerrain']);
     
 }
+ if (isset($_POST['action']) && $_POST['action'] === 'deplacerPlanification') {
+    require 'class/planificationDao.class.php';
+    $planification = new planificationDao();
+
+    $planification->nettoyerPlanificationsVides($_POST['idTournoi']);
+
+    $planifId      = (int) $_POST['planifId'];
+    $newTerrain    = (int) $_POST['newTerrain'];
+    $newCreneau    = (int) $_POST['newCreneau'];
+    $targetPlanifId = isset($_POST['targetPlanifId']) && $_POST['targetPlanifId'] !== '' 
+                        ? (int) $_POST['targetPlanifId'] 
+                        : null;
+    $originTerrain = (int) $_POST['originTerrain'];
+    $originCreneau = (int) $_POST['originCreneau'];
+
+    if ($targetPlanifId !== null) {
+        // SWAP : déplacer d'abord la cible vers l'origine, puis la source vers la destination
+        $planification->deplacerPlanification($targetPlanifId, $originTerrain, $originCreneau);
+        $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    } else {
+        // Déplacement simple
+        $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    }
+
+    http_response_code(200);
+    exit;
+}
 
 
-if ($_POST['action'] == "deplanifier") {
+
+if (isset($_POST['action']) && $_POST['action'] === 'deplanifier') {
   require ('class/planificationDao.class.php');
   $planification = new planificationDao();
     $idTournoi = $_POST['idTournoi'];
@@ -30,6 +54,7 @@ if ($_POST['action'] == "deplanifier") {
 
     }
 
+   
 
  
 
@@ -81,7 +106,9 @@ if (isset ($_POST['Addevent'])) {
    
 }
 
-if ($_POST['modifMinutes'] != "" ) {
+
+
+if (isset($_POST['modifMinutes']) && $_POST['modifMinutes'] != "" ) {
     
     require 'class/creneauxDao.class.php';
     $creneau=new creneauxDao();
@@ -93,23 +120,51 @@ if ($_POST['modifMinutes'] != "" ) {
 
 //permet de modifier dans la bdd les info du tournoi et de mettre à jour les horaires
 if (isset ($_POST['modifHeureDebut'])) {
-
-    
     require 'class/creneauxDao.class.php';
     require_once 'class/tournoiDao.class.php';
-    $creneau=new creneauxDao();
+    $creneau = new creneauxDao();
     $tournoi = new tournoiDao();
-    
-    $tournoi->modifierTournoi($_POST['idTournoi'],null,$_POST['modifHeureDebut'],null,$_POST['modifPasHoraire'],null,null,null,null,null,null);
 
-    $creneau->mettreAJourIntervalle($_POST['idTournoi'],$_POST['modifPasHoraire']);
-    
-    
+    $idTournoi = (int) $_POST['idTournoi'];
+    $nouveauPasHoraire = (int) $_POST['modifPasHoraire'];
+
+    $tournoi->modifierTournoi($idTournoi, null, $_POST['modifHeureDebut'], null, $nouveauPasHoraire, null, null, null, null, null, null);
+
+    // Recalcule tous les créneaux en respectant le tempsChangementMinutes propre à chacun
+    $creneau->recalculerCreneauxAvecNouveauPas($idTournoi, $nouveauPasHoraire);
+
     header("Location: " . $_SERVER['HTTP_REFERER']);
-   
-    
+    exit;
 }
 
+
+
+if (isset($_POST['action']) && $_POST['action'] === 'modifierTempsChangement') {
+    require_once 'class/creneauxDao.class.php';
+    require_once 'class/tournoiDao.class.php';
+    $creneau  = new creneauxDao();
+    $tournoi  = new tournoiDao();
+
+    $idTournoi    = (int) $_POST['idTournoi'];
+    $creneauId    = (int) $_POST['creneau_id'];
+    $nouveauTemps = (int) $_POST['tempsChangementMinutes'];
+
+    $infosCreneau = $creneau->getOrdreParId($creneauId);
+    if (!$infosCreneau) {
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit;
+    }
+
+    // Sauvegarder la nouvelle valeur SUR CE créneau précis
+    $creneau->modifierTempsChangementCreneau($creneauId, $nouveauTemps);
+
+    // Recalculer tous les créneaux suivants en partant de l'heure réelle du créneau modifié
+    $tournoiInfo = $tournoi->getTournoiById($idTournoi);
+    $creneau->decalerCreneauxApres($idTournoi, $infosCreneau['ordre'], (int)$tournoiInfo['pasHoraire']);
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     require 'class/creneauxDao.class.php';
@@ -205,10 +260,22 @@ if (isset($_GET['action'])) {
 
         if (($_GET['action'] == "delTerrain")) {
             require 'class/terrainDao.class.php';
+            require 'class/PersonneTableDao.class.php';
             try {
                 $terrain = new TerrainDao();
-                $terrain->suppressionTerrain($_GET['idTournoi'], $_GET['terrain_id']);
+                $personneTableDao = new PersonneTableDao();
+                $verif = $personneTableDao->verifierSiPersonneEstSurUnTerrain((int)$_GET['terrain_id']);
+                if ($verif) {
+                    echo "Erreur: Impossible de supprimer ce terrain car il y a des personnes assignées à cette table .";
+                    header("Refresh:3; url=" . $_SERVER['HTTP_REFERER']);
+                    exit();
+
+                }
+                else {
+                 $terrain->suppressionTerrain($_GET['idTournoi'], $_GET['terrain_id']);
                 header("Location: " . $_SERVER['HTTP_REFERER']);
+                }
+               
             } catch (PDOException $e) {
                 
                     echo "Erreur: Impossible de supprimer ce terrain car il est déjà utilisé, il faut deplanifier les événements.";

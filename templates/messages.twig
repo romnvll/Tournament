@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Messages – {{ equipeInfo.nom }}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 40px;
+        }
+
+        .container-fluid { padding: 12px; max-width: 700px; margin: 0 auto; }
+
+        .card-modern {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem;
+            margin-bottom: 14px;
+        }
+        .back-link:hover { color: white; opacity: .85; }
+
+        .message-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            padding: 18px;
+            margin-bottom: 14px;
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+        }
+
+        .message-card.unread {
+            border-left-color: var(--info-color);
+            background: linear-gradient(135deg, rgba(6,182,212,.05), white);
+        }
+
+        .message-card.unread::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--info-color);
+            box-shadow: 0 0 0 3px rgba(6,182,212,.2);
+        }
+
+        .message-scope {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: white;
+            background: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .message-date {
+            font-size: .72rem;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .message-text {
+            font-size: .92rem;
+            color: var(--bg-dark);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+        .empty-state i { font-size: 2.5rem; opacity: .3; display: block; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+
+       <a href="#" onclick="history.back(); return false;" class="back-link">
+    <i class="fas fa-arrow-left"></i> Retour aux rencontres
+</a>
+
+        <div class="card-header-modern">
+            <i class="fas fa-bell"></i>
+            Messages de {{ equipeInfo.nom|upper }}
+        </div>
+
+        {% if messagesEquipe | length > 0 %}
+        
+            {% for msg in messagesEquipe %}
+                <div class="message-card">                    {% if msg.equipe_id %}
+                        <span class="message-scope" style="background: var(--success-color);">
+                            <i class="fas fa-user-tag"></i> Message pour votre équipe
+                        </span>
+                    {% elseif msg.poule_id %}
+                        <span class="message-scope" style="background: var(--info-color);">
+                            <i class="fas fa-layer-group"></i> Message pour votre poule
+                        </span>
+                    {% elseif msg.categorie_id %}
+                        <span class="message-scope">
+                            <i class="fas fa-tag"></i> Message pour votre catégorie
+                        </span>
+                    {% else %}
+                        <span class="message-scope">
+                            <i class="fas fa-globe"></i> Message global
+                        </span>
+                    {% endif %}
+
+                    <div class="message-date">
+                        <i class="fas fa-clock"></i> {{ msg.date_creation|date('d/m/Y à H:i') }}
+                    </div>
+
+                    <div class="message-text">{{ msg.contenu }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card-modern empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Aucun message pour le moment.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

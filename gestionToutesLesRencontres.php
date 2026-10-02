@@ -12,8 +12,10 @@ require 'vendor/autoload.php';
 require 'class/creneauxDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
+require 'class/utilisateurDao.class.php';
+require 'Lang/lang.php';
 
-session_start();
+
 $_SESSION['id_tournoi'] = $_GET['id_tournoi'];
 
 
@@ -31,6 +33,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 $poulemanager = new PouleManager();
@@ -43,9 +46,13 @@ $planification = new planificationDao();
 $arbitre = new arbitreDao();
 
 
-if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
 
 
@@ -54,7 +61,7 @@ $template = $twig->load('gestionToutesLesRencontres.twig');
 
 if (!isset($_GET['id_tournoi'])) {
   
-  $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
+  $listedestournois = $tournois->afficherLesTournois($userData['id']);
   $nbrterrain = null;
   $table = null;
   $listdecreneau = null;
@@ -67,24 +74,30 @@ if (!isset($_GET['id_tournoi'])) {
   $pourcentage=null;
   
 } else {
- $listedestournois = $tournois->afficherLesTournois($_GET['id_tournoi']);
+ 
+$listedestournois = $tournois->afficherLesTournois($userData['id']);
+
  $nbrterrain = $terrain->AfficherTerrains($_GET['id_tournoi']);
- $listdecreneaux = $creneaux->afficherCreneaux($_GET['id_tournoi']);
+ $listdecreneaux = $creneaux->afficherCreneauxOccupes($_GET['id_tournoi']);
  $ToutesPlanification = $planification->afficherPlanifications($_GET['id_tournoi']);
   $planificationSansCreneauNiTerrain = $planification->afficherRencontresSansPlanification($_GET['id_tournoi']);
   $libelleParTournoi = $planification->listerLabelsParTournoi($_GET['id_tournoi']);
   $listeDesArbitres = $arbitre->afficherArbitres($_GET['id_tournoi']);
   $tournoiInfo = $tournois->getTournoiById($_GET['id_tournoi']);
   $pourcentage = $tournois->pourcentageRencontresTermineesDuTournoi($_GET['id_tournoi']);
+  $getLastCreneau = $creneaux->getCreneauApresDernierCreneauEnCours($_GET['id_tournoi']);
  
   
 }
+
+$utilisateurDao = new utilisateurDao();
+$EffetSonoreUtilisateurDebut = $utilisateurDao->getEffetSonoreByUserId($userData['id']);
 
 
 
 
 echo $template->render([
-  'logo' => $userData['logo'],
+  
   'email' => $userData['email'],
   'pageEnCours' => 'GestionDesRencontres',
 
@@ -103,7 +116,10 @@ echo $template->render([
     'libelleParTournoi' => $libelleParTournoi,
     'listeDesArbitres' => $listeDesArbitres,
     'tournoiInfo'   => $tournoiInfo,
-    'pourcentage' => $pourcentage
+    'pourcentage' => $pourcentage,
+    'effetSonoreDebut' => $EffetSonoreUtilisateurDebut['effetsSonoreDebut'],
+    'effetSonoreFin' => $EffetSonoreUtilisateurDebut['effetsSonoreFin'],
+    'getLastCreneau' => $getLastCreneau,
    
 
   

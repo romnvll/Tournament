@@ -6,10 +6,11 @@ require 'class/equipeDao.class.php';
 
 require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
-
+require 'class/creneauxDao.class.php';
 require 'class/pouleManagerDao.class.php';
 require 'vendor/autoload.php';
-session_start();
+require 'Lang/lang.php';
+
 $_SESSION['idTournoi'] = $_GET['idTournoi'];
 
 
@@ -20,11 +21,13 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 $tournoi = new tournoiDao();
 $poulemanager = new PouleManager();
 $rencontre = new RencontreDAO();
 $equipeDao = new EquipeDAO();
+$creneauxDao = new CreneauxDAO();
 
 
 
@@ -35,49 +38,50 @@ if (!isset ($_GET['idTournoi']) || $_GET['idTournoi'] == 0) {
   exit();
 }
 
-if ($tournoi->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) {
-    
-  exit;
+$idTournoi = isset($_GET['idTournoi']) ? (int) $_GET['idTournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoi->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
 
 
 
+$creneauApresDernierTermine = $creneauxDao->getCreneauApresDernierCreneauEnCours($_GET['idTournoi']);
 if (isset ($_GET['rencontreRetour']) && ($_GET['rencontreRetour'] == true) ) {
-  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],0,true);
+  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi'],1,true);
   
 }
 
-else {
-  $rencontre->createRencontreByPoule($_GET['idPoule'],$_GET['idTournoi']);
- 
-}
 
 
 
 //si on ne test pas le parametre idPoule --> erreur 500
 if (isset ($_GET['idPoule'])) {
- $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
+ $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 }
 
 
 $template = $twig->load('GestionRencontres.twig');
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
-  'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule']),
+
+  'isRencontreCreated' => $poulemanager->checkRencontresInPoule($_GET['idPoule'],1),
   'pageEnCours' => 'GestionDesRencontres',
   'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),
   'afficherLesPoules' => $poulemanager->getAllPoulesByTournoi($_SESSION['idTournoi']),
   'idTournoi'=> $_SESSION['idTournoi'],
-  'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule'],),
-  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],$_SESSION['idTournoi'],0,'tour'),
+  'listeDesEquipesParPoules' => $poulemanager->getEquipesInPoule($_GET['idPoule']),
+  'RencontreByPoule' => $rencontre->getRencontreByPoule($_GET['idPoule'],1,'tour'),
   'idPoule' => $_GET['idPoule'],
   'pouleEnCours' => $_GET['idPoule'],
   'tournoiEnCours' => $_SESSION['idTournoi'],
   'resultatRencontres' => $GetResultatDesPoules,
   'NombreEquipeParPoules' => $equipeDao->countEquipesPresentesInPoule($_GET['idPoule']),
-  'NombreTerrain' => $tournoi->getNbTerrainsById($_GET['idTournoi']),
   'InfoPoule' => $poulemanager->getInfoPoule($_GET['idPoule']),
+  'getNextCreneau' => $creneauApresDernierTermine,
 
 ]);
 

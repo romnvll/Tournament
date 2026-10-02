@@ -1,3 +1,5 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
 <?php
 require 'security.php';
 require('class/equipeDao.class.php');
@@ -5,42 +7,7 @@ require ('class/rencontreDao.class.php');
 
 
 
-//Etat des equipe ( absente ou présente)
-if (isset($_POST['etat'])) {
- $id = $_POST['id'];
-$etat = $_POST['etat'];
-$equipeDao = new EquipeDAO();
-$equipeDao->confirmerEquipe((int)$id, $etat);
-// renvoyer le HTML mis à jour
-if ($etat === 'presente') {
-    echo '<a 
-        href="javascript:void(0);"
-        hx-post="ajoutEquipe_traitement.php"
-        hx-vals=\'{"id": ' . $id . ', "etat": "absente"}\'
-        hx-trigger="dblclick"
-        hx-swap="outerHTML"
-        hx-target="this"
-        title="Double-cliquer pour marquer comme absente"
-        style="text-decoration: none; cursor: pointer;"
-    >✅</a>';
-    exit;
-} else {
-    echo '<a 
-        href="javascript:void(0);"
-        hx-post="ajoutEquipe_traitement.php"
-        hx-vals=\'{"id": ' . $id . ', "etat": "presente"}\'
-        hx-trigger="dblclick"
-        hx-swap="outerHTML"
-        hx-target="this"
-        title="Double-cliquer pour marquer comme présente"
-        style="text-decoration: none; cursor: pointer;"
-    >❌</a>';
-    exit;
 
-
-}
-
-}
 
 
 
@@ -48,16 +15,14 @@ if ($etat === 'presente') {
 
 // Vérifier si des rencontres existent déjà pour cette catégorie et ce tournoi
 $rencontreDao = new RencontreDAO();
-$RencontreExist = $rencontreDao->rencontresExistByCategorieAndTournoi($_POST['Categorie'], $_POST['IdTournoi']);
 
-if ($RencontreExist) {
-    echo "Des rencontres existent déjà, impossible d'ajouter une équipe.<br>Il faut d'abord supprimer les rencontres.";
+$rencontrePlanifiee = $rencontreDao->rencontresCategorieDejaPlanifiees($_POST['Categorie'], $_POST['IdTournoi']);
+
+if ($rencontrePlanifiee) {
+    // Si des rencontres existent déjà, afficher un message d'erreur
+    echo "<div class='alert alert-danger'>Des rencontres existent déjà pour cette catégorie et ce tournoi. Impossible d'ajouter une équipe.</div>";
     exit;
 }
-
-
-
-
 
 
 
@@ -67,8 +32,10 @@ $equipeDao = new EquipeDAO();
     $nomEquipe = $_POST['nomEquipe'];
     $nomEquipe = strtoupper($nomEquipe);
     $nomEquipe = trim($nomEquipe); // Supprimer les espaces inutiles
+
+    
     try {
-            $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs']);            } catch (Exception $e) {
+            $equipeDao->ajouterEquipe($nomEquipe, $_POST['Categorie'], $_POST['IdTournoi'], null, $_POST['idClubs'], $_POST['Coach']);            } catch (Exception $e) {
                 // Redirige avec message d'erreur
                 header("Location: ajoutEquipe.php?error=" . urlencode($e->getMessage())."&idTournoi=".$_POST['IdTournoi']."&query=".$_POST['query']);
                 exit;

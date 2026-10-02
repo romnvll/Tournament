@@ -5,6 +5,9 @@ require 'vendor/autoload.php';
 require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
 require_once 'class/SponsorDAO.class.php';
+require 'Lang/lang.php';
+require_once 'class/utilisateurDao.class.php';
+require_once 'class/gymnaseDao.class.php';
 
 $sponsorDao = new SponsorDAO();
 $categories = new CategorieDao();
@@ -18,10 +21,15 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('mesPreferences.twig');
+
 
 $club = new ClubDAO();
 $label = new LabelDao();
+
+$utilisateurDao = new UtilisateurDAO();
+$utilisateurData = $utilisateurDao->getUtilisateurById($userData['id']);
 
 
 if (isset($_GET['status']) && $_GET['status'] == 'success') {
@@ -30,20 +38,65 @@ if (isset($_GET['status']) && $_GET['status'] == 'success') {
     $message = null;
 }
 
+/**
+ * Récupère les sons disponibles dans la banque
+ * @param string $type 'debut' ou 'fin'
+ * @return array Liste des sons avec nom et chemin
+ */
+function getBanqueSons($type) {
+    $banqueDir = 'Audio/Effets/Banque/' . $type . '/';
+    $sons = [];
+    
+    if (is_dir($banqueDir)) {
+        $files = scandir($banqueDir);
+        foreach ($files as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) === 'mp3') {
+                $sons[] = [
+                    'nom' => ucfirst(str_replace(['-', '_'], ' ', pathinfo($file, PATHINFO_FILENAME))),
+                    'chemin' => $banqueDir . $file
+                ];
+            }
+        }
+    }
+    
+    return $sons;
+}
+
+$gymnaseDao = new GymnaseDAO();
+$gymnases   = $gymnaseDao->getGymnasesByUser($userData['id']);
+
+
+
+$idClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_id'] ?? null;
+$logoClubChoisit = $utilisateurDao->getClubFromIdUser($userData['id'])['club_logo'] ?? null;    
 
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEnCours' =>  'Users',
   'categories' => $categorie,
   'message' => $message,
   'idClub' => $userData['id'],
+  'listeClubs' => $club->afficherClubs(),
   'sponsors' => $sponsorDao->getSponsorsParClub($userData['id']),
- 
+  'idTournoi' => $_GET['id_tournoi'],
+  'affichageSponsors' => isset($_GET['affichageSponsors']) && $_GET['affichageSponsors'] === 'true',
+  'monMotDePasse' => isset($_GET['monMotDePasse']) && $_GET['monMotDePasse'] === 'true',
+  'gestionCategorie' => isset($_GET['gestionCategorie']) && $_GET['gestionCategorie'] === 'true',
+ 'gestionEffetsSonores' => isset($_GET['gestionEffetsSonores']),
+    'effetsSonoreDebut' => $utilisateurData['effetsSonoreDebut'] ?? null,
+    'effetsSonoreFin' => $utilisateurData['effetsSonoreFin'] ?? null,
+    'userId' => $userData['id'],
+     'banqueSonsDebut' => getBanqueSons('debut'),
+    'banqueSonsFin' => getBanqueSons('fin'),
+    'idClubChoisit' => $idClubChoisit,
+    'logoClubChoisit' => $logoClubChoisit,
+    'monClub' => isset($_GET['monClub']) && $_GET['monClub'] === 'true',
+    'affichageFlyer' => isset($_GET['affichageFlyer']),
+    'gestionGymnases' => isset($_GET['gestionGymnases']) && $_GET['gestionGymnases'] === 'true',
+  'gymnases'        => $gymnases,
+
    
-//'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
-//'AfficherClub' => $listeClub->afficherClubs(),
-//'AfficherLesEquipes' => $listeDesEquipes->getAllEquipeByIdTournoi($_GET['idTournoi']),
-//'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
+
 
 ]);

@@ -1,8 +1,11 @@
 <?php
 require 'security.php';
 require 'vendor/autoload.php';
+require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
-
+$licenceDao = new LicenceDao();
+$licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -11,6 +14,8 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
+
 
 
 require_once 'class/clubDao.class.php';
@@ -24,13 +29,21 @@ $tournoiDao = new tournoiDao();
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 
+$idTournoi = isset($_GET['idTournoi']) ? (int) $_GET['idTournoi'] : 0;
 
-
-if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-    
-  exit;
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($idTournoi, $userData['id']) === null &&
+    $idTournoi === 0
+) {
+    header("Location: ajoutTournoi.php");
+    exit;
 }
 
+
+//check licence
+
+//
 
 $poules = new PouleManager();
 
@@ -65,21 +78,36 @@ else {
 $error = $_GET['error'] ?? null;
 $success = $_GET['success'] ?? null;
 
+
+if ($_GET['idTournoi'] != 0) {
+
+  $afficherClub = $listeClub->afficherClubsParTypeDeSport($tournoiDao->getTournoiById($_GET['idTournoi'])['type_sport_id']);
+
+}
+
+else {
+   $afficherClub = null;
+}
+
+
+
+
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEncours' => 'ajoutEquipe',
   'tournoiEnCours' => $_GET['idTournoi'],
   'idTournoi' => $_GET['idTournoi'],
   'dernierTournoi' => $dernierId,
 'ListeDesTournois' => $tournoiDao->afficherLesTournois($userData['id']),
-'AfficherClub' => $listeClub->afficherClubs(),
-'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']),
+'AfficherClub' => $afficherClub,
+'AfficherLesEquipes' => $listeDesEquipes->rechercherEquipesDansTournoi($_GET['idTournoi'], $_GET['query']??null),
 'AfficherLesPoules' => $poules->getAllPoulesByTournoi($_GET['idTournoi']),
 'AfficheLesCategories' => $listeDesCategorie->obtenirToutesLesCategories($userData['id']),
 'infoTournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
 'query' => $query,
 'error' => $error,
+'licence' => $licence,
 
 
 ]);

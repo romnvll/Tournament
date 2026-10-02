@@ -10,6 +10,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 require 'class/clubDao.class.php';
@@ -21,16 +22,22 @@ require 'class/equipeDao.class.php';
 require 'class/personneDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/PersonneTableDao.class.php';
-$tournoiDao = new tournoiDao();
+require 'Lang/lang.php';
+require 'class/gymnaseDao.class.php';
 
-if (($tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) == null) and ($_GET['idTournoi'] != "0")) {
-   
-  exit;
+$tournoiDao = new tournoiDao();
+if (
+    $userData['role'] !== 'admin' &&
+    $tournoiDao->droitTournoiClub($_GET['idTournoi'], $userData['id']) === null &&
+    $_GET['idTournoi'] != "0"
+) {
+    exit;
 }
 
 
 $terrain = new TerrainDao();
 $personneTable = new PersonneTableDao();
+$gymnaseDao = new GymnaseDAO();
 
 $poules = new PouleManager();
 
@@ -41,6 +48,7 @@ $arbitre = new arbitreDao();
 
 if (!isset($_GET['idTournoi']) ){
 $idtournoi = 0;
+
 }
 else {
     $idtournoi = $_GET['idTournoi'];
@@ -48,13 +56,17 @@ else {
 
 }
 
+if ($idtournoi == 0) {
+  header('Location: ajoutTournoi.php');
+}
+
 $template = $twig->load('modifierTournoi.twig');
 
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
-  'idUser' => $_COOKIE['user'],
+  
+  
   'pageEnCours' => 'GestionTournois',
   'infotournoi' => $tournoiDao->getTournoiById($_GET['idTournoi']),
   'tournoiEnCours' => $idtournoi,
@@ -68,6 +80,8 @@ echo $template->render([
 'AfficherLesPersonnesCrees' => $personneTable->recupererToutesLesPersonnesParTournoi($_GET['idTournoi']),
 'AfficherLesClubsPourArbitres' => $listeClub->clubsParticipatingInTournoi($_GET['idTournoi']),
 'AfficherLesArbitres' => $arbitre->afficherArbitres($_GET['idTournoi']),
-'tab'=>$_GET['tab'],
+'tab'=>$_GET['tab'] ?? null,
+'gymnases' => $gymnaseDao->getGymnasesByUser($userData['id']),
+'gymnaseActuel' => $tournoiDao->getTournoiById($_GET['idTournoi'])['gymnase_id'] ?? null,
 
 ]);

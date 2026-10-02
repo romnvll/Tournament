@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
 require 'class/pouleManagerDao.class.php';
@@ -9,8 +9,31 @@ require 'class/clubDao.class.php';
 require 'class/planificationDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/terrainDao.class.php';
+require 'class/licenceDao.class.php';
+require 'class/categorie.class.php';
+require 'class/gymnaseDao.class.php';
+require 'class/messageDao.class.php';
+require 'class/creneauxDao.class.php';
 
 
+require 'Lang/lang.php';
+
+/* COOKIE des messages */
+
+function getVisiteurId(): string {
+    if (!empty($_COOKIE['visiteur_id']) && preg_match('/^[a-f0-9]{32}$/', $_COOKIE['visiteur_id'])) {
+        return $_COOKIE['visiteur_id'];
+    }
+    $id = bin2hex(random_bytes(16));
+    setcookie('visiteur_id', $id, [
+        'expires'  => time() + 60 * 60 * 24 * 365 * 2, // 2 ans
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE['visiteur_id'] = $id;
+    return $id;
+}
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -23,7 +46,9 @@ $twig->addFilter(new \Twig\TwigFilter('shuffle', function ($array) {
     shuffle($array);
     return $array;
 }));
+
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('index.twig');
 
 
@@ -35,14 +60,70 @@ $tournoiDao = new tournoiDao();
 $poulemanager = new PouleManager();
 $clubdao = new ClubDAO();
 $equipeDao = new EquipeDAO();
-$listeDesTournois = $tournoiDao->afficherTousLesTournois();
+$licenceDao = new LicenceDAO();
+$categorieDao = new CategorieDao();
+$gymnaseDao = new GymnaseDAO();
+$creneauxDao = new creneauxDao();
+
+
+
+
 $RencontreByPoule=null;
 $Labels= new LabelDao();
 $listeDesRencontresByTerrain = null;
 $terrain = new TerrainDao();
+$planTournoi = null;
+$classementFinal = null;
 
+$creneauEnCours = null;
+$creneauSuivant = null;
 if (isset ($_GET['id_tournoi'])) {
   $nbrterrain = $terrain->compterTerrains($_GET['id_tournoi']);
+  $creneauEnCours = $creneauxDao->getCreneauEnCours((int)$_GET['id_tournoi']);
+ 
+  $timers = $creneauxDao->getCreneauEnCoursEtSuivant((int)$_GET['id_tournoi']);
+    $creneauEnCours = $timers['en_cours'];
+    $creneauSuivant = $timers['suivant'];
+
+    
+  
+   
+  if (file_exists(('img/planTournoi/'.$_GET['id_tournoi'].'-plan.png'))) {
+  $planTournoi = 'img/planTournoi/'.$_GET['id_tournoi'].'-plan.png';
+
+
+  }
+
+$gymnaseDao = new GymnaseDAO();
+$gymnaseInfo = $gymnaseDao->getGymnaseByTournoiId($_GET['id_tournoi']);
+
+}
+else {
+  $planTournoi = null;
+  $gymnaseInfo = null;
+ 
+   $nbrterrain = null;
+}
+
+
+
+$messageDao = new MessageDAO();
+ 
+if (isset($_GET['id_equipe'])) {
+    $nbMessagesNonLus = $messageDao->compterMessagesNonLusParEquipe((int)$_GET['id_equipe'],getVisiteurId());
+   
+} else {
+    $nbMessagesNonLus = 0;
+}
+ 
+
+
+
+if (isset ($_GET['affichageByPoule'])) {
+  $affichageByPoule = true;
+}
+else {
+  $affichageByPoule = null;
 }
 
 
@@ -72,8 +153,6 @@ if (isset ($_GET['id_equipe'])) {
 $listePoulesParEquipe = $poulemanager->getPoulesByEquipeId($_GET['id_equipe']);
 
 
-
-
 }
 
 else {
@@ -81,6 +160,34 @@ else {
   $listePoulesParEquipe = null;
  
 }
+
+if (isset ($_GET['affichageByCategorie'])) {
+  
+  $affichageByCategorie = true;
+   if (isset ($_GET['idCategorie'])) {
+    
+    
+    $RencontreByCategorie = $rencontre->getRencontreByCategorie($_GET['idCategorie'], $_GET['id_tournoi'], 1);
+    $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
+    
+  
+   }
+
+   else {
+    $RencontreByCategorie = null;
+    $RencontreByCategoriePhaseFinale = null;
+   }
+}
+else {
+  $affichageByCategorie = null;
+    $RencontreByCategorie = null;
+    $RencontreByCategoriePhaseFinale = null;
+}
+
+
+
+
+
 
 
 if (isset ($_GET['id_club'])) {
@@ -91,6 +198,7 @@ if (isset ($_GET['id_club'])) {
   $listeDesRencontreByClubs = $rencontre->afficherRencontreByTournoiByClub($_GET['id_tournoi'],$_GET['id_club']);
   $listeDesEquipesByClubs = $equipeDao->getAllEquipeByIdTournoiAndClub($_GET['id_tournoi'],$_GET['id_club']);
   $nomClub = $clubdao->getClubById($_GET['id_club'])['nom'];
+  $logoClub = $clubdao->getClubById($_GET['id_club'])['logo'];
 //derniere poules des équipes :
 
 $equipesAvecPoule = [];
@@ -100,7 +208,11 @@ foreach ($listeDesEquipesByClubs as $equipe) {
         'id' => $equipe['id'],
         'nom' => $equipe['nom'],
         'Nom_categorie' => $equipe['Nom_categorie'],
-        'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id'])
+        'idCategorie' => $equipe['idCategorie'],
+        'idPoule' => $poulemanager->getPremierePouleIdParEquipe($equipe['id']) ?? null,
+        //'idPoule' => $poulemanager->getDernierePouleIdParEquipe($equipe['id']),
+        'couleurCategorie' => $equipe['Couleur'],
+        'nomCoach' => $equipe['nomCoach'] ?? null,
     ];
 }
 
@@ -109,10 +221,17 @@ foreach ($listeDesEquipesByClubs as $equipe) {
 
 
 
+$classementFinal = [];
+if (isset($_GET['idCategorie'])) {
+    $classementFinal = $poulemanager->getClassementFinal((int)$_GET['id_tournoi'], (int)$_GET['idCategorie']);
+}
+
+
 
 }
 
 else {
+  $logoClub = null;
   $nomClub = null;
   $equipesAvecPoule = null;
   $listeDesRencontreByClubs = null;
@@ -124,9 +243,10 @@ if (isset ($_GET['id_equipe'])) {
 
   $listeDesRenbcontreByEquipe = $rencontre->afficherRencontreByTournoiByEquipe($_GET['id_tournoi'],$_GET['id_equipe']);
 $idequipe = $_GET['id_equipe'];
-
-
 $equipeNom = $equipeDao->getEquipeById($_GET['id_equipe'])['nom'];
+
+
+
 }
 
 
@@ -138,42 +258,50 @@ else {
 }
 
 if (isset ($_GET['id_tournoi'])) {
-  $_SESSION['idTournoi'] = $_GET['id_tournoi'];
+  
   $idTournoi= $_GET['id_tournoi'];
   $listeClubsParticipants = $clubdao->clubsParticipatingInTournoi($_GET['id_tournoi']);
   $Labels = $Labels->getLabelsWithCreneauxByTournoiId($_GET['id_tournoi']);
+  
 
 }
 
 else {
   $listeClubsParticipants=null;
-  $Labels = $Labels->getLabelsWithCreneauxByTournoiId(0);
+  $Labels = [];
   $idTournoi=0;
 }
 
 if (isset ($_GET['idPoule'])) {
 $idPoule = $_GET['idPoule'];
+$pouleInfo = $poulemanager->getPouleById($idPoule);
+
 }
 else {
   $idPoule = null;
+  $pouleInfo = null;
 }
+
+
 
 if (isset ($_GET['idPoule'])) {
   //$GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule']);
-  
  
-  if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 1 ) {
+
+ 
+  if ($poulemanager->getPouleById($_GET['idPoule'])['is_classement'] == 3 ) {
     
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,$_GET['id_tournoi'],1);
-   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,3);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],3);
 
   }
    else {
-   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,$_GET['id_tournoi'],0);
-   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],0);
+   $RencontreByPoule = $rencontre->getRencontreByPoule($idPoule,1,'index',true);
+   $GetResultatDesPoules= $rencontre->GetResultatDesPoules($_GET['idPoule'],1);
 
    }
 
+   
 
 
 
@@ -181,36 +309,56 @@ if (isset ($_GET['idPoule'])) {
 
  else {
   $GetResultatDesPoules = null;
+  $PouleHasPhasefinal = null;
  }
 
 
 
- 
-//gestion des sponsor
 
-if ( $tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
-  
-  //recuperation des partenaires du club qui a organiser ce tournoi
-  require_once 'class/SponsorDAO.class.php';
-  $sponsorDao = new SponsorDAO();
-  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($idTournoi)['club_id']);
- 
+
+if (isset ($_GET['id_equipe'])) {
+  $equipeAsRencontreAmicale = $rencontre->equipeAsRencontreAmicale($_GET['id_equipe']);
 }
 else {
-  $listeDesPartenaires = null;
+  $equipeAsRencontreAmicale = null;
+}
+ 
+//gestion des sponsor
+if (isset($_GET['id_tournoi']) && $_GET['id_tournoi'] != 0) {
+    $idTournoi = (int) $_GET['id_tournoi'];
+
+    if ($tournoiDao->getTournoiById($idTournoi)['gestionPartenaires'] == 1) {
+        // Récupération des partenaires du club qui a organisé ce tournoi
+        require_once 'class/SponsorDAO.class.php';
+        $sponsorDao = new SponsorDAO();
+        $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub(
+            $tournoiDao->getTournoiById($idTournoi)['utilisateur_id']
+        );
+    } else {
+        $listeDesPartenaires = null;
+    }
+}
+
+
+if (isset ($_GET['idCategorie'])) {
+  $idCategorie = $_GET['idCategorie'];
+  $RencontreByCategoriePhaseFinale = $rencontre->getRencontreByCategorie($_GET['idCategorie'], $_GET['id_tournoi'], 3);
+   $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
+    
 }
 
 
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),
-    'ListeDesTournois' => $listeDesTournois,
+    
     'afficherLesPoules' => $listePoulesParEquipe ,
-    'idTournoi'=> $_SESSION['idTournoi'],
     'RencontreByPoule' => $RencontreByPoule,
     'IdPoules' => $idPoule,
     'IdClub' => $idclub,
     'affichageByClubs'=> $affichageByClubs,
     'affichageByTeam' =>$affichageByTeam,
+    'affichageByPoule' => $affichageByPoule,
+    'affichageByCategorie' => $affichageByCategorie,
     'listeDesCLubs' => $listeClubsParticipants,
     'listeDesRencontreByClubs' => $listeDesRencontreByClubs,
     'listeDesEquipesByClubs' =>$listeDesEquipesByClubs,
@@ -221,12 +369,27 @@ echo $template->render([
     'affichageByTerrain' => $listeDesRencontresByTerrain,
     'resultatRencontres'=> $GetResultatDesPoules,
     'getNomClubCourant' => $nomClub,
+    'getCategorieCourante' => $getCategorieCourante ?? null,
     'getNomEquipeCourant' => $equipeNom,
+    'logoClub' => $logoClub,
     'labels' => $Labels,
     'equipesAvecPoule' => $equipesAvecPoule,
-    'nbrTerrains' => $nbrterrain,
-    'partenaires' => $listeDesPartenaires,
-  
+    'nbrTerrains' => $nbrterrain ?? null,
+    'partenaires' => $listeDesPartenaires ??null,
+    'idTournoi' => $idTournoi,
+    'licence' =>$licenceDao->getTousLesTypesDeLicence(),
+    'planTournoi' => $planTournoi,
+    'equipeAsRencontreAmicale' => $equipeAsRencontreAmicale,
+     'classementFinal' => $classementFinal,
+     'RencontreByCategorie' => $RencontreByCategorie,
+     'pouleInfo' => $pouleInfo,
+     'RencontreByCategoriePhaseFinale' => $RencontreByCategoriePhaseFinale,
+      'gymnaseInfo' => $gymnaseInfo,
+      'nbMessagesNonLus' => $nbMessagesNonLus,
+      'creneauEnCours' => $creneauEnCours,
+      'creneauSuivant' => $creneauSuivant,
+      'idCategorie' => $idCategorie ?? null
+      
     
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),

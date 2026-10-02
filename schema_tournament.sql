@@ -48,11 +48,11 @@ CREATE TABLE `Categorie` (
   `id_categorie` int(11) NOT NULL AUTO_INCREMENT,
   `Nom_categorie` varchar(32) NOT NULL,
   `Couleur` varchar(8) NOT NULL,
-  `fk_id_club` int(11) NOT NULL,
+  `utilisateur_id` int(11) NOT NULL,
   PRIMARY KEY (`id_categorie`),
-  KEY `idx_fk_id_club` (`fk_id_club`),
-  CONSTRAINT `fk_club` FOREIGN KEY (`fk_id_club`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `fk_categorie_utilisateur` (`utilisateur_id`),
+  CONSTRAINT `fk_categorie_utilisateur` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=218 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,12 +65,15 @@ DROP TABLE IF EXISTS `Clubs`;
 CREATE TABLE `Clubs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` text NOT NULL,
-  `email` varchar(32) DEFAULT NULL,
-  `password` text DEFAULT NULL,
-  `contact` text NOT NULL,
   `logo` text DEFAULT 'logos/default.png',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `type_sport_id` int(11) NOT NULL DEFAULT 1,
+  `utilisateur_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_clubs_type_sport` (`type_sport_id`),
+  KEY `fk_club_utilisateur` (`utilisateur_id`),
+  CONSTRAINT `fk_club_utilisateur` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  CONSTRAINT `fk_clubs_type_sport` FOREIGN KEY (`type_sport_id`) REFERENCES `TypeDeSport` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,9 +89,8 @@ CREATE TABLE `Creneaux` (
   `tournoi_id` int(11) NOT NULL,
   `ordre` int(11) NOT NULL,
   PRIMARY KEY (`creneau_id`),
-  KEY `idx_tournoi_id` (`tournoi_id`),
-  CONSTRAINT `Creneaux_ibfk_1` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=665 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `idx_tournoi_id` (`tournoi_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=918 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,7 +107,7 @@ CREATE TABLE `EquipePoule` (
   KEY `poule_id` (`poule_id`),
   KEY `idx_equipepoule_poule_equipe` (`poule_id`,`equipe_id`),
   CONSTRAINT `EquipePoule_ibfk_1` FOREIGN KEY (`equipe_id`) REFERENCES `Equipes` (`id`),
-  CONSTRAINT `EquipePoule_ibfk_2` FOREIGN KEY (`poule_id`) REFERENCES `Poules` (`id`)
+  CONSTRAINT `EquipePoule_ibfk_2` FOREIGN KEY (`poule_id`) REFERENCES `Poules` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -130,8 +132,8 @@ CREATE TABLE `Equipes` (
   KEY `idx_categorie` (`categorie`),
   KEY `idx_equipes_club_id` (`club_id`),
   KEY `idx_equipes_categorie` (`categorie`),
-  CONSTRAINT `fk_categorie` FOREIGN KEY (`categorie`) REFERENCES `Categorie` (`id_categorie`)
-) ENGINE=InnoDB AUTO_INCREMENT=508 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `fk_categorie` FOREIGN KEY (`categorie`) REFERENCES `Categorie` (`id_categorie`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=567 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -148,8 +150,48 @@ CREATE TABLE `Labels` (
   `tournoi_id` int(11) NOT NULL,
   PRIMARY KEY (`label_id`),
   KEY `idx_tournoi_id` (`tournoi_id`),
-  CONSTRAINT `Labels_ibfk_1` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `Labels_ibfk_1` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Licence`
+--
+
+DROP TABLE IF EXISTS `Licence`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Licence` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `utilisateur_id` int(11) NOT NULL,
+  `licence_type_id` int(11) NOT NULL DEFAULT 1,
+  `date_debut` date NOT NULL DEFAULT curdate(),
+  `date_fin` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `licence_type_id` (`licence_type_id`),
+  KEY `Licence_ibfk_1` (`utilisateur_id`),
+  CONSTRAINT `Licence_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `Licence_ibfk_3` FOREIGN KEY (`licence_type_id`) REFERENCES `LicenceType` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `LicenceType`
+--
+
+DROP TABLE IF EXISTS `LicenceType`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `LicenceType` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(50) NOT NULL,
+  `prix` decimal(8,2) NOT NULL,
+  `limite_tournois` int(11) NOT NULL,
+  `limite_equipes` int(11) NOT NULL,
+  `description` text DEFAULT NULL,
+  `duree_jours` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,10 +264,10 @@ CREATE TABLE `Planification` (
   CONSTRAINT `Planification_ibfk_1` FOREIGN KEY (`terrain_id`) REFERENCES `Terrains` (`terrain_id`),
   CONSTRAINT `Planification_ibfk_2` FOREIGN KEY (`creneau_id`) REFERENCES `Creneaux` (`creneau_id`),
   CONSTRAINT `Planification_ibfk_3` FOREIGN KEY (`rencontre_id`) REFERENCES `Rencontres` (`id`),
-  CONSTRAINT `Planification_ibfk_4` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`),
+  CONSTRAINT `Planification_ibfk_4` FOREIGN KEY (`tournoi_id`) REFERENCES `Tournois` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `Planification_ibfk_5` FOREIGN KEY (`arbitre_id`) REFERENCES `Arbitres` (`arbitre_id`),
   CONSTRAINT `Planification_ibfk_6` FOREIGN KEY (`label_id`) REFERENCES `Labels` (`label_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=881 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=923 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,8 +286,8 @@ CREATE TABLE `Poules` (
   PRIMARY KEY (`id`),
   KEY `idx_fk_idcategorie` (`fk_idcategorie`),
   KEY `idx_tournoi_id` (`tournoi_id`),
-  CONSTRAINT `Poules_ibfk_1` FOREIGN KEY (`fk_idcategorie`) REFERENCES `Categorie` (`id_categorie`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=297 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `Poules_ibfk_1` FOREIGN KEY (`fk_idcategorie`) REFERENCES `Categorie` (`id_categorie`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=311 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -275,7 +317,7 @@ CREATE TABLE `Rencontres` (
   KEY `idx_Arbitre` (`Arbitre`),
   KEY `idx_tournoi_id` (`tournoi_id`),
   KEY `idx_rencontres_order` (`tour`,`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6389 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -291,12 +333,14 @@ CREATE TABLE `Sponsors` (
   `description` text DEFAULT NULL,
   `lien_web` varchar(255) NOT NULL,
   `logo` text DEFAULT 'logos/default_sponsor.png',
+  `telephone` varchar(15) DEFAULT NULL,
+  `adresse` varchar(200) DEFAULT NULL,
   `is_actif` int(1) NOT NULL DEFAULT 1,
-  `club_id` int(11) NOT NULL,
+  `utilisateur_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `club_id` (`club_id`),
-  CONSTRAINT `Sponsors_ibfk_1` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `fk_sponsors_utilisateur` (`utilisateur_id`),
+  CONSTRAINT `fk_sponsors_utilisateur` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -313,8 +357,8 @@ CREATE TABLE `Terrains` (
   `audio_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`terrain_id`),
   KEY `idx_fk_idTournoi` (`fk_idTournoi`),
-  CONSTRAINT `Terrains_ibfk_1` FOREIGN KEY (`fk_idTournoi`) REFERENCES `Tournois` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `Terrains_ibfk_1` FOREIGN KEY (`fk_idTournoi`) REFERENCES `Tournois` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -342,11 +386,54 @@ CREATE TABLE `Tournois` (
   `isArchived` int(1) NOT NULL DEFAULT 0,
   `IsRankingView` int(1) NOT NULL DEFAULT 0,
   `refreshClientTime` int(11) NOT NULL DEFAULT 30000,
-  `club_id` int(11) NOT NULL,
+  `type_sport_id` int(11) DEFAULT NULL,
+  `utilisateur_id` int(11) NOT NULL DEFAULT 1,
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `idx_club_id` (`club_id`),
-  CONSTRAINT `fk_tournois_club` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `Tournois_ibfk_1` (`utilisateur_id`),
+  KEY `fk_tournoi_type_sport` (`type_sport_id`),
+  CONSTRAINT `Tournois_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_tournoi_type_sport` FOREIGN KEY (`type_sport_id`) REFERENCES `TypeDeSport` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_tournois_utilisateur` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_utilisateur_id` FOREIGN KEY (`utilisateur_id`) REFERENCES `Utilisateurs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `TypeDeSport`
+--
+
+DROP TABLE IF EXISTS `TypeDeSport`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `TypeDeSport` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nom` (`nom`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Utilisateurs`
+--
+
+DROP TABLE IF EXISTS `Utilisateurs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Utilisateurs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(64) NOT NULL,
+  `password` text NOT NULL,
+  `nom` varchar(64) DEFAULT NULL,
+  `prenom` varchar(64) DEFAULT NULL,
+  `role` enum('admin','organisateur','arbitre','club') NOT NULL DEFAULT 'organisateur',
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp(),
+  `email_token` varchar(255) DEFAULT NULL,
+  `email_confirme` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -358,4 +445,4 @@ CREATE TABLE `Tournois` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-24 16:13:11
+-- Dump completed on 2025-08-13  9:14:56

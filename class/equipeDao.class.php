@@ -30,7 +30,7 @@ class EquipeDAO {
         return $stmt->fetch(PDO::FETCH_ASSOC);
 
     }
-    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id): void
+    public function ajouterEquipe(string $nom, int $categorie, int $tournoi_id, ?int $poule_id, int $club_id, ?string $nomCoach = null): void
 {
     // Vérifie si le nom d'équipe existe déjà dans ce tournoi (insensible à la casse)
     $verifStmt = $this->connexion->prepare("
@@ -48,13 +48,14 @@ class EquipeDAO {
 
     // Insertion de l'équipe
     $stmt = $this->connexion->prepare("
-        INSERT INTO Equipes (nom, categorie, tournoi_id, club_id) 
-        VALUES (:nom, :categorie, :tournoi_id, :club_id)
+        INSERT INTO Equipes (nom, categorie, tournoi_id, club_id, nomCoach) 
+        VALUES (:nom, :categorie, :tournoi_id, :club_id, :nomCoach)
     ");
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':categorie', $categorie);
     $stmt->bindParam(':tournoi_id', $tournoi_id);
     $stmt->bindParam(':club_id', $club_id);
+    $stmt->bindParam(':nomCoach', $nomCoach);
     $stmt->execute();
 
     // Récupérer l'ID de l'équipe insérée
@@ -82,19 +83,54 @@ class EquipeDAO {
 
     
 
-    public function modifierEquipe(int $id, string $nom, int $categorie): void {
-        $stmt = $this->connexion->prepare("UPDATE Equipes SET nom = :nom, categorie = :categorie WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':categorie', $categorie);
-        $stmt->execute();
+    public function modifierEquipe(int $id, string $nom, int $categorie): void
+{
+    // Récupérer le tournoi_id de l'équipe à modifier
+    $tournoiStmt = $this->connexion->prepare("SELECT tournoi_id FROM Equipes WHERE id = :id");
+    $tournoiStmt->bindParam(':id', $id);
+    $tournoiStmt->execute();
+    $tournoi_id = $tournoiStmt->fetchColumn();
+
+    if (!$tournoi_id) {
+        throw new Exception("L'équipe avec l'ID $id n'existe pas.");
     }
 
-    public function mettreAJourAudioEquipe(int $idEquipe, string $audioPath): void
+    // Vérifie si une autre équipe dans ce tournoi a déjà ce nom (insensible à la casse)
+    $verifStmt = $this->connexion->prepare("
+        SELECT COUNT(*) FROM Equipes 
+        WHERE LOWER(nom) = LOWER(:nom) AND tournoi_id = :tournoi_id AND id != :id
+    ");
+    $verifStmt->bindParam(':nom', $nom);
+    $verifStmt->bindParam(':tournoi_id', $tournoi_id);
+    $verifStmt->bindParam(':id', $id);
+    $verifStmt->execute();
+    $count = $verifStmt->fetchColumn();
+
+    if ($count > 0) {
+        throw new Exception("Le nom de l'équipe \"$nom\" est déjà utilisé dans ce tournoi.");
+    }
+
+    // Mise à jour de l'équipe
+    $stmt = $this->connexion->prepare("UPDATE Equipes SET nom = :nom, categorie = :categorie WHERE id = :id");
+    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':categorie', $categorie);
+    $stmt->execute();
+}
+
+public function modifierNomCoach(int $id, string $nomCoach): void
+{
+    $stmt = $this->connexion->prepare("UPDATE Equipes SET nomCoach = :nomCoach WHERE id = :id");
+    $stmt->bindParam(':nomCoach', $nomCoach);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+}
+
+public function mettreAJourAudioEquipe(int $idEquipe, ?string $audioPath): void
 {
     $stmt = $this->connexion->prepare("UPDATE Equipes SET audio_path = :audio_path WHERE id = :id");
-    $stmt->bindParam(':audio_path', $audioPath);
-    $stmt->bindParam(':id', $idEquipe);
+    $stmt->bindParam(':audio_path', $audioPath, $audioPath === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $stmt->bindParam(':id', $idEquipe, PDO::PARAM_INT);
     $stmt->execute();
 }
 
@@ -238,11 +274,12 @@ class EquipeDAO {
 
     public function getAllEquipesByPouleId(int $pouleId): array {
         $stmt = $this->connexion->prepare(
-            "SELECT e.*, c.Nom_categorie 
+            "SELECT e.*, c.Nom_categorie, cl.id AS club_id, cl.nom AS club_nom, cl.logo AS club_logo
              FROM Equipes e
              JOIN EquipePoule ep ON e.id = ep.equipe_id
              JOIN Poules p ON ep.poule_id = p.id
              JOIN Categorie c ON p.fk_idcategorie = c.id_categorie
+             JOIN Clubs cl ON e.club_id = cl.id
              WHERE ep.poule_id = :pouleId"
         );
     
@@ -385,7 +422,7 @@ class EquipeDAO {
     
 
     public function getAllEquipeByIdTournoiAndClub (int $idTournoi, int $clubId) {
-        $query = "SELECT e.*, c.logo, cat.Nom_categorie, cat.Couleur
+        $query = "SELECT e.*, c.logo, cat.Nom_categorie, cat.Couleur,cat.id_categorie as idCategorie
 FROM Equipes e
 INNER JOIN Clubs c ON e.club_id = c.id
 INNER JOIN Categorie cat ON e.categorie = cat.id_categorie

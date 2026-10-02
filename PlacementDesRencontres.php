@@ -9,6 +9,14 @@ require 'class/planificationDao.class.php';
 require 'class/arbitreDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/categorie.class.php';
+require 'class/licenceDao.class.php';
+require 'class/equipeDao.class.php';
+require 'Lang/lang.php';
+
+
+$licenceDao = new LicenceDao();
+
+$licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -18,7 +26,9 @@ $twig = new \Twig\Environment($loader, [
 ]);
 
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('PlacementDesRencontres.twig');
+
 
 $tournois = new tournoiDao();
 $creneaux = new creneauxDao();
@@ -27,6 +37,7 @@ $planification = new planificationDao();
 $arbitre = new arbitreDao();
 $labels = new labelDao();
 $categories = new CategorieDao();
+$equipes = new EquipeDAO();
 
 if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
     echo "Aucun tournoi actif en cours.";
@@ -34,10 +45,19 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
     exit();
 }
 
-if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-    
+
+$idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
     exit;
 }
+
+
+
+
 
 
 
@@ -56,6 +76,8 @@ if (!isset($_GET['id_tournoi'])) {
     $nombreDeRencontresPlanifiee=null;
     $nombreRencontreAPlanifier=null;
     $nombreDeLabel=null;
+    $listeDesEquipes=null;
+    
     
 } else {
    $listedestournois = $tournois->afficherLesTournois($userData['id']);
@@ -69,6 +91,7 @@ if (!isset($_GET['id_tournoi'])) {
     $nombreDeRencontresPlanifiee = $tournois->rencontresPlanifieeDuTournoi($_GET['id_tournoi']);
     $nombreRencontreAPlanifier = $tournois->nombreRencontreAPlanifier($_GET['id_tournoi']);
     $nombreDeLabel = $labels->getLabelsByTournoiId($_GET['id_tournoi']);
+    $listeDesEquipes = $equipes->rechercherEquipesDansTournoi($_GET['id_tournoi'], $_GET['query']??null);
     
 
 //création du premier creneau :
@@ -96,8 +119,7 @@ if (!$timeDebut) {
     throw new Exception("Le format de l'heure est invalide : " . $lastCreneau['nom']);
 }
 
-$pasHoraire = $tournoiInfo['pasHoraire']; // Valeur des minutes à ajouter
-
+$pasHoraire = $tournoiInfo['pasHoraire'] + $tournoiInfo['tempsChangementMinutes']; // Valeur des minutes à ajouter
 // Ajouter le pas horaire
 $timeNextCreneau = $timeDebut->add(new DateInterval('PT' . $pasHoraire . 'M'));
 
@@ -115,15 +137,140 @@ $timeNextCreneauFormatted = $timeNextCreneau->format('H:i');
 }
 
 
+$statsParCategorie = [];
+$equipeMatchs = [];
 
+foreach ($ToutesPlanification as $p) {
+    if ($p['rencontre_id'] !== null) {
+        [$h, $m] = explode(':', $p['creneau_nom']);
+        $heureMin = ((int)$h * 60) + (int)$m;
 
+        $key1 = $p['equipe1_id'].'|'.$p['equipe1_nom'].'|'.$p['equipe1_categorie_nom'];
+        $key2 = $p['equipe2_id'].'|'.$p['equipe2_nom'].'|'.$p['equipe2_categorie_nom'];
+
+        $equipeMatchs[$key1][] = $heureMin;
+        $equipeMatchs[$key2][] = $heureMin;
+    }
+}
+
+$format = function(int $min): string {
+    $min = $min % 1440;
+    return sprintf('%dh%02d', floor($min / 60), $min % 60);
+};
+
+foreach ($equipeMatchs as $key => $creneaux) {
+
+    if (count($creneaux) < 2) continue;
+
+    [$id, $equipeNom, $categorieNom] = explode('|', $key);
+
+    // 1. Tri initial
+    sort($creneaux);
+
+    // 2. Trouver le plus grand écart pour détecter le passage minuit
+    $maxGap   = 0;
+    $cutIndex = 0;
+    for ($i = 0; $i < count($creneaux) - 1; $i++) {
+        $gap = $creneaux[$i + 1] - $creneaux[$i];
+        if ($gap > $maxGap) {
+            $maxGap   = $gap;
+            $cutIndex = $i + 1;
+        }
+    }
+
+    // 3. Si l'écart max > 12h, c'est un passage minuit
+    if ($maxGap > 720) {
+        for ($i = 0; $i < $cutIndex; $i++) {
+            $creneaux[$i] += 1440;
+        }
+        sort($creneaux);
+    }
+
+    $maxEcart      = 0;
+    $maxDe         = 0;
+    $maxA          = 0;
+    $total         = 0;
+    $count         = 0;
+    $enchaînements = [];
+
+    // 4. Calculer les écarts
+    for ($i = 0; $i < count($creneaux) - 1; $i++) {
+        $ecart = $creneaux[$i + 1] - ($creneaux[$i] + $tournoiInfo['pasHoraire']);
+        $ecart = max(0, $ecart);
+
+        if ($ecart === 0) {
+            $enchaînements[] = $format($creneaux[$i]);
+        }
+
+        if ($ecart > 0) {
+            $total += $ecart;
+            $count++;
+        }
+
+        if ($ecart > $maxEcart) {
+            $maxEcart = $ecart;
+            $maxDe    = $creneaux[$i];
+            $maxA     = $creneaux[$i + 1];
+        }
+    }
+
+    $moyenne = $count > 0 ? round($total / $count) : 0;
+
+    if (!isset($statsParCategorie[$categorieNom])) {
+        $statsParCategorie[$categorieNom] = [
+            'totalEcart'    => 0,
+            'nbEquipes'     => 0,
+            'maxAttente'    => 0,
+            'maxEquipe'     => '',
+            'maxEquipeDe'   => '',
+            'maxEquipeA'    => '',
+            'minAttente'    => PHP_INT_MAX,
+            'minEquipe'     => '',
+            'enchaînements' => [],
+            'detailEquipes' => [],  // ← ajoutez cette ligne pour stocker les détails de chaque équipe
+        ];
+    }
+
+ 
+
+    $cat = &$statsParCategorie[$categorieNom];
+
+    if ($maxEcart > $cat['maxAttente']) {
+        $cat['maxAttente']  = $maxEcart;
+        $cat['maxEquipe']   = $equipeNom;
+        $cat['maxEquipeDe'] = $format($maxDe);
+        $cat['maxEquipeA']  = $format($maxA);
+    }
+
+    if ($cat['minEquipe'] === '' || $moyenne < $cat['minAttente']) {
+        $cat['minAttente'] = $moyenne;
+        $cat['minEquipe']  = $equipeNom;
+    }
+
+    if (!empty($enchaînements)) {
+        $cat['enchaînements'][] = [
+            'equipe'   => $equipeNom,
+            'horaires' => $enchaînements,
+        ];
+    }
+
+       $cat['detailEquipes'][] = [
+    'equipe'  => $equipeNom,
+    'attente' => $maxEcart,
+    'de'      => $maxEcart > 0 ? $format($maxDe) : '',
+    'a'       => $maxEcart > 0 ? $format($maxA)  : '',
+    ];
+
+    $cat['totalEcart'] += $moyenne;
+    $cat['nbEquipes']++;
+}
 
 
 
 
 echo $template->render([
     'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
     'pageEnCours' => 'GestionDesRencontres',
     'idTournoi' => $_GET['id_tournoi'],
     'afficherPlanification' =>  $ToutesPlanification,
@@ -140,7 +287,11 @@ echo $template->render([
     'timeNextCreneau' => $timeNextCreneauFormatted,
     'nombreRencontreAPlanifier' => $nombreRencontreAPlanifier,
     'nombreDeLabel' => $nombreDeLabel,
-    'listeCategorie' => $categories->obtenirCategoriesDuTournoi($_GET['id_tournoi'])
+    'listeCategorie' => $categories->obtenirCategoriesDuTournoi($_GET['id_tournoi']),
+    'licence' => $licence,
+    'AfficherLesEquipes' => $listeDesEquipes,
+    'statsParCategorie' => $statsParCategorie,
+
     
 
 

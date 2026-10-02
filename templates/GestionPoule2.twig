@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+    <title>{{ t('gestionDesPoules') }}</title>
+
+    <style>
+        :root {
+            --primary:   #4f46e5;
+            --primary-h: #4338ca;
+            --danger:    #ef4444;
+            --warning:   #f59e0b;
+            --success:   #10b981;
+            --info:      #06b6d4;
+            --dark:      #1f2937;
+            --light:     #f9fafb;
+            --muted:     #6b7280;
+            --s-sm:  0 1px 3px rgba(0,0,0,.1);
+            --s-md:  0 4px 6px rgba(0,0,0,.1);
+            --s-lg:  0 10px 15px rgba(0,0,0,.1);
+            --s-xl:  0 20px 40px rgba(0,0,0,.15);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        /* ── Layout principal ─────────────────────────────── */
+        .page-wrapper {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--s-xl);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        /* ── Flash ────────────────────────────────────────── */
+        .flash {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 18px 22px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            animation: slideDown .3s ease;
+        }
+        .flash.success { background: #ecfdf5; border-left: 4px solid var(--success); color: #065f46; }
+        .flash.error   { background: #fef2f2; border-left: 4px solid var(--danger);  color: #991b1b; }
+        .flash .flash-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+        .flash .flash-body { flex: 1; font-weight: 500; }
+        .flash .flash-body a { font-weight: 700; color: inherit; text-decoration: underline; }
+        .flash-close { background: none; border: none; cursor: pointer; color: inherit; opacity: .6; font-size: 1.2rem; transition: opacity .2s; }
+        .flash-close:hover { opacity: 1; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Tournoi buttons ──────────────────────────────── */
+        .tournament-buttons {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px;
+        }
+        .tournament-btn {
+            padding: 12px 24px; border-radius: 30px; font-weight: 700;
+            border: none; transition: all .25s; box-shadow: var(--s-sm);
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; font-size: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: white;
+        }
+        .tournament-btn.active {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+        .tournament-btn:hover { transform: translateY(-2px); box-shadow: var(--s-md); color: white; }
+
+        /* ── Section header ───────────────────────────────── */
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin: 24px 0 16px; padding-bottom: 12px;
+            border-bottom: 2px solid var(--light);
+        }
+        .section-icon {
+            width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.3rem;
+        }
+        .section-icon.green  { background: linear-gradient(135deg, var(--success), #059669); }
+        .section-icon.cyan   { background: linear-gradient(135deg, var(--info), #0891b2); }
+        .section-icon.orange { background: linear-gradient(135deg, var(--warning), #d97706); }
+        .section-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); margin: 0; }
+
+        /* ── Tabs ─────────────────────────────────────────── */
+        .tabs {
+            display: flex; gap: 0; margin-bottom: 28px;
+            border: 2px solid #e5e7eb; border-radius: var(--radius); overflow: hidden;
+        }
+        .tab-btn {
+            flex: 1; padding: 14px 20px; border: none; cursor: pointer;
+            font-weight: 600; font-size: .95rem; transition: all .2s;
+            background: white; color: var(--muted);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: white;
+        }
+        .tab-btn:not(.active):hover { background: var(--light); color: var(--dark); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── Buttons grille (catégories / nombres) ────────── */
+        .btn-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .grid-btn {
+            padding: 10px 20px; border-radius: 9px; font-weight: 600;
+            border: 2px solid #e5e7eb; transition: all .25s; cursor: pointer;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
+            background: white; color: var(--dark);
+        }
+        .grid-btn:hover { transform: translateY(-2px); box-shadow: var(--s-md); border-color: var(--success); color: var(--success); }
+        .grid-btn.active { background: linear-gradient(135deg, var(--success), #059669); color: white; border-color: var(--success); }
+        .grid-btn-num { width: 54px; height: 54px; padding: 0; justify-content: center; font-size: 1.2rem; font-weight: 700; }
+
+        /* ── Divider ──────────────────────────────────────── */
+        .divider { height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); margin: 24px 0; border: none; }
+
+        /* ── Poule cards (section Création) ──────────────── */
+        .poule-card {
+            background: white; border-radius: var(--radius); box-shadow: var(--s-md);
+            margin-bottom: 20px; overflow: hidden; animation: fadeUp .4s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .poule-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: white; padding: 18px 22px; position: relative; overflow: hidden;
+        }
+        .poule-header::before {
+            content: ''; position: absolute; top: -50%; right: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+        }
+        .poule-title { font-size: 1.3rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+        .poule-body  { padding: 22px; }
+
+        /* ── Stat badges ──────────────────────────────────── */
+        .stat-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white; border-radius: 10px; font-size: 1.4rem; font-weight: 700; box-shadow: var(--s-sm);
+        }
+
+        /* ── Table moderne ────────────────────────────────── */
+        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 10px; overflow: hidden; }
+        .modern-table thead { background: linear-gradient(135deg, var(--light), white); }
+        .modern-table thead th { padding: 13px 14px; font-weight: 700; color: var(--light); text-align: center; border-bottom: 2px solid #e5e7eb; }
+        .modern-table tbody td { padding: 13px 14px; text-align: center; vertical-align: middle; border-bottom: 1px solid #e5e7eb; }
+        .modern-table tbody tr:last-child td { border-bottom: none; }
+        .modern-table tbody tr:hover { background: var(--light); }
+
+        /* ── Team list ────────────────────────────────────── */
+        .team-list { list-style: none; padding: 0; margin: 0; max-height: 260px; overflow-y: auto; }
+        .team-list-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 9px 12px; margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--light), white);
+            border-radius: 8px; border-left: 3px solid var(--primary);
+            transition: all .25s;
+        }
+        .team-list-item:hover { transform: translateX(4px); }
+        .team-logo { width: 30px; height: 30px; object-fit: contain; border-radius: 4px; flex-shrink: 0; }
+
+        /* ── Présence badges ──────────────────────────────── */
+        .badge-present { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: #d1fae5; color: #065f46; }
+        .badge-absent  { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: #fee2e2; color: #991b1b; }
+        .badge-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+        .badge-dot.green { background: #10b981; }
+        .badge-dot.red   { background: #ef4444; }
+
+        /* ── FAB ──────────────────────────────────────────── */
+        .create-fab {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; padding: 16px 36px; border-radius: 50px;
+            font-weight: 700; font-size: 1.2rem; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white; box-shadow: 0 10px 30px rgba(16,185,129,.4);
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+            transition: all .3s;
+        }
+        .create-fab:hover { transform: translateX(-50%) translateY(-5px); box-shadow: 0 15px 40px rgba(16,185,129,.5); color: white; }
+
+        /* ── Layout 2 colonnes (section Modifier) ─────────── */
+        .two-col { display: grid; grid-template-columns: 280px 1fr; gap: 28px; margin-top: 24px; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* ── Poule buttons (modifier) ─────────────────────── */
+        .poule-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .poule-btn {
+            padding: 14px 20px; border-radius: 11px; font-weight: 600;
+            border: none; transition: all .25s; box-shadow: var(--s-sm);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            text-decoration: none; font-size: 1rem;
+            background: linear-gradient(135deg, #9ca3af, #6b7280); color: white;
+        }
+        .poule-btn.active { background: linear-gradient(135deg, var(--success), #059669); }
+        .poule-btn:hover:not(.locked) { transform: translateX(4px); box-shadow: var(--s-md); color: white; }
+        .poule-btn.locked { opacity: .6; cursor: not-allowed; }
+        .poule-btn-left { display: flex; align-items: center; gap: 9px; }
+        .team-count-badge { background: rgba(255,255,255,.28); padding: 3px 10px; border-radius: 20px; font-size: .85rem; }
+        .delete-btn { background: var(--danger); color: white; padding: 7px 11px; border-radius: 7px; font-size: .85rem; transition: all .25s; text-decoration: none; }
+        .delete-btn:hover { background: #dc2626; color: white; transform: scale(1.08); }
+
+        /* ── Teams table (modifier) ───────────────────────── */
+        .teams-box { background: white; border-radius: var(--radius); box-shadow: var(--s-md); overflow: hidden; }
+        .teams-box table thead { background: linear-gradient(135deg, var(--dark), #374151); color: white; }
+        .teams-box table thead th { padding: 15px; font-weight: 600; text-align: center; }
+        .teams-box table tbody td,
+        .teams-box table tbody th { padding: 13px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+
+        .modern-select {
+            padding: 10px 13px; border: 2px solid #e5e7eb; border-radius: 8px;
+            transition: all .25s; font-size: .95rem; width: 100%; cursor: pointer;
+        }
+        .modern-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+
+        .move-btn {
+            padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none;
+            cursor: pointer; transition: all .25s;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: white; box-shadow: var(--s-sm);
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .move-btn:hover { transform: translateY(-2px); box-shadow: var(--s-md); color: white; }
+
+        /* ── Rencontres warning banner ────────────────────── */
+        .warning-banner {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px; border-radius: var(--radius); margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(245,158,11,.1), rgba(245,158,11,.05));
+            border-left: 4px solid var(--warning);
+        }
+        .warning-banner i { color: var(--warning); font-size: 1.4rem; }
+        .warning-banner span { font-weight: 500; color: var(--dark); }
+        .warning-banner a { color: var(--primary); font-weight: 700; text-decoration: none; }
+        .warning-banner a:hover { text-decoration: underline; }
+
+        /* ── Responsive ───────────────────────────────────── */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .page-wrapper { padding: 15px; }
+            .section-title { font-size: 1.2rem; }
+            .tournament-btn { font-size: .9rem; padding: 10px 16px; }
+            .grid-btn-num { width: 46px; height: 46px; font-size: 1rem; }
+            .create-fab { font-size: 1rem; padding: 13px 26px; }
+            .modern-table { font-size: .82rem; }
+        }
+    </style>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+    {% set today   = "now"|date('Y-m-d')|date %}
+
+    <div class="page-wrapper">
+
+        {# ── Flash message ──────────────────────────────────── #}
+        {% if flash is not null %}
+            <div class="flash {{ flash }}" id="flashMsg">
+                <span class="flash-icon">
+                    {% if flash == 'success' %}<i class="fa-solid fa-check-circle"></i>{% else %}<i class="fa-solid fa-triangle-exclamation"></i>{% endif %}
+                </span>
+                <span class="flash-body">{{ flashMsg|raw }}</span>
+                <button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            </div>
+        {% endif %}
+
+        {# ── Boutons tournois ───────────────────────────────── #}
+        <div class="tournament-buttons">
+            {% for tournoi in ListeDesTournois %}
+                {% if tournoi.isArchived == 0 %}
+                    <a href="GestionPoule2.php?id_tournoi={{ tournoi.id }}"
+                       class="tournament-btn {% if tournoi.id == idTournoi %}active{% endif %}">
+                        {{ tournoi.nom }} <i class="fas fa-trophy"></i>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if AfficherLesEquipes['nombre'] < licence.limite_equipes or today <= dateFin %}
+
+            {# ── Tabs ───────────────────────────────────────── #}
+            <div class="tabs">
+                <button class="tab-btn {% if idPoule is null %}active{% endif %}" onclick="switchTab('creation')">
+                    <i class="fa-solid fa-layer-group"></i> {{ t('creerPoule') }}
+                </button>
+                <button class="tab-btn {% if idPoule is not null %}active{% endif %}" onclick="switchTab('modifier')">
+                    <i class="fa-solid fa-pen-to-square"></i> {{ t('modifierPoules') }}
+                </button>
+            </div>
+
+            {# ══════════════════════════════════════════════════ #}
+            {# TAB 1 — CRÉER DES POULES                         #}
+            {# ══════════════════════════════════════════════════ #}
+            <div id="tab-creation" class="tab-content {% if idPoule is null %}active{% endif %}">
+
+                {# Choix de catégorie #}
+                <div class="section-header">
+                    <div class="section-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <h3 class="section-title">{{ t('choisirCategorie') }}</h3>
+                </div>
+
+                <div class="btn-grid">
+                    {% for categorie in ListeDesCategorie %}
+                        <a href="GestionPoule2.php?id_tournoi={{ idTournoi }}&categorie={{ categorie.id_categorie }}&NbrEquipeParPoule={{ categorie.nombre_equipes }}"
+                           class="grid-btn {% if categorie.id_categorie == categorieEnCours %}active{% endif %}">
+                            {{ categorie.Nom_categorie }}
+                            <span style="opacity:.75;">({{ categorie.nombre_equipes }})</span>
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if categorieEnCours is not null %}
+                    <hr class="divider">
+
+                    {# Nombre d'équipes par poule #}
+                    <div class="section-header">
+                        <div class="section-icon green"><i class="fa-solid fa-users-gear"></i></div>
+                        <h4 class="section-title" style="font-size:1.3rem;">{{ t('selectionNombreEquipeParPoule') }}</h4>
+                    </div>
+
+                    <div class="btn-grid">
+                        {% for i in 1..15 %}
+                            <a href="GestionPoule2.php?id_tournoi={{ idTournoi }}&categorie={{ categorieEnCours }}&NbrEquipeParPoule={{ i }}"
+                               class="grid-btn grid-btn-num {% if i == nbrEquipe %}active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Liste des poules existantes #}
+                {% if listeDesPoules is not null and listeDesPoules|length > 0 %}
+                    <div class="section-header">
+                        <div class="section-icon cyan"><i class="fa-solid fa-table"></i></div>
+                        <h3 class="section-title">{{ t('listeDesPoules') }}</h3>
+                    </div>
+
+                    <div class="row">
+                        {% for poule in listeDesPoules %}
+                            {# Chercher si cette poule a des rencontres planifiées #}
+                            {% set pouleBloquee = false %}
+                            {% for p in toutesLesPoules %}
+                                {% if p.idPoule == poule.id and p.rencontresExistesDeja %}
+                                    {% set pouleBloquee = true %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="col-12">
+                                <div class="poule-card">
+                                    <div class="poule-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                                        <h4 class="poule-title">
+                                            <i class="fa-solid fa-circle-nodes"></i>
+                                            {{ poule.nom }}
+                                            <span style="opacity:.85;">({{ poule.equipes|length }} équipes)</span>
+                                        </h4>
+                                        {% if not pouleBloquee %}
+                                            <button type="button"
+                                                    onclick="toggleEdit('edit-{{ poule.id }}')"
+                                                    style="flex-shrink:0;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:white;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;"
+                                                    onmouseover="this.style.background='rgba(255,255,255,.35)'"
+                                                    onmouseout="this.style.background='rgba(255,255,255,.2)'">
+                                                <i class="fa-solid fa-pen-to-square"></i> Modifier
+                                            </button>
+                                        {% else %}
+                                            <span style="flex-shrink:0;background:rgba(0,0,0,.2);color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.85rem;display:flex;align-items:center;gap:6px;">
+                                                <i class="fa-solid fa-lock"></i> Rencontres planifiées
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="poule-body">
+                                        {# ── Vue résumé stats ── #}
+                                        <table class="modern-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ t('listeDesEquipes') }}</th>
+                                                    <th>{{ t('nombreRencontresTotal') }}</th>
+                                                    <th>{{ t('matchsParEquipe') }}</th>
+                                                    <th>{{ t('nombreDeTour') }}</th>
+                                                    <th>{{ t('nombreDeRencontresParTour') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <ul class="team-list">
+                                                            {% for equipe in poule.equipes %}
+                                                                <li class="team-list-item">
+                                                                    <img src="{{ equipe.club_logo }}" alt="{{ equipe.equipe_nom }}" class="team-logo">
+                                                                    <span style="font-weight:500;flex:1;">{{ equipe.equipe_nom }}</span>
+                                                                    {% if equipe.isPresent == 1 %}
+                                                                        <span class="badge-present"><span class="badge-dot green"></span>Présente</span>
+                                                                    {% else %}
+                                                                        <span class="badge-absent"><span class="badge-dot red"></span>Absente</span>
+                                                                    {% endif %}
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </td>
+                                                    <td><div class="stat-badge">{{ (poule.equipes|length * (poule.equipes|length - 1)) // 2 }}</div></td>
+                                                    <td><div class="stat-badge">{{ poule.equipes|length - 1 }}</div></td>
+                                                    <td><div class="stat-badge">{{ poule.equipes|length - 1 }}</div></td>
+                                                    <td><div class="stat-badge">{{ poule.equipes|length // 2 }}</div></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        {# ── Section modification inline ── #}
+                                        {% if not pouleBloquee %}
+                                        <div id="edit-{{ poule.id }}" style="display:none;margin-top:20px;border-top:2px solid #e5e7eb;padding-top:20px;">
+                                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                                                <div class="section-icon orange" style="width:36px;height:36px;font-size:1rem;">
+                                                    <i class="fa-solid fa-arrows-left-right"></i>
+                                                </div>
+                                                <h5 style="margin:0;font-weight:700;color:var(--dark);">Déplacer des équipes</h5>
+                                            </div>
+                                            <div class="teams-box">
+                                                <table class="modern-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>{{ t('equipe') }}</th>
+                                                            <th>{{ t('deplacerDansCettePoule') }}</th>
+                                                            <th>{{ t('action') }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for equipe in poule.equipes %}
+                                                            <form method="post" action="GestionPoule2.php?id_tournoi={{ idTournoi }}&categorie={{ categorieEnCours }}&NbrEquipeParPoule={{ nbrEquipe }}&action=deplacer">
+                                                                <tr>
+                                                                    <th style="text-align:left;">
+                                                                        <div style="display:flex;align-items:center;gap:10px;">
+                                                                            <img src="{{ equipe.club_logo }}" alt="{{ equipe.equipe_nom }}"
+                                                                                 style="width:32px;height:32px;object-fit:contain;border-radius:4px;flex-shrink:0;">
+                                                                            <div style="display:flex;flex-direction:column;gap:2px;">
+                                                                                <div style="display:flex;align-items:center;gap:8px;">
+                                                                                    <span style="font-weight:600;">{{ equipe.equipe_nom }}</span>
+                                                                                    {% if equipe.isPresent == 1 %}
+                                                                                        <span class="badge-present"><span class="badge-dot green"></span>Présente</span>
+                                                                                    {% else %}
+                                                                                        <span class="badge-absent"><span class="badge-dot red"></span>Absente</span>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </th>
+                                                                    <td>
+                                                                        <select class="modern-select" name="dstpoule" required>
+                                                                            <option value="" disabled selected>{{ t('pouleDeDestination') }}</option>
+                                                                            {% for p in toutesLesPoules %}
+                                                                                {% set parts = p.nomPoule|split('-') %}
+                                                                                {% if p.nomPoule starts with 'Mini' or (parts|length > 1 and parts[0]|trim == equipe.equipe_categorie) %}
+                                                                                    <option value="{{ p.idPoule }}" {% if p.rencontresExistesDeja %}disabled{% endif %}>
+                                                                                        {{ p.nomPoule }}{% if p.rencontresExistesDeja %} (planifiée){% endif %}
+                                                                                    </option>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                        <input type="hidden" name="equipeNom"  value="{{ equipe.equipe_nom }}">
+                                                                        <input type="hidden" name="equipe"     value="{{ equipe.equipe_id }}">
+                                                                        <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
+                                                                        <input type="hidden" name="id_poule"   value="{{ poule.id }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="submit" class="move-btn">
+                                                                            <i class="fa-solid fa-arrow-right"></i>{{ t('deplacer') }}
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </form>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                    </div>{# /poule-body #}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# FAB Créer #}
+                {% if nbrEquipe is not null %}
+                    <a href="GestionPoule2.php?id_tournoi={{ idTournoi }}&categorie={{ categorieEnCours }}&NbrEquipeParPoule={{ nbrEquipe }}&action=creer"
+                       class="create-fab"
+                       onclick="return confirm('Créer / recréer les poules pour cette catégorie ?');">
+                        <i class="fa-solid fa-check-circle"></i>
+                        {{ t('creerPoule') }}
+                    </a>
+                {% endif %}
+
+            </div>{# /tab-creation #}
+
+            {# ══════════════════════════════════════════════════ #}
+            {# TAB 2 — MODIFIER LES POULES                      #}
+            {# ══════════════════════════════════════════════════ #}
+            <div id="tab-modifier" class="tab-content {% if idPoule is not null %}active{% endif %}">
+
+                {% if toutesLesPoules|length == 0 %}
+                    <div class="warning-banner" style="border-color:var(--info);">
+                        <i class="fa-solid fa-info-circle" style="color:var(--info);"></i>
+                        <span>Aucune poule n'existe encore pour ce tournoi. Créez-en depuis l'onglet <strong>Créer des poules</strong>.</span>
+                    </div>
+                {% else %}
+
+                    {# Alerte rencontres planifiées #}
+                    {% if pouleHasRencontre %}
+                        <div class="warning-banner">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>
+                                {{ t('attention') }} — {{ t('rencontresDejaPlacees') }}
+                                <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">{{ t('placerLesRencontres') }}</a>
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div class="two-col">
+
+                        {# Colonne gauche — liste des poules #}
+                        <div>
+                            <h4 style="margin-bottom:16px;font-weight:700;color:var(--dark);">
+                                <i class="fa-solid fa-list me-2" style="color:var(--primary);"></i>Poules
+                            </h4>
+                            <div class="poule-buttons">
+                                {% for poule in toutesLesPoules %}
+                                    <a href="GestionPoule2.php?id_tournoi={{ idTournoi }}&id_poule={{ poule.idPoule }}"
+                                       class="poule-btn {% if poule.idPoule == idPoule %}active{% endif %} {% if poule.rencontresExistesDeja %}locked{% endif %}">
+                                        <span class="poule-btn-left">
+                                            <i class="fa-solid fa-circle-nodes"></i>
+                                            {{ poule.nomPoule }}
+                                            <span class="team-count-badge">{{ poule.nbrEquipeParPoule }}</span>
+                                        </span>
+                                        {# Bouton supprimer uniquement si poule vide — jamais possible ici car nettoyée en PHP #}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Colonne droite — équipes de la poule #}
+                        <div>
+                            {% if idPoule is not null %}
+                                <h4 style="margin-bottom:16px;font-weight:700;color:var(--dark);">
+                                    <i class="fa-solid fa-users me-2" style="color:var(--success);"></i>Équipes de la poule
+                                </h4>
+
+                                {% if pouleHasRencontre %}
+                                    <div class="warning-banner">
+                                        <i class="fa-solid fa-lock"></i>
+                                        <span>Les rencontres de cette poule sont planifiées. <a href="PlacementDesRencontres.php?id_tournoi={{ idTournoi }}">Déprogrammer</a> pour modifier.</span>
+                                    </div>
+                                {% else %}
+                                    <div class="teams-box">
+                                        <table class="modern-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ t('equipe') }}</th>
+                                                    <th>{{ t('deplacerDansCettePoule') }}</th>
+                                                    <th>{{ t('action') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for equipe in equipesPouleEnCours %}
+                                                    <form method="post" action="GestionPoule2.php?id_tournoi={{ idTournoi }}&id_poule={{ idPoule }}&action=deplacer">
+                                                        <tr>
+                                                            <th style="text-align:left;">
+                                                                <div style="display:flex;align-items:center;gap:10px;">
+                                                                    <img src="{{ equipe.club_logo }}" alt="{{ equipe.club_nom }}"
+                                                                         style="width:32px;height:32px;object-fit:contain;border-radius:4px;flex-shrink:0;">
+                                                                    <div style="display:flex;flex-direction:column;gap:2px;">
+                                                                        <div style="display:flex;align-items:center;gap:8px;">
+                                                                            <span style="font-weight:600;">{{ equipe.nom }}</span>
+                                                                            {% if equipe.IsPresent == 1 %}
+                                                                                <span class="badge-present"><span class="badge-dot green"></span>Présente</span>
+                                                                            {% else %}
+                                                                                <span class="badge-absent"><span class="badge-dot red"></span>Absente</span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <small style="color:var(--muted);font-size:12px;">{{ equipe.club_nom }}</small>
+                                                                    </div>
+                                                                </div>
+                                                            </th>
+                                                            <td>
+                                                                <select class="modern-select" name="dstpoule" required>
+                                                                    <option value="" disabled selected>{{ t('pouleDeDestination') }}</option>
+                                                                    {% for p in toutesLesPoules %}
+                                                                        {% set parts = p.nomPoule|split('-') %}
+                                                                        {% if p.nomPoule starts with 'Mini' or (parts|length > 1 and parts[0]|trim == equipe.Nom_categorie) %}
+                                                                            <option value="{{ p.idPoule }}" {% if p.rencontresExistesDeja %}disabled{% endif %}>
+                                                                                {{ p.nomPoule }}{% if p.rencontresExistesDeja %} (planifiée){% endif %}
+                                                                            </option>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <input type="hidden" name="equipeNom" value="{{ equipe.nom }}">
+                                                                <input type="hidden" name="equipe"    value="{{ equipe.id }}">
+                                                                <input type="hidden" name="id_tournoi" value="{{ idTournoi }}">
+                                                                <input type="hidden" name="id_poule"  value="{{ idPoule }}">
+                                                            </td>
+                                                            <td>
+                                                                <button type="submit" class="move-btn">
+                                                                    <i class="fa-solid fa-arrow-right"></i>{{ t('deplacer') }}
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </form>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+
+                            {% else %}
+                                <div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);flex-direction:column;gap:12px;">
+                                    <i class="fa-solid fa-hand-pointer" style="font-size:2.5rem;opacity:.4;"></i>
+                                    <span style="font-size:1.05rem;">Sélectionnez une poule pour voir ses équipes</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                {% endif %}
+            </div>{# /tab-modifier #}
+
+        {% endif %}{# licence #}
+    </div>{# /page-wrapper #}
+
+    <script>
+        // ── Toggle modification inline ────────────────────
+        function toggleEdit(id) {
+            const el = document.getElementById(id);
+            const btn = el.previousElementSibling.querySelector('button[onclick]') 
+                     || document.querySelector(`[onclick="toggleEdit('${id}')"]`);
+            const isOpen = el.style.display !== 'none';
+            el.style.display = isOpen ? 'none' : 'block';
+            if (btn) {
+                btn.innerHTML = isOpen
+                    ? '<i class="fa-solid fa-pen-to-square"></i> Modifier'
+                    : '<i class="fa-solid fa-times"></i> Fermer';
+            }
+        }
+
+        // ── Onglets ──────────────────────────────────────────
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', (i === 0 && tab === 'creation') || (i === 1 && tab === 'modifier'));
+            });
+            document.getElementById('tab-creation').classList.toggle('active', tab === 'creation');
+            document.getElementById('tab-modifier').classList.toggle('active', tab === 'modifier');
+        }
+
+        // ── Auto-dismiss flash après 6 s ─────────────────────
+        setTimeout(() => { document.getElementById('flashMsg')?.remove(); }, 6000);
+    </script>
+</body>
+</html>

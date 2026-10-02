@@ -1,0 +1,170 @@
+/* ============================================
+   STYLES DE VALIDATION - DOUBLONS
+   ============================================ */
+
+/**
+ * Marquage visuel d'une ligne avec erreur
+ */
+.modern-table tbody tr.row-validation-error {
+    background: linear-gradient(90deg, 
+        rgba(239, 68, 68, 0.1) 0%, 
+        rgba(239, 68, 68, 0.05) 50%, 
+        rgba(239, 68, 68, 0.1) 100%);
+    border-left: 4px solid #ef4444;
+    animation: pulseError 2s ease-in-out infinite;
+}
+
+/**
+ * Animation de pulsation pour les erreurs
+ */
+@keyframes pulseError {
+    0%, 100% {
+        background: linear-gradient(90deg, 
+            rgba(239, 68, 68, 0.1) 0%, 
+            rgba(239, 68, 68, 0.05) 50%, 
+            rgba(239, 68, 68, 0.1) 100%);
+    }
+    50% {
+        background: linear-gradient(90deg, 
+            rgba(239, 68, 68, 0.2) 0%, 
+            rgba(239, 68, 68, 0.1) 50%, 
+            rgba(239, 68, 68, 0.2) 100%);
+    }
+}
+
+/**
+ * Icône d'alerte
+ */
+.validation-error-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 6px 8px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px solid #ef4444;
+    border-radius: 6px;
+    cursor: help;
+    transition: all 0.3s ease;
+    animation: slideInError 0.3s ease;
+}
+
+.validation-error-icon i {
+    color: #ef4444;
+    font-size: 1.1rem;
+}
+
+/**
+ * Hover sur l'icône d'alerte
+ */
+.validation-error-icon:hover {
+    background: rgba(239, 68, 68, 0.25);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/**
+ * Animation d'entrée de l'icône
+ */
+@keyframes slideInError {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/**
+ * Style du tooltip pour les erreurs
+ */
+.validation-error-icon[data-bs-toggle="tooltip"] {
+    z-index: 1030;
+}
+
+/* Compatibilité avec Bootstrap 5 */
+.tooltip-inner {
+    text-align: left;
+    max-width: 300px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-left: 3px solid #ef4444;
+    background-color: #1f2937;
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+/* ============================================
+   STYLES ADDITIONNELS POUR MISE EN ÉVIDENCE
+   ============================================ */
+
+/**
+ * Mise en évidence des cellules avec erreurs
+ */
+.row-validation-error td.planif-cell {
+    position: relative;
+}
+
+/**
+ * Badge d'erreur pour les cards
+ */
+.row-validation-error .match-card,
+.row-validation-error .arbitre-card,
+.row-validation-error .label-card {
+    box-shadow: 0 0 0 2px #ef4444, var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.row-validation-error .match-card:hover,
+.row-validation-error .arbitre-card:hover,
+.row-validation-error .label-card:hover {
+    box-shadow: 0 0 0 3px #ef4444, var(--shadow-md);
+}
+
+/* ============================================
+   STYLES POUR MESSAGE D'ERREUR DÉTAILLÉ
+   ============================================ */
+
+/**
+ * Affichage du message d'erreur (optionnel)
+ */
+.validation-error-message {
+    font-size: 0.8rem;
+    color: #ef4444;
+    font-weight: 600;
+    padding: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 2px solid #ef4444;
+    border-radius: 4px;
+    margin-top: 6px;
+    display: none;
+}
+
+.row-validation-error .validation-error-message {
+    display: block;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .validation-error-icon {
+        padding: 4px 6px;
+    }
+    
+    .validation-error-icon i {
+        font-size: 1rem;
+    }
+    
+    .tooltip-inner {
+        max-width: 200px;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+}

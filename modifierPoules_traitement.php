@@ -6,7 +6,7 @@ require 'class/rencontreDao.class.php';
 require 'class/tournoiDao.class.php';
 
 $tournoiDao = new tournoiDao();
-var_dump($_POST);
+
 
 // Prioriser $_POST['idTournoi'], sinon utiliser $_GET['tournoiId']
 if (isset($_POST['id_tournoi']) && is_numeric($_POST['id_tournoi'])) {
@@ -56,9 +56,9 @@ else {
 
    //var_dump($_POST['id_poule']);
     
-    $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi']);
+    $rencontres->createRencontreByPoule($_POST['id_poule'],$_POST['id_tournoi'],1);
    
-    $rencontres->createRencontreByPoule($_POST['dstpoule'],$_POST['id_tournoi']);
+    $rencontres->createRencontreByPoule($_POST['dstpoule'],$_POST['id_tournoi'],1);
     
    
   

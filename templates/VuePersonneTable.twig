@@ -2,192 +2,840 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=0.68"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <title>Gestion de la table</title>
+    <title>Saisie des scores</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
     <style>
+        :root {
+            --c-primary:   #4f46e5;
+            --c-primary-d: #4338ca;
+            --c-danger:    #ef4444;
+            --c-success:   #10b981;
+            --c-warning:   #f59e0b;
+            --c-dark:      #1f2937;
+            --c-muted:     #6b7280;
+            --c-border:    #e5e7eb;
+            --c-bg:        #f3f4f6;
+            --radius:      14px;
+            --radius-sm:   8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: #f8f9fa;
+            background: #eef0f8;
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--c-dark);
         }
-        .container-fluid {
-            padding: 20px;
+
+        /* ── Layout ── */
+        .page {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 12px 12px 40px;
         }
-        .table th, .table td {
-            vertical-align: middle;
+
+        /* ── Header ── */
+        .page-header {
+            background: var(--c-primary);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            color: white;
         }
-        .table img {
-            max-width: 50px;
+
+        .page-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
-        .btn-success, .btn-danger {
-            margin: 2px;
+
+        .brackito-logo {
+            width: 100px;
+            max-height: 40px;
+            object-fit: contain;
         }
-        .badge {
-            font-size: 14px;
+
+        .page-header h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
-        .lead {
-            font-size: 16px;
+
+        .page-header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
+        .terrain-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* ── Section label (heure) ── */
+        .time-separator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0 8px;
+        }
+
+        .time-separator .time-pill {
+            background: var(--c-dark);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .time-separator .sep-line {
+            flex: 1;
+            height: 1px;
+            background: var(--c-border);
+        }
+
+        /* ── Carte terminée (ligne compacte) ── */
+        .card-done {
+            background: white;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--c-border);
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 10px;
+            margin-bottom: 6px;
+            opacity: 0.7;
+        }
+
+        .card-done .done-icon {
+            color: var(--c-success);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .card-done .done-team {
+            flex: 1;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--c-dark);
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .card-done .done-team.right {
+            text-align: right;
+        }
+
+        .card-done .done-score {
+            background: var(--c-bg);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--c-primary);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ── Carte match en cours / à venir ── */
+        .match-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--c-border);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        /* time strip */
+        .match-time-bar {
+            background: var(--c-dark);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .match-time-bar .time-txt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .btn-swap {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .btn-swap:hover { background: rgba(255,255,255,0.22); color: white; }
+        .btn-swap:active { transform: scale(0.95); }
+
+        .btn-swap .swap-icon { transition: transform 0.3s; }
+        .btn-swap.is-swapped .swap-icon { transform: rotate(180deg); }
+
+        /* teams */
+        .teams-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 0;
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--c-border);
+        }
+
+        .team-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .team-col.right { align-items: center; }
+
+        .team-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--c-border);
+        }
+
+        .team-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.2;
+            color: var(--c-dark);
+        }
+
+        .score-big {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--c-primary);
+        }
+
+        /* vs divider */
+        .vs-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+        }
+
+        .vs-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--c-muted);
+            letter-spacing: 1px;
+        }
+
+        .vs-dash {
+            width: 1px;
+            height: 20px;
+            background: var(--c-border);
+        }
+
+        /* score buttons */
+        .score-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            padding: 0 4px;
+        }
+
+        .btn-goal {
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: filter 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-goal:active:not(:disabled) { transform: scale(0.94); }
+        .btn-goal:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .btn-add {
+            background: var(--c-success);
+            color: white;
+            padding: 11px;
+        }
+
+        .btn-sub {
+            background: #fee2e2;
+            color: var(--c-danger);
+            padding: 7px;
+            font-size: 0.85rem;
+        }
+
+        /* info section */
+        .match-info {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .info-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--c-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--c-muted);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .info-body {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--c-muted);
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            color: var(--c-dark);
+        }
+
+        /* status stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .stp {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .stp-bubble {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.25s;
+        }
+
+        .stp-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--c-muted);
+            text-align: center;
+        }
+
+        .stp-arrow {
+            color: var(--c-border);
+            font-size: 0.7rem;
+            padding-bottom: 16px;
+            flex-shrink: 0;
+        }
+
+        .stp-arrow.done { color: var(--c-success); }
+
+        .stp.inactive .stp-bubble { background: var(--c-bg); color: var(--c-muted); }
+        .stp.done .stp-bubble { background: var(--c-success); color: white; }
+        .stp.done .stp-label { color: var(--c-success); }
+
+        .stp.current .stp-bubble {
+            background: var(--c-primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.15);
+        }
+
+        .stp.current .stp-label { color: var(--c-primary); font-weight: 800; }
+
+        .stp.warn .stp-bubble {
+            background: var(--c-warning);
+            color: white;
+            animation: pulse-w 1.8s ease-in-out infinite;
+        }
+
+        .stp.warn .stp-label { color: #b45309; font-weight: 800; }
+        .stp-hint { font-size: 0.58rem; color: var(--c-muted); text-align: center; }
+
+        @keyframes pulse-w {
+            0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+            50%      { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+        }
+
+        .stp.clickable { cursor: pointer; }
+        .stp.clickable:hover .stp-bubble { transform: scale(1.08); }
+
+        /* category badge */
+        .cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        /* sponsor */
+        .sponsor-strip {
+            border-top: 1px solid var(--c-border);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: var(--c-muted);
+        }
+
+        .sponsor-strip a { color: var(--c-primary); font-weight: 700; text-decoration: none; }
+        .sponsor-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
+
+        /* label card */
+        .label-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--c-border);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .label-body {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--c-dark);
+        }
+
+        .label-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fef3c7;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 360px) {
+            .team-logo { width: 58px; height: 58px; }
+            .score-big { font-size: 2rem; }
+            .team-name { font-size: 0.78rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row justify-content-center mb-4">
-            <div class="col text-center">
-                <h2><i class="fas fa-user-check"></i> Bonjour {{ prenom }},</h2>
-                <p>vous êtes en charge d'insérer les scores pour le terrain <b>{{ terrain }}</b>.</p>
-            </div>
+<div class="page">
+
+    {# ── Header ── #}
+    <div class="page-header">
+        <div class="page-header-top">
+            <h1><i class="fas fa-user-check"></i> Bonjour {{ prenom }} !</h1>
+            <img src="logos/Logo.png" class="brackito-logo" alt="Brackito">
         </div>
-
-        <div class="row">
-            <div class="col-12" id="scoreRefresh">
-                <table class="table table-striped table-responsive" id="myTable">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="text-center"><i class="fas fa-clock"></i> Heure</th>
-                            <th scope="col order-2" class="w-25 text-center"><i class="fas fa-futbol"></i> Score équipe 1</th>
-                            <th scope="col order-1" class="w-25 text-center"><i class="fas fa-futbol"></i> Score équipe 2</th>
-                            <th scope="col"><i class="fas fa-info-circle"></i> Informations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for planification in AffichagePlanification %}
-                            <tr id="planification-{{ planification.rencontre_id }}">
-                                {% if planification.rencontre_id is not null %}
-                                    <td class="text-center">
-                                        <h3><i class="fas fa-clock"></i> {{ planification.creneau_nom|slice(0, -3) }}</h3>
-                                    </td>
-                                    <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ planification.rencontre_id }}">
-                                        <input type="hidden" name="return_id" value="row-{{ planification.rencontre_id }}">
-                                        <td class="text-center order-2">
-                                            <img src="{{ planification.club1_logo }}" class="img-fluid rounded">
-                                            <p class="lead text-uppercase">{{ planification.equipe1_nom }}</p>
-                                            <input type="hidden" name="scoreEquipe1" value="{{ planification.score1 }}" id="scoreEquipe1{{ planification.rencontre_id }}">
-                                            <p>Score: <span id="displayScoreEquipe1{{ planification.rencontre_id }}">{{ planification.score1 }}</span></p>
-                                            {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=1" hx-on::after-request="vibrate(200)" hx-trigger="click" hx-swap="innerHTML" hx-target="#displayScoreEquipe1{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-center order-1">
-                                            <img src="{{ planification.club2_logo }}" class="img-fluid rounded">
-                                            <p class="lead text-uppercase">{{ planification.equipe2_nom }}</p>
-                                            <input type="hidden" name="scoreEquipe2" value="{{ planification.score2 }}" id="scoreEquipe2{{ planification.rencontre_id }}">
-                                            <p>Score: <span id="displayScoreEquipe2{{ planification.rencontre_id }}">{{ planification.score2 }}</span></p>
-                                            {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
-                                                <button type="button" class="btn btn-success btn-lg" hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(50)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-plus"></i> But</button>
-                                                <button type="button" class="btn btn-danger btn-sm order-md-last" hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ planification.rencontre_id }}&team=2" hx-trigger="click" hx-on::after-request="vibrate(200)" hx-swap="innerHTML" hx-target="#displayScoreEquipe2{{ planification.rencontre_id }}" {% if planification.est_premier_zero == false %} disabled {% endif %}><i class="fas fa-minus"></i> But</button>
-                                            {% endif %}
-                                        </td>
-                                        <td class="align-left">
-                                            <table class="table table-borderless mb-0">
-                                                <tbody>
-                                                    <tr>
-                                                        <td><strong>Status :</strong></td>
-                                                        <td>
-                                                            {% if planification.isTerminated == 1 %}
-                                                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Rencontre terminée</span>
-                                                            {% else %}
-                                                                {% if planification.est_premier_zero == true %}
-                                                                    {% if planification.isTerminated == 0 %}
-                                                                        <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Saisir le score</span>
-                                                                    {% elseif planification.isTerminated == 2 %}
-                                                                        <a class="badge bg-primary" id="State{{ planification.rencontre_id }}" role="button" onclick="updateStatus({{ planification.rencontre_id }})"><i class="fas fa-sync-alt"></i> En cours</a>
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Catégorie:</strong></td>
-                                                        <td>
-                                                            <span class="badge" style="background-color: {{ planification.Couleur }}; color: #000;"><i class="fas fa-tag"></i> {{ planification.categorie_equipe1_nom }}</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Arbitre:</strong></td>
-                                                        <td><i class="fas fa-user-tie"></i> {{ planification.arbitre_nom }} {{planification.arbitre_club_nom}} </td>
-                                                    </tr>
-                                                      {% if partenaires is not empty %}
-                                                                {% set randIndex = random(0, partenaires|length - 1) %}
-                                                                {% set sponsor = partenaires[randIndex] %}
-                                                                <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                                            <div class="text-muted small">
-                                                                                <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                                                {% if sponsor.description %}
-                                                                                    <br><em>{{ sponsor.description }}</em>
-                                                                                {% endif %}
-                                                                            </div>
-
-                                                                            {% if sponsor.logo %}
-                                                                                <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                                    <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        </div>
-
-                                                        {% endif %}
-                                                </tbody>
-                                              
-                                            </table>
-                                        </td>
-                                    </form>
-                                {% elseif planification.label_description is not null %}
-                                    <td class="w-25 text-center">
-                                        <h3><i class="fas fa-clock"></i> {{ planification.creneau_nom }}</h3>
-                                    </td>
-                                    <td class="w-25 text-center"><p>{{ planification.label_description }}</p></td>
-                                    <td>
-                                        
-                                    </td>
-                                    <td></td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <p>Saisie des scores</p>
+        <div class="terrain-chip">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ terrain }}
         </div>
     </div>
 
-    <script>
-       function updateStatus(idRencontre) {
-    if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
-        const target = `#State${idRencontre}`;
+    <div id="scoreRefresh">
+    {% for planification in AffichagePlanification %}
 
-        const handler = function(evt) {
-            if (evt.target.id === `State${idRencontre}`) {
-                document.body.removeEventListener('htmx:afterSwap', handler);
-                location.reload();
-            }
-        };
+        {% if planification.rencontre_id is not null %}
 
-        document.body.addEventListener('htmx:afterSwap', handler);
+            {# ── Swap logic ── #}
+            {% set rid       = planification.rencontre_id %}
+            {% set isSwapped = rid in swappedIds %}
 
-        htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
-            target: target,
-            swap: 'outerHTML'
-        });
+            {% if isSwapped %}
+                {% set newSwaps = swappedIds | filter(id => id != rid) %}
+            {% else %}
+                {% set newSwaps = swappedIds | merge([rid]) %}
+            {% endif %}
+
+            {% set swapQuery = '' %}
+            {% for id in newSwaps %}
+                {% set swapQuery = swapQuery ~ 'swap[]=' ~ id ~ '&' %}
+            {% endfor %}
+
+            {% if isSwapped %}
+                {% set gauche = {
+                    nom:     planification.equipe2_nom,
+                    logo:    planification.club2_logo,
+                    score:   planification.score2,
+                    dispId:  'displayScoreEquipe2' ~ rid,
+                    hidId:   'scoreEquipe2' ~ rid,
+                    hidName: 'scoreEquipe2',
+                    team:    2
+                } %}
+                {% set droite = {
+                    nom:     planification.equipe1_nom,
+                    logo:    planification.club1_logo,
+                    score:   planification.score1,
+                    dispId:  'displayScoreEquipe1' ~ rid,
+                    hidId:   'scoreEquipe1' ~ rid,
+                    hidName: 'scoreEquipe1',
+                    team:    1
+                } %}
+            {% else %}
+                {% set gauche = {
+                    nom:     planification.equipe1_nom,
+                    logo:    planification.club1_logo,
+                    score:   planification.score1,
+                    dispId:  'displayScoreEquipe1' ~ rid,
+                    hidId:   'scoreEquipe1' ~ rid,
+                    hidName: 'scoreEquipe1',
+                    team:    1
+                } %}
+                {% set droite = {
+                    nom:     planification.equipe2_nom,
+                    logo:    planification.club2_logo,
+                    score:   planification.score2,
+                    dispId:  'displayScoreEquipe2' ~ rid,
+                    hidId:   'scoreEquipe2' ~ rid,
+                    hidName: 'scoreEquipe2',
+                    team:    2
+                } %}
+            {% endif %}
+
+            {# ══════════════════════════════════════════════════ #}
+            {# CAS 1 — Rencontre TERMINÉE → ligne compacte       #}
+            {# ══════════════════════════════════════════════════ #}
+            {% if planification.isTerminated == 1 %}
+
+                <div class="card-done d-none">
+                    <span class="done-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="done-time" style="font-size:0.8rem;font-weight:700;color:#6b7280;white-space:nowrap;min-width:38px;">
+                        {{ planification.creneau_nom|slice(0, -3) }}
+                    </span>
+                    <span class="done-team">{{ gauche.nom }}</span>
+                    <span class="done-score">{{ gauche.score }} – {{ droite.score }}</span>
+                    <span class="done-team right">{{ droite.nom }}</span>
+                </div>
+
+            {# ══════════════════════════════════════════════════ #}
+            {# CAS 2 — En cours ou à venir → carte complète      #}
+            {# ══════════════════════════════════════════════════ #}
+            {% else %}
+
+                <div class="match-card" id="planification-{{ rid }}">
+
+                    {# Time bar #}
+                    <div class="match-time-bar">
+                        <div class="time-txt">
+                            <i class="fas fa-clock" style="font-size:1rem;opacity:0.7;"></i>
+                            {{ planification.creneau_nom|slice(0, -3) }}
+                        </div>
+                        <a href="?{{ swapQuery }}#planification-{{ rid }}"
+                           class="btn-swap {{ isSwapped ? 'is-swapped' : '' }}">
+                            <i class="fas fa-exchange-alt swap-icon"></i>
+                            Inverser
+                        </a>
+                    </div>
+
+                    <form action="vuePersonneTable_traitement.php" method="get" hx-target="#row-{{ rid }}">
+                        <input type="hidden" name="return_id" value="row-{{ rid }}">
+
+                        {# Teams row #}
+                        <div class="teams-row">
+
+                            {# Équipe gauche #}
+                            <div class="team-col">
+                                <img src="{{ gauche.logo }}" class="team-logo" alt="{{ gauche.nom }}">
+                                <div class="team-name">{{ gauche.nom }}</div>
+                                <input type="hidden" name="{{ gauche.hidName }}" value="{{ gauche.score }}" id="{{ gauche.hidId }}">
+                                <div class="score-big" id="{{ gauche.dispId }}">{{ gauche.score }}</div>
+                                {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                    <div class="score-btns">
+                                        <button type="button" class="btn-goal btn-add"
+                                                hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ gauche.team }}"
+                                                hx-trigger="click"
+                                                hx-on::after-request="vibrate(50)"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ gauche.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-plus"></i> But
+                                        </button>
+                                        <button type="button" class="btn-goal btn-sub"
+                                                hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ gauche.team }}"
+                                                hx-on::after-request="vibrate(200)"
+                                                hx-trigger="click"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ gauche.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {# VS divider #}
+                            <div class="vs-col">
+                                <span class="vs-label">VS</span>
+                                <div class="vs-dash"></div>
+                            </div>
+
+                            {# Équipe droite #}
+                            <div class="team-col right">
+                                <img src="{{ droite.logo }}" class="team-logo" alt="{{ droite.nom }}">
+                                <div class="team-name">{{ droite.nom }}</div>
+                                <input type="hidden" name="{{ droite.hidName }}" value="{{ droite.score }}" id="{{ droite.hidId }}">
+                                <div class="score-big" id="{{ droite.dispId }}">{{ droite.score }}</div>
+                                {% if planification.isTerminated == 0 or planification.isTerminated == 2 %}
+                                    <div class="score-btns">
+                                        <button type="button" class="btn-goal btn-add"
+                                                hx-post="vuePersonneTable_traitement.php?action=addGoal&idRencontre={{ rid }}&team={{ droite.team }}"
+                                                hx-trigger="click"
+                                                hx-on::after-request="vibrate(50)"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ droite.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-plus"></i> But
+                                        </button>
+                                        <button type="button" class="btn-goal btn-sub"
+                                                hx-post="vuePersonneTable_traitement.php?action=removeGoal&idRencontre={{ rid }}&team={{ droite.team }}"
+                                                hx-on::after-request="vibrate(200)"
+                                                hx-trigger="click"
+                                                hx-swap="innerHTML"
+                                                hx-target="#{{ droite.dispId }}"
+                                                {% if planification.est_premier_zero == false %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                        </div>{# /teams-row #}
+
+                        {# Info section #}
+                        <div class="match-info">
+
+                            {# Statut #}
+                            <div class="info-row">
+                                <div class="info-icon"><i class="fas fa-flag"></i></div>
+                                <div class="info-body">
+                                    <div class="info-label">Statut</div>
+                                    <div class="info-value">
+
+                                        {% if planification.isTerminated == 0 %}
+                                            <div class="stepper">
+                                                <div class="stp warn">
+                                                    <div class="stp-bubble"><i class="fas fa-exclamation"></i></div>
+                                                    <div class="stp-label">À venir</div>
+                                                    <div class="stp-hint">Saisir le score</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-play"></i></div>
+                                                    <div class="stp-label">En cours</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-flag-checkered"></i></div>
+                                                    <div class="stp-label">Terminée</div>
+                                                </div>
+                                            </div>
+
+                                        {% elseif planification.isTerminated == 2 %}
+                                            <div class="stepper">
+                                                <div class="stp done">
+                                                    <div class="stp-bubble"><i class="fas fa-check"></i></div>
+                                                    <div class="stp-label">À venir</div>
+                                                </div>
+                                                <div class="stp-arrow done"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp current clickable" onclick="updateStatus({{ rid }})" id="State{{ rid }}">
+                                                    <div class="stp-bubble"><i class="fas fa-play"></i></div>
+                                                    <div class="stp-label">En cours</div>
+                                                    <div class="stp-hint">Appuyer pour<br>terminer</div>
+                                                </div>
+                                                <div class="stp-arrow"><i class="fas fa-chevron-right"></i></div>
+                                                <div class="stp inactive">
+                                                    <div class="stp-bubble"><i class="fas fa-flag-checkered"></i></div>
+                                                    <div class="stp-label">Terminée</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Catégorie #}
+                            <div class="info-row">
+                                <div class="info-icon"><i class="fas fa-tag"></i></div>
+                                <div class="info-body">
+                                    <div class="info-label">Catégorie</div>
+                                    {% if planification.type_rencontre_code == 'AMICAL' %}
+                                    <div class="info-label">Rencontre amicale</div>
+                                    {% endif %}
+                                    <div class="info-value">
+                                        <span class="cat-badge" style="background-color: {{ planification.Couleur }};">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ planification.categorie_equipe1_nom }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Arbitre #}
+                            {% if planification.arbitre_nom %}
+                                <div class="info-row">
+                                    <div class="info-icon"><i class="fas fa-user-tie"></i></div>
+                                    <div class="info-body">
+                                        <div class="info-label">Arbitre</div>
+                                        <div class="info-value">{{ planification.arbitre_nom }} — {{ planification.arbitre_club_nom }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        </div>{# /match-info #}
+
+                        {# Sponsor #}
+                        {% if partenaires is not empty %}
+                            {% set randIndex = random(0, partenaires|length - 1) %}
+                            {% set sponsor = partenaires[randIndex] %}
+                            <div class="sponsor-strip">
+                                <i class="fas fa-handshake" style="color:var(--c-primary);font-size:1rem;flex-shrink:0;"></i>
+                                <div style="flex:1;line-height:1.4;">
+                                    Sponsorisé par <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">{{ sponsor.nom }}</a>
+                                    {% if sponsor.description %}<br><em>{{ sponsor.description }}</em>{% endif %}
+                                </div>
+                                {% if sponsor.logo %}
+                                    <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
+                                        <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="sponsor-logo">
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                    </form>
+                </div>{# /match-card #}
+
+            {% endif %}{# /isTerminated #}
+
+        {% elseif planification.label_description is not null %}
+
+            {# ── Label card ── #}
+            <div class="label-card">
+                <div class="match-time-bar" style="padding:10px 16px;">
+                    <div class="time-txt" style="font-size:1rem;">
+                        <i class="fas fa-clock" style="font-size:0.9rem;opacity:0.7;"></i>
+                        {{ planification.creneau_nom }}
+                    </div>
+                </div>
+                <div class="label-body">
+                    <div class="label-icon-box"><i class="fas fa-info"></i></div>
+                    {{ planification.label_description }}
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+    </div>{# /scoreRefresh #}
+
+</div>{# /page #}
+
+<script>
+    function updateStatus(idRencontre) {
+        if (confirm('Es-tu sûr de vouloir mettre à jour le statut ?')) {
+            const target = `#State${idRencontre}`;
+            const handler = function(evt) {
+                if (evt.target.id === `State${idRencontre}`) {
+                    document.body.removeEventListener('htmx:afterSwap', handler);
+                    location.reload();
+                }
+            };
+            document.body.addEventListener('htmx:afterSwap', handler);
+            htmx.ajax('POST', `vuePersonneTable_traitement.php?action=updateStatus&idRencontre=${idRencontre}`, {
+                target: target,
+                swap: 'outerHTML'
+            });
+        }
     }
-}
 
+    function vibrate(temps) {
+        if (navigator.vibrate) navigator.vibrate(temps);
+    }
 
-        function vibrate(temps) {
-        
-            if (navigator.vibrate) {
-                navigator.vibrate(temps);
-                
-            }
+    $(document).ready(function () {
+        const savedScroll = sessionStorage.getItem('scrollPos');
+        if (savedScroll) {
+            window.scrollTo(0, parseInt(savedScroll));
+            sessionStorage.removeItem('scrollPos');
         }
 
-        $(document).ready(function () {
-            setTimeout(function () {
-                location.reload(true);
-            }, 30000);
-        });
-    </script>
+        setTimeout(function () {
+            sessionStorage.setItem('scrollPos', window.scrollY);
+            location.reload(true);
+        }, 30000);
+    });
+</script>
 </body>
 </html>

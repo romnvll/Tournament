@@ -3,8 +3,13 @@ config.php
 updateDB.txt
 security.php
 secureCookies.php
+Audio
 Audio/*
-!Audio/.gitignore
+!Audio/**/
+!Audio/**/.gitkeep
 Sponsors/*
+img/planTournoi/*
 !Sponsors/.gitignore
-
+uploadsAssistance/*
+!uploadsAssistance/.gitignore
+videos/HBCAT_Tournoi_herbe.mp4

@@ -15,11 +15,12 @@ class ClubDAO {
         }
     }
 
-    public function ajouterClub(string $nom, string $contact, ?string $logo): void {
-        $stmt = $this->connexion->prepare("INSERT INTO Clubs (nom, contact, logo) VALUES (:nom, :contact, :logo)");
+    public function ajouterClub(string $nom, ?string $logo, int $typeSport, int $utilisateur): void {
+        $stmt = $this->connexion->prepare("INSERT INTO Clubs (nom, logo, type_sport_id, utilisateur_id) VALUES (:nom, :logo, :type_sport_id, :utilisateur_id)");
     
         $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':contact', $contact);
+        $stmt->bindParam(':type_sport_id', $typeSport);
+        $stmt->bindParam(':utilisateur_id', $utilisateur);
     
         // Vérifier si $logo est null
         if ($logo === null) {
@@ -37,19 +38,46 @@ class ClubDAO {
         $stmt->bindParam(':id', $id);
         $stmt->execute();
     }
-
+/*
     public function afficherClubsDetailByMail(string $email): array {
         $stmt = $this->connexion->prepare("SELECT * FROM Clubs where email=:email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+*/
+  public function afficherClubs(): array {
+    $stmt = $this->connexion->prepare("
+        SELECT 
+            c.*, 
+            tds.nom AS nom_type_sport
+        FROM 
+            Clubs c
+        LEFT JOIN 
+            TypeDeSport tds ON c.type_sport_id = tds.id
+    ");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-    public function afficherClubs(): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM Clubs");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function afficherClubsParTypeDeSport(int $typeSportId): array {
+    $stmt = $this->connexion->prepare("
+        SELECT 
+            c.*, 
+            tds.nom AS nom_type_sport
+        FROM 
+            Clubs c
+        LEFT JOIN 
+            TypeDeSport tds ON c.type_sport_id = tds.id
+        WHERE 
+            c.type_sport_id = :typeSportId
+    ");
+    $stmt->bindParam(':typeSportId', $typeSportId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
     
 
     public function clubsParticipatingInTournoi(int $tournoiId): array {
@@ -64,81 +92,64 @@ class ClubDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-public function changeClubPassword(int $clubId, string $oldPassword, string $newPassword): bool {
-    // Récupérer le mot de passe actuel du club
-    $stmt = $this->connexion->prepare("SELECT password FROM Clubs WHERE id = :clubId");
-    $stmt->bindParam(':clubId', $clubId);
-    $stmt->execute();
-    $club = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Vérifier si le club existe et si l'ancien mot de passe est correct
-    if ($club && hash('sha256', $oldPassword) === $club['password']) {
-        // Hacher le nouveau mot de passe en SHA-256
-        $newPasswordHash = hash('sha256', $newPassword);
-
-        // Mettre à jour le mot de passe du club
-        $updateStmt = $this->connexion->prepare("UPDATE Clubs SET password = :newPassword WHERE id = :clubId");
-        $updateStmt->bindParam(':newPassword', $newPasswordHash);
-        $updateStmt->bindParam(':clubId', $clubId);
-        $updateStmt->execute();
-
-        return true; // Le mot de passe a été changé avec succès
-    }
-
-    return false; // L'ancien mot de passe est incorrect ou le club n'existe pas
-}
-
-
 
 
     // Dans clubDao.class.php
 
-    public function updateClub($id, $nom, $email = null, $password = null, $contact, $logo) {
-        // Commencez la requête de mise à jour
-        $query = "UPDATE Clubs SET nom = :nom, contact = :contact, logo = :logo";
-    
-        // Ajoutez les champs facultatifs s'ils sont fournis
-        if (!is_null($email)) {
-            $query .= ", email = :email";
-        }
-        if (!is_null($password)) {
-            $query .= ", password = :password";
-        }
-    
-        // Complétez la requête avec la condition WHERE
-        $query .= " WHERE id = :id";
-    
-        // Préparez la requête
-        $stmt = $this->connexion->prepare($query);
-    
-        // Lie les paramètres requis
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':contact', $contact);
-        $stmt->bindParam(':logo', $logo);
-    
-        // Lie les paramètres facultatifs s'ils sont fournis
-        if (!is_null($email)) {
-            $stmt->bindParam(':email', $email);
-        }
-        if (!is_null($password)) {
-            $stmt->bindParam(':password', $password);
-        }
-    
-        // Exécutez la requête
-        return $stmt->execute();
+    public function updateClub($id, $nom, $email = null, $logo, int $typeSport, int $utilisateurId) {
+    // Commencez la requête de mise à jour
+    $query = "UPDATE Clubs 
+              SET nom = :nom, logo = :logo, type_sport_id = :typeSport";
+
+    // Ajoutez le champ email si fourni
+    if (!is_null($email)) {
+        $query .= ", email = :email";
     }
-    
+
+    // Condition WHERE pour vérifier que l'utilisateur est bien le créateur du club
+    $query .= " WHERE id = :id AND utilisateur_id = :utilisateurId";
+
+    // Préparez la requête
+    $stmt = $this->connexion->prepare($query);
+
+    // Lie les paramètres obligatoires
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':nom', $nom);
+    $stmt->bindParam(':logo', $logo);
+    $stmt->bindParam(':typeSport', $typeSport, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateurId', $utilisateurId, PDO::PARAM_INT);
+
+    // Lie l'email si fourni
+    if (!is_null($email)) {
+        $stmt->bindParam(':email', $email);
+    }
+
+    // Exécute la requête
+    return $stmt->execute();
+}
+
+
 
 // Dans clubDao.class.php
 
 public function getClubById($id) {
-    $query = "SELECT * FROM Clubs WHERE id = :id";
+    $query = "
+        SELECT 
+            c.*, 
+            tds.nom AS nom_type_sport
+        FROM 
+            Clubs c
+        LEFT JOIN 
+            TypeDeSport tds ON c.type_sport_id = tds.id
+        WHERE 
+            c.id = :id
+    ";
     $stmt = $this->connexion->prepare($query);
-    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
 
 
     

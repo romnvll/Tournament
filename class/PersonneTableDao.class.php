@@ -61,6 +61,20 @@ public function chercherCleUrl($urlKey) {
     $stmt->execute();
 }
 
+public function verifierSiPersonneEstSurUnTerrain(int $terrain_id): bool {
+    $stmt = $this->connexion->prepare("
+        SELECT 1 
+        FROM PersonneTable
+        WHERE terrain_id = :terrain_id
+    ");
+    $stmt->bindValue(':terrain_id', $terrain_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $result ? true : false;
+}
+
 // Vérification du code PIN et retour des détails de la rencontre si valide
 public function verifierCodePinEtRecupererRencontres($urlKey, $codePin) {
     $stmt = $this->connexion->prepare("
@@ -133,7 +147,7 @@ WHERE pr.id = :PersonneTableId;
     if ($result) {
         try {
             include('./config.php');
-            $mail->setFrom('noreply.hbcat@gmail.com', 'HBCAT');
+            $mail->setFrom('romain@brackito.net', 'BRACKITO');
             $mail->isHTML(true);
             $mail->addAddress($result['Mail'], "{$result['Prenom']} {$result['Nom']}");
             $mail->Subject = "[Tournoi" .$result['tournoi_nom']. "]Accès sécurisé pour saisir les résultats sur le terrain '{$result['terrain_nom']}'";

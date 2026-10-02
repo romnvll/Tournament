@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+    <title>{{ t('ajouterEquipeDernierMoment') }}</title>
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --text-light: #6b7280;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            padding: 30px;
+            margin-top: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 25px 0;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bg-light);
+        }
+
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin: 0;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .step-block { margin-bottom: 25px; }
+
+        .step-label {
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .button-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .grid-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--bg-dark);
+            font-size: 0.95rem;
+        }
+
+        .grid-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .grid-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .modern-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            margin: 25px 0;
+            border: none;
+        }
+
+        .poule-info-box {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .poule-info-box ul { margin: 8px 0 0 0; padding-left: 0; list-style: none; }
+
+        .poule-info-box li {
+            padding: 4px 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+        }
+
+        .form-label { font-weight: 600; color: var(--bg-dark); }
+
+        .char-count {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* ===== Avertissement nouvelles rencontres ===== */
+        .warning-rencontres {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+            border-left: 4px solid var(--warning-color);
+            color: #92400e;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .warning-rencontres i { font-size: 1.4rem; margin-top: 2px; }
+        .warning-rencontres .nb-rencontres { font-size: 1.15rem; font-weight: 800; }
+
+        /* ===== Choix du mode club ===== */
+        .club-mode-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+
+        .club-mode-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .club-mode-btn.active {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05));
+            color: var(--success-color);
+        }
+
+        /* ===== Club picker (repris de ajoutEquipe) ===== */
+        .club-picker { position: relative; }
+        .club-search-wrapper { position: relative; }
+
+        .club-search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .club-search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .club-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .club-dropdown.open { display: block; }
+
+        .club-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .club-option:hover { background: rgba(79, 70, 229, 0.08); }
+        .club-option.hidden { display: none; }
+
+        .club-option img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #e5e7eb;
+        }
+
+        .club-selected-display {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--success-color);
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.06);
+            cursor: pointer;
+        }
+
+        .club-selected-display .selected-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .club-selected-display .selected-name { font-weight: 600; flex: 1; font-size: 0.9rem; }
+
+        .club-clear-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--danger-color);
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .club-dropdown::-webkit-scrollbar { width: 6px; }
+        .club-dropdown::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .club-dropdown::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+
+        .btn-submit-equipe {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-submit-equipe:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+
+        .alert-modern {
+            border-radius: var(--border-radius);
+            padding: 18px 22px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-modern.alert-success {
+            background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.05));
+            border-left: 4px solid var(--success-color);
+            color: #065f46;
+        }
+
+        .alert-modern.alert-danger {
+            background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.05));
+            border-left: 4px solid var(--danger-color);
+            color: #991b1b;
+        }
+
+        .form-section-hidden { display: none; }
+    </style>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    <div class="main-container">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h3 class="section-title">{{ t('ajouterEquipeDernierMoment') }}</h3>
+        </div>
+
+        {% if message %}
+            <div class="alert-modern alert-{{ messageType }}">
+                <i class="fa-solid {% if messageType == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+                <div>{{ message }}</div>
+            </div>
+        {% endif %}
+
+        <!-- Étape 1 : choix du tournoi -->
+        <div class="step-block">
+            <div class="step-label">
+                <span class="step-number">1</span>
+                {{ t('choisirTournoi') }}
+            </div>
+            <div class="button-grid">
+                {% for tournoi in ListeDesTournois %}
+                    {% if tournoi.isArchived == 0 %}
+                        <a href="ajouterEquipeDernierMoment.php?id_tournoi={{ tournoi.id }}"
+                           class="grid-btn {% if tournoi.id == idTournoi %}active{% endif %}">
+                            <i class="fas fa-trophy"></i> {{ tournoi.nom }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if idTournoi %}
+            <hr class="modern-divider">
+
+            <!-- Étape 2 : choix de la catégorie -->
+            <div class="step-block">
+                <div class="step-label">
+                    <span class="step-number">2</span>
+                    {{ t('choisirCategorie') }}
+                </div>
+                <div class="button-grid">
+                    {% for categorie in listeCategories %}
+                        <a href="ajouterEquipeDernierMoment.php?id_tournoi={{ idTournoi }}&categorie={{ categorie.id_categorie }}"
+                           class="grid-btn {% if categorie.id_categorie == idCategorie %}active{% endif %}">
+                            {{ categorie.Nom_categorie }}
+                            <span style="opacity: 0.7;">({{ categorie.nombre_equipes }})</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if idCategorie %}
+            <hr class="modern-divider">
+
+            <!-- Étape 3 : choix de la poule -->
+            <div class="step-block">
+                <div class="step-label">
+                    <span class="step-number">3</span>
+                    {{ t('choisirPoule') }}
+                </div>
+
+                {% if listePoules|length == 0 %}
+                    <div class="alert-modern alert-danger">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <div>{{ t('aucunePoulePourCetteCategorie') }}</div>
+                    </div>
+                {% else %}
+                    <div class="button-grid">
+                        {% for poule in listePoules %}
+                            <a href="ajouterEquipeDernierMoment.php?id_tournoi={{ idTournoi }}&categorie={{ idCategorie }}&poule={{ poule.id }}"
+                               class="grid-btn {% if poule.id == idPoule %}active{% endif %}">
+                                <i class="fa-solid fa-circle-nodes"></i>
+                                {{ poule.nom }}
+                                <span style="opacity: 0.7;">({{ poule.nombre_equipes }} équipes)</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if idPoule %}
+            <hr class="modern-divider">
+
+            {# Nombre de rencontres générées par l'ajout d'une équipe :
+               1 match contre chacune des équipes déjà présentes (x2 si aller/retour).
+               Passer allerRetour (bool) depuis le PHP, sinon on considère un simple aller. #}
+            {% set nbEquipesPoule = equipesDeLaPoule|length %}
+            {% set nbNouvellesRencontres = nbEquipesPoule * (allerRetour|default(false) ? 2 : 1) %}
+
+            <!-- Récap des équipes déjà dans la poule -->
+            <div class="poule-info-box">
+                <strong><i class="fa-solid fa-circle-info me-2"></i>{{ t('equipesActuellementDansLaPoule') }}</strong>
+                <ul id="liste-equipes-poule">
+                    {% for e in equipesDeLaPoule %}
+                        <li data-club="{{ e.club_nom|upper }}">
+                            {% if e.club_logo %}
+                                <img src="{{ e.club_logo }}" alt="" style="width: 22px; height: 22px; object-fit: contain; border-radius: 4px;">
+                            {% endif %}
+                            {{ e.nom }} <span style="opacity: 0.6;">({{ e.club_nom }})</span>
+                        </li>
+                    {% else %}
+                        <li>{{ t('aucuneEquipeDansCettePoule') }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Avertissement : nouvelles rencontres -->
+            {% if nbNouvellesRencontres > 0 %}
+                <div class="warning-rencontres">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Attention :</strong> l'ajout de cette équipe va générer
+                        <span class="nb-rencontres">{{ nbNouvellesRencontres }}
+                        nouvelle{{ nbNouvellesRencontres > 1 ? 's' : '' }}
+                        rencontre{{ nbNouvellesRencontres > 1 ? 's' : '' }}</span>
+                        supplémentaire{{ nbNouvellesRencontres > 1 ? 's' : '' }}
+                        ({{ nbEquipesPoule }} équipe{{ nbEquipesPoule > 1 ? 's' : '' }} déjà présente{{ nbEquipesPoule > 1 ? 's' : '' }}{{ allerRetour|default(false) ? ', aller + retour' : '' }}).
+                        <br>
+                        <small>Ces rencontres devront ensuite être planifiées. Les rencontres existantes ne sont pas modifiées.</small>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Étape 4 : formulaire de création + ajout de l'équipe -->
+            <div class="step-block">
+                <div class="step-label">
+                    <span class="step-number">4</span>
+                    {{ t('creerEtAjouterEquipe') }}
+                </div>
+
+                <div class="form-card">
+                    <form id="form-ajout-equipe" method="POST"
+                          action="ajouterEquipeDernierMoment.php?id_tournoi={{ idTournoi }}&categorie={{ idCategorie }}&poule={{ idPoule }}"
+                          data-nb-rencontres="{{ nbNouvellesRencontres }}">
+                        <input type="hidden" name="action" value="ajouter_equipe">
+                        <input type="hidden" name="tournoi_id" value="{{ idTournoi }}">
+                        <input type="hidden" name="categorie_id" value="{{ idCategorie }}">
+                        <input type="hidden" name="poule_id" value="{{ idPoule }}">
+
+                        <!-- Club -->
+                        <div class="mb-3">
+                            <label class="form-label d-block mb-2">{{ t('club') }} *</label>
+
+                            <div class="club-mode-toggle">
+                                <div class="club-mode-btn active" data-mode="existant" onclick="switchClubMode('existant')">
+                                    <i class="fa-solid fa-list me-1"></i> {{ t('clubExistant') }}
+                                </div>
+                                <div class="club-mode-btn" data-mode="nouveau" onclick="switchClubMode('nouveau')">
+                                    <i class="fa-solid fa-plus me-1"></i> {{ t('nouveauClub') }}
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="mode_club" id="mode_club" value="existant">
+
+                            <div id="bloc-club-existant">
+                                <div class="club-picker" id="club-picker">
+                                    <div class="club-search-wrapper">
+                                        <input type="text" class="club-search-input" placeholder="🔍 Rechercher un club..." autocomplete="off">
+                                        <div class="club-dropdown">
+                                            {% for club in listeClubs|sort((a, b) => a.nom <=> b.nom) %}
+                                                <div class="club-option" data-value="{{ club.id }}" data-name="{{ club.nom|upper }}">
+                                                    <img src="{{ club.logo }}" alt="{{ club.nom }}" onerror="this.src='logos/default.png'">
+                                                    <span>{{ club.nom|upper }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="club-selected-display">
+                                        <img class="selected-logo" src="" alt="">
+                                        <span class="selected-name"></span>
+                                        <button type="button" class="club-clear-btn" aria-label="Effacer">✕</button>
+                                    </div>
+                                    <input type="hidden" name="club_id" id="club_id" value="">
+                                </div>
+                            </div>
+
+                            <div id="bloc-club-nouveau" class="form-section-hidden">
+                                <input type="text" name="nom_nouveau_club" id="nom_nouveau_club" class="form-control"
+                                       placeholder="{{ t('nomDuNouveauClub') }}">
+                            </div>
+                        </div>
+
+                        <!-- Nom d'équipe -->
+                        <div class="mb-3">
+                            <label class="form-label" for="nom_equipe">{{ t('nomEquipe') }} *</label>
+                            <input type="text" name="nom_equipe" id="nom_equipe" class="form-control"
+                                   maxlength="13" placeholder="Ex: HBCAT2" required>
+                            <small id="charCountEquipe" class="char-count">13 / 13 caractères restants</small>
+                        </div>
+
+                        <!-- Coach -->
+                        <div class="mb-3">
+                            <label class="form-label" for="nom_coach">
+                                {{ t('nomCoach') }}
+                                <span style="font-weight:400; font-size:.8em; opacity:.6;">(optionnel)</span>
+                            </label>
+                            <input type="text" name="nom_coach" id="nom_coach" class="form-control"
+                                   maxlength="20" placeholder="Nom du coach">
+                            <small id="charCountCoach" class="char-count">20 / 20 caractères restants</small>
+                        </div>
+
+                        <button type="submit" class="btn-submit-equipe">
+                            <i class="fa-solid fa-check-circle me-2"></i>
+                            {{ t('ajouterCetteEquipe') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // ===== Mode club : existant / nouveau =====
+        function switchClubMode(mode) {
+            document.getElementById('mode_club').value = mode;
+
+            document.getElementById('bloc-club-existant').classList.toggle('form-section-hidden', mode !== 'existant');
+            document.getElementById('bloc-club-nouveau').classList.toggle('form-section-hidden', mode !== 'nouveau');
+
+            document.querySelectorAll('.club-mode-btn').forEach(function (btn) {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            if (mode === 'nouveau') {
+                const input = document.getElementById('nom_nouveau_club');
+                if (input) input.focus();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('form-ajout-equipe');
+            if (!form) return;
+
+            const picker        = document.getElementById('club-picker');
+            const searchInput   = picker.querySelector('.club-search-input');
+            const dropdown      = picker.querySelector('.club-dropdown');
+            const options       = picker.querySelectorAll('.club-option');
+            const hiddenInput   = document.getElementById('club_id');
+            const selectedDisp  = picker.querySelector('.club-selected-display');
+            const selectedLogo  = picker.querySelector('.selected-logo');
+            const selectedName  = picker.querySelector('.selected-name');
+            const clearBtn      = picker.querySelector('.club-clear-btn');
+            const nomEquipe     = document.getElementById('nom_equipe');
+            const nomCoach      = document.getElementById('nom_coach');
+            let highlighted = -1;
+
+            // --- Compteurs de caractères ---
+            function bindCounter(input, counterId) {
+                const counter = document.getElementById(counterId);
+                const max = input.getAttribute('maxlength');
+                input.addEventListener('input', function () {
+                    counter.textContent = (max - input.value.length) + ' / ' + max + ' caractères restants';
+                });
+            }
+            bindCounter(nomEquipe, 'charCountEquipe');
+            bindCounter(nomCoach, 'charCountCoach');
+
+            // --- Picker ---
+            function filterOptions(query) {
+                const q = query.toLowerCase().trim();
+                highlighted = -1;
+                options.forEach(function (opt) {
+                    opt.style.background = '';
+                    opt.classList.toggle('hidden', !(opt.dataset.name || '').toLowerCase().includes(q));
+                });
+
+                // Lien "Créer le club" si aucun résultat
+                const old = dropdown.querySelector('.create-club-link');
+                if (old) old.remove();
+
+                const visibles = [...options].filter(o => !o.classList.contains('hidden'));
+                if (visibles.length === 0 && query.trim() !== '') {
+                    const link = document.createElement('div');
+                    link.className = 'create-club-link club-option';
+                    link.style.color = 'var(--primary-color)';
+                    link.innerHTML = '<i class="fas fa-plus-circle"></i> Créer le club "<strong></strong>"';
+                    link.querySelector('strong').textContent = query.trim();
+                    link.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        dropdown.classList.remove('open');
+                        switchClubMode('nouveau');
+                        document.getElementById('nom_nouveau_club').value = query.trim();
+                        searchInput.value = '';
+                    });
+                    dropdown.appendChild(link);
+                }
+            }
+
+            function openDropdown() {
+                filterOptions(searchInput.value);
+                dropdown.classList.add('open');
+            }
+
+            function selectOption(opt) {
+                const name = opt.dataset.name;
+                const img  = opt.querySelector('img');
+
+                hiddenInput.value = opt.dataset.value;
+                dropdown.classList.remove('open');
+                highlighted = -1;
+
+                searchInput.style.display = 'none';
+                selectedDisp.style.display = 'flex';
+                selectedLogo.src = img ? img.src : '';
+                selectedName.textContent = name;
+
+                // Pré-remplir le nom d'équipe : CLUB + numéro suivant (dans cette poule)
+                const existantes = [...document.querySelectorAll('#liste-equipes-poule li[data-club]')]
+                    .filter(li => li.dataset.club === name).length;
+                nomEquipe.value = (name + (existantes + 1)).substring(0, nomEquipe.maxLength);
+                nomEquipe.dispatchEvent(new Event('input'));
+                nomEquipe.focus();
+                const len = nomEquipe.value.length;
+                nomEquipe.setSelectionRange(len, len);
+            }
+
+            function resetSelection() {
+                hiddenInput.value = '';
+                selectedDisp.style.display = 'none';
+                searchInput.style.display = '';
+                searchInput.value = '';
+                searchInput.focus();
+                filterOptions('');
+            }
+
+            searchInput.addEventListener('input', function () {
+                if (searchInput.value.length >= 1) {
+                    openDropdown();
+                } else {
+                    dropdown.classList.remove('open');
+                    highlighted = -1;
+                }
+            });
+
+            searchInput.addEventListener('keydown', function (e) {
+                const visibles = [...options].filter(o => !o.classList.contains('hidden'));
+                const paint = () => visibles.forEach((o, i) => {
+                    o.style.background = i === highlighted ? 'rgba(79, 70, 229, 0.12)' : '';
+                });
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!dropdown.classList.contains('open')) openDropdown();
+                    highlighted = Math.min(highlighted + 1, visibles.length - 1);
+                    paint();
+                    visibles[highlighted]?.scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlighted = Math.max(highlighted - 1, 0);
+                    paint();
+                    visibles[highlighted]?.scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const cible = highlighted >= 0 ? visibles[highlighted] : visibles[0];
+                    if (cible) selectOption(cible);
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('open');
+                    highlighted = -1;
+                }
+            });
+
+            options.forEach(function (opt) {
+                opt.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    selectOption(opt);
+                });
+            });
+
+            clearBtn.addEventListener('click', function (e) { e.stopPropagation(); resetSelection(); });
+            selectedDisp.addEventListener('click', resetSelection);
+
+            document.addEventListener('click', function (e) {
+                if (!picker.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                    highlighted = -1;
+                }
+            });
+
+            // --- Validation + confirmation à la soumission ---
+            form.addEventListener('submit', function (e) {
+                const mode = document.getElementById('mode_club').value;
+
+                if (mode === 'existant' && !hiddenInput.value) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner un club.');
+                    searchInput.focus();
+                    return;
+                }
+                if (mode === 'nouveau' && !document.getElementById('nom_nouveau_club').value.trim()) {
+                    e.preventDefault();
+                    alert('Veuillez saisir le nom du nouveau club.');
+                    document.getElementById('nom_nouveau_club').focus();
+                    return;
+                }
+
+                const nb = parseInt(form.dataset.nbRencontres, 10) || 0;
+                if (nb > 0) {
+                    const msg = 'Cette équipe va générer ' + nb + ' nouvelle' + (nb > 1 ? 's' : '')
+                              + ' rencontre' + (nb > 1 ? 's' : '') + ' supplémentaire' + (nb > 1 ? 's' : '')
+                              + '.\n\nConfirmer l\'ajout ?';
+                    if (!confirm(msg)) e.preventDefault();
+                }
+            });
+
+            // Focus initial sur la recherche de club
+            setTimeout(function () { searchInput.focus(); }, 50);
+        });
+    </script>
+</body>
+</html>

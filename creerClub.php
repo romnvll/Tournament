@@ -3,6 +3,9 @@ require ('security.php');
 require ('class/clubDao.class.php');
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
+require 'class/typeSportDao.class.php';
+require 'Lang/lang.php';
+
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
@@ -12,10 +15,12 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $template = $twig->load('creerClub.twig');
 
 $club = new ClubDAO();
 $tournoiDao = new tournoiDao();
+$typeSportDao = new TypeSportDAO();
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 $dernierId = null;
@@ -31,10 +36,11 @@ foreach ($tousLesTournois as $tournoi) {
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEnCours' =>  'GestionClub',
     'ListeDesClubs' => $club->afficherClubs(),
     'idTournoi' => $dernierId,
+    'listeSports' => $typeSportDao->getTousLesTypesDeSport(),
   
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),

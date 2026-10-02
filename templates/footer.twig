@@ -1,28 +1,203 @@
-<footer class="bg-dark text-light mt-4">
-    <div class="container d-flex justify-content-between align-items-center w-100 py-2">
-        
-        <!-- Liens à gauche -->
-        <ul class="list-unstyled d-flex mb-0">
-            <li class="mx-2">
-                <a href="index.php" class="btn btn-primary btn-sm">Fonctionnalités</a>
-            </li>
-            <li class="mx-2">
-                <a href="#" class="text-light text-decoration-none small">Vallée Romain</a>
-            </li>
-        </ul>
+<!-- Tarifs Modal -->
+<div class="modal fade modal-modern" id="tarifsModal" tabindex="-1" aria-labelledby="tarifsModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tarifsModalLabel">
+                    <i class="fas fa-receipt"></i>
+                    {{t('footerTarifs')}}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">{{t('captionTitre')}}</p>
+                
+                <div class="row">
+                    <!-- Free Plan -->
+                    <div class="col-md-4 mb-4">
+                        <div class="pricing-card">
+                            <div class="pricing-header free">
+                                {{t('captionGratuit')}}
+                            </div>
+                            <div class="pricing-body">
+                                <div class="pricing-price">
+                                    0<span>€</span>
+                                </div>
+                                
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('nombreDeTournois')}}:</strong><br>
+                                            {{licence[0]['limite_tournois']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('equipesParTournoi')}}:</strong><br>
+                                            {{licence[0]['limite_equipes']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-infinity"></i>
+                                        <div>
+                                            <strong>{{t('dureeDeValidite')}}:</strong><br>
+                                            {{t('illimite')}}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- GitHub et Arbitrage à droite -->
-        <div class="d-flex align-items-center">
-            <a href="https://github.com/romnvll/Tournament" class="text-light text-decoration-none small me-2" target="_blank">
-                <i class="fab fa-github"></i> GitHub
-            </a>
-            
-            {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
-            <a href="affichagePlanningArbitre.php?idTournoi={{infoTournoiEnCours['id']}}" class="btn btn-primary btn-sm">
-                <i class="fa fa-user"></i> Arbitrage
-            </a>
-            {% endif %}
+                    <!-- Basic Plan -->
+                    <div class="col-md-4 mb-4">
+                        <div class="pricing-card featured">
+                            <div class="pricing-header basic">
+                                {{t('captionBasique')}}
+                            </div>
+                            <div class="pricing-body">
+                                <div class="pricing-price">
+                                    {{licence[1]['prix']}}<span>€</span>
+                                </div>
+                                
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('nombreDeTournois')}}:</strong><br>
+                                            {{licence[1]['limite_tournois']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('equipesParTournoi')}}:</strong><br>
+                                            {{licence[1]['limite_equipes']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <div>
+                                            <strong>{{t('dureeDeValidite')}}:</strong><br>
+                                            {{licence[1]['duree_jours']}} {{t('jours')}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-video"></i>
+                                        <div>
+                                            <strong>{{t('Formation')}}:</strong><br>
+                                            {{licence[1]['description']}} {{t('jours')}}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Premium Plan -->
+                    <div class="col-md-4 mb-4">
+                        <div class="pricing-card featured">
+                            <div class="pricing-header premium">
+                                {{t('captionPremium')}}
+                                <i class="fas fa-star ms-2"></i>
+                            </div>
+                            <div class="pricing-body">
+                                <div class="pricing-price">
+                                    {{licence[2]['prix']}}<span>€</span>
+                                </div>
+                                
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('nombreDeTournois')}}:</strong><br>
+                                            {{licence[2]['limite_tournois']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>
+                                            <strong>{{t('equipesParTournoi')}}:</strong><br>
+                                            {{licence[2]['limite_equipes']}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <div>
+                                            <strong>{{t('dureeDeValidite')}}:</strong><br>
+                                            {{licence[2]['duree_jours']}} {{t('jours')}}
+                                        </div>
+                                    </li>
+                                    <li class="pricing-feature">
+                                        <i class="fas fa-video"></i>
+                                        <div>
+                                            <strong>{{t('Formation')}}:</strong><br>
+                                            {{licence[2]['description']}} {{t('jours')}}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <img src="logos/Logo.png" alt="Logo" class="modal-logo">
+                <button type="button" class="btn-close-modal" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Fermer
+                </button>
+            </div>
         </div>
-
     </div>
-</footer>
+</div>
+
+<!-- Modern Footer -->
+<div class="footer-content">
+    <!-- Left Links -->
+    <ul class="footer-links">
+       
+        <!-- CGV -->
+        <li>
+            <a href="cgv.php" class="footer-link">
+                <i class="fas fa-file-contract"></i>
+                CGV
+            </a>
+        </li>
+
+        <!-- Mentions légales -->
+        <li>
+            <a href="mentions-legales.php" class="footer-link">
+                <i class="fas fa-scale-balanced"></i>
+                Mentions légales
+            </a>
+        </li>
+       
+    </ul>
+
+    <!-- Right Actions -->
+    <div class="footer-actions">
+        <button type="button" class="footer-btn tarifs" data-bs-toggle="modal" data-bs-target="#tarifsModal">
+            <i class="fas fa-receipt"></i>
+            {{t('footerTarifs')}}
+        </button>
+
+      
+    </div>
+
+<div class="footer-actions">
+  {% if infoTournoiEnCours|length != 0 and gestionArbitres == 1 %}
+            <a href="affichagePlanningArbitre.php?idTournoi={{infoTournoiEnCours['id']}}" class="footer-btn arbitrage">
+                <i class="fas fa-user-tie"></i>
+                Arbitrage
+            </a>
+        {% endif %}
+</div>
+
+</div>
+
+
+
+

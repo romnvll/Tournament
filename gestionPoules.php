@@ -6,6 +6,8 @@ require 'class/tournoiDao.class.php';
 require 'class/equipeDao.class.php';
 require 'class/rencontreDao.class.php';
 require 'class/planificationDao.class.php';
+require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 $tournois = new tournoiDao();
 
@@ -15,12 +17,18 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
   exit();
 }
 
-if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-    
-  exit;
+
+$idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
 }
 
-
+$licenceDao = new LicenceDao();
+$licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
@@ -30,6 +38,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 $idCategorie = null;
 
@@ -40,12 +49,10 @@ $afficheCategorie = new EquipeDAO();
 $poules = new PouleManager();
 $rencontres = new RencontreDAO();
 $planification = new planificationDao();
+$equipeDao = new EquipeDAO();
 
-if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-    
-  exit;
-}
 
+    $listeDesEquipes = $equipeDao->rechercherEquipesDansTournoi($_GET['id_tournoi'], $_GET['query']??null);
 
 
 
@@ -58,6 +65,7 @@ if (isset($_GET['categorie'])) {
 
     $rencontre = new RencontreDAO();
     $poule =  $poules->afficherPoulesPourCategorie($_GET['id_tournoi'], $nbrEquipeEnCours, $idCategorie);
+   
     $pouleHasRencontre = new PouleManager();
    
     
@@ -94,7 +102,8 @@ if (isset($_GET['categorie'])) {
                        
                        foreach ($poule as $idpoule) {
                         $rencontres->supprimerRencontresParPoule($idpoule);
-                        $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],0,false);
+                        
+                        $rencontres->createRencontreByPoule($idpoule,$_GET['id_tournoi'],1,false);
                         
                         }
                                        
@@ -137,21 +146,23 @@ if (isset($_GET['categorie'])) {
 $template = $twig->load('GestionPoules.twig');
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+
   'pageEnCours' => 'GestionDesPoules',
 
-  'nbrEquipeEnCours' => $nbrEquipeEnCours,
+  'nbrEquipeEnCours' => $nbrEquipeEnCours??null,
 
-  'nomDuTournoi' => $nomTournoi,
+  
 
   'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
   'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
   'idTournoi' => $_GET['id_tournoi'],
-  'nombreEquipeParPoule' => $PouleAuto,
-  'listeDesPoules' => $poule,
-  'categorieEnCours' => $categorieEnCours,
-  'nbrEquipe' => $_GET['NbrEquipeParPoule'],
+  
+  'listeDesPoules' => $poule??null,
+  'categorieEnCours' => $categorieEnCours??null,
+  'nbrEquipe' => $_GET['NbrEquipeParPoule']??null,
   'modal' => isset($_GET['modal']) ? $_GET['modal'] : null, // Passez la variable de modal à Twig
+  'AfficherLesEquipes' => $listeDesEquipes,
+  'licence' => $licence,
 
 
 ]);

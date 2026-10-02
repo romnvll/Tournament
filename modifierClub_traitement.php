@@ -49,7 +49,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $uploadPath = $club['logo']; // Conserver le chemin actuel
     }
 
-    $clubdao->updateClub($_POST['idclub'], $_POST['nomduclub'], null, null, $_POST['contactClub'], $uploadPath);
+    //var_dump($_POST);
+    $typeSport = (int) $_POST['typeSport'];
+    //var_dump($typeSport);
+    // Mettre à jour le club avec les données fournies
+    $clubdao->updateClub($_POST['idclub'], $_POST['nomduclub'], null, $uploadPath,$typeSport,$_POST['IdUser']);
 }
 
 $referer = $_SERVER['HTTP_REFERER'];

@@ -5,6 +5,20 @@ require ('security.php');
 require 'class/equipeDao.class.php';
 require 'class/tournoiDao.class.php';
 require 'vendor/autoload.php';
+require 'Lang/lang.php';
+
+$tournois = new tournoiDao();
+
+$idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
+    exit;
+}
+
+
 
 
 
@@ -15,7 +29,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
-
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 $tournoi = new tournoiDao();
 
 
@@ -24,7 +38,7 @@ $tournoi = new tournoiDao();
 $template = $twig->load('resultatsParCategorie.twig');
 echo $template->render([
   'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
   'pageEnCours' => 'GestionDesRencontres',
   'afficherLesTournois' => $tournoi->afficherLesTournois($userData['id']),
 

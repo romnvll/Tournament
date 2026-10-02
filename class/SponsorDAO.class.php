@@ -19,13 +19,13 @@ class SponsorDAO {
     ?string $description,
     string $lien_web,
     ?string $logo,
-    int $club_id,
+    int $utilisateur_id,
     ?string $telephone = null,
     ?string $adresse = null
 ): void {
     // Construction dynamique des colonnes et des placeholders
-    $colonnes = ['nom', 'description', 'lien_web', 'logo', 'club_id'];
-    $placeholders = [':nom', ':description', ':lien_web', ':logo', ':club_id'];
+    $colonnes = ['nom', 'description', 'lien_web', 'logo', 'utilisateur_id'];
+    $placeholders = [':nom', ':description', ':lien_web', ':logo', ':utilisateur_id'];
 
     if ($telephone !== null) {
         $colonnes[] = 'telephone';
@@ -47,7 +47,7 @@ class SponsorDAO {
     // Champs obligatoires
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':lien_web', $lien_web);
-    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
 
     // Champs optionnels avec gestion de NULL
     $description === null
@@ -71,16 +71,16 @@ class SponsorDAO {
 
 
     // Exemple de méthode pour récupérer les sponsors d'un club
-    public function getSponsorsParClub(int $club_id): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM Sponsors WHERE club_id = :club_id");
-        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    public function getSponsorsParClub(int $utilisateurID): array {
+        $stmt = $this->connexion->prepare("SELECT * FROM Sponsors WHERE utilisateur_id = :utilisateurID");
+        $stmt->bindParam(':utilisateurID', $utilisateurID, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-     public function getSponsorsActifParClub(int $club_id): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM Sponsors WHERE club_id = :club_id and is_actif = '1'");
-        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+     public function getSponsorsActifParClub(int $utilisateurID): array {
+        $stmt = $this->connexion->prepare("SELECT * FROM Sponsors WHERE utilisateur_id = :utilisateurID and is_actif = '1'");
+        $stmt->bindParam(':utilisateurID', $utilisateurID, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -92,7 +92,7 @@ public function modifierSponsor(
     ?string $description,
     string $lien_web,
     ?string $logo,
-    int $club_id,
+    int $utilisateur_id,
     ?string $telephone = null,
     ?string $adresse = null
 ): void {
@@ -102,7 +102,7 @@ public function modifierSponsor(
             description = :description,
             lien_web = :lien_web,
             logo = :logo,
-            club_id = :club_id";
+            utilisateur_id = :utilisateur_id";
 
     // Ajout dynamique des champs optionnels
     if ($telephone !== null) {
@@ -121,7 +121,7 @@ public function modifierSponsor(
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':lien_web', $lien_web);
-    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    $stmt->bindParam(':utilisateur_id', $utilisateur_id, PDO::PARAM_INT);
 
     // Champs optionnels avec gestion de NULL
     $description === null

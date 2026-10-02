@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3NFVPTP2MY"></script>
     <script>
@@ -12,608 +13,2244 @@
         gtag('config', 'G-3NFVPTP2MY');
     </script>
     <meta charset="UTF-8">
-    {% if ListeDesTournois[0]['gestionArbitres'] == 1 %}
-    <meta name="viewport" content="width=device-width, initial-scale=0.5">
-    {% else %}
-    <meta name="viewport" content="width=device-width, initial-scale=0.7">
-    {% endif %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous">
-    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
-    <title>{% if IdPoules %}
-            Vue par poule - MatchEvent PRO ! 
-            {% elseif affichageByTeam %}
-            Vue par équipe - MatchEvent PRO ! 
-            {% elseif affichageByClubs %}
-            Vue par club - MatchEvent PRO ! 
-            {% elseif affichageByTerrain %}
-            Vue par terrain - MatchEvent PRO ! 
-            {% elseif idTournoi %}
-            Menu des clubs - équipes - poules - MatchEvent PRO ! 
-            
-            
-            {% else %}
-            MatchEvent PRO ! 
-            {% endif %} 
-            
-        </title>
+    <meta name="description" content="Brackito est un logiciel français pour gérer vos tournois sportifs : création automatique des poules, planification des matchs, suivi des scores en direct.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/synchroHorloge.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <title>
+        {% if affichageByCategorie %}
+            Vue par catégorie - Brackito
+        {% elseif affichageByTeam %}
+            Vue par équipe - Brackito
+        {% elseif affichageByClubs %}
+            Vue par club - Brackito
+        {% elseif affichageByTerrain %}
+            Vue par terrain - Brackito
+        {% elseif affichageByPoule %}
+            Vue par poule - Brackito
+        {% else %}
+            Brackito - Gestion de tournois sportifs
+        {% endif %}
+    </title>
     <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        .container-fluid {
+            padding: 12px;
+            max-width: 100vw;
+        }
+
+        .card-modern {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 10px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes hintPulse {
+            0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(79,70,229,0.4); }
+            40%  { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(79,70,229,0); }
+            60%  { transform: scale(0.97); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+        }
+
+        .hint-animate {
+            animation: hintPulse 0.6s ease-out 4;
+        }
+
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clickable-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background-color: #e53935;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            display: block;
+        }
+
+        .selection-item {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--bg-dark);
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .selection-item:active {
+            transform: scale(0.98);
+            background: #e5e7eb;
+        }
+
+        .selection-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .selection-text {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .nav-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .nav-button:active {
+            transform: scale(0.98);
+        }
+
+        .info-alert {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--info-color);
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: var(--info-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .match-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .match-card.finished {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .match-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .match-countdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.match-countdown .fa-hourglass-half,
+.match-countdown .fa-hourglass-end {
+    color: var(--primary-color);
+}
+
+        .team-side {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            max-width: 110px;
+            overflow: hidden;
         }
-        .container-fluid {
-             width: 100%;
-            padding-right: 1px;
-            padding-left: 0px;
-            margin-right: auto;
-            margin-left: auto;
-            margin-bottom: 30px;
-        }
-      
-        
-        .table th, .table td {
-            vertical-align: middle;
-        }
-        .table img {
-            max-width: 50px;
-        }
-        .btn-success, .btn-danger {
-            margin: 2px;
-        }
-        .badge {
-            font-size: 14px;
-        }
-        .lead {
-            font-size: 16px;
-        }
-        footer {
-            background-color: #343a40;
+
+        .terrain-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 20px;
+            padding: 5px 8px;
+            cursor: pointer;
+            background: #222;
             color: white;
-            
+            border: 1.0px solid rgba(255,255,255,0.15);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .terrain-link:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .terrain-num {
+            background: #e63946;
+            color: white;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .team-logo-wrap {
+            position: relative;
+            display: inline-block;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .team-logo {
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.1s;
+        }
+
+        .team-logo-wrap:active .team-logo {
+            transform: scale(0.92);
+        }
+
+        .team-logo-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #e63946;
+            color: white;
+            font-weight: 700;
+            font-size: 9px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .terrain-wrapper {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 4px 4px 1px 4px;
+            gap: 0px;
+            max-width: 70px;
+        }
+
+        .terrain-nom {
+            color: #fff;
+            font-size: 10px;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 500%;
+        }
+
+        .phase-finale-time-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: #fff;
+            font-weight: 700;
+            font-size: .8rem;
+            padding: .3rem .85rem;
+            border-radius: 999px;
+            white-space: nowrap;
+            letter-spacing: .03em;
+        }
+
+        .match-card {
+            background: var(--card-bg, #fff);
+            border: 1px solid var(--border-color, #e5e7eb);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: box-shadow .2s ease, transform .2s ease;
+        }
+
+        .match-card:hover {
+            box-shadow: 0 6px 24px rgba(0,0,0,.1);
+            transform: translateY(-2px);
+        }
+
+        .match-card--terminated {
+            border-color: var(--danger-color, #ef4444);
+        }
+
+        .phase-finale-poule {
+            font-size: .68rem;
+            color: var(--danger-color, #ef4444);
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+            max-width: 110px;
+        }
+          .bell-wrapper {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 200;
+    }
+
+    .bell-button {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--bg-dark);
+        position: relative;
+        transition: transform .15s;
+    }
+
+
+    .creneau-badge {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 200;
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-radius: 12px; /* plutôt qu'une pilule */
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--bg-dark);
+}
+
+.creneau-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.creneau-badge i {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+    .creneau-badge {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+        top: 10px;
+        left: 10px;
+    }
+}
+
+    .bell-button:active { transform: scale(0.94); }
+
+    .bell-button i { font-size: 1.2rem; }
+
+    .bell-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        min-width: 19px;
+        height: 19px;
+        padding: 0 4px;
+        border-radius: 99px;
+        background: var(--danger-color, #ef4444);
+        color: white;
+        font-size: .68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+    }
+
+    @keyframes bellRing {
+        0%, 100% { transform: rotate(0deg); }
+        10%, 30% { transform: rotate(-12deg); }
+        20%, 40% { transform: rotate(12deg); }
+        50% { transform: rotate(0deg); }
+    }
+    .bell-button.has-unread i { animation: bellRing 1.8s ease-in-out infinite; transform-origin: top center; }
+
+
+        @media (min-width: 768px) {
+            .match-header {
+                grid-template-columns: 1fr auto 1fr;
+                gap: 24px;
+                padding: 24px 32px;
+            }
+
+            .team-side {
+                max-width: none;
+                width: 100%;
+            }
+
+            .team-name {
+                max-width: none;
+                font-size: 1rem;
+            }
+
+            .team-logo-wrap {
+                position: relative;
+                display: inline-block;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .team-logo-wrap:active .team-logo {
+                transform: scale(0.92);
+            }
+
+            .team-logo-badge {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                background: #e63946;
+                color: white;
+                font-weight: 700;
+                font-size: 9px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid white;
+            }
+
+            .team-logo {
+                border-radius: 50%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.1s;
+            }
+        }
+
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .team-name {
+            font-size: clamp(0.6rem, 2vw, 0.9rem);
+            font-weight: 400;
+            text-align: center;
+            background: var(--bg-dark);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            text-decoration: none;
+            max-width: 110px;
+            word-break: keep-all;
+            overflow-wrap: normal;
+            line-height: 1.2;
+            display: inline-block;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .team-name:active {
+            box-shadow: none;
+            transform: translateY(2px);
+        }
+
+        .team-arrow {
+            opacity: 0.6;
+            font-size: 1.1em;
+        }
+
+        .match-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .match-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-light);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .match-score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .score-badge {
+            padding: 6px 14px;
+            border-radius: 10px;
+            color: white;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .score-win  { background: var(--success-color); }
+        .score-lose { background: var(--danger-color); }
+        .score-draw { background: #6b7280; }
+
+        .match-terrain {
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .match-details {
+            padding: 16px 20px;
+            background: var(--bg-light);
+            border-top: 1px solid #e5e7eb;
+            display: grid;
+            gap: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .match-category {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #000;
+            display: inline-block;
+        }
+
+        .match-status {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pending  { background: var(--warning-color); color: white; }
+        .status-finished { background: var(--danger-color); color: white; }
+        .status-ongoing  { background: var(--info-color); color: white; }
+
+        .ranking-card {
+            margin-left: 0;
+            padding: 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+        }
+
+        .ranking-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px 12px 16px;
+            border-bottom: 2px solid var(--warning-color);
+        }
+
+        .ranking-card .table-responsive {
+            padding: 0 16px;
+        }
+
+        .coach-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #4b5563;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            width: fit-content;
+        }
+
+        .sponsor-box {
+            background: linear-gradient(135deg, var(--bg-light), white);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .sponsor-logo {
+            max-width: 60px;
+            max-height: 45px;
+            border-radius: 6px;
+        }
+
+        .modern-footer {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            padding: 10px 0;
+            margin-top: 10px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
             position: fixed;
             bottom: 0;
+            left: 0;
             width: 100%;
+            z-index: 100;
         }
-       
-        .no-bullet {
-    list-style-type: none; /* Supprime les puces */
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 12px;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-link:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        .footer-link.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .footer-link.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .footer-actions {
+            display: nowrap;
+            flex-wrap: nowrap;
+            gap: 8px;
+        }
+
+        .footer-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: white;
+        }
+
+        .footer-btn.tarifs { background: rgba(255,255,255,0.1); }
+        .footer-btn.tarifs:hover { background: rgba(255,255,255,0.2); }
+
+        .footer-btn.arbitrage {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .footer-btn.arbitrage:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-modern .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            overflow: hidden;
+            position: relative;
+            z-index: 1056;
+        }
+
+        .modal-backdrop { z-index: 1055; }
+        .modal { z-index: 1056; }
+
+        .modal-modern .modal-header {
+            background: linear-gradient(135deg, var(--bg-dark), #374151);
+            color: white;
+            border: none;
+            padding: 20px 24px;
+        }
+
+        .modal-modern .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-modern .btn-close { filter: brightness(0) invert(1); opacity: 1; }
+        .modal-modern .btn-close:hover { opacity: 0.8; }
+        .modal-modern .modal-body { padding: 32px 24px; }
+
+        .modal-intro {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .coach-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 4px 8px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1));
+            border-radius: 20px;
+            font-size: 0.5rem;
+            color: #4b5563;
+            border: 1px solid rgba(59,130,246,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .coach-info:hover {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.15));
+            border-color: rgba(59,130,246,0.3);
+            transform: translateY(-1px);
+        }
+
+        .coach-info i { color: #3b82f6; font-size: 0.9rem; }
+        .coach-info span { font-weight: 800; letter-spacing: 0.6px; }
+
+        .pricing-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+
+        .pricing-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .pricing-header.free    { background: linear-gradient(135deg, #6b7280, #4b5563); }
+        .pricing-header.basic   { background: linear-gradient(135deg, var(--info-color), #0891b2); }
+        .pricing-header.premium { background: linear-gradient(135deg, var(--warning-color), #f97316); }
+
+        .pricing-body { padding: 24px; }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .pricing-price span { font-size: 1rem; color: #6b7280; }
+
+        .pricing-features { list-style: none; padding: 0; margin: 20px 0; }
+
+        .pricing-feature {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            padding: 10px 0;
+            color: var(--bg-dark);
+        }
+
+        .pricing-feature i { color: var(--success-color); font-size: 1.1rem; margin-top: 2px; }
+        .pricing-feature strong { color: #6b7280; font-size: 0.85rem; min-width: 80px; }
+
+        .modal-modern .modal-footer {
+            background: var(--bg-light);
+            border: none;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-logo { height: 30px; opacity: 0.6; }
+
+        .btn-close-modal {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            background: var(--bg-dark);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-close-modal:hover { background: #374151; transform: translateY(-2px); }
+
+        .d-none { display: none !important; }
+
+        /* Tableau rencontres terminées */
+        .table-terminées {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .table-terminées-header {
+            padding: 12px 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        @media (max-width: 767px) {
+            .footer-content {
+                padding: 3px 8px;
+                gap: 5px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .footer-links { gap: 5px; }
+            .footer-actions { gap: 5px; }
+            .footer-link, .footer-btn { padding: 6px 10px; font-size: 12px; gap: 5px; }
+            .footer-link i, .footer-btn i { font-size: 12px; }
+            .pricing-price { font-size: 2rem; }
+
+            .organisateur-info {
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                color: white;
+            }
+            .organisateur-content { margin-top: 1rem; padding: 0; text-align: center; }
+            .organisateur-label { display: block; font-size: 0.9rem; opacity: 0.9; margin-bottom: 1rem; font-weight: 500; }
+            .organisateur-label i { margin-right: 0.5rem; }
+            .organisateur-club { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+            .organisateur-logo { width: 50px; height: 50px; object-fit: contain; background: white; border-radius: 50%; padding: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .organisateur-nom { font-size: 1.3rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            .organisateur-info > div:last-child {
+    padding-top: 15px;
+    margin-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
 }
+        }
+
+        @media (min-width: 768px) {
+            body { background: #f8f9fa; padding-bottom: 10px; }
+            .modern-footer { position: relative; }
+            .team-logo { width: 90px; height: 90px; }
+            .match-score { font-size: 2.2rem; }
+
+            .organisateur-info {
+                margin-bottom: 1.5rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                color: white;
+            }
+            .organisateur-content { padding: 1.5rem; text-align: center; }
+            .organisateur-label { display: block; font-size: 0.9rem; opacity: 0.9; margin-bottom: 1rem; font-weight: 500; }
+            .organisateur-label i { margin-right: 0.5rem; }
+            .organisateur-club { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+            .organisateur-logo { width: 50px; height: 50px; object-fit: contain; background: white; border-radius: 50%; padding: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .organisateur-nom { font-size: 1.3rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        }
     </style>
 </head>
-{# include('headerIndex.twig') #} 
 <body>
-    <div class="container-fluid mt-1">
 
-    
- 
+    <div class="container-fluid">
         {% if infoTournoiEnCours is not empty and (infoTournoiEnCours.isArchived == 1 or infoTournoiEnCours.isVisible == 0) %}
-
-            <div class="container-fluid">
-                <div class="alert alert-warning text-center mt-5">
-                    <h2><i class="fas fa-exclamation-triangle"></i> Ce tournoi n'est plus disponible</h2>
+            <div class="card-modern">
+                <div class="info-alert">
+                    <div class="info-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Ce tournoi n'est plus disponible
+                    </div>
                     <p>Il n'y a actuellement aucun tournoi en cours ou à venir.</p>
                 </div>
             </div>
-            
         {% else %}
             {% set countVisibleTournois = 0 %}
-            {% for tournoi in ListeDesTournois %}
-                {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
-                    {% set countVisibleTournois = countVisibleTournois + 1 %}
-                {% endif %}
-            {% endfor %}
+
+            {% if infoTournoiEnCours.isVisible == 1 and infoTournoiEnCours.isArchived == 0 %}
+                {% set countVisibleTournois = countVisibleTournois + 1 %}
+            {% endif %}
 
             {% if infoTournoiEnCours|length == 0 %}
-             
-
-<div class="container-fluid">
-    <div class="row shadow bg-light">
-        <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
-            <div class="text-center text-dark">
-                <h2 class="mb-4 text-primary">Gérez vos tournois comme un pro</h2>
-                <p class="lead mb-4">
-                    Simplifiez l'organisation de vos compétitions avec notre outil tout-en-un pensé pour les clubs de sport.
-                </p>
-                <div class="text-start fs-5">
-                    <p><i class="fas fa-users-gear me-2 text-primary"></i> Création automatique des poules</p>
-                    <p><i class="fas fa-calendar-alt me-2 text-success"></i> Planification optimisée des rencontres</p>
-                    <p><i class="fas fa-trophy me-2 text-warning"></i> Suivi en temps réel des scores et classements pour les coachs et la famille</p>
-                    <p><i class="fas fa-user-slash me-2 text-danger"></i> Gestion des absences d'équipes</p>
-                    <p><i class="fas fa-mobile-screen-button me-2 text-info"></i> Interface mobile pour les bénévoles, arbitres et gestionnaires des tables</p>
-                    <p> 🤝 Gestion des partenaires / sponsors</p>
-                    <p><i class="fas fa-layer-group me-2 text-secondary"></i> Gestion intuitive des catégories (U9, U11, etc.)</p>
-                    <p><i class="fas fa-circle-info me-2 text-dark"></i> <strong>Ce logiciel est conçu uniquement pour les tournois de type poule ou poule aller/retour</strong></p>
-                </div>
-                <div class="mt-4">
-                    <p class="fw-semibold">
-                        <i class="fas fa-envelope text-primary me-2"></i>
-                        Pour plus de renseignements, <span id="email"></span>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 d-flex align-items-center justify-content-center">
-            <img src="logos/matcheventPro.webp" class="rounded img-fluid w-75 h-75 fade-in" alt="logo">
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Script pour reconstruire l'adresse e-mail dynamiquement -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const user = "vallee.romain";
-        const domain = "gmail.com";
-        const email = `${user}@${domain}`;
-        const link = `<a href="mailto:${email}">${email}</a>`;
-        document.getElementById('email').innerHTML = link;
-    });
-</script>
-
-
- {% set hasNonArchived = false %}
-
-{% for tournoi in ListeDesTournois %}
-
-    {% if tournoi.isArchived == 0 %}
-        {% set hasNonArchived = true %}
-        
-    {% endif %}
-{% endfor %}
-
- {% if  hasNonArchived %}
-     <h2 class="mb-4 ml-2">
-     <i class="fas fa-exclamation-circle"></i> Les tournois en cours
-     </h2>
-      {% else %}
-     <h2 class="mb-4 ml-2">
-        <i class="fas fa-exclamation-circle"></i> aucun tournoi en cours
-       </h2>
-
-      {% endif %}
-                    <p class="mb-4">
-                    {% for tournoi in ListeDesTournois %}
-                    {% if tournoi.isVisible == 1 and tournoi.isArchived == 0 %}
-                                    {% if tournoi.id == idTournoi %}
-                                        <a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-success btn-lg"><i class="fas fa-trophy"></i> {{ tournoi.nom|upper }}</a>
-                                    {% else %}
-                                        <a href="index.php?id_tournoi={{ tournoi.id }}" class="btn btn-secondary"><i class="fas fa-trophy"></i> {{ tournoi.nom|upper }}</a>
-                                    {% endif %}
-                                {% endif %}
-                    {% endfor %}
-                    </p>
+                {% include ('accueil.twig') %}
+            {% elseif countVisibleTournois == 0 %}
+                <div class="card-modern">
+                    <div class="info-alert">
+                        <div class="info-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Ce tournoi n'est plus disponible
+                        </div>
+                        <p>Il n'y a actuellement aucun tournoi en cours ou à venir.</p>
+                    </div>
                 </div>
             {% else %}
-                <div class="container-lg">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            {% set heureIsVisible = 0 %}
-                            {% set visibility = 0 %}
-                            {% set IsRankingView = 0 %}
-                            {% set gestionArbitres = 0 %}
-                            {% for tournoi in ListeDesTournois %}
-                                {% if tournoi.id == idTournoi %}
-                                    {% if tournoi.isVisible == 1 %}
-                                        {% set visibility = 1 %}
-                                    {% endif %}
-                                    {% if tournoi.IsRankingView == 1 %}
-                                        {% set IsRankingView = 1 %}
-                                    {% endif %}
-                                    {% if tournoi.gestionArbitres == 1 %}
-                                        {% set gestionArbitres = 1 %}
-                                    {% endif %}
-                                {% endif %}
-                                {% if tournoi.heureIsVisible == 1 and tournoi.id == idTournoi %}
-                                    {% set heureIsVisible = 1 %}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <div class="col-lg-3 text-left choisirClub">
-                            {% if idTournoi %}
-                                {% if visibility == 1 %}
-                                    <div class="alert alert-success mt-2">
-                                        <h4><i class="fas fa-users"></i> Choisir un club ...</h4>
-                                    </div>
-                                    <ul class="list-group no-bullet">
-                                    <li class="">
-                                        {% for club in listeDesCLubs %}
-                         
-<li>
-    <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <img class="img-thumbnail me-2" src="{{ club.logo }}" alt="Logo club" style="max-width: 50px; max-height: 50px;">
-            <strong class="me-3">{{ club.nom|upper }}</strong>
-        </div>
-
-       
-    </a>
-     {% if partenaires is not empty %}
-            {% set randIndex = random(0, partenaires|length - 1) %}
-            {% set sponsor = partenaires[randIndex] %}
-             <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                        <div class="text-muted small">
-                                                            <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                            {% if sponsor.description %}
-                                                                <br><em>{{ sponsor.description }}</em>
-                                                            {% endif %}
-                                                        </div>
-
-                                                        {% if sponsor.logo %}
-                                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-
-        {% endif %}
-</li>
-
-
-
-
-
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                        <div class="col-lg-3 choisirEquipe">
-                            {% if idTournoi %}
-                                {% if IdClub %}
-                                    {% if visibility == 1 %}
-                                        <div class="alert alert-success mt-2">
-                                            <h4><i class="fas fa-futbol"></i> Choisir mon équipe</h4>
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
-                                <ul class="list-group no-bullet">
-                                    {% for equipe in equipesAvecPoule %}
-                                    <li>
-                                        {% if equipe.idPoule != null %}
-                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}" class="list-group-item list-group-item-action">
-                                            {{ equipe.nom|upper }} - {{ equipe.Nom_categorie }}
-                                        </a>
-                                         {% if partenaires is not empty %}
-                                    {% set randIndex = random(0, partenaires|length - 1) %}
-                                    {% set sponsor = partenaires[randIndex] %}
-                                          <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                        <div class="text-muted small">
-                                                            <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                            {% if sponsor.description %}
-                                                                <br><em>{{ sponsor.description }}</em>
-                                                            {% endif %}
-                                                        </div>
-
-                                                        {% if sponsor.logo %}
-                                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                         {% endif %}
-                                        {% endif %}
-                                        
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
-                        <div class="col-lg-3">
-                            {% if visibility == 1 %}
-                                {% if IdEquipe and affichageByClubs is not defined %}
-                                    <div class="alert alert-success mt-2">
-                                        <h4><i class="fas fa-check-circle"></i> Dernière étape: Choisir la poule</h4>
-                                    </div>
-                                {% endif %}
-                                <ul class="list-group no-bullet">
-                                    {% for poule in afficherLesPoules %}
-                                        {% if IdPoules == poule.id %}
-                                        <li>
-                                            <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action active">
-                                                {{ poule.nom|upper }}
-                                            </a>
-                                        </li>
-                                        {% else %}
-                                         <li>
-                                            <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ poule.id }}&id_club={{ IdClub }}&id_equipe={{IdEquipe}}" class="list-group-item list-group-item-action">
-                                                {{ poule.nom|upper }}
-                                            </a>
-                                        </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            {% if affichageByTeam %}
-                <div class="alert alert-info mt-3 shadow-sm rounded-3 p-4 d-flex align-items-center">
-                    <i class="fa-solid fa-users me-3 fs-4 text-primary"></i>
-                    <span class="fw-bold">Toutes les rencontres de l'équipe <strong>{{ getNomEquipeCourant }}</strong></span>
-                </div>
-            {% elseif affichageByClubs %}
-                <div class="alert alert-warning mt-3 shadow-sm rounded-3 p-4 d-flex align-items-center">
-                    <i class="fa-solid fa-building me-3 fs-4 text-warning"></i>
-                    <span class="fw-bold">Toutes les rencontres du club <strong>{{ getNomClubCourant }}</strong></span>
-                </div>
-            {% elseif affichageByTerrain %}
-                <div class="alert alert-success mt-3 shadow-sm rounded-3 p-4 d-flex align-items-center">
-                    <i class="fa-solid fa-map-location-dot me-3 fs-4 text-success"></i>
-                    <span class="fw-bold">Toutes les rencontres du terrain <strong>{{ listeDesRencontresByTerrain[0]['terrain_nom'] }}</strong></span>
-                </div>
-            {% elseif IdPoules != null %}
-                <div class="alert alert-primary mt-3 shadow-sm rounded-3 p-4 d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="mb-0">
-                            <i class="fa-solid fa-futbol me-2"></i> Rencontres par poule
-                        </h3>
-                    </div>
-                    {% if IsRankingView == 1 %}
-                        <a href="#classementTableau" class="btn btn-success btn-sm fw-bold">
-                            Voir le classement <i class="fa-solid fa-ranking-star ms-1"></i>
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
-
-            {# Gestion des labels #}
-            {% set current_time = "now"|date("H:i") %}
-            {% set labels_to_display = labels|filter(label => label['creneau_horaire'] > current_time) %}
-            {% set grouped_labels = [] %}
-            {% set seen_creneaux = [] %}
-            {% for label in labels_to_display %}
-                {% if label['creneau_horaire'] not in seen_creneaux %}
-                    {% set grouped_labels = grouped_labels|merge([label]) %}
-                    {% set seen_creneaux = seen_creneaux|merge([label['creneau_horaire']]) %}
-                {% endif %}
-            {% endfor %}
-            {% if grouped_labels|length > 0 %}
-                <div class="alert alert-primary p-4 rounded shadow-sm" role="alert" id="labels">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fa-solid fa-circle-info me-2 text-info" style="font-size: 1.5rem;"></i>
-                        <h5 class="mb-0">Informations du tournoi</h5>
-                    </div>
-                    <div class="d-flex flex-column">
-                        {% for label in grouped_labels %}
-                            <div class="d-flex align-items-center">
-                                <i class="fa-solid fa-check-circle me-2 text-success" style="font-size: 1.2rem;"></i>
-                                <span>
-                                    <strong>{{ label['creneau_horaire'] }}</strong> -> {{ label['labels'] }}
-                                </span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-            {# fin Gestion des labels #}
-           
-            <div class="row mt-3">
-                <div class="col-lg-12 col-md-6 col-sm-12 col-12" id="score">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm ">
-                            <thead>
-                                <tr>
-                                    {% if affichageByTeam != null or affichageByClubs != null or affichageByTerrain != null or IdPoules != null %}
-                                        {% if heureIsVisible == 1 %}
-                                            <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-clock"></i> Heure</th>
-                                        {% endif %}
-                                        {% if nbrTerrains > 1 %}
-                                            <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-map-marker-alt"></i> Terrain</th>
-                                        {% endif %}
-                                        <th scope="col" class="col-lg-2 col-md-3 col-sm-4 text-center"><i class="fas fa-futbol"></i> Equipe1</th>
-                                        <th scope="col" class="col-lg-1 col-md-2 col-sm-4 text-center"><i class="fas fa-info-circle"></i> Informations</th>
-                                        <th scope="col" class="col-lg-2 col-md-3 col-sm-4"><i class="fas fa-futbol"></i> Equipe2</th>
-                                    {% endif %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if affichageByClubs %}
-                                    {% set rencontres = listeDesRencontreByClubs %}
-                                {% endif %}
-                                {% if affichageByTeam %}
-                                    {% set rencontres = listeDesRencontreByTeam %}
-                                {% endif %}
-                                {% if affichageByTerrain %}
-                                    {% set rencontres = listeDesRencontresByTerrain %}
-                                {% endif %}
-                                {% if IdPoules %}
-                                    {% set rencontres = RencontreByPoule %}
-                                {% endif %}
-                                {% for equipe in rencontres %}
-                                    {% if equipe.score1 != 0 or equipe.score2 !=0 %}
-                                        <tr class="table-success">
-                                    {% else %}
-                                        <tr>
-                                    {% endif %}
-                                    {% if heureIsVisible == 1 %}
-                                        {% if not equipe.creneau_nom is empty %}
-                                            <td class="align-middle text-center">
-                                                <p class="fw-bold">
-                                                    {{ equipe.creneau_nom|slice(0, -3) }}
-                                                </p>
-                                            </td>
-                                        {% else %}
-                                            <td class="align-middle text-center">
-                                                <span class="badge bg-warning text-dark">
-                                                    A planifier
-                                                </span>
-                                            </td>
-                                        {% endif %}
-                                    {% endif %}
-                                     {% if nbrTerrains > 1 %} 
-                                    {% if equipe.terrain_nom != 0 %}
-                                        <td class="align-middle text-center position-relative">
-                                            <a href="index.php?id_tournoi={{idTournoi}}&terrain={{equipe.terrain_id}}&id_club={{IdClub}}&id_equipe={{IdEquipe}}&affichageByTerrain=true">
-                                                <img src="img/football.png" class="w-100 img-fluid w-md-50 w-lg-50" alt="terrain">
-                                                <h6 class="position-absolute top-50 start-50 translate-middle">
-                                                    <span class="badge rounded-pill bg-danger">{{ equipe.terrain_nom }}</span>
-                                                </h6>
-                                            </a>
-                                        </td>
-                                    {% else %}
-                                        <td class="align-middle text-center"></td>
-                                    {% endif %}
-                                    {% endif %}
-                                    <td class="align-middle text-center">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByTeam=true">
-                                                <h4> 
-                                                    <span class="badge text-bg-dark fs-6 p-1">{{ equipe.equipe1_nom|upper }}</span>
-                                                </h4>
-                                            </a>
-                                            <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe1_id}}&id_club={{equipe.club1_id}}&affichageByClubs=true">
-                                                <img src="{{ equipe.club1_logo }}" class="w-100 img-fluid w-md-50 w-lg-50" alt="{{ equipe.equipe1_nom|upper }}">
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <div class="d-flex justify-content-center flex-column align-items-center mb-2">
-                                            {% if gestionArbitres == 1 and equipe.arbitre_nom or equipe.arbitre_club_nom %}
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-user-tie"></i><i class="material-icons me-2" style="color: black; font-size: 20px;">sports</i>
-                                                    <span>{{ equipe.arbitre_nom|capitalize  }} {{ equipe.arbitre_club_nom|upper }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="d-flex justify-content-center flex-nowrap mb-2">
-                                            
-                                            <span class="badge" style="background-color: {{ equipe.equipe2_categorie_couleur }}; color: #000;">
-                                                {{ equipe.equipe2_categorie_nom }} 
-                                            </span>
-                                        </div>
-                                        <div class="d-flex justify-content-center flex-nowrap">
-                                            {% if equipe.score1 > equipe.score2 %}
-                                                <span class="badge bg-success">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-danger">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 < equipe.score2 %}
-                                                <span class="badge bg-danger">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-success">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 is same as(equipe.score2) and (equipe.score1 is not null or equipe.score2 is not null) %}
-                                                <span class="badge bg-secondary">{{ equipe.score1 }}</span>-
-                                                <span class="badge bg-secondary">{{ equipe.score2 }}</span>
-                                            {% elseif equipe.score1 or equipe.score2 == null %}
-                                                <span class="badge bg-secondary">0</span>-
-                                                <span class="badge bg-secondary">0</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            {% if equipe.isTerminated == 0 %}
-                                                <span class="badge bg-warning text-dark">À venir</span>
-                                            {% elseif equipe.isTerminated == 1 %}
-                                                <span class="badge bg-danger">Rencontre terminée</span>
-                                            {% elseif equipe.isTerminated == 2 %}
-                                                <span class="badge bg-info text-dark d-inline-flex align-items-center">
-                                                    <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-                                                    Rencontre en cours
-                                                </span>
-                                            {% endif %}
-                                        </div>
-
-                                         {% if partenaires is not empty %}
-                                            {% set randIndex = random(0, partenaires|length - 1) %}
-                                            {% set sponsor = partenaires[randIndex] %}
-                                                    <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-light mt-1">
-                                                        <div class="text-muted small">
-                                                            <span>Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener" style="text-decoration: none; outline: none;">{{ sponsor.nom }}</a></strong></span>
-                                                            {% if sponsor.description %}
-                                                                <br><em>{{ sponsor.description }}</em>
-                                                            {% endif %}
-                                                        </div>
-
-                                                        {% if sponsor.logo %}
-                                                            <a href="{{ sponsor.lien_web }}" target="_blank" rel="noopener">
-                                                                <img src="{{ sponsor.logo }}" alt="{{ sponsor.nom }}" class="img-thumbnail ms-2" style="max-width: 80px; max-height: 60px;">
-                                                            </a>
-                                                        {% endif %}
-                                                    </div>
-                                        {% endif %}
-
-                                    </td>
-                                    <td class="align-middle text-center">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByTeam=true">
-                                                <h5>
-                                                    <span class="badge text-bg-dark fs-6 p-1">{{ equipe.equipe2_nom|upper }}</span>
-                                                </h5>
-                                            </a>
-                                            <a href="index.php?id_tournoi={{idTournoi}}&id_equipe={{equipe.equipe2_id}}&id_club={{equipe.club2_id}}&affichageByClubs=true">
-                                                <img src="{{ equipe.club2_logo }}" class="w-100 img-fluid w-md-50 w-lg-50" alt="{{ equipe.equipe2_nom|upper }}">
-                                            </a>
-                                        </div>
-                                    </td>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12 col-12">
-                    {% if IsRankingView == 1 and IdPoules != null %}
-                        <table class="table" id="classementTableau" >
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="text-center"><i class="fas fa-users"></i> Equipe</th>
-                                    <th scope="col"><i class="fas fa-medal"></i> Points</th>
-                                    <th scope="col"><i class="fas fa-futbol"></i> Buts+</th>
-                                    <th scope="col"><i class="fas fa-futbol"></i> Buts-</th>
-                                    <th scope="col"><i class="fas fa-sort-amount-down"></i> Buts diff</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% set classement = 0 %}
-                                {% for resultat in resultatRencontres %}
-                                    {% set classement = classement + 1 %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <span class="me-2">{{ classement }}</span>
-                                                <img src="{{ resultat.club_logo }}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;" alt="logo">
-                                                <span>{{ resultat.nom|upper }}</span>
-                                            </div>
-                                        </td>
-                                        <td>{{ resultat.TotalDesPoints }}</td>
-                                        <td>{{ resultat.nombreButsMarque }}</td>
-                                        <td>{{ resultat.nombreButsEncaisse }}</td>
-                                        <td>{{ resultat.DifferenceButs }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
+                {% set heureIsVisible = 0 %}
+                {% set visibility = 0 %}
+                {% set IsRankingView = 0 %}
+                {% set gestionArbitres = 0 %}
                 
-            </div >
-            {% include "footer.twig" %}
-        {% endif %}
-        
-        
+                {% if infoTournoiEnCours.isVisible == 1 %}
+                    {% set visibility = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.IsRankingView == 1 and getCategorieCourante['afficherClassement'] == 1 %}
+                    {% set IsRankingView = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.gestionArbitres == 1 %}
+                    {% set gestionArbitres = 1 %}
+                {% endif %}
+                {% if infoTournoiEnCours.heureIsVisible == 1 %}
+                    {% set heureIsVisible = 1 %}
+                {% endif %}
+
+
+
+                
+
+                <!-- Header Logo -->
+                {% if IdClub is not null or idIdPoules is not null or IdEquipe is not null %}
+                   <div class="card-modern organisateur-info">
+                 <div style="margin-top: 12px; text-align: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.25);">
+        <small style="color: rgba(255,255,255,0.85); font-size: 0.85em; display: inline-flex; align-items: center; gap: 6px;">
+            Conçu par
+            <img src="logos/Logo.png" 
+                alt="Brackito" 
+                style="height: 18px; vertical-align: middle; background: white; border-radius: 4px; padding: 2px 4px;">
+        </small>
     </div>
+    <div class="organisateur-content">
+         <!-- Badge Brackito -->
     
 
+
+        <a href="index.php?id_tournoi={{ infoTournoiEnCours.id }}" 
+        style="text-decoration: none; color: inherit; display: block;">
+            <span class="organisateur-label">
+                <i class="fas fa-trophy"></i>
+                Tournoi organisé par
+            </span>
+            <div class="organisateur-club">
+                {% if infoTournoiEnCours.logo_club %}
+                    <img src="{{ infoTournoiEnCours.logo_club }}" 
+                        alt="{{ infoTournoiEnCours.nom_club }}" 
+                        loading="lazy" 
+                        class="organisateur-logo">
+                {% endif %}
+                <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+            </div>
+        </a>
+    </div>
+    
    
+</div>
+                {% endif %}
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+                <!-- Club Selection -->
+                {% if idTournoi and visibility == 1 and (not IdClub and not affichageByTerrain) %}
+
+                    {% if infoTournoiEnCours.nom_club %}
+                        <div class="card-modern organisateur-info">
+                            <div style="margin-top: 12px; text-align: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.25);">
+                            <small style="color: rgba(255,255,255,0.85); font-size: 0.85em; display: inline-flex; align-items: center; gap: 6px;">
+                                Conçu par
+                                <img src="logos/Logo.png" 
+                                    alt="Brackito" 
+                                    style="height: 18px; vertical-align: middle; background: white; border-radius: 4px; padding: 2px 4px;">
+                            </small>
+                        </div>
+
+
+
+                            <div class="organisateur-content">
+                                <span class="organisateur-label">
+                                    <i class="fas fa-trophy"></i>
+                                    Tournoi organisé par
+                                </span>
+                                <div class="organisateur-club">
+                                    {% if infoTournoiEnCours.logo_club %}
+                                        <img src="{{ infoTournoiEnCours.logo_club }}" 
+                                             alt="{{ infoTournoiEnCours.nom_club }}" 
+                                             loading="lazy" 
+                                             class="organisateur-logo">
+                                    {% endif %}
+                                    <span class="organisateur-nom">{{ infoTournoiEnCours.nom_club|upper }}</span>
+                                </div>
+                            </div>
+                          
+                        </div>
+                    {% endif %}
+
+                    <div class="card-modern choisirClub">
+               
+                        {% if gymnaseInfo and infoTournoiEnCours.gestionInformations == 1 %}
+                        <div class="modern-card mt-4">
+                            <div class="card-header-modern" style="background: linear-gradient(135deg, #0f766e, #0d9488);">
+                                <i class="fas fa-building"></i>
+                                🏟️ {{ gymnaseInfo.nom }}
+                            </div>
+                            <div class="card-body-modern">
+                                <div class="d-flex flex-column gap-3 mb-5" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 16px;">
+
+                                    {% if gymnaseInfo.adresse or gymnaseInfo.ville or gymnaseInfo.code_postal %}
+    {% set adresseComplete = gymnaseInfo.nom ~ ', ' ~ gymnaseInfo.adresse ~ ', ' ~ gymnaseInfo.ville ~ ' ' ~ gymnaseInfo.code_postal %}
+    <a href="https://maps.google.com/?q={{ adresseComplete|url_encode }}"
+       target="_blank"
+       class="text-decoration-none d-flex align-items-center gap-3"
+       style="padding:10px;border-radius:10px;background:rgba(13,148,136,0.06);transition:background 0.2s;">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#0d9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-map-marker-alt" style="color:white;font-size:1.1rem;"></i>
+        </div>
+        <div style="flex-grow:1;">
+            <div style="font-size:1rem;color:#0d9488;font-weight:600;">
+                {% if gymnaseInfo.adresse %}{{ gymnaseInfo.adresse }},{% endif %}
+                {% if gymnaseInfo.ville %}{{ gymnaseInfo.ville }}{% endif %}
+                {% if gymnaseInfo.code_postal %}{{ gymnaseInfo.code_postal }}{% endif %}
+            </div>
+            <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">
+                <i class="fas fa-location-arrow" style="font-size:0.7rem;"></i>
+                {{ t('ouvrirDansMaps') }}
+            </div>
+        </div>
+        <i class="fas fa-chevron-right" style="color:#0d9488;font-size:0.9rem;flex-shrink:0;"></i>
+    </a>
+{% endif %}
+
+                                    {% if gymnaseInfo.adresse and gymnaseInfo.telephone %}
+                                        <hr style="margin: 0; border-color: #e5e7eb;">
+                                    {% endif %}
+
+                                  {% if infoTournoiEnCours.telephone %}
+    <div class="d-flex align-items-center gap-3"
+         style="padding:10px;border-radius:10px;background:rgba(79,70,229,0.06);">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#4338ca);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-phone" style="color:white;font-size:1rem;"></i>
+        </div>
+        <div style="flex-grow:1;">
+            <div style="font-size:1rem;color:#4f46e5;font-weight:600;">
+                {{ infoTournoiEnCours.telephone }}
+            </div>
+            <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">
+                {{ t('contacterPar') }}
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-shrink-0">
+            <a href="tel:{{ infoTournoiEnCours.telephone }}"
+               class="text-decoration-none d-flex align-items-center justify-content-center"
+               style="width:38px;height:38px;border-radius:50%;background:#4f46e5;"
+               title="{{ t('appeler') }}">
+                <i class="fas fa-phone" style="color:white;font-size:0.9rem;"></i>
+            </a>
+            <a href="sms:{{ infoTournoiEnCours.telephone }}"
+               class="text-decoration-none d-flex align-items-center justify-content-center"
+               style="width:38px;height:38px;border-radius:50%;background:#4f46e5;"
+               title="{{ t('envoyerSms') }}">
+                <i class="fas fa-comment-dots" style="color:white;font-size:0.9rem;"></i>
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+                                    {% if infoTournoiEnCours.commentaire %}
+                                        <hr style="margin: 0; border-color: #e5e7eb;">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                <i class="fas fa-comment-alt" style="color:white;font-size:1rem;"></i>
+                                            </div>
+                                            <div style="font-size:1rem;color:#1f2937;">
+                                                {{ infoTournoiEnCours.commentaire }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if listeDesCLubs|length == 1 %}
+                            <script>
+                                const urlParams = new URLSearchParams(window.location.search);
+                                if (!urlParams.get('id_club')) {
+                                    window.location.href = "index.php?id_tournoi={{ idTournoi }}&id_club={{ listeDesCLubs[0].id }}";
+                                }
+                            </script>
+                        {% else %}
+                            {% for club in listeDesCLubs %}
+                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ club.id }}" class="selection-item">
+                                    <img src="{{ club.logo }}" alt="{{ club.nom }}" loading="lazy" class="selection-logo">
+                                    <div class="selection-text">{{ club.nom|upper }}</div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+
+                                {% if partenaires is not empty %}
+                                    {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                                    <div class="sponsor-box">
+                                        <div>
+                                            Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
+                                        </div>
+                                        {% if sponsor.logo %}
+                                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <!-- Team Selection -->
+                {% if idTournoi and IdClub and visibility == 1 %}
+                    <div class="card-modern choisirEquipe">
+                        <div class="card-header-modern">
+                            <i class="fas fa-users"></i>
+                            Choisir une équipe
+                        </div>
+                    
+                        {% for equipe in equipesAvecPoule %}
+                            {% if equipe.idPoule != null %}
+                                <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ IdClub }}&id_equipe={{ equipe.id }}&idPoule={{ equipe.idPoule }}&idCategorie={{ equipe.idCategorie }}&affichageByPoule=true" class="selection-item">
+                                    <i class="fas fa-users" style="color: {{ equipe.couleurCategorie }}; font-size: 1.5rem;"></i>
+                                    <div class="selection-text">{{ equipe.nom|upper }} - {{ equipe.Nom_categorie }} 
+                                        {% if equipe.nomCoach %}
+                                            <div class="coach-tag">
+                                                <i class="fas fa-clipboard-user"></i>
+                                                <span>Coach : {{ equipe.nomCoach }}</span>
+                                            </div>
+                                        {% else %}
+                                            <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px;
+                                                        background:var(--color-background-info); border:0.5px solid var(--color-border-info);
+                                                        border-radius:12px; max-width:420px;">
+                                                <i class="fas fa-clipboard-user" style="font-size:18px; color:var(--color-text-info); margin-top:2px;"></i>
+                                                <div>
+                                                    <strong style="display:block; font-size:13px; color:var(--color-text-info); margin-bottom:3px;">
+                                                        Vous coachez cette équipe ?
+                                                    </strong>
+                                                    <span style="font-size:12px; color:var(--color-text-info); opacity:0.8;">
+                                                        Rendez-vous à la table centrale pour vous enregistrer.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+
+                                {% if partenaires is not empty %}
+                                    {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                                    <div class="sponsor-box">
+                                        <div>
+                                            Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
+                                        </div>
+                                        {% if sponsor.logo %}
+                                            <img src="{{ sponsor.logo }}" loading="lazy" class="sponsor-logo" alt="{{ sponsor.nom }}">
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if idCategorie %}
+                    <div class="card-modern">
+                        Planning de la catégorie {{ nomCategorie|upper }}
+                    </div>
+                {% endif %}
+
+                <!-- Ranking -->
+                {% if IsRankingView == 1 and IdPoules != null %}
+                    <div class="card-modern ranking-card" id="classementTableau">
+                        <div class="ranking-header">
+                            <i class="fas fa-trophy"></i>
+                            Classement phase de poule {{pouleInfo.nom|upper}} 
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 w-100 rounded">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th style="width: ;">#</th>
+                                        <th>Équipe</th>
+                                        <th class="text-center" style="width: 70px;">Pts</th>
+                                        <th class="text-center" style="width: 50px;">+</th>
+                                        <th class="text-center" style="width: 50px;">-</th>
+                                        <th class="text-center" style="width: 60px;">Diff</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set classement = 0 %}
+                                    {% for resultat in resultatRencontres %}
+                                        {% set classement = classement + 1 %}
+                                        <tr>
+                                            <td class="fw-bold fs-5">{{ classement }}.</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ resultat.club_logo }}" 
+                                                         class="rounded-circle" 
+                                                         style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;" 
+                                                         alt="logo"
+                                                         loading="lazy">
+                                                    <span class="fw-semibold">{{ resultat.nom|upper }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge rounded-pill" 
+                                                      style="background-color: var(--warning-color); font-size: 0.9rem; padding: 6px 12px;">
+                                                    {{ resultat.TotalDesPoints }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center fw-semibold">{{ resultat.nombreButsMarque }}</td>
+                                            <td class="text-center fw-semibold">{{ resultat.nombreButsEncaisse }}</td>
+                                            <td class="text-center fw-semibold">{{ resultat.DifferenceButs }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Terrain Matches -->
+                {% if affichageByTerrain %}
+                    <div class="card-modern">
+                        <div class="card-header-modern">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Rencontres du terrain: {{ listeDesRencontresByTerrain[0]["terrain_nom"] }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Notifications -->
+                      
+                          {% if IdEquipe is not null %}
+                            {% if creneauEnCours is defined and creneauEnCours is not null %}
+                         <div class="creneau-badge" id="creneauBadge">
+                            <i class="fas fa-clock"></i>
+
+                            <div class="creneau-text">
+                                <span>Créneau en cours : {{ creneauEnCours.nom|slice(0, -3) }}</span>
+
+                                {% if creneauSuivant is defined and creneauSuivant is not null %}
+                                    <span>Créneau suivant : {{ creneauSuivant.nom|slice(0, -3) }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                                        
+                            {% endif %}
+
+
+                            <div class="bell-wrapper" id="bellWrapper">
+                            <a href="messages.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}"
+                            class="bell-button {% if nbMessagesNonLus > 0 %}has-unread{% endif %}">
+                                <i class="fas fa-bell"></i>
+                                {% if nbMessagesNonLus > 0 %}
+                                    <span class="bell-badge">
+                                        {{ nbMessagesNonLus > 9 ? '9+' : nbMessagesNonLus }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </div>
+{% endif %}
+                        {% if planTournoi is defined and planTournoi is not null %}
+                            <div style="text-align: center; margin-top: 16px; padding: 12px; background: var(--bg-light); border-radius: 10px;">
+                                <div style="font-size: 0.9rem; font-weight: 600; color: var(--bg-dark); margin-bottom: 8px;">
+                                    <i class="fas fa-map"></i> Plan des terrains
+                                </div>
+                                <img src="{{ planTournoi }}?v={{ random() }}" 
+                                     alt="Plan des terrains" 
+                                     loading="lazy"
+                                     style="max-width: 120px; border-radius: 10px; cursor: pointer; box-shadow: var(--shadow-sm);"
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#planModal">
+                                <div style="font-size: 0.75rem; color: #6b7280; margin-top: 6px;">
+                                    <i class="fas fa-search-plus"></i> Cliquer pour agrandir
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if planTournoi is defined and planTournoi is not null %}
+                        <div class="modal fade" id="planModal" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Plan des terrains</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="{{ planTournoi }}?v={{ random() }}" alt="Plan" loading="lazy" class="img-fluid">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if equipeAsRencontreAmicale %}
+                    <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+                        <i class="fas fa-star me-3 fs-4"></i>
+                        <div>
+                            <strong>Rencontres amicales</strong><br>
+                            Votre équipe participe à des rencontres amicales.
+                            <div class="mt-2">
+                                <a class="btn btn-sm btn-primary"
+                                href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}&id_club={{ IdClub }}&affichageByTeam=true">
+                                    Voir les rencontres de mon équipe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                    
+                {% if RencontreByPoule[0].equipe2_has_phase_finale == 1 or RencontreByPoule[0].equipe1_has_phase_finale == 1 %}
+                    <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+                        <i class="fas fa-trophy me-3 fs-4"></i>
+                        <div>
+                            <strong>Phase finale </strong><br>
+                            Votre catégorie comporte une phase finale à élimination direct.
+                            <div class="mt-2">
+                                <a class="btn btn-sm btn-primary"
+                                href="suiviArbreTournoiPublic.php?categorie_id={{ RencontreByPoule[0].equipe2_categorie_id }}&id_tournoi={{ idTournoi }}&affichageByTeam=true">
+                                    Voir le tableau final
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Titre de la vue courante -->
+                {% if affichageByClubs %}
+                <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                        
+                            <i class="fas fa-building" style="color: var(--warning-color);"></i>
+                            Toutes les rencontres du club <span style="color: var(--primary-color);">{{ getNomClubCourant }}</span>
+                        {% elseif affichageByTeam %}
+                        <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                        
+                            <i class="fas fa-users" style="color: var(--primary-color);"></i>
+                            Toutes les rencontres de l'équipe <span style="color: var(--primary-color);">{{ getNomEquipeCourant }}</span>
+                        {% elseif affichageByPoule %}
+                        <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                        
+                            <i class="fas fa-layer-group" style="color: var(--success-color);"></i>
+                            Toutes les rencontres de la poule <span style="color: var(--success-color);">{{ pouleInfo.nom|upper }}</span>
+                        {% elseif affichageByCategorie %}
+                        <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                        
+                            <i class="fas fa-tag" style="color: var(--info-color);"></i>
+                            Toutes les rencontres de la catégorie <span style="color: var(--info-color);">{{ getCategorieCourante['Nom_categorie']|upper }}</span>
+                        {% elseif affichageByTerrain %}
+                        <div class="card-modern" style="padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 700; color: var(--bg-dark);">
+                        
+                            <i class="fas fa-map-marker-alt" style="color: var(--danger-color);"></i>
+                            Toutes les rencontres du terrain <span style="color: var(--danger-color);">{{ listeDesRencontresByTerrain[0]["terrain_nom"] }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="score">
+
+                    <!-- Matches List -->
+                    {% if affichageByClubs %}
+                        {% set rencontres = listeDesRencontreByClubs %}
+                    {% elseif affichageByTeam %}
+                        {% set rencontres = listeDesRencontreByTeam %}
+                    {% elseif affichageByTerrain %}
+                        {% set rencontres = listeDesRencontresByTerrain %}
+                    {% elseif RencontreByCategorie %}
+                        {% set rencontres = RencontreByCategorie %}
+                    {% elseif IdPoules %}
+                        {% set rencontres = RencontreByPoule %}
+                    {% endif %}
+
+                    {# ============================================================
+                       TABLEAU DES RENCONTRES TERMINÉES
+                    ============================================================ #}
+                    {% set hasTerminees = false %}
+                    {% if rencontres is iterable %}
+                        {% for equipe in rencontres %}
+                            {% if equipe.isTerminated == 1 %}{% set hasTerminees = true %}{% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if hasTerminees %}
+                    <div class="table-terminées">
+                        <div class="table-terminées-header">
+                            <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                            Rencontres terminées
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.82rem;">
+                                <thead class="table-light">
+                                    <tr>
+                                        {% if heureIsVisible == 1 %}<th style="width: 50px;">Heure</th>{% endif %}
+                                        <th>Équipe 1</th>
+                                        <th class="text-center" style="width: 80px;">Score</th>
+                                        <th>Équipe 2</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for equipe in rencontres %}
+                                    {% if equipe.isTerminated == 1 %}
+                                    <tr>
+                                        {% if heureIsVisible == 1 %}
+                                        <td class="text-muted" style="white-space: nowrap;">{{ equipe.creneau_nom|slice(0,5) }}</td>
+
+                                       
+                                        
+                                        {% endif %}
+
+                                        {# Équipe 1 #}
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <img src="{{ equipe.club1_logo }}" width="22" height="22"
+                                                     style="border-radius: 50%; object-fit: cover; flex-shrink: 0;" loading="lazy">
+                                                <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true"
+                                                   style="color: inherit; text-decoration: none; font-weight: {% if equipe.score1 > equipe.score2 %}700{% else %}400{% endif %};">
+                                                    {{ equipe.equipe1_nom|upper }}
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                        {# Score #}
+                                        <td class="text-center" style="white-space: nowrap; font-weight: 700;">
+                                            {% if equipe.score1 > equipe.score2 %}
+                                                <span style="color: var(--success-color);">{{ equipe.score1 }}</span>
+                                                <span style="color: #9ca3af;">-</span>
+                                                <span style="color: var(--danger-color);">{{ equipe.score2 }}</span>
+                                            {% elseif equipe.score1 < equipe.score2 %}
+                                                <span style="color: var(--danger-color);">{{ equipe.score1 }}</span>
+                                                <span style="color: #9ca3af;">-</span>
+                                                <span style="color: var(--success-color);">{{ equipe.score2 }}</span>
+                                            {% else %}
+                                                <span style="color: #6b7280;">{{ equipe.score1 }} - {{ equipe.score2 }}</span>
+                                            {% endif %}
+                                        </td>
+
+                                        {# Équipe 2 #}
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <img src="{{ equipe.club2_logo }}" width="22" height="22"
+                                                     style="border-radius: 50%; object-fit: cover; flex-shrink: 0;" loading="lazy">
+                                                <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true"
+                                                   style="color: inherit; text-decoration: none; font-weight: {% if equipe.score2 > equipe.score1 %}700{% else %}400{% endif %};">
+                                                    {{ equipe.equipe2_nom|upper }}
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                        {# Terrain #}
+                                       
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# ============================================================
+                       CARTES : rencontres NON terminées (à venir / en cours)
+                    ============================================================ #}
+                
+                    {% if rencontres is iterable %}
+                    {% for equipe in rencontres %}
+                        {% if equipe.isTerminated != 1 %}
+                        <div class="match-card">
+                            <div class="match-header">
+                           
+                                <!-- Team 1 -->
+                                <div class="team-side">
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                        <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
+                                        <span class="team-logo-badge">›</span>
+                                    </a>
+                                    {% if affichageByClubs %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% elseif affichageByTerrain %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% elseif affichageByPoule %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% else %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if equipe.equipe1_coach_nom %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                            <span>{{ equipe.equipe1_coach_nom|upper }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Center -->
+                                <div class="match-center">
+                                    {% if heureIsVisible == 1 and equipe.creneau_nom %}
+                                        <div class="match-time">
+                                            <i class="fas fa-clock"></i>
+                                            {{ equipe.creneau_nom|slice(0, -3) }}
+                                        </div>
+                                        {% if infoTournoiEnCours['gestionTempsChangement'] == 1 and infoTournoiEnCours['afficherCountdownCoach'] == 1 %}
+
+                                            {% if equipe.isTerminated == 2 %}
+                                            <div class="match-countdown" 
+                                                data-heure-debut="{{ equipe.creneau_nom|slice(0, -3) }}"
+                                                data-duree="{{ infoTournoiEnCours['pasHoraire'] }}">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                <span class="countdown-label">Temps restant&nbsp;: </span>
+                                                <span class="countdown-timer">--:--</span>
+                                            </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+
+                                    <div class="match-score">
+                                        {% if equipe.score1 > equipe.score2 %}
+                                            <span class="score-badge score-win">{{ equipe.score1 }}</span>
+                                            <span>-</span>
+                                            <span class="score-badge score-lose">{{ equipe.score2 }}</span>
+                                        {% elseif equipe.score1 < equipe.score2 %}
+                                            <span class="score-badge score-lose">{{ equipe.score1 }}</span>
+                                            <span>-</span>
+                                            <span class="score-badge score-win">{{ equipe.score2 }}</span>
+                                        {% else %}
+                                            <span class="score-badge score-draw">{{ equipe.score1 ?? 0 }}</span>
+                                            <span>-</span>
+                                            <span class="score-badge score-draw">{{ equipe.score2 ?? 0 }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true" 
+                                       class="terrain-link">
+                                        <span class="terrain-icon">
+                                            <div class="terrain-wrapper">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40" width="48" height="30" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <rect x="1" y="1" width="62" height="38" rx="2" fill="#4CAF50" stroke="white"/>
+                                                    <line x1="32" y1="1" x2="32" y2="39" stroke="white"/>
+                                                    <circle cx="32" cy="20" r="7" stroke="white"/>
+                                                    <circle cx="32" cy="20" r="0.8" fill="white"/>
+                                                    <rect x="1" y="10" width="12" height="20" stroke="white"/>
+                                                    <rect x="1" y="15" width="5" height="10" stroke="white"/>
+                                                    <rect x="51" y="10" width="12" height="20" stroke="white"/>
+                                                    <rect x="58" y="15" width="5" height="10" stroke="white"/>
+                                                    <path d="M13,16 A7,7 0 0,1 13,24" stroke="white" fill="none"/>
+                                                    <path d="M51,16 A7,7 0 0,0 51,24" stroke="white" fill="none"/>
+                                                    <circle cx="10" cy="20" r="0.8" fill="white"/>
+                                                    <circle cx="54" cy="20" r="0.8" fill="white"/>
+                                                    <path d="M1,4 A3,3 0 0,0 4,1" stroke="white" fill="none"/>
+                                                    <path d="M60,1 A3,3 0 0,0 63,4" stroke="white" fill="none"/>
+                                                    <path d="M1,36 A3,3 0 0,1 4,39" stroke="white" fill="none"/>
+                                                    <path d="M60,39 A3,3 0 0,1 63,36" stroke="white" fill="none"/>
+                                                </svg>
+                                                <span class="terrain-nom">{{ equipe.terrain_nom }}</span>
+                                            </div>
+                                        </span>
+                                    </a>
+                                </div>
+
+                                <!-- Team 2 -->
+                                <div class="team-side">
+                                    <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                        <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
+                                        <span class="team-logo-badge">›</span>
+                                    </a>
+                                    {% if affichageByClubs %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% elseif affichageByTerrain %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% elseif affichageByPoule %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% else %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&idPoule={{ equipe.equipe2_poules_ids|split(',')|first }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if equipe.equipe2_coach_nom %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                            <span>{{ equipe.equipe2_coach_nom|upper }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="coach-info">
+                                            <i class="fas fa-clipboard-user"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="match-details">
+                                <div class="detail-row">
+                                
+                                    {% if equipe.type_rencontre_id == 4 or equipe.source_type == 'amical' %}
+                                        <span class="match-category" style="background-color: #ffc107; color: #212529;">
+                                            <i class="fa fa-star"></i>Rencontre amicale
+                                        </span>
+                                    {% else %}
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_club={{ equipe.club1_id }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByCategorie=true" style="position: relative; display: inline-block;"> 
+                                            <span class="match-category team-name" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
+                                                {{ equipe.equipe2_categorie_nom }}
+                                            </span>
+                                            <span class="clickable-badge"></span>
+                                        </a>
+
+                                        {% if equipe.equipe1_poules_ids %}
+                                            <a href="index.php?id_tournoi={{ idTournoi }}&idPoule={{ equipe.equipe1_poules_ids|split(',')|first }}&id_club={{IdClub}}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByPoule=true" style="position: relative; display: inline-block;">
+                                                <span class="match-category team-name" style="background-color: {{ equipe.equipe2_categorie_couleur }};">
+                                                    {{ equipe.equipe1_poules|split(' - ')[1]|split(',')[0] }}
+                                                </span>
+                                                <span class="clickable-badge"></span>
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {% if equipe.isTerminated == 0 %}
+                                        <span class="match-status status-pending">
+                                            <i class="fas fa-clock"></i> À venir
+                                        </span>
+                                    {% elseif equipe.isTerminated == 2 %}
+                                        <span class="match-status status-ongoing">
+                                            <span class="spinner-grow spinner-grow-sm"></span> En cours
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                {% if gestionArbitres == 1 and (equipe.arbitre_nom or equipe.arbitre_club_nom) %}
+                                    <div class="detail-row">
+                                        <i class="fas fa-user-tie" style="color: var(--bg-dark);"></i>
+                                        <span>{{ equipe.arbitre_nom|capitalize }} ({{ equipe.arbitre_club_nom|upper }})</span>
+                                    </div>
+                                {% endif %}
+
+                                {% if partenaires is not empty %}
+                                    {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                                    <div class="sponsor-box" style="margin: 0; padding: 10px;">
+                                        <div>
+                                            Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
+                                        </div>
+                                        {% if sponsor.logo %}
+                                            <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}" loading="lazy">
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                </div>{# fin #score #}
+              {# ============================================================
+   LABELS DE LA CATÉGORIE (placements/classification)
+============================================================ #}
+{% set labelsValides = [] %}
+{% if rencontres is iterable and rencontres|length > 0 and rencontres[0].categorie_labels is defined and rencontres[0].categorie_labels %}
+    {% for labelRaw in rencontres[0].categorie_labels|split('||') %}
+        {% set labelParts = labelRaw|split('|') %}
+        {% if labelParts|length == 5 %}
+            {% set labelsValides = labelsValides|merge([labelParts]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if labelsValides|length > 0 %}
+    <div class="card-modern" style="padding: 16px;">
+        <div class="card-header-modern" style="background: linear-gradient(135deg, var(--info-color), #0891b2);">
+            <i class="fas fa-tags"></i>
+            Classement / Placements
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            {% for labelParts in labelsValides %}
+                <span style="background-color: {{ labelParts[2] }}1A; color: {{ labelParts[2] }}; border: 1px solid {{ labelParts[2] }}; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                    {{ labelParts[1] }}
+                    {% if labelParts[3] %}
+                        <span style="opacity: 0.8; font-weight: 400;">
+                            <i class="fas fa-clock" style="font-size: 0.75em;"></i> {{ labelParts[3]|slice(0, -3) }}
+                        </span>
+                    {% endif %}
+                    {% if labelParts[4] %}
+                        <span style="opacity: 0.8; font-weight: 400;">
+                            <i class="fas fa-map-marker-alt" style="font-size: 0.75em;"></i> {{ labelParts[4] }}
+                        </span>
+                    {% endif %}
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+
+
+
+
+                <!-- phases finales -->
+                {% if RencontreByCategoriePhaseFinale is not empty %}
+                <div class="card-modern" id="phase-finale">
+                    <div class="card-header-modern" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
+                        <i class="fas fa-trophy"></i>
+                        Phase finale {{ getCategorieCourante['Nom_categorie']|upper }}
+                        {% if IsRankingView %}
+                            <a href="#classementTableauFinal" class="ms-auto team-name" style="color: white; font-size: 0.8rem; font-weight: 600; text-decoration: none; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">
+                                <i class="fas fa-ranking-star me-1"></i> Classement final
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% set rencontresByHoraire = {} %}
+                    {% for rencontre in RencontreByCategoriePhaseFinale %}
+                        {% set horaire = rencontre.creneau_nom %}
+                        {% if rencontresByHoraire[horaire] is not defined %}
+                            {% set rencontresByHoraire = rencontresByHoraire|merge({(horaire): []}) %}
+                        {% endif %}
+                        {% set rencontresByHoraire = rencontresByHoraire|merge({
+                            (horaire): rencontresByHoraire[horaire]|merge([rencontre])
+                        }) %}
+                    {% endfor %}
+
+                    {% for horaire, rencontresSlot in rencontresByHoraire %}
+
+                        <div class="d-flex align-items-center gap-2 mb-3 px-2 pt-2">
+                            <div class="phase-finale-time-badge">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ horaire|slice(0, 5) }}
+                            </div>
+                            <hr class="flex-grow-1 m-0" style="border-color: #e5e7eb;">
+                        </div>
+
+                        {% for equipe in rencontresSlot %}
+                            <div class="match-card {% if equipe.score1 != 0 or equipe.score2 != 0 %}finished{% endif %}" style="border-left: 4px solid var(--danger-color);">
+                                <div class="match-header">
+
+                                    <div class="team-side">
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&id_club={{ equipe.club1_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                            <img src="{{ equipe.club1_logo }}" class="team-logo" alt="{{ equipe.equipe1_nom }}" loading="lazy" width="60" height="60">
+                                            <span class="team-logo-badge">›</span>
+                                        </a>
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe1_id }}&id_club={{ equipe.club1_id }}&idCategorie={{ equipe.equipe1_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe1_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                        {% if IsRankingView %}
+                                            <div class="phase-finale-poule">
+                                                <i class="fas fa-sitemap"></i> {{ equipe.equipe1_poules|split(' - ')|last|split(', ')|last }}
+                                            </div>
+                                        {% endif %}
+                                        {% if equipe.equipe1_coach_nom %}
+                                            <div class="coach-info">
+                                                <i class="fas fa-clipboard-user"></i>
+                                                <span>{{ equipe.equipe1_coach_nom|upper }}</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="coach-info">
+                                                <i class="fas fa-clipboard-user"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="match-center">
+                                        {% if heureIsVisible == 1 and equipe.creneau_nom %}
+                                            <div class="match-time">
+                                                <i class="fas fa-clock"></i>
+                                                {{ equipe.creneau_nom|slice(0, -3) }}
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="match-score">
+                                            {% if equipe.score1 > equipe.score2 %}
+                                                <span class="score-badge score-win">{{ equipe.score1 }}</span>
+                                                <span>-</span>
+                                                <span class="score-badge score-lose">{{ equipe.score2 }}</span>
+                                            {% elseif equipe.score1 < equipe.score2 %}
+                                                <span class="score-badge score-lose">{{ equipe.score1 }}</span>
+                                                <span>-</span>
+                                                <span class="score-badge score-win">{{ equipe.score2 }}</span>
+                                            {% else %}
+                                                <span class="score-badge score-draw">{{ equipe.score1 ?? 0 }}</span>
+                                                <span>-</span>
+                                                <span class="score-badge score-draw">{{ equipe.score2 ?? 0 }}</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&terrain={{ equipe.terrain_id }}&affichageByTerrain=true"
+                                           class="terrain-link">
+                                            <div class="terrain-wrapper">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40" width="48" height="30" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <rect x="1" y="1" width="62" height="38" rx="2" fill="#4CAF50" stroke="white"/>
+                                                    <line x1="32" y1="1" x2="32" y2="39" stroke="white"/>
+                                                    <circle cx="32" cy="20" r="7" stroke="white"/>
+                                                    <circle cx="32" cy="20" r="0.8" fill="white"/>
+                                                    <rect x="1" y="10" width="12" height="20" stroke="white"/>
+                                                    <rect x="1" y="15" width="5" height="10" stroke="white"/>
+                                                    <rect x="51" y="10" width="12" height="20" stroke="white"/>
+                                                    <rect x="58" y="15" width="5" height="10" stroke="white"/>
+                                                    <path d="M13,16 A7,7 0 0,1 13,24" stroke="white" fill="none"/>
+                                                    <path d="M51,16 A7,7 0 0,0 51,24" stroke="white" fill="none"/>
+                                                    <circle cx="10" cy="20" r="0.8" fill="white"/>
+                                                    <circle cx="54" cy="20" r="0.8" fill="white"/>
+                                                    <path d="M1,4 A3,3 0 0,0 4,1" stroke="white" fill="none"/>
+                                                    <path d="M60,1 A3,3 0 0,0 63,4" stroke="white" fill="none"/>
+                                                    <path d="M1,36 A3,3 0 0,1 4,39" stroke="white" fill="none"/>
+                                                    <path d="M60,39 A3,3 0 0,1 63,36" stroke="white" fill="none"/>
+                                                </svg>
+                                                <span class="terrain-nom">{{ equipe.terrain_nom }}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div class="team-side">
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&id_club={{ equipe.club2_id }}&affichageByClubs=true" class="team-logo-wrap">
+                                            <img src="{{ equipe.club2_logo }}" class="team-logo" alt="{{ equipe.equipe2_nom }}" loading="lazy" width="60" height="60">
+                                            <span class="team-logo-badge">›</span>
+                                        </a>
+                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ equipe.equipe2_id }}&id_club={{ equipe.club2_id }}&idCategorie={{ equipe.equipe2_categorie_id }}&affichageByTeam=true" class="team-name">
+                                            {{ equipe.equipe2_nom|upper }} <span class="team-arrow">›</span>
+                                        </a>
+                                        {% if IsRankingView %}
+                                            <div class="phase-finale-poule">
+                                                <i class="fas fa-sitemap"></i> {{ equipe.equipe2_poules|split(' - ')|last|split(', ')|last }}
+                                            </div>
+                                        {% endif %}
+                                        {% if equipe.equipe2_coach_nom %}
+                                            <div class="coach-info">
+                                                <i class="fas fa-clipboard-user"></i>
+                                                <span>{{ equipe.equipe2_coach_nom|upper }}</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="coach-info">
+                                                <i class="fas fa-clipboard-user"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+
+                                <div class="match-details">
+                                    <div class="detail-row">
+                                        {% if equipe.isTerminated == 0 %}
+                                            <span class="match-status status-pending">
+                                                <i class="fas fa-clock"></i> À venir
+                                            </span>
+                                        {% elseif equipe.isTerminated == 1 %}
+                                            <span class="match-status status-finished">
+                                                <i class="fas fa-check-circle"></i> Terminée
+                                            </span>
+                                        {% elseif equipe.isTerminated == 2 %}
+                                            <span class="match-status status-ongoing">
+                                                <span class="spinner-grow spinner-grow-sm"></span> En cours
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if gestionArbitres == 1 and (equipe.arbitre_nom or equipe.arbitre_club_nom) %}
+                                        <div class="detail-row">
+                                            <i class="fas fa-user-tie" style="color: var(--bg-dark);"></i>
+                                            <span>{{ equipe.arbitre_nom|capitalize }} ({{ equipe.arbitre_club_nom|upper }})</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if partenaires is not empty %}
+                                        {% set sponsor = partenaires[random(0, partenaires|length - 1)] %}
+                                        <div class="sponsor-box" style="margin: 0; padding: 10px;">
+                                            <div>
+                                                Sponsorisé par <strong><a href="{{ sponsor.lien_web }}" target="_blank">{{ sponsor.nom }}</a></strong>
+                                            </div>
+                                            {% if sponsor.logo %}
+                                                <img src="{{ sponsor.logo }}" class="sponsor-logo" alt="{{ sponsor.nom }}" loading="lazy">
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+                <!-- fin phase finale -->
+
+                {% if IsRankingView %}
+                    {% if RencontreByCategoriePhaseFinale is not empty %}
+                        {% set pouleEnCours = null %}
+                        {% set classement = 0 %}
+                        {% set rang = 0 %}
+
+                        <div class="table-responsive" id="classementTableauFinal">
+                            <table class="table table-hover align-middle mb-0 w-100 rounded">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th>#</th>
+                                        <th>#</th>
+                                        <th>Équipe</th>
+                                        <th class="text-center" style="width: 70px;">Pts</th>
+                                        <th class="text-center" style="width: 50px;">+</th>
+                                        <th class="text-center" style="width: 50px;">-</th>
+                                        <th class="text-center" style="width: 60px;">Diff</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set rang = 0 %}
+                                    {% set rangPoule = 0 %}
+                                    {% set pouleEnCours = null %}
+
+                                    {% for resultat in classementFinal %}
+                                        {% if pouleEnCours != resultat.poule_nom %}
+                                            {% set pouleEnCours = resultat.poule_nom %}
+                                            {% set rangPoule = 0 %}
+                                            <tr>
+                                                <td colspan="7" class="text-center fw-bold py-2"
+                                                    style="background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; letter-spacing: 0.05em;">
+                                                    <i class="fas fa-medal me-2"></i>{{ pouleEnCours }}
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+
+                                        {% set rang = rang + 1 %}
+                                        {% set rangPoule = rangPoule + 1 %}
+
+                                        <tr>
+                                            <td class="fw-bold fs-9 text-muted">{{ rang }}.</td>
+                                            <td class="fw-bold fs-8">{{ rangPoule }}.</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ resultat.club_logo }}"
+                                                        class="rounded-circle"
+                                                        style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;"
+                                                        alt="logo"
+                                                        loading="lazy">
+                                                    <span class="fw-semibold">
+                                                        <a href="index.php?id_tournoi={{ idTournoi }}&id_equipe={{ resultat.id }}&id_club={{ resultat.club_id }}&affichageByTeam=true" class="team-name">
+                                                            {{ resultat.nom|upper }}
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge rounded-pill"
+                                                    style="background-color: var(--warning-color); font-size: 0.9rem; padding: 6px 12px;">
+                                                    {{ resultat.TotalDesPoints }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center fw-semibold">{{ resultat.nombreButsMarque }}</td>
+                                            <td class="text-center fw-semibold">{{ resultat.nombreButsEncaisse }}</td>
+                                            <td class="text-center fw-semibold">{{ resultat.DifferenceButs }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+            {% endif %}
+       
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="modern-footer">
+        {% include ('footer.twig') %}
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script>
-        var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] }};
+        var refreshInterval = {{ infoTournoiEnCours['refreshClientTime'] ?? 30000 }};
+/*
+   setInterval(function () {
+    $('#score').load(location.href + ' #score > *', function () {
+        initCountdowns(); // ← relance les timers sur les nouveaux éléments
+    });
+    $('#classementTableau').load(location.href + ' #classementTableau > *');
+    $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
+    $('#labels').load(location.href + ' #labels > *', function () {
+        if ($.trim($('#labels').text()) === '') {
+            $('#labels').hide();
+        } else {
+            $('#labels').show();
+        }
+    });
+    $('#bellWrapper').load(location.href + ' #bellWrapper > *');
+    $('#creneauBadge').load(location.href + ' #creneauBadge > *');
+}, refreshInterval);
 
-        setInterval(function () {
-            $('#score').load(location.href + ' #score > *');
-            $('#classementTableau').load(location.href + ' #classementTableau > *');
-            $('#labels').load(location.href + ' #labels > *', function () {
-                if ($.trim($('#labels').text()) === '') {
-                    $('#labels').hide();
-                } else {
-                    $('#labels').show();
-                }
-            });
-        }, refreshInterval);
+*/
+function connectSSE(idTournoi, idPoule, idEquipe, idCategorie) {
+
+    let url = `sse.php?id_tournoi=${idTournoi}`;
+
+    if (idPoule) {
+        url += `&idPoule=${idPoule}`;
+    }
+
+    if (idEquipe) {
+        url += `&id_equipe=${idEquipe}`;
+    }
+
+    if (idCategorie) {
+        url += `&idCategorie=${idCategorie}`;
+    }
+
+    const evtSource = new EventSource(url);
+
+    evtSource.addEventListener('score_update', function () {
+        $('#score').load(location.href + ' #score > *', function () {
+            initCountdowns();
+        });
+    });
+
+    evtSource.addEventListener('ranking_update', function () {
+        $('#classementTableau').load(location.href + ' #classementTableau > *');
+    });
+
+    evtSource.addEventListener('classement_final_update', function () {
+        $('#classementTableauFinal').load(location.href + ' #classementTableauFinal > *');
+    });
+
+    evtSource.addEventListener('finale_update', function () {
+
+    $('#phase-finale').load(
+        location.href + ' #phase-finale > *',
+        function () {
+            initCountdowns();
+        }
+    );
+
+});
+
+    evtSource.addEventListener('bell_update', function (e) {
+        const data = JSON.parse(e.data);
+        const bellButton = document.querySelector('.bell-button');
+        if (!bellButton) return;
+
+        bellButton.classList.toggle('has-unread', data.nbMessagesNonLus > 0);
+
+        let badge = bellButton.querySelector('.bell-badge');
+        if (data.nbMessagesNonLus > 0) {
+            const label = data.nbMessagesNonLus > 9 ? '9+' : data.nbMessagesNonLus;
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'bell-badge';
+                bellButton.appendChild(badge);
+            }
+            badge.textContent = label;
+        } else if (badge) {
+            badge.remove();
+        }
+    });
+
+    evtSource.addEventListener('creneau_update', function () {
+        $('#creneauBadge').load(location.href + ' #creneauBadge > *');
+    });
+
+    evtSource.onerror = function () {
+        // reconnexion automatique par le navigateur
+    };
+
+    return evtSource;
+}
+
+const evtSource = connectSSE(
+    {{ idTournoi }},
+    {{ IdPoules ?? 'null' }},
+    {{ IdEquipe ?? 'null' }},
+    {{ idCategorie ?? 'null' }}
+);
 
         document.addEventListener("DOMContentLoaded", function () {
             function getUrlParams() {
@@ -629,14 +2266,7 @@
 
             let params = getUrlParams();
 
-            if (params.hasOwnProperty('id_equipe')) {
-                let choisirEquipeDiv = document.querySelector('.choisirEquipe');
-                if (choisirEquipeDiv) {
-                    choisirEquipeDiv.style.display = 'none';
-                }
-            }
-
-            if (params.hasOwnProperty('idPoule')) {
+            if (params.hasOwnProperty('id_equipe') || params.hasOwnProperty('idPoule')) {
                 let choisirEquipeDiv = document.querySelector('.choisirEquipe');
                 if (choisirEquipeDiv) {
                     choisirEquipeDiv.style.display = 'none';
@@ -650,6 +2280,89 @@
                 }
             }
         });
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.team-name, .team-logo-wrap, .terrain-link').forEach(function (el) {
+                        el.classList.add('hint-animate');
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.8
+        });
+
+        document.querySelectorAll('.match-card').forEach(function (card) {
+            observer.observe(card);
+        });
+
+        {% if RencontreByCategoriePhaseFinale is not empty %}
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function() {
+                const el = document.getElementById('phase-finale');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
+        });
+        {% endif %}
     </script>
+
+<script>
+            function initCountdowns() {
+                document.querySelectorAll('.match-countdown').forEach(function (el) {
+                if (el.dataset.running === '1') return;
+                el.dataset.running = '1';
+
+                const heureDebut = el.dataset.heureDebut;
+                const duree      = parseInt(el.dataset.duree, 10);
+                const timerEl    = el.querySelector('.countdown-timer');
+
+                const [h, m] = heureDebut.split(':').map(Number);
+
+                // Construire la cible en temps local, puis corriger par l'offset
+                const cibleLocale = new Date();
+                cibleLocale.setHours(h, m + duree, 0, 0);
+                const fin = cibleLocale.getTime() - _serverOffset; // ← correction offset
+
+        function update() {
+            // Si l'élément a été retiré du DOM par le refresh, on arrête
+            if (!document.contains(el)) return;
+
+            const reste = Math.floor((fin - serverNow()) / 1000);
+
+            if (reste <= 0) {
+                timerEl.textContent = '00:00';
+                timerEl.style.color = '#e74c3c';
+                el.querySelector('.fa-hourglass-half')
+                  ?.classList.replace('fa-hourglass-half', 'fa-hourglass-end');
+                return;
+            }
+
+            const mm = String(Math.floor(reste / 60)).padStart(2, '0');
+            const ss = String(reste % 60).padStart(2, '0');
+            timerEl.textContent = `${mm}:${ss}`;
+
+            if (reste <= 60) {
+                timerEl.style.color = '#e74c3c';
+            } else if (reste <= 180) {
+                timerEl.style.color = '#f39c12';
+            } else {
+                timerEl.style.color = '';
+            }
+
+            setTimeout(update, 1000);
+        }
+
+        update();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initCountdowns);
+</script>
+
+
 </body>
 </html>

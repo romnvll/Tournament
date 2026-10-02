@@ -3,6 +3,15 @@ require 'security.php';
 
 require 'vendor/autoload.php';
 require 'class/tournoiDao.class.php';
+require 'class/licenceDao.class.php';
+require 'class/typeSportDao.class.php';
+require 'Lang/lang.php';
+
+
+
+
+
+
 $tournoiDao = new tournoiDao();
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
@@ -11,7 +20,12 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
+
 $template = $twig->load('ajoutTournoi.twig');
+
+$afficherTypeDeSport = new TypeSportDAO();
+$typeDeSport = $afficherTypeDeSport->getTousLesTypesDeSport();
 
 
 $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
@@ -24,12 +38,21 @@ foreach ($tousLesTournois as $tournoi) {
     }
 }
 
+$licenceDao = new LicenceDao();
+$licence = $licenceDao->getLicencesParUtilisateur($userData['id']);
+$expiration = $licenceDao->retrograderLicencesExpirees();
+
+$isArchived = $tournoiDao->afficherLesTournois($userData['id']);
 
 echo $template->render([
  'email' => $userData['email'],
-  'logo' => $userData['logo'],
+ 
 'pageEnCours' => 'GestionTournois',
 'idTournoi' => $dernierId,
+'tousLesTournois' => $tousLesTournois,
+'licence' => $licence,
+'typeDeSport' => $typeDeSport,
+'isArchived' => $isArchived,
 
 //'ListeDesTournois' => $tournoiDao->afficherLesTournois(),
 //'AfficherClub' => $listeClub->afficherClubs(),

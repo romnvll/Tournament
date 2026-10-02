@@ -2,7 +2,36 @@
 require 'security.php';
 require_once 'class/categorie.class.php';
 
+$categorieDao = new CategorieDao();
 
+
+if (isset($_POST['renommerCategorie'])) {
+    $categorieDao->renommerCategorie(
+        (int)$_POST['id_categorie'], 
+        $_POST['nomCategorie'], 
+        $userData['id']
+    );
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+if (isset($_POST['afficherClassement']) ) {
+
+    
+    $categorieDao->changerAfficherClassementCategorie($_POST['id_categorie'], $_POST['afficherClassement'], $userData['id']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+   
+    
+}
+
+
+if (isset ($_POST['clubToUser']))   {
+    require_once ('class/utilisateurDao.class.php');
+    $utilisateurDao = new UtilisateurDAO();
+    $utilisateurDao->lierUtilisateurAClub($userData['id'], (int)$_POST['clubToUser']);
+           header("Location: " . $_SERVER['HTTP_REFERER']);
+
+}
 
 
 if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
@@ -18,7 +47,7 @@ if (isset($_POST['ajoutSponsor']) && $_POST['ajoutSponsor'] == '1') {
 
         // Créer le nouveau nom de fichier
         $newFileName = $club_id . '-Sponsors-' . $nom;
-
+        echo $newFileName;
         // Obtenir l'extension du fichier
         $fileExtension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
 
@@ -105,31 +134,224 @@ else {
 
 
 //fin modif sponsors
+// ==================== GESTION DES EFFETS SONORES ====================
+
+// Ajout effet sonore de DÉBUT
+// Ajout effet sonore de DÉBUT depuis la banque
+if (isset($_POST['ajouterEffetDebutBanque']) && $_POST['ajouterEffetDebutBanque'] == '1') {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    $user_id = (int)$_POST['user_id'];
+    $sonChoisi = $_POST['sonChoisi'];
+    
+    // Copier le son de la banque vers le répertoire de l'utilisateur
+    $uploadDir = 'Audio/Effets/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $fileName = pathinfo($sonChoisi, PATHINFO_FILENAME);
+    $newFileName = $user_id . '-debut-' . $fileName . '.mp3';
+    $destination = $uploadDir . $newFileName;
+    
+    if (copy($sonChoisi, $destination)) {
+        $utilisateurDao->ajouterEffetsSonores($user_id, $destination, null);
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+// Ajout effet sonore de FIN depuis la banque
+if (isset($_POST['ajouterEffetFinBanque']) && $_POST['ajouterEffetFinBanque'] == '1') {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    $user_id = (int)$_POST['user_id'];
+    $sonChoisi = $_POST['sonChoisi'];
+    
+    // Copier le son de la banque vers le répertoire de l'utilisateur
+    $uploadDir = 'Audio/Effets/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $fileName = pathinfo($sonChoisi, PATHINFO_FILENAME);
+    $newFileName = $user_id . '-Fin-' . $fileName . '.mp3';
+    $destination = $uploadDir . $newFileName;
+    
+    if (copy($sonChoisi, $destination)) {
+        $utilisateurDao->ajouterEffetsSonores($user_id, null, $destination);
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
 
 
-if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POST['newPassword2'])) {
-    require_once 'class/clubDao.class.php';
-    $clubDao = new ClubDao();
-
-    // Vérifier si les deux nouveaux mots de passe sont identiques
-    if ($_POST['newPassword1'] === $_POST['newPassword2']) {
-        $success = $clubDao->changeClubPassword($userData['id'], $_POST['oldPassword'], $_POST['newPassword1']);
-
-        // Vérifier si le changement de mot de passe a réussi
-        if ($success) {
-            header("Location: " . $_SERVER['HTTP_REFERER'] ."?status=success");
-            exit();
+if (isset($_POST['ajouterEffetDebut']) && $_POST['ajouterEffetDebut'] == '1') {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    $user_id = (int)$_POST['user_id'];
+    $uploadDir = 'Audio/Effets/';
+    
+    // Créer le répertoire s'il n'existe pas
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $destination = null;
+    
+    // Vérifier si un fichier a été uploadé
+    if (isset($_FILES['effetDebutFile']) && $_FILES['effetDebutFile']['error'] == UPLOAD_ERR_OK) {
+        $originalName = pathinfo($_FILES['effetDebutFile']['name'], PATHINFO_FILENAME);
+        $newFileName = $user_id . '-debut-' . $originalName . '.mp3';
+        $destination = $uploadDir . $newFileName;
+        
+        if (move_uploaded_file($_FILES['effetDebutFile']['tmp_name'], $destination)) {
+            $utilisateurDao->ajouterEffetsSonores($user_id, $destination, null);
         } else {
-            // Gérer l'erreur, par exemple, afficher un message d'erreur
-            echo "L'ancien mot de passe est incorrect.";
+            echo "Erreur lors du téléchargement du fichier.";
+        }
+    }
+    // Vérifier si un enregistrement a été fait
+    elseif (isset($_POST['effetDebutRecorded']) && !empty($_POST['effetDebutRecorded'])) {
+        $audioData = $_POST['effetDebutRecorded'];
+        
+        // Extraire le base64
+        list($type, $data) = explode(';', $audioData);
+        list(, $data) = explode(',', $data);
+        $data = base64_decode($data);
+        
+        $newFileName = $user_id . '-debut-enregistrement-' . time() . '.mp3';
+        $destination = $uploadDir . $newFileName;
+        
+        if (file_put_contents($destination, $data)) {
+            $utilisateurDao->ajouterEffetsSonores($user_id, $destination, null);
+        } else {
+            echo "Erreur lors de l'enregistrement du fichier.";
+        }
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+// Ajout effet sonore de FIN
+if (isset($_POST['ajouterEffetFin']) && $_POST['ajouterEffetFin'] == '1') {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    $user_id = (int)$_POST['user_id'];
+    $uploadDir = 'Audio/Effets/';
+    
+    // Créer le répertoire s'il n'existe pas
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $destination = null;
+    
+    // Vérifier si un fichier a été uploadé
+    if (isset($_FILES['effetFinFile']) && $_FILES['effetFinFile']['error'] == UPLOAD_ERR_OK) {
+        $originalName = pathinfo($_FILES['effetFinFile']['name'], PATHINFO_FILENAME);
+        $newFileName = $user_id . '-Fin-' . $originalName . '.mp3';
+        $destination = $uploadDir . $newFileName;
+        
+        if (move_uploaded_file($_FILES['effetFinFile']['tmp_name'], $destination)) {
+            $utilisateurDao->ajouterEffetsSonores($user_id, null, $destination);
+        } else {
+            echo "Erreur lors du téléchargement du fichier.";
+        }
+    }
+    // Vérifier si un enregistrement a été fait
+    elseif (isset($_POST['effetFinRecorded']) && !empty($_POST['effetFinRecorded'])) {
+        $audioData = $_POST['effetFinRecorded'];
+        
+        // Extraire le base64
+        list($type, $data) = explode(';', $audioData);
+        list(, $data) = explode(',', $data);
+        $data = base64_decode($data);
+        
+        $newFileName = $user_id . '-Fin-enregistrement-' . time() . '.mp3';
+        $destination = $uploadDir . $newFileName;
+        
+        if (file_put_contents($destination, $data)) {
+            $utilisateurDao->ajouterEffetsSonores($user_id, null, $destination);
+        } else {
+            echo "Erreur lors de l'enregistrement du fichier.";
+        }
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+// Suppression effet sonore de DÉBUT
+if (isset($_GET['supprimerEffetDebut'])) {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    // Récupérer l'utilisateur pour obtenir le chemin du fichier
+    $utilisateur = $utilisateurDao->getUtilisateurById($userData['id']);
+    
+    if ($utilisateur && $utilisateur['effetsSonoreDebut']) {
+        // Supprimer le fichier du serveur
+        if (file_exists($utilisateur['effetsSonoreDebut'])) {
+            unlink($utilisateur['effetsSonoreDebut']);
+        }
+        
+        // Mettre à jour la base de données
+        $utilisateurDao->supprimerEffetSonore($userData['id'], true);
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+// Suppression effet sonore de FIN
+if (isset($_GET['supprimerEffetFin'])) {
+    require_once 'class/utilisateurDao.class.php';
+    $utilisateurDao = new UtilisateurDAO();
+    
+    // Récupérer l'utilisateur pour obtenir le chemin du fichier
+    $utilisateur = $utilisateurDao->getUtilisateurById($userData['id']);
+  
+    if ($utilisateur && $utilisateur['effetsSonoreFin']) {
+        // Supprimer le fichier du serveur
+        if (file_exists($utilisateur['effetsSonoreFin'])) {
+            unlink($utilisateur['effetsSonoreFin']);
+        }
+        
+        // Mettre à jour la base de données avec le paramètre pour effetDebut = false
+        $utilisateurDao->supprimerEffetSonore($userData['id'], false);
+    }
+    
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
+}
+
+if (isset($_POST['oldPassword']) || isset($_POST['newPassword1']) || isset($_POST['newPassword2'])) {
+    if (isset($_POST['oldPassword']) && isset($_POST['newPassword1']) && isset($_POST['newPassword2'])) {
+        require_once 'class/utilisateurDao.class.php';
+        $utilisateurDao = new UtilisateurDAO();
+
+        if ($_POST['newPassword1'] === $_POST['newPassword2']) {
+            $success = $utilisateurDao->changerMotDePasse($userData['id'], $_POST['oldPassword'], $_POST['newPassword1']);
+            if ($success) {
+                header("Location: " . $_SERVER['HTTP_REFERER'] . "?status=success");
+                exit();
+            } else {
+                echo "L'ancien mot de passe est incorrect.";
+            }
+        } else {
+            echo "Les nouveaux mots de passe ne correspondent pas.";
         }
     } else {
-        // Gérer l'erreur, par exemple, afficher un message d'erreur
-        echo "Les nouveaux mots de passe ne correspondent pas.";
+        echo "Tous les champs de mot de passe doivent être remplis.";
     }
-} else {
-    // Gérer l'erreur, par exemple, afficher un message d'erreur
-    echo "Tous les champs de mot de passe doivent être remplis.";
 }
 
 if (isset($_GET['supprimerSponsors'])) {
@@ -163,7 +385,7 @@ if (isset($_POST['ChangeColor']) ) {
         echo "Clé: " . htmlspecialchars($key) . ", Valeur: " . htmlspecialchars($value) . "<br>";
 
         // Assurez-vous que $dao et $userData sont définis avant cette boucle
-        $change = $dao->changerCouleurCategorie($key, $value, $userData['id']);
+        $change = $categorieDao->changerCouleurCategorie($key, $value, $userData['id']);
 
         // Affiche le résultat de la fonction changerCouleurCategorie
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -177,30 +399,6 @@ if (isset($_POST['ChangeColor']) ) {
 
 
 
-
-
-
-
-// Ajout
-if (isset($_POST['action']) && $_POST['action'] === 'create') {
-    $dao->creerCategorie($_POST['nom'], $_POST['couleur'], $userData['id']);
-    header('Location: categories.php?msg=created');
-    exit;
-}
-
-// Mise à jour
-if (isset($_POST['action']) && $_POST['action'] === 'update') {
-    $dao->mettreAJourCategorie((int)$_POST['id'], $_POST['nom'], $_POST['couleur'], $userData['id']);
-    header('Location: categories.php?msg=updated');
-    exit;
-}
-
-// Suppression
-if (isset($_GET['delete'])) {
-    $dao->supprimerCategorie((int)$_GET['delete'],$userData['id']);
-    header('Location: categories.php?msg=deleted');
-    exit;
-}
 
 
 

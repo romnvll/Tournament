@@ -76,8 +76,8 @@ $qrcode = (new QRCode($options))->render($url);
             </div>
             <div class="col-md-6">
                 <div class="card p-3">
-                    <img src="logos/matcheventPro.webp" alt="Logo" class="img-fluid rounded">
-                    <p class="mt-2"><i class="fas fa-handshake"></i> Matchevent Pro - Votre gestionnaire de tournois</p>
+                    <img src="logos/Logo.png" alt="Logo" class="img-fluid rounded">
+                    <p class="mt-2"><i class="fas fa-handshake"></i> Brackito - Votre gestionnaire de tournois</p>
                 </div>
             </div>
         </div>

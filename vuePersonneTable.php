@@ -1,6 +1,6 @@
 <?php
 
-use Twig\Node\Expression\ConstantExpression;
+session_start();
 
 require 'vendor/autoload.php';
 require 'class/PersonneTableDao.class.php';
@@ -29,17 +29,18 @@ $infoUser=null;
 $affichagePlanification=null;
 $key = null;
 
-session_start();
 
 
 $tournoiId = $_SESSION['tournoiId'];
+
 $tournoiDao = new TournoiDAO();
+
 if ( $tournoiDao->getTournoiById($tournoiId)['gestionPartenaires'] == 1) {
   
   //recuperation des partenaires du club qui a organiser ce tournoi
   require_once 'class/SponsorDAO.class.php';
   $sponsorDao = new SponsorDAO();
-  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($tournoiId)['club_id']);
+  $listeDesPartenaires = $sponsorDao->getSponsorsActifParClub($tournoiDao->getTournoiById($tournoiId)['utilisateur_id']);
  
 }
 else {
@@ -99,12 +100,22 @@ $infoTablePersonne = $tablePersonne->recupererInformationsParCle($_GET['key']);
 }
 
 else {
-  echo "erreur";
-  exit(1);
+    echo "<script>
+        alert('Clé invalide ou expirée.');
+        window.history.back();
+    </script>";
+    exit;
+  
 }
 
 
 
+
+
+
+
+// Récupère les rencontres dont les équipes sont inversées (ex: ?swap[]=12&swap[]=34)
+$swappedIds = isset($_GET['swap']) ? array_map('intval', $_GET['swap']) : [];
 
 
 
@@ -114,7 +125,7 @@ else {
 echo $template->render([
   
   
- 
+ 'swappedIds' => $swappedIds,
   'AfficherCodePin' => $afficherCodePin,
   'AffichagePlanification' => $affichagePlanification,
   'tournoiId' => $tournoiId,

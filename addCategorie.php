@@ -25,7 +25,19 @@ $tousLesTournois = $tournoiDao->afficherLesTournois($userData['id']);
 
 
 
-$categorie = new CategorieDao();
+$categorieDao = new CategorieDao();
 
-$categorie->creerCategorie($_POST['Nom_categorie'], $_POST['Couleur'], $userData['id']);
+$listcategories = $categorieDao->obtenirToutesLesCategories($userData['id'],'ordrePlacementAuto');
+
+$maxCategorie = null;
+
+foreach ($listcategories as $cat) {
+    if ($maxCategorie === null || $cat['ordrePlacementAuto'] > $maxCategorie['ordrePlacementAuto']) {
+        $maxCategorie = $cat;
+    }
+}
+
+$maxCategorie = $maxCategorie['ordrePlacementAuto'] + 1;
+
+$categorieDao->creerCategorie($_POST['Nom_categorie'], $_POST['Couleur'], $userData['id'], $maxCategorie);
 header("Location: " . $_SERVER['HTTP_REFERER']);

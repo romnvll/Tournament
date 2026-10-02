@@ -4,6 +4,8 @@ require 'vendor/autoload.php';
 require 'class/pouleManagerDao.class.php';
 require 'class/tournoiDao.class.php';
 require 'class/equipeDao.class.php';
+require 'class/licenceDao.class.php';
+require 'Lang/lang.php';
 
 $tournois = new tournoiDao();
 $poules = new PouleManager();
@@ -14,6 +16,7 @@ $twig = new \Twig\Environment($loader, [
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
+$twig->addFunction(new \Twig\TwigFunction('t', 't'));
 
 
 if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
@@ -21,18 +24,28 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
     header("Refresh:3; url=ajoutTournoi.php");
     exit();
   }
-  
-  if ($tournois->droitTournoiClub($_GET['id_tournoi'], $userData['id']) == null) {
-      
+
+
+
+  $idTournoi = isset($_GET['id_tournoi']) ? (int) $_GET['id_tournoi'] : 0;
+
+if (
+    $userData['role'] !== 'admin' &&
+    $tournois->droitTournoiClub($idTournoi, $userData['id']) === null
+) {
     exit;
-  }
+}
+
   
 
 
 
 
 $equipe = new EquipeDAO();
+$listeDesEquipes = $equipe->rechercherEquipesDansTournoi($_GET['id_tournoi'], $_GET['query']??null);
 
+$licenceDao = new LicenceDao();
+$licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 if (isset ($_GET['id_tournoi'])) {
     //on recup les poules
@@ -101,19 +114,21 @@ if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
 $template = $twig->load('modifierPoules.twig');
 echo $template->render([
     'email' => $userData['email'],
-  'logo' => $userData['logo'],
+  
     'pageEnCours' => 'GestionDesPoules',
-    'tournoiEnCours' => $idtournoi,
+    'tournoiEnCours' => $idtournoi ?? null,
     'poules' => $poulesEtNombreEquipe,
    
     'ListeDesTournois' => $tournois->afficherLesTournois($userData['id']),
     //'ListeDesCategorie' => $afficheCategorie->getAllCategorieByIdTournoi($_GET['id_tournoi']),
     'idTournoi' => $_GET['id_tournoi'],
-    'idPoule' => $_GET['id_poule'],
-    'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']),
-    'message' => $message,
-    'afficherEquipeParPoule' => $equipes,
+    'idPoule' => $_GET['id_poule'] ?? null,
+    //'nombreEquipeParPoules' => $poules->compterEquipesParPoule($_GET['id_poule']??null),
+    'message' => $message??null,
+    'afficherEquipeParPoule' => $equipes??null,
     'RencontresExistesDansPoules'=>$pouleHasRencontre,
+    'AfficherLesEquipes' => $listeDesEquipes,
+    'licence' => $licence,
 
     //'nombreEquipeParPoule' => $PouleAuto,
 

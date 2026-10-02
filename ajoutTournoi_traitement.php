@@ -4,11 +4,10 @@ require 'class/tournoiDao.class.php';
 require 'class/terrainDao.class.php';
 require 'class/labelsDao.class.php';
 require 'class/creneauxDao.class.php';
+require 'class/licenceDao.class.php';
 
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-
-var_dump($_POST['heuredebut']);
 
 
 
@@ -16,10 +15,10 @@ $terrainDao=new TerrainDao();
 $tournoiDao = new tournoiDao();
 $creneauxDao = new CreneauxDao();
 
-
+var_dump($_POST);
 //echo $_POST['dateTournoi'];
 
-$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$userData['id'],$_POST['pasHoraire']);
+$ajoutTournoi = $tournoiDao->ajouterTournoi($_POST['nomTournoi'],$_POST['dateTournoi'],1,$_POST['heuredebut'],0,$userData['id'],$_POST['typeDeSport'],$_POST['pasHoraire']);
 
 
 
@@ -60,7 +59,10 @@ for ($i = 1; $i <= 20; $i++) {
 $labelsDao = new LabelDao();
 $labelsDao->ajouterLabel("Pause","#000000",$dernierId);
 
-header("location: modifierTournoi.php?idTournoi=".$dernierId);
+
+
+
+header("location: ajoutEquipe.php?idTournoi=".$dernierId);
 
 
 
