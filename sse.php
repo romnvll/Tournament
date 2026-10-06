@@ -233,7 +233,7 @@ while (time() - $start < $maxDuration) {
             $idCategorie,
             
         );
-var_dump($classement);
+
         /*
          * Détection d'un changement dans le classement
          */
