@@ -127,12 +127,13 @@ public function afficherMessagesParEquipe(int $equipeId, string $visiteurId, int
         INNER JOIN Equipes eq ON eq.id = :equipe_id
         LEFT JOIN EquipePoule ep ON ep.equipe_id = eq.id AND ep.poule_id = m.poule_id
         LEFT JOIN MessagesVues mv ON mv.message_id = m.id AND mv.visiteur_id = :visiteur_id
-        WHERE
-            m.equipe_id = eq.id
+        WHERE m.tournoi_id = :tournoi_id
+        AND (
+                m.equipe_id = eq.id
             OR m.categorie_id = eq.categorie
             OR ep.poule_id IS NOT NULL
             OR (m.categorie_id IS NULL AND m.poule_id IS NULL AND m.equipe_id IS NULL)
-            AND m.tournoi_id = :tournoi_id
+        )
         ORDER BY m.date_creation DESC
     ");
     $stmt->bindParam(':equipe_id', $equipeId, PDO::PARAM_INT);
@@ -149,23 +150,32 @@ public function afficherMessagesParEquipe(int $equipeId, string $visiteurId, int
     /**
  * Nombre de messages non lus PAR CE VISITEUR (pour la cloche).
  */
-public function compterMessagesNonLusParEquipe(int $equipeId, string $visiteurId): int {
+public function compterMessagesNonLusParEquipe(int $equipeId, string $visiteurId, int $tournoiId): int {
     $stmt = $this->connexion->prepare("
-        SELECT COUNT(*) AS nb
+        SELECT COUNT(DISTINCT m.id) AS nb
         FROM Messages m
         INNER JOIN Equipes eq ON eq.id = :equipe_id
         LEFT JOIN EquipePoule ep ON ep.equipe_id = eq.id AND ep.poule_id = m.poule_id
-        LEFT JOIN MessagesVues mv ON mv.message_id = m.id AND mv.visiteur_id = :visiteur_id
-        WHERE
-            (m.equipe_id = eq.id OR m.categorie_id = eq.categorie OR ep.poule_id IS NOT NULL OR (m.categorie_id IS NULL AND m.poule_id IS NULL AND m.equipe_id IS NULL))
-            AND (mv.statut IS NULL OR mv.statut != 'lu')
+        WHERE m.tournoi_id = :tournoi_id
+          AND (
+                m.equipe_id = eq.id
+             OR m.categorie_id = eq.categorie
+             OR ep.poule_id IS NOT NULL
+             OR (m.categorie_id IS NULL AND m.poule_id IS NULL AND m.equipe_id IS NULL)
+          )
+          AND NOT EXISTS (
+                SELECT 1 FROM MessagesVues v
+                WHERE v.message_id = m.id
+                  AND v.visiteur_id = :visiteur_id
+                  AND v.statut = 'lu'
+          )
     ");
     $stmt->bindParam(':equipe_id', $equipeId, PDO::PARAM_INT);
+    $stmt->bindParam(':tournoi_id', $tournoiId, PDO::PARAM_INT);
     $stmt->bindParam(':visiteur_id', $visiteurId);
     $stmt->execute();
     return (int)$stmt->fetch(PDO::FETCH_ASSOC)['nb'];
 }
-
   /**
  * Marque un message comme "reçu" par ce visiteur (équipe_id est gardé
  * pour les stats organisateur), sans écraser un statut déjà 'lu'.

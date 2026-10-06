@@ -110,7 +110,7 @@ else {
 $messageDao = new MessageDAO();
  
 if (isset($_GET['id_equipe'])) {
-    $nbMessagesNonLus = $messageDao->compterMessagesNonLusParEquipe((int)$_GET['id_equipe'],getVisiteurId());
+    $nbMessagesNonLus = $messageDao->compterMessagesNonLusParEquipe((int)$_GET['id_equipe'],getVisiteurId(),(int)$_GET['id_tournoi']);
    
 } else {
     $nbMessagesNonLus = 0;

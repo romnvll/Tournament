@@ -1420,7 +1420,9 @@
                             <a href="messages.php?id_tournoi={{ idTournoi }}&id_equipe={{ IdEquipe }}"
                             class="bell-button {% if nbMessagesNonLus > 0 %}has-unread{% endif %}">
                                 <i class="fas fa-bell"></i>
+                                
                                 {% if nbMessagesNonLus > 0 %}
+                                
                                     <span class="bell-badge">
                                         {{ nbMessagesNonLus > 9 ? '9+' : nbMessagesNonLus }}
                                     </span>
