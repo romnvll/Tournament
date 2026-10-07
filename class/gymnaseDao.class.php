@@ -65,18 +65,17 @@ class GymnaseDAO
         string $adresse,
         string $ville,
         string $codePostal,
-        ?string $telephone = null,
+        
         ?string $commentaire = null
     ): int {
-        $query = "INSERT INTO Gymnases (utilisateur_id, nom, adresse, ville, code_postal, telephone, commentaire)
-                  VALUES (:userId, :nom, :adresse, :ville, :codePostal, :telephone, :commentaire)";
+        $query = "INSERT INTO Gymnases (utilisateur_id, nom, adresse, ville, code_postal,  commentaire)
+                  VALUES (:userId, :nom, :adresse, :ville, :codePostal, :commentaire)";
         $stmt = $this->connexion->prepare($query);
         $stmt->bindValue(':userId',      $userId,      PDO::PARAM_INT);
         $stmt->bindValue(':nom',         $nom,         PDO::PARAM_STR);
         $stmt->bindValue(':adresse',     $adresse,     PDO::PARAM_STR);
         $stmt->bindValue(':ville',       $ville,       PDO::PARAM_STR);
         $stmt->bindValue(':codePostal',  $codePostal,  PDO::PARAM_STR);
-        $stmt->bindValue(':telephone',   $telephone,   PDO::PARAM_STR);
         $stmt->bindValue(':commentaire', $commentaire, PDO::PARAM_STR);
         $stmt->execute();
         return (int) $this->connexion->lastInsertId();
@@ -162,7 +161,6 @@ public function getGymnaseByTournoiId(int $tournoiId): ?array
                       adresse     = :adresse,
                       ville       = :ville,
                       code_postal = :codePostal,
-                      telephone   = :telephone,
                       commentaire = :commentaire
                   WHERE id = :id AND utilisateur_id = :userId";
         $stmt = $this->connexion->prepare($query);
@@ -170,7 +168,6 @@ public function getGymnaseByTournoiId(int $tournoiId): ?array
         $stmt->bindValue(':adresse',     $adresse,     PDO::PARAM_STR);
         $stmt->bindValue(':ville',       $ville,       PDO::PARAM_STR);
         $stmt->bindValue(':codePostal',  $codePostal,  PDO::PARAM_STR);
-        $stmt->bindValue(':telephone',   $telephone,   PDO::PARAM_STR);
         $stmt->bindValue(':commentaire', $commentaire, PDO::PARAM_STR);
         $stmt->bindValue(':id',          $gymnaseId,   PDO::PARAM_INT);
         $stmt->bindValue(':userId',      $userId,      PDO::PARAM_INT);

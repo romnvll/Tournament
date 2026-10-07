@@ -4,6 +4,7 @@ updateDB.txt
 security.php
 secureCookies.php
 Audio
+vendor/
 Audio/*
 !Audio/**/
 !Audio/**/.gitkeep
