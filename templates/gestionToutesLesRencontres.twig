@@ -796,7 +796,12 @@
 													{% endif %}
 													<button class="btn-record audio-btn no-print">🎙️ Enregistrer</button>
 													<button class="btn-stop audio-btn no-print" disabled>⏹️ Arrêter</button>
-													<button class="btn-play audio-btn no-print" {% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}disabled{% endif %}>▶️ Écouter</button>
+														<button class="btn-play audio-btn no-print" {% if terrains[i]['audio_path'] is null or terrains[i]['audio_path'] == '' %}disabled{% endif %}>▶️ Écouter</button>
+														{% if terrains[i]['audio_path'] is not null and terrains[i]['audio_path'] != '' %}
+															<button class="btn-delete audio-btn no-print" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">🗑️ Supprimer</button>
+															<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
+														{% endif %}
+
 													{% if terrains[i]['audio_path'] is not null and terrains[i]['audio_path'] != '' %}
 														<audio class="audio-preview" src="{{ terrains[i]['audio_path'] }}"></audio>
 													{% endif %}
@@ -1142,57 +1147,90 @@
 
 		<script>
 			document.querySelectorAll('div[data-terrain-id]').forEach(container => {
-				let mediaRecorder;
-				let audioChunks = [];
+				document.querySelectorAll('div[data-terrain-id]').forEach(container => {
+    let mediaRecorder;
+    let audioChunks = [];
 
-				const recordBtn = container.querySelector('.btn-record');
-				const stopBtn = container.querySelector('.btn-stop');
-				const playBtn = container.querySelector('.btn-play');
-				const audioElement = container.querySelector('.audio-preview');
+    const recordBtn    = container.querySelector('.btn-record');
+    const stopBtn      = container.querySelector('.btn-stop');
+    const playBtn      = container.querySelector('.btn-play');
+    const deleteBtn    = container.querySelector('.btn-delete'); // peut être null
+    const audioElement = container.querySelector('.audio-preview');
 
-				const idTournoi = container.dataset.tournoiId;
-				const idTerrain = container.dataset.terrainId;
+    const idTournoi = container.dataset.tournoiId;
+    const idTerrain = container.dataset.terrainId;
 
-				recordBtn.addEventListener('click', async () => {
-					try {
-						const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-						mediaRecorder = new MediaRecorder(stream);
-						audioChunks = [];
+    recordBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
 
-						mediaRecorder.ondataavailable = event => {
-							audioChunks.push(event.data);
-						};
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
 
-						mediaRecorder.onstop = async () => {
-							const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-							const formData = new FormData();
-							formData.append('audio', audioBlob, 'audio.wav');
-							formData.append('idTournoi', idTournoi);
-							formData.append('idTerrain', idTerrain);
+            mediaRecorder.onstop = async () => {
+                // Libère le micro
+                stream.getTracks().forEach(track => track.stop());
 
-							const response = await fetch('upload_audio.php', {
-								method: 'POST',
-								body: formData
-							});
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'audio.wav');
+                formData.append('idTournoi', idTournoi);
+                formData.append('idTerrain', idTerrain);
 
-							if (response.ok) {
-								const timestamp = new Date().getTime();
-								audioElement.src = `Audio/${idTournoi}/Terrain/${idTerrain}.wav?${timestamp}`;
-								playBtn.disabled = false;
-							} else {
-								alert("Erreur lors de l'enregistrement");
-							}
-						};
+                const response = await fetch('upload_audio.php', {
+                    method: 'POST',
+                    body: formData
+                });
 
-						mediaRecorder.start();
-						recordBtn.disabled = true;
-						stopBtn.disabled = false;
-						playBtn.disabled = true;
-					} catch (err) {
-						alert("Impossible d'accéder au microphone : " + err.message);
-					}
-				});
+                if (response.ok) {
+                    location.reload();   // rechargement une fois l'upload terminé
+                } else {
+                    alert("Erreur lors de l'enregistrement");
+                    recordBtn.disabled = false;
+                }
+            };
 
+            mediaRecorder.start();
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+            playBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
+        } catch (err) {
+            alert("Impossible d'accéder au microphone : " + err.message);
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();          // déclenche onstop → upload → reload
+            stopBtn.disabled = true;
+        }
+    });
+
+    playBtn.addEventListener('click', () => audioElement.play());
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+            if (!confirm("Supprimer l'enregistrement de ce terrain ?")) return;
+
+            const formData = new FormData();
+            formData.append('idTournoi', idTournoi);
+            formData.append('idTerrain', idTerrain);
+
+            const response = await fetch('supprimer_audio.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert("Erreur lors de la suppression");
+            }
+        });
+    }
+});
 				stopBtn.addEventListener('click', () => {
 					if (mediaRecorder && mediaRecorder.state !== 'inactive') {
 						mediaRecorder.stop();
@@ -1209,7 +1247,9 @@
 
 		<script>
 			function ouvrirLectureAudio(idCreneau) {
-				const url = `lectureAudio.php?idCreneau=${idCreneau}`;
+				//const url = `lectureAudio.php?idCreneau=${idCreneau}`;
+				const url = `lectureAudioSynthese.php?idCreneau=${idCreneau}`;
+
 				const options = 'width=600,height=500,menubar=no,location=no,resizable=no,scrollbars=no,status=no';
 				window.open(url, '_blank', options);
 			}

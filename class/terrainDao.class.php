@@ -24,14 +24,14 @@ class TerrainDao {
         $stmt->execute();
     }
 
-    public function mettreAJourAudioTerrain(int $terrain_id, string $cheminAudio): void {
+    public function mettreAJourAudioTerrain(int $terrain_id, ?string $cheminAudio): void {
     $stmt = $this->connexion->prepare("
         UPDATE Terrains 
         SET audio_path = :cheminAudio 
         WHERE terrain_id = :terrain_id
     ");
-    $stmt->bindParam(':cheminAudio', $cheminAudio);
-    $stmt->bindParam(':terrain_id', $terrain_id);
+    $stmt->bindValue(':cheminAudio', $cheminAudio, $cheminAudio === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $stmt->bindValue(':terrain_id', $terrain_id, PDO::PARAM_INT);
     $stmt->execute();
 }
 

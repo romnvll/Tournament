@@ -5,1701 +5,790 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <script src="https://unpkg.com/htmx.org@latest/dist/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
     <title>Gestion du tournoi</title>
 
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --success-color: #10b981;
-            --info-color: #06b6d4;
-            --bg-dark: #1f2937;
-            --bg-light: #f9fafb;
-            --text-light: #6b7280;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-            --border-radius: 12px;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --surface: #f9fafb;
+            --radius: 12px;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
             padding: 20px;
         }
 
-        .main-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            padding: 30px;
+        .panel {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+            padding: 20px 24px;
             margin-bottom: 20px;
         }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--bg-dark);
-            margin: 0;
-        }
-
-        .tournament-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .tournament-btn {
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
+        /* ---------- En-tête ---------- */
+        .chip {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .tournament-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .tournament-btn.active {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .tournament-btn:not(.active) {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .modern-card {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            margin-bottom: 25px;
-        }
-
-        .card-header-modern {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-            padding: 20px;
-            font-weight: 700;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .card-header-modern.info {
-            background: linear-gradient(135deg, var(--info-color), #0891b2);
-        }
-
-        .card-body-modern {
-            padding: 30px;
-        }
-
-        .form-group-modern {
-            margin-bottom: 20px;
-        }
-
-        .form-label-modern {
-            font-weight: 600;
-            color: var(--bg-dark);
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modern-input {
-            padding: 12px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        .modern-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .modern-input:disabled {
-            background-color: #f3f4f6;
-            cursor: not-allowed;
-        }
-
-        .options-section {
-            background: linear-gradient(135deg, var(--bg-light), white);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 25px;
-        }
-
-        .options-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--bg-dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-switch-modern {
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s;
-        }
-
-        .form-switch-modern:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateX(5px);
-        }
-
-        .form-switch-modern.nested {
-            margin-left: 30px;
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(79, 70, 229, 0.02));
-        }
-
-        .form-check-input:checked {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-        }
-
-        .form-check-label {
-            font-weight: 600;
-            color: var(--bg-dark);
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .modern-btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-sm);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modern-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-danger-modern {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .btn-success-modern {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-        }
-
-        .btn-primary-modern {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .qr-card {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .qr-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .qr-card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--bg-dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .action-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-
-        .action-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateX(5px);
-        }
-
-        .action-btn {
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            min-width: 200px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05));
-            border-left: 4px solid var(--info-color);
-            padding: 15px;
-            border-radius: 8px;
-            flex-grow: 1;
-        }
-
-        .info-box i {
-            color: var(--info-color);
-            margin-right: 8px;
-        }
-
-        .modern-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .tab-btn {
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-sm);
-            cursor: pointer;
-            text-decoration: none;
-            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
-            color: var(--bg-dark);
-        }
-
-        .tab-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .modern-table-container {
-            background: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-        }
-
-        .modern-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .modern-table thead {
-            background: linear-gradient(135deg, var(--bg-dark), #374151);
-            color: white;
-        }
-
-        .modern-table thead th {
-            padding: 18px 15px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .modern-table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .modern-table tbody tr {
-            transition: all 0.3s;
-        }
-
-        .modern-table tbody tr:hover {
-            background: var(--bg-light);
-        }
-
-        .search-input {
-            padding: 10px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            width: 100%;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .status-badge {
-            padding: 6px 12px;
+            gap: 6px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            display: inline-block;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            font-size: .9rem;
+            color: var(--ink);
         }
+        .chip i { color: var(--muted); }
 
-        .status-badge.success {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-        }
-
-        .status-badge.secondary {
-            background: linear-gradient(135deg, #9ca3af, #6b7280);
-            color: white;
-        }
-
-        .audio-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .audio-btn {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .audio-btn.record {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: white;
-        }
-
-        .audio-btn.play {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            color: white;
-        }
-
-        .audio-btn.stop {
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-        }
-
-        .audio-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .audio-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .toast {
-            border-radius: 10px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .main-container { padding: 15px; }
-            .card-body-modern { padding: 15px; }
-            .action-card { flex-direction: column; }
-            .action-btn { width: 100%; min-width: auto; }
-            .modern-tabs { flex-direction: column; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .modern-card { animation: fadeIn 0.3s ease; }
-
-        .qr-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .copy-toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            left: 40px;
-            background: #10b981;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .copy-toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .copy-toast i { font-size: 20px; }
-
-        /* Responsive tables/cartes */
-        .table-personnes-desktop,
-        .table-placement-desktop { display: block; }
-        .table-personnes-mobile,
-        .table-placement-mobile  { display: none;  }
-
-        @media (max-width: 768px) {
-            .table-personnes-desktop,
-            .table-placement-desktop { display: none;  }
-            .table-personnes-mobile,
-            .table-placement-mobile  { display: block; }
-        }
-
-        .personne-card {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #e5e7eb;
+        /* ---------- Cartes de partage ---------- */
+        .share-card {
+            height: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
             padding: 16px;
-            margin-bottom: 12px;
-            transition: box-shadow 0.2s;
-        }
-
-        .personne-card:hover { box-shadow: var(--shadow-md); }
-
-        .personne-card-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e5e7eb;
+            flex-direction: column;
+            gap: 10px;
         }
+        .share-card h6 { margin: 0; font-weight: 700; }
+        .share-card small { color: var(--muted); }
 
-        .personne-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(79, 70, 229, 0.12);
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-            flex-shrink: 0;
-            text-transform: uppercase;
-        }
-
-        .personne-card-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--bg-dark);
-            line-height: 1.3;
-        }
-
-        .personne-card-email {
-            font-size: 0.82rem;
-            color: var(--text-light);
-            margin-top: 2px;
-            word-break: break-all;
-        }
-
-        .personne-card-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .personne-card-field label {
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-light);
-            margin-bottom: 3px;
-        }
-
-        .personne-card-field span {
-            font-size: 0.9rem;
-            color: var(--bg-dark);
-        }
-
-        .personne-card-field.full-width { grid-column: 1 / -1; }
-
-        .personne-card-actions {
+        /* ---------- Onglets ---------- */
+        .tabs-bar {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid #e5e7eb;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+            -webkit-overflow-scrolling: touch;
         }
+        .tabs-bar a {
+            flex: 0 0 auto;
+            padding: 10px 18px;
+            border-radius: 8px 8px 0 0;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--muted);
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .tabs-bar a:hover { color: var(--primary); }
+        .tabs-bar a.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tabs-bar a.danger.active { color: #dc2626; border-bottom-color: #dc2626; }
+
+        /* ---------- Cartes d'options ---------- */
+        .option-card {
+            height: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+        }
+        .option-card h6 {
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nested {
+            margin: 6px 0 10px 8px;
+            padding-left: 14px;
+            border-left: 3px solid rgba(79, 70, 229, .25);
+        }
+        .form-check-input:checked { background-color: #10b981; border-color: #10b981; }
+        .form-check-label { cursor: pointer; font-weight: 500; }
+
+        .btn-brand { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .btn-brand:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+
+        .danger-zone { border: 1px solid #fecaca; border-radius: var(--radius); padding: 20px; }
 
         .audio-announce {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 6px 12px;
-            background-color: var(--info-color, #e8f4fd);
-            border-left: 3px solid var(--primary-color, #3498db);
-            border-radius: 4px;
-            font-size: 0.875rem;
-            color: var(--text-color, #333);
+            font-size: .85rem;
+            color: var(--muted);
             font-style: italic;
+            margin-top: 6px;
         }
 
-        .audio-announce i {
-            color: var(--primary-color, #3498db);
-            flex-shrink: 0;
-        }
-
-        .audio-announce strong {
-            font-style: normal;
-            font-weight: 600;
-        }
+        .table > :not(caption) > * > * { vertical-align: middle; }
     </style>
 </head>
 <body>
     {{ include('header.twig') }}
 
-    <!-- Sélection du tournoi -->
-    <div class="main-container">
-        <div class="section-header">
-            <h3 class="section-title">
-                <i class="fas fa-trophy me-2"></i>
-                {{ t('selectionTournoi') }}
-            </h3>
+    {# ------------------------------------------------------------------
+       Onglet courant (retombe sur "options" si l'onglet demandé est désactivé)
+       ------------------------------------------------------------------ #}
+    {% set currentTab = tab|default('options') %}
+    {% if tournoiEnCours != 0 %}
+        {% if currentTab == 'arbitres' and infotournoi.gestionArbitres != 1 %}{% set currentTab = 'options' %}{% endif %}
+        {% if currentTab == 'gestionTables' and infotournoi.gestionTables != 1 %}{% set currentTab = 'options' %}{% endif %}
+        {% if currentTab == 'infos' and infotournoi.gestionInformations != 1 %}{% set currentTab = 'options' %}{% endif %}
+    {% endif %}
+
+    {# Macro : un switch Bootstrap (id = name, valeur 1) #}
+    {% macro switch(id, label, checked, controls) %}
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" role="switch"
+                   id="{{ id }}" name="{{ id }}" value="1"
+                   {% if checked %}checked{% endif %}
+                   {% if controls %}data-controls="{{ controls }}"{% endif %}>
+            <label class="form-check-label" for="{{ id }}">{{ label|raw }}</label>
         </div>
-        <div class="tournament-buttons">
-            {% for tournoi in ListeDesTournois %}
-                <a href="modifierTournoi.php?idTournoi={{ tournoi.id }}"
-                   class="tournament-btn {% if tournoi.id == tournoiEnCours %}active{% endif %}">
-                    {{ tournoi.nom }}
-                    <i class="fas fa-trophy"></i>
-                </a>
-            {% endfor %}
+    {% endmacro %}
+    {% import _self as ui %}
+
+    <!-- ===================== EN-TÊTE ===================== -->
+    <div class="panel">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5">
+                <label for="selectTournoi" class="form-label fw-bold mb-1">
+                    <i class="fas fa-trophy me-1"></i> {{ t('selectionTournoi') }}
+                </label>
+                <select id="selectTournoi" class="form-select"
+                        onchange="if (this.value) location.href = 'modifierTournoi.php?idTournoi=' + this.value;">
+                    {% if tournoiEnCours == 0 %}<option value="">—</option>{% endif %}
+                    {% for tournoi in ListeDesTournois %}
+                        <option value="{{ tournoi.id }}" {% if tournoi.id == tournoiEnCours %}selected{% endif %}>
+                            {{ tournoi.nom }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if tournoiEnCours != 0 %}
+            <div class="col-lg-7">
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                    <span class="chip"><i class="fas fa-futbol"></i> {{ infotournoi.nom_type_sport }}</span>
+                    <span class="chip"><i class="fas fa-calendar-day"></i> {{ infotournoi.dateDebut }}</span>
+                    <span class="chip"><i class="fas fa-clock"></i> {{ infotournoi.heure_debut }}</span>
+                    <span class="chip"><i class="fas fa-hourglass-half"></i> {{ infotournoi.pasHoraire }} min</span>
+                    {% if infotournoi.isVisible == 1 %}
+                        <span class="chip"><i class="fas fa-eye text-success"></i> {{ t('tournoiVisible') }}</span>
+                    {% else %}
+                        <span class="chip"><i class="fas fa-eye-slash"></i> Masqué</span>
+                    {% endif %}
+                    {% if infotournoi.isArchived == 1 %}
+                        <span class="chip"><i class="fas fa-box-archive"></i> Archivé</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
+
+        {% if tournoiEnCours != 0 %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="ajoutEquipe.php?idTournoi={{ idTournoi }}" class="btn btn-success btn-sm"
+               title="{{ t('explicationEquipe')|striptags|e('html_attr') }}">
+                <i class="fa-solid fa-plus"></i> {{ t('creerEquipe') }}
+            </a>
+            <a href="creerClub.php" class="btn btn-success btn-sm"
+               title="{{ t('explicationClub')|striptags|e('html_attr') }}">
+                <i class="fa-solid fa-plus"></i> {{ t('creerClub') }}
+            </a>
+        </div>
+        {% endif %}
     </div>
 
     {% if tournoiEnCours != 0 %}
-    <div class="row">
 
-        <!-- ===================== COLONNE GAUCHE ===================== -->
-        <div class="col-lg-6">
-            <div class="modern-card">
-                <div class="card-header-modern">
-                    <i class="fas fa-cog"></i>
-                    {{ t('parametresDuTournoi') }} ({{ infotournoi.nom_type_sport }})
-                </div>
-                <div class="card-body-modern">
-
-                    {# ================================================================
-                       FORMULAIRE PRINCIPAL
-                       Contient : nom, heure_debut, pasHoraire, tous les switches,
-                       ET refreshClientTime (déplacé ici pour éviter l'écrasement des
-                       autres champs lors du submit de refreshClientTime).
-                       ================================================================ #}
-                    <form action="modifierTournoi_traitement.php" method="POST">
-                        <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-
-                        <div class="form-group-modern">
-                            <label for="nom" class="form-label-modern">
-                                <i class="fas fa-signature"></i>
-                                {{ t('nameOfTournament') }}
-                            </label>
-                            <input type="text" class="modern-input" id="nom" name="nom"
-                                   value="{{ infotournoi.nom }}" onchange="this.form.submit()">
-                        </div>
-
-                        <div class="form-group-modern">
-                            <label for="dateDebut" class="form-label-modern">
-                                <i class="fas fa-calendar-day"></i>
-                                {{ t('dateDuTournoi') }}
-                            </label>
-                            <input type="date" class="modern-input" id="dateDebut" name="dateDebut"
-                                   value="{{ infotournoi.dateDebut }}" readonly>
-                        </div>
-
-                        <div class="form-group-modern">
-                            <label for="heure_debut" class="form-label-modern">
-                                <i class="fas fa-clock"></i>
-                                {{ t('hourStart') }}
-                            </label>
-                            <input type="time" class="modern-input" id="heure_debut" name="heure_debut"
-                                   value="{{ infotournoi.heure_debut }}" onchange="this.form.submit()">
-                        </div>
-
-                        <div class="form-group-modern">
-                            <label for="pasHoraire" class="form-label-modern">
-                                <i class="fas fa-hourglass-half"></i>
-                                {{ t('dureeRencontreDisable') }}
-                            </label>
-                            <input type="number" class="modern-input" id="pasHoraire" name="pasHoraire"
-                                   value="{{ infotournoi.pasHoraire }}" onchange="this.form.submit()" readonly>
-                        </div>
-
-                        <div class="options-section">
-                            <div class="options-title">
-                                <i class="fas fa-sliders-h"></i>
-                                Options
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionTables"
-                                           name="gestionTables" value="1"
-                                           {% if infotournoi.gestionTables == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="gestionTables">
-                                        🧮 {{ t('gestionDesTables') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionVoix"
-                                           name="gestionVoix" value="1"
-                                           {% if infotournoi.gestionVoix == 1 %}checked{% endif %}
-                                           onchange="toggleDependencies(), this.form.submit()">
-                                    <label class="form-check-label" for="gestionVoix">
-                                        🎙️ {{ t('gestionDesAnnoncesVocales') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern nested" id="effetsSonoresContainer">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="effetsSonores"
-                                           name="effetsSonores" value="1"
-                                           {% if infotournoi.effetsSonores == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="effetsSonores">
-                                        🔊 {{ t('effetsSonoresMatch') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionArbitres"
-                                           name="gestionArbitres" value="1"
-                                           {% if infotournoi.gestionArbitres == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="gestionArbitres">
-                                        🧑‍⚖️ {{ t('gestionDesArbitres') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionPartenaires"
-                                           name="gestionPartenaires" value="1"
-                                           {% if infotournoi.gestionPartenaires == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="gestionPartenaires">
-                                        🤝 {{ t('gestionDesPartenaires') }}
-                                        {{ t('partenairesDansLesPreferences', {'%tournoiId%': idTournoi}) | raw }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="isVisible"
-                                           name="isVisible" value="1"
-                                           {% if infotournoi.isVisible == 1 %}checked{% endif %}
-                                           onchange="toggleDependencies(), this.form.submit()">
-                                    <label class="form-check-label" for="isVisible">
-                                        👁️ {{ t('tournoiVisible') }}?
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern nested" id="heureIsVisibleContainer">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="heureIsVisible"
-                                           name="heureIsVisible" value="1"
-                                           {% if infotournoi.heureIsVisible == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="heureIsVisible">
-                                        ⏰ {{ t('horaireIsVisible') }}?
-                                    </label>
-                                </div>
-                            </div>
-
-                        <div class="form-switch-modern">
-    <div class="form-check form-switch">
-        <input class="form-check-input"
-               type="checkbox"
-               id="gestionTempsChangement"
-               name="gestionTempsChangement"
-               value="1"
-               {% if infotournoi.gestionTempsChangement == 1 %}checked{% endif %}
-               onchange="toggleDependencies(); this.form.submit();">
-
-        <label class="form-check-label" for="gestionTempsChangement">
-            ⏱️ Utiliser le panneau d'affichage virtuel ?
-        </label>
-    </div>
-</div>
-
-        <div class="form-switch-modern nested"
-                id="tempsChangementContainer"
-                style="display:none;">
-
-                <label class="form-label-modern">
-                    ⌛ Temps entre deux matchs (minutes)
-                </label>
-
-                  <input type="number"
-           class="modern-input"
-           name="tempsChangementMinutes"
-           min="0"
-           max="60"
-           value="{{ infotournoi.tempsChangementMinutes }}"
-           onchange="this.form.submit()">
-
-    <div class="form-check form-switch mt-3">
-        <input class="form-check-input" type="checkbox" id="afficherCountdownCoach"
-               name="afficherCountdownCoach" value="1"
-               {% if infotournoi.afficherCountdownCoach == 1 %}checked{% endif %}
-               onchange="this.form.submit()">
-        <label class="form-check-label" for="afficherCountdownCoach">
-            ⏳ Afficher le compte à rebours aux coachs
-        </label>
-    </div>
-</div>
-
-
-
-                            <div class="form-switch-modern " id="IsRankingViewContainer">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="IsRankingView"
-                                           name="IsRankingView" value="1"
-                                           {% if infotournoi.IsRankingView == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="IsRankingView">
-                                        🏆 {{ t('classementIsVisible') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="gestionInformations"
-                                           name="gestionInformations" value="1"
-                                           {% if infotournoi.gestionInformations == 1 %}checked{% endif %}
-                                           onchange="toggleDependencies(), this.form.submit()">
-                                    <label class="form-check-label" for="gestionInformations">
-                                        🏟️ {{ t('gestionInformations') }}
-                                    </label>
-                                </div>
-                            </div>
-
-                            {# ── refreshClientTime déplacé ici (même formulaire que les autres champs) ── #}
-                            <div class="form-group-modern mt-3" style="display:none;">
-                                <label for="refreshClientTime" class="form-label-modern">
-                                    🔄 Taux rafraîchissement (s)
-                                </label>
-                                <input type="number" class="modern-input" id="refreshClientTime"
-                                       name="refreshClientTime" value="{{ infotournoi.refreshClientTime / 1000 }}"
-                                       onchange="this.form.submit()" min="20" max="200" readonly>
-                            </div>
-
-                        </div>{# ── FIN .options-section ── #}
-                    </form>
-                    {# ── FIN du formulaire principal ── #}
-
-                    {# ================================================================
-                       BLOC GESTION DES INFORMATIONS
-                       ================================================================ #}
-                    <div id="gestionInformationsContainer" class="options-section mt-4" style="display:none;">
-                        
-                        {# ── SOUS-BLOC GYMNASE ── #}
-                        <div id="gymnaseContainer">
-                            <div class="options-title">
-                                <i class="fas fa-building"></i>
-                                🏟️ Gymnase du tournoi
-                                <span class="badge bg-secondary ms-2" style="font-size:0.7rem;font-weight:500;">Optionnel</span>
-                            </div>
-                            <div class="info-box mb-3">
-                                <i class="fa-solid fa-circle-info"></i>
-                                <strong>Ces informations seront visibles par les participants</strong> sur la page publique du tournoi —
-                                adresse, ville et téléphone du gymnase s'afficheront automatiquement,
-                                ce qui évitera aux participants de vous contacter pour savoir où se rendre.
-                            </div>
-
-                            {% if gymnases is empty %}
-                                <div class="alert alert-info d-flex align-items-center gap-2 mb-0" style="border-radius:8px;">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span>
-                                        Vous n'avez pas encore de gymnase.
-                                        <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true" class="fw-bold">
-                                            Créer un gymnase dans mes préférences
-                                        </a>
-                                    </span>
-                                </div>
-                            {% else %}
-                                <form action="modifierTournoi_traitement.php" method="POST">
-                                    <input type="hidden" name="attacherGymnase" value="1">
-                                    <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-
-                                    <div class="form-group-modern mb-3">
-                                        <label for="gymnase_id" class="form-label-modern">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            Sélectionner un gymnase
-                                        </label>
-                                        <select name="gymnase_id" id="gymnase_id" class="modern-input"
-                                                onchange="this.form.submit()">
-                                            <option value="">— Aucun gymnase —</option>
-                                            {% for g in gymnases %}
-                                                <option value="{{ g.id }}" {% if gymnaseActuel == g.id %}selected{% endif %}>
-                                                    {{ g.nom }}
-                                                    {% if g.ville %} — {{ g.ville }}{% endif %}
-                                                    {% if g.nb_terrains %} ({{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}){% endif %}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    {% if gymnaseActuel %}
-                                        {% for g in gymnases %}
-                                            {% if g.id == gymnaseActuel %}
-                                            <div class="info-box" style="margin-top:0;">
-                                                <div class="fw-bold mb-1">
-                                                    <i class="fas fa-building me-1"></i>{{ g.nom }}
-                                                </div>
-                                                {% if g.adresse %}
-                                                    <div class="text-muted" style="font-size:0.9rem;">
-                                                        <i class="fas fa-map-pin me-1"></i>{{ g.adresse }}
-                                                        {% if g.ville %}, {{ g.ville }}{% endif %}
-                                                        {% if g.code_postal %} {{ g.code_postal }}{% endif %}
-                                                    </div>
-                                                {% endif %}
-                                                {% if g.telephone %}
-                                                    <div class="text-muted" style="font-size:0.9rem;">
-                                                        <i class="fas fa-phone me-1"></i>{{ g.telephone }}
-                                                    </div>
-                                                {% endif %}
-                                                {% if g.nb_terrains %}
-                                                    <div class="text-muted" style="font-size:0.9rem;">
-                                                        <i class="fas fa-th-large me-1"></i>
-                                                        {{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-
-                                    <div class="d-flex gap-2 mt-3">
-                                        <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true"
-                                           class="modern-btn btn-primary-modern btn-sm">
-                                            <i class="fas fa-cog"></i>
-                                            Gérer mes gymnases
-                                        </a>
-                                    </div>
-                                </form>
-                            {% endif %}
-                        </div>
-                        {# ── FIN SOUS-BLOC GYMNASE ── #}
-
-                        {# ── SOUS-BLOC CONTACT ── #}
-                        <div id="contactContainer" class="mt-4">
-                            <div class="options-title">
-                                <i class="fas fa-phone"></i>
-                                📱 Informations de contact
-                                <span class="badge bg-secondary ms-2" style="font-size:0.7rem;font-weight:500;">Optionnel</span>
-                            </div>
-                            <div class="info-box mb-3">
-                                <i class="fa-solid fa-circle-info"></i>
-                                <strong>Ces informations seront visibles par les participants : </strong> sur la page publique du tournoi <br>ex: restauration sur place.... contactez le 06.XX pour vos questions
-                            </div>
-
-                            <form action="modifierTournoi_traitement.php" method="POST">
-                                <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-                                <input type="hidden" name="actionContact" value="1">
-
-                                <div class="form-group-modern">
-                                    <label for="telephone" class="form-label-modern">
-                                        <i class="fas fa-phone"></i>
-                                        {{ t('telephone') }}
-                                    </label>
-                                    <input type="tel" class="modern-input" id="telephone" name="telephone"
-                                           value="{{ infotournoi.telephone }}" onchange="this.form.submit()">
-                                </div>
-
-                                <div class="form-group-modern">
-                                    <label for="commentaire" class="form-label-modern">
-                                        <i class="fas fa-comment"></i>
-                                        {{ t('commentaire') }}
-                                    </label>
-                                    <textarea class="modern-input" id="commentaire" name="commentaire"
-                                              rows="3" onchange="this.form.submit()">{{ infotournoi.commentaire }}</textarea>
-                                </div>
-                            </form>
-                        </div>
-                        {# ── FIN SOUS-BLOC CONTACT ── #}
-
-                    </div>
-                    {# ── FIN BLOC GESTION DES INFORMATIONS ── #}
-
-                    {# ── Formulaire archivage seul ── #}
-                    <form action="modifierTournoi_traitement.php" method="POST">
-                        <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-                        <input type="hidden" name="actionArchiver" value="1">
-                        <div class="options-section mt-3">
-                            <div class="form-switch-modern">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="isArchived"
-                                           name="isArchived" value="1"
-                                           {% if infotournoi.isArchived == 1 %}checked{% endif %}
-                                           onchange="this.form.submit()">
-                                    <label class="form-check-label" for="isArchived">
-                                        🗃️ {{ t('archiverLeTournoi') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    {# ── FIN formulaire archivage ── #}
-
-                    {% if infotournoi.isArchived == 1 %}
-                        <a class="modern-btn btn-danger-modern mt-3"
-                           href="deleteTournament.php?idTournoi={{ infotournoi.id }}&action=delete"
-                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\nL\'action est irréversible');">
-                            <i class="fa-solid fa-trash-can"></i>
-                            {{ t('suppressionDuTournoi') }}
+    <!-- ===================== PARTAGE & DIFFUSION ===================== -->
+    <div class="panel">
+        <div class="row g-3">
+            <div class="col-md-{{ infotournoi.gestionArbitres == 1 ? 4 : 6 }}">
+                <div class="share-card">
+                    <h6><i class="fa-solid fa-qrcode me-1"></i> {{ t('QrpourLesCoachsetPublic') }}</h6>
+                    <div class="d-flex flex-wrap gap-2 mt-auto">
+                        <a href="GenerateQrCode.php?idTournoi={{ infotournoi.id }}" class="btn btn-brand btn-sm">
+                            <i class="fa-solid fa-qrcode"></i> {{ t('qrCode') }}
                         </a>
-                    {% endif %}
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                onclick="copyTournamentLink('{{ infotournoi.id }}')">
+                            <i class="fa-solid fa-link"></i> {{ t('CopierLeLien') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
 
+            {% if infotournoi.gestionArbitres == 1 %}
+            <div class="col-md-4">
+                <div class="share-card">
+                    <h6><i class="fa-solid fa-qrcode me-1"></i> {{ t('pourLesArbitres') }}</h6>
+                    <div class="mt-auto">
+                        <a href="GenerateQrCodeArbitre.php?idTournoi={{ infotournoi.id }}" class="btn btn-brand btn-sm">
+                            <i class="fa-solid fa-qrcode"></i> {{ t('qrCode') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="col-md-{{ infotournoi.gestionArbitres == 1 ? 4 : 6 }}">
+                <div class="share-card">
+                    <h6><i class="fas fa-tv me-1"></i> Brackito TV</h6>
+                    <small>{{ t('explicationTv')|raw }}</small>
+                    <div class="mt-auto">
+                        <a href="tv_display.php?id_tournoi={{ infotournoi.id }}" target="_blank" class="btn btn-brand btn-sm">
+                            <i class="fas fa-tv"></i> {{ t('voirSurTv') }}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        {# ── FIN colonne gauche ── #}
-
-        <!-- ===================== COLONNE DROITE ===================== -->
-        <div class="col-lg-6">
-
-            <!-- QR Codes -->
-            <div class="modern-card">
-                <div class="card-header-modern info">
-                    <i class="fa-solid fa-qrcode"></i>
-                    {{ t('generateQrCode') }}
-                </div>
-                <div class="card-body-modern">
-                    <div class="row">
-                        <div class="col-lg-{% if infotournoi.gestionArbitres == 0 %}12{% else %}6{% endif %}">
-                            <div class="qr-card">
-                                <div class="qr-card-title">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                    {{ t('QrpourLesCoachsetPublic') }}
-                                </div>
-                                <div class="qr-actions">
-                                    <a href="GenerateQrCode.php?idTournoi={{ infotournoi.id }}"
-                                       class="modern-btn btn-primary-modern">
-                                        <i class="fa-solid fa-qrcode"></i>
-                                        {{ t('qrCode') }}
-                                    </a>
-                                    <button type="button"
-                                            class="modern-btn btn-secondary-modern"
-                                            onclick="copyTournamentLink('{{ infotournoi.id }}')"
-                                            title="{{ t('CopierLeLien') }}">
-                                        <i class="fa-solid fa-link"></i>
-                                        {{ t('CopierLeLien') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="copy-toast" class="copy-toast">
-                            <i class="fa-solid fa-check-circle"></i>
-                            <span>{{ t('lienCopie') }}</span>
-                        </div>
-
-                        {% if infotournoi.gestionArbitres == 1 %}
-                        <div class="col-lg-6">
-                            <div class="qr-card">
-                                <div class="qr-card-title">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                    {{ t('pourLesArbitres') }}
-                                </div>
-                                <a href="GenerateQrCodeArbitre.php?idTournoi={{ infotournoi.id }}"
-                                   class="modern-btn btn-primary-modern">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                    {{ t('qrCode') }}
-                                </a>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="modern-card">
-                <div class="card-header-modern">
-                    <i class="fas fa-tv"></i>
-                    BRACKITO TV
-                </div>
-                        <div class="action-card mt-3">
-                            <a href="tv_display.php?id_tournoi={{ infotournoi.id }}" class="action-btn btn-primary-modern" target="_blank">
-                                <i class="fas fa-tv"></i>
-                                {{ t('voirSurTv') }}
-                                
-                            </a>
-                        <div class="info-box">
-                            <i class="fa-solid fa-info-circle"></i>
-                            {{ t('explicationTv') | raw }}
-                        </div>
-
-                       </div> 
-
-            </div>
-
-            <!-- Actions rapides -->
-            <div class="modern-card">
-                <div class="card-header-modern">
-                    <i class="fas fa-bolt"></i>
-                    Actions rapides
-                </div>
-                <div class="card-body-modern">
-                    <div class="action-card">
-                        <a href="creerClub.php" class="action-btn btn-success-modern">
-                            <i class="fa-solid fa-plus"></i>
-                            {{ t('creerClub') }}
-                        </a>
-                        <div class="info-box">
-                            <i class="fa-solid fa-info-circle"></i>
-                            {{ t('explicationClub') | raw }}
-                        </div>
-                    </div>
-                    <div class="action-card">
-                        <a href="ajoutEquipe.php?idTournoi={{ idTournoi }}" class="action-btn btn-success-modern">
-                            <i class="fa-solid fa-plus"></i>
-                            {{ t('creerEquipe') }}
-                        </a>
-                        <div class="info-box">
-                            <i class="fa-solid fa-info-circle"></i>
-                            {{ t('explicationEquipe') }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        {# ── FIN colonne droite ── #}
-
     </div>
-    {# ── FIN row ── #}
 
-    <!-- ===================== TABS ===================== -->
-    {% if infotournoi.gestionArbitres == 1 or infotournoi.gestionTables == 1 %}
-    <div class="main-container">
-        <div class="modern-tabs">
+    <!-- ===================== ONGLETS ===================== -->
+    <div class="panel">
+        <nav class="tabs-bar">
+            <a href="modifierTournoi.php?idTournoi={{ infotournoi.id }}&tab=options"
+               class="{{ currentTab == 'options' ? 'active' }}">
+                <i class="fas fa-sliders-h"></i> Options
+            </a>
+            {% if infotournoi.gestionInformations == 1 %}
+            <a href="modifierTournoi.php?idTournoi={{ infotournoi.id }}&tab=infos"
+               class="{{ currentTab == 'infos' ? 'active' }}">
+                <i class="fas fa-building"></i> {{ t('gestionInformations') }}
+            </a>
+            {% endif %}
             {% if infotournoi.gestionArbitres == 1 %}
             <a href="modifierTournoi.php?idTournoi={{ infotournoi.id }}&tab=arbitres"
-               class="tab-btn {% if tab == 'arbitres' %}active{% endif %}">
-                <i class="fas fa-user-tie"></i>
-                {{ t('arbitres') }}
+               class="{{ currentTab == 'arbitres' ? 'active' }}">
+                <i class="fas fa-user-tie"></i> {{ t('arbitres') }}
             </a>
             {% endif %}
-
             {% if infotournoi.gestionTables == 1 %}
             <a href="modifierTournoi.php?idTournoi={{ infotournoi.id }}&tab=gestionTables"
-               class="tab-btn {% if tab == 'gestionTables' %}active{% endif %}">
-                <i class="fas fa-table"></i>
-                Table
+               class="{{ currentTab == 'gestionTables' ? 'active' }}">
+                <i class="fas fa-table"></i> Table
             </a>
             {% endif %}
-        </div>
+            <a href="modifierTournoi.php?idTournoi={{ infotournoi.id }}&tab=danger"
+               class="danger {{ currentTab == 'danger' ? 'active' }}">
+                <i class="fas fa-triangle-exclamation"></i> Archivage
+            </a>
+        </nav>
 
-        <!-- Tab Arbitres -->
-        {% if tab == 'arbitres' and infotournoi.gestionArbitres == 1 %}
-        <div class="modern-card">
-            <div class="card-header-modern">
-                <i class="fas fa-user-plus"></i>
-                {{ t('ajouterDesArbitres') }}
-            </div>
-            <div class="card-body-modern">
-                <div class="row">
-                    <div class="col-lg-5">
-                    {% if AfficherLesClubsPourArbitres is empty %}
-                    <div class="alert alert-warning d-flex align-items-center gap-2" style="border-radius:8px;">
-                        <i class="fas fa-triangle-exclamation"></i>
-                        <span>Il faut au moins créer les équipes avant de placer les arbitres. <a href="ajoutEquipe.php?idTournoi={{ infotournoi.id }}" class="alert-link">Créer une équipe</a></span>
-                    </div>
-                    
-                    {% endif %}
-                        <form action="modifierTournoi_traitement.php" method="GET">
-                            <input type="hidden" name="addArbitre" value="true">
-                            <input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
+        {# ============================ ONGLET OPTIONS ============================ #}
+        {% if currentTab == 'options' %}
+        <form action="modifierTournoi_traitement.php" method="POST" class="auto-submit">
+            <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+            {# Champs en lecture seule conservés pour le traitement #}
+            <input type="hidden" name="dateDebut" value="{{ infotournoi.dateDebut }}">
+            <input type="hidden" name="pasHoraire" value="{{ infotournoi.pasHoraire }}">
+            <input type="hidden" name="refreshClientTime" value="{{ infotournoi.refreshClientTime / 1000 }}">
 
-                            <div class="form-group-modern">
-                                <label for="nomArbitre" class="form-label-modern">
-                                    <i class="fas fa-user"></i>
-                                    {{ t('nomArbitreOptionnel') }}
-                                </label>
-                                <input type="text" class="modern-input" id="nomArbitre" name="nomArbitre" {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
-                            </div>
+            <div class="row g-3">
 
-                            <div class="form-group-modern">
-                                <label for="club" class="form-label-modern">
-                                    <i class="fas fa-building"></i>
-                                    {{ t('Club') }}
-                                </label>
-                                <select class="modern-input" id="club" name="clubID" {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
-                                    {% for club in AfficherLesClubsPourArbitres %}
-                                        <option value="{{ club.id }}">{{ club.nom }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <button type="submit" class="modern-btn btn-success-modern" {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
-                                <i class="fas fa-plus"></i>
-                                {{ t('ajouter') }}
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="col-lg-12 mt-4">
-                        <div class="modern-table-container">
-                            <table class="modern-table" id="tableDesArbitres">
-                                <thead>
-                                    <tr>
-                                        <th>{{ t('nomArbitreOptionnel') }}</th>
-                                        <th>{{ t('Club') }}</th>
-                                        <th>{{ t('Action') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for arbitre in AfficherLesArbitres %}
-                                    <tr id="ligne-arbitre-{{ arbitre.arbitre_id }}">
-                                        <td>
-                                            <form id="form-arbitre-{{ arbitre.arbitre_id }}"
-                                                  hx-post="modifierTournoi_traitement.php"
-                                                  hx-trigger="keyup"
-                                                  hx-target="#message-arbitre-{{ arbitre.arbitre_id }}"
-                                                  hx-swap="innerHTML">
-                                                <input type="text" name="nomArbitre" value="{{ arbitre.nom }}"
-                                                       placeholder="optionnel" class="modern-input">
-                                                <input type="hidden" name="idArbitre" value="{{ arbitre.arbitre_id }}">
-                                                <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-                                            </form>
-                                            <div id="message-arbitre-{{ arbitre.arbitre_id }}"></div>
-                                        </td>
-                                        <td>{{ arbitre.club_nom }}</td>
-                                        <td>
-                                            <div class="d-flex gap-2 justify-content-center flex-wrap">
-                                                <a href="modifierTournoi_traitement.php?action=delArbitre&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{ infotournoi.id }}"
-                                                   class="modern-btn btn-danger-modern btn-sm">
-                                                    <i class="fa fa-trash-o"></i>
-                                                    {{ t('supprimerArbitre') }}
-                                                </a>
-
-                                                {% if infotournoi.gestionVoix == 1 %}
-                                                <div class="audio-controls">
-                                                    <button class="audio-btn record"
-                                                            onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-                                                        🎤 {{ t('enregistrer') }}
-                                                    </button>
-                                                    <button id="stopButton_{{ arbitre.arbitre_id }}"
-                                                            class="audio-btn stop"
-                                                            onclick="stopRecording()" disabled>
-                                                        ⏹️ {{ t('stop') }}
-                                                    </button>
-
-                                                    {% if arbitre.audio_path == null %}
-                                                        <i class="fa-solid fa-volume-xmark" style="color: var(--danger-color);" title="Aucun enregistrement"></i>
-                                                    {% else %}
-                                                        <i class="fa-solid fa-volume-high" style="color: var(--success-color);" title="Enregistrement disponible"></i>
-                                                        <button class="audio-btn play"
-                                                                id="playButton_{{ arbitre.arbitre_id }}"
-                                                                onclick="playArbitreAudio({{ arbitre.arbitre_id }}, '{{ arbitre.audio_path }}')"
-                                                                title="Écouter l'enregistrement">
-                                                            ▶️ Écouter
-                                                        </button>
-                                                        <button class="audio-btn stop"
-                                                                id="stopPlayButton_{{ arbitre.arbitre_id }}"
-                                                                onclick="stopArbitreAudio({{ arbitre.arbitre_id }})"
-                                                                style="display:none;">
-                                                            ⏹️ Stop
-                                                        </button>
-                                                    {% endif %}
-
-                                                    <div class="audio-announce">
-                                                        <i class="fa-solid fa-microphone-lines"></i>
-                                                        <span>
-                                                            {{ t('il faut annoncer') }} :
-                                                            <strong>{{ t('arbitrée par') }} {{ arbitre.nom }}</strong>
-                                                            {{ t('du club') }} <strong>{{ arbitre.club_nom }}</strong>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                <div class="col-lg-6">
+                    <div class="option-card">
+                        <h6><i class="fas fa-signature"></i> Général</h6>
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">{{ t('nameOfTournament') }}</label>
+                            <input type="text" class="form-control" id="nom" name="nom" value="{{ infotournoi.nom }}">
+                        </div>
+                        <div>
+                            <label for="heure_debut" class="form-label">{{ t('hourStart') }}</label>
+                            <input type="time" class="form-control" id="heure_debut" name="heure_debut" value="{{ infotournoi.heure_debut }}">
                         </div>
                     </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="option-card">
+                        <h6><i class="fas fa-eye"></i> Visibilité</h6>
+                        {{ ui.switch('isVisible', '👁️ ' ~ t('tournoiVisible') ~ ' ?', infotournoi.isVisible == 1, 'box-visible') }}
+                        <div id="box-visible" class="nested">
+                            {{ ui.switch('heureIsVisible', '⏰ ' ~ t('horaireIsVisible') ~ ' ?', infotournoi.heureIsVisible == 1) }}
+                            {{ ui.switch('IsRankingView', '🏆 ' ~ t('classementIsVisible'), infotournoi.IsRankingView == 1) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="option-card">
+                        <h6><i class="fas fa-users-gear"></i> Organisation</h6>
+                        {{ ui.switch('gestionTables', '🧮 ' ~ t('gestionDesTables'), infotournoi.gestionTables == 1) }}
+                        {{ ui.switch('gestionArbitres', '🧑‍⚖️ ' ~ t('gestionDesArbitres'), infotournoi.gestionArbitres == 1) }}
+                        {{ ui.switch('gestionPartenaires',
+                            '🤝 ' ~ t('gestionDesPartenaires') ~ ' ' ~ t('partenairesDansLesPreferences', {'%tournoiId%': idTournoi}),
+                            infotournoi.gestionPartenaires == 1) }}
+                        {{ ui.switch('gestionInformations', '🏟️ ' ~ t('gestionInformations'), infotournoi.gestionInformations == 1) }}
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="option-card">
+                        <h6><i class="fas fa-microphone"></i> Annonces vocales</h6>
+                        {{ ui.switch('gestionVoix', '🎙️ ' ~ t('gestionDesAnnoncesVocales'), infotournoi.gestionVoix == 1, 'box-voix') }}
+                        <div id="box-voix" class="nested">
+                            {{ ui.switch('effetsSonores', '🔊 ' ~ t('effetsSonoresMatch'), infotournoi.effetsSonores == 1) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="option-card">
+                        <h6><i class="fas fa-tv"></i> Panneau d'affichage virtuel</h6>
+                        {{ ui.switch('gestionTempsChangement', '⏱️ Utiliser le panneau d\'affichage virtuel ?', infotournoi.gestionTempsChangement == 1, 'box-temps') }}
+                        <div id="box-temps" class="nested">
+                            <label for="tempsChangementMinutes" class="form-label">⌛ Temps entre deux matchs (minutes)</label>
+                            <input type="number" class="form-control mb-3" style="max-width:160px;"
+                                   id="tempsChangementMinutes" name="tempsChangementMinutes"
+                                   min="0" max="60" value="{{ infotournoi.tempsChangementMinutes }}">
+                            {{ ui.switch('afficherCountdownCoach', '⏳ Afficher le compte à rebours aux coachs', infotournoi.afficherCountdownCoach == 1) }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        {% endif %}
+
+        {# ============================ ONGLET INFORMATIONS ============================ #}
+        {% if currentTab == 'infos' %}
+        <div class="alert alert-info">
+            <i class="fa-solid fa-circle-info"></i>
+            Ces informations sont visibles par les participants sur la page publique du tournoi.
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="option-card">
+                    <h6><i class="fas fa-building"></i> Gymnase <span class="badge bg-secondary">Optionnel</span></h6>
+
+                    {% if gymnases is empty %}
+                        <p class="mb-0">
+                            Vous n'avez pas encore de gymnase.
+                            <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true" class="fw-bold">
+                                Créer un gymnase dans mes préférences
+                            </a>
+                        </p>
+                    {% else %}
+                        <form action="modifierTournoi_traitement.php" method="POST" class="auto-submit">
+                            <input type="hidden" name="attacherGymnase" value="1">
+                            <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+
+                            <label for="gymnase_id" class="form-label">Sélectionner un gymnase</label>
+                            <select name="gymnase_id" id="gymnase_id" class="form-select">
+                                <option value="">— Aucun gymnase —</option>
+                                {% for g in gymnases %}
+                                    <option value="{{ g.id }}" {% if gymnaseActuel == g.id %}selected{% endif %}>
+                                        {{ g.nom }}{% if g.ville %} — {{ g.ville }}{% endif %}{% if g.nb_terrains %} ({{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+
+                        {% for g in gymnases %}
+                            {% if gymnaseActuel and g.id == gymnaseActuel %}
+                            <div class="mt-3 p-3 rounded" style="background:var(--surface);">
+                                <div class="fw-bold mb-1"><i class="fas fa-building me-1"></i>{{ g.nom }}</div>
+                                {% if g.adresse %}
+                                    <div class="text-muted small">
+                                        <i class="fas fa-map-pin me-1"></i>{{ g.adresse }}{% if g.ville %}, {{ g.ville }}{% endif %}{% if g.code_postal %} {{ g.code_postal }}{% endif %}
+                                    </div>
+                                {% endif %}
+                                {% if g.telephone %}
+                                    <div class="text-muted small"><i class="fas fa-phone me-1"></i>{{ g.telephone }}</div>
+                                {% endif %}
+                                {% if g.nb_terrains %}
+                                    <div class="text-muted small"><i class="fas fa-th-large me-1"></i>{{ g.nb_terrains }} terrain{{ g.nb_terrains > 1 ? 's' : '' }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <a href="mesPreferences.php?id_tournoi={{ idTournoi }}&gestionGymnases=true"
+                           class="btn btn-brand btn-sm mt-3">
+                            <i class="fas fa-cog"></i> Gérer mes gymnases
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="option-card">
+                    <h6><i class="fas fa-phone"></i> Contact <span class="badge bg-secondary">Optionnel</span></h6>
+                    <p class="text-muted small">Ex. : restauration sur place, contactez le 06.XX pour vos questions.</p>
+
+                    <form action="modifierTournoi_traitement.php" method="POST" class="auto-submit">
+                        <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+                        <input type="hidden" name="actionContact" value="1">
+
+                        <div class="mb-3">
+                            <label for="telephone" class="form-label">{{ t('telephone') }}</label>
+                            <input type="tel" class="form-control" id="telephone" name="telephone" value="{{ infotournoi.telephone }}">
+                        </div>
+                        <div>
+                            <label for="commentaire" class="form-label">{{ t('commentaire') }}</label>
+                            <textarea class="form-control" id="commentaire" name="commentaire" rows="3">{{ infotournoi.commentaire }}</textarea>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
         {% endif %}
 
-        <!-- Tab Tables -->
-        {% if tab == 'gestionTables' and infotournoi.gestionTables == 1 %}
-        <div class="modern-card">
-            <div class="card-header-modern">
-                <i class="fas fa-user-plus"></i>
-                {{ t('ajouterPersonneTerrainTitre') }}
-            </div>
-            <div class="card-body-modern">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <form action="modifierTournoi_traitement.php">
-                            <input type="hidden" name="addPersonne" value="true">
-                            <input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
-
-                            <div class="form-group-modern">
-                                <label for="Email" class="form-label-modern">
-                                    <i class="fas fa-envelope"></i>
-                                    {{ t('email') }}
-                                </label>
-                                <input type="email" class="modern-input" id="Email" name="mail" required>
-                                <small class="text-muted">{{ t('entrerValidAdressMail') }}</small>
-                            </div>
-
-                            <div class="form-group-modern">
-                                <label for="Nom" class="form-label-modern">
-                                    <i class="fas fa-user"></i>
-                                    {{ t('name') }}
-                                </label>
-                                <input type="text" class="modern-input" id="Nom" name="nom" required>
-                            </div>
-
-                            <div class="form-group-modern">
-                                <label for="prenom" class="form-label-modern">
-                                    <i class="fas fa-user"></i>
-                                    {{ t('prenom') }}
-                                </label>
-                                <input type="text" class="modern-input" id="prenom" name="prenom" required>
-                            </div>
-
-                            <button type="submit" class="modern-btn btn-success-modern">
-                                <i class="fas fa-plus"></i>
-                                {{ t('ajouter') }}
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="col-lg-12 mt-4">
-                        {% if AfficherPersonnes | length > 0 %}
-                        <input type="text" id="filtreNom" class="search-input"
-                               placeholder="🔍 Rechercher par nom...">
-
-                        {# Desktop #}
-                        <div class="modern-table-container table-placement-desktop">
-                            <table class="modern-table" id="placementPersonneSurTerrain">
-                                <thead>
-                                    <tr>
-                                        <th>{{ t('name') }}</th>
-                                        <th>{{ t('prenom') }}</th>
-                                        <th>{{ t('email') }}</th>
-                                        <th>{{ t('postionnerPersonneTerrain') }}</th>
-                                        <th>{{ t('action') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for personne in AfficherPersonnes %}
-                                   
-                                    
-                                    <tr data-nom="{{ personne.Nom | lower }}">
-                                        <td>{{ personne.Nom }}</td>
-                                        <td>{{ personne.Prenom }}</td>
-                                        <td>{{ personne.Mail }}</td>
-                                        <td>
-                                            <div class="d-flex gap-2 justify-content-center flex-wrap">
-                                                {% for terrain in AfficherTerrain %}
-                                                    {% set estAffecte = false %}
-                                                    {% for personneTable in AfficherLesPersonnesCrees %}
-                                                        {% if personneTable.personne_id == personne.id and personneTable.terrain_id == terrain.terrain_id %}
-                                                            {% set estAffecte = true %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                    <a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{ personne.id }}&idterrain={{ terrain.terrain_id }}&tournoiId={{ infotournoi.id }}"
-                                                       class="modern-btn btn-sm {{ estAffecte ? 'btn-secondary disabled' : 'btn-success-modern' }}">
-                                                        {{ terrain.nom }}
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}&tab=gestionTables"
-                                               class="modern-btn btn-danger-modern btn-sm">
-                                                <i class="fa fa-trash"></i>
-                                                {{ t('supprimer') }}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {# Mobile #}
-                        <div class="table-placement-mobile">
-                            {% for personne in AfficherPersonnes %}
-                            <div class="personne-card placement-card" data-nom="{{ personne.Nom | lower }}">
-                                <div class="personne-card-header">
-                                    <div class="personne-avatar">
-                                        {{ personne.Nom | slice(0,1) }}{{ personne.Prenom | slice(0,1) }}
-                                    </div>
-                                    <div>
-                                        <div class="personne-card-name">{{ personne.Nom }} {{ personne.Prenom }}</div>
-                                        <div class="personne-card-email">{{ personne.Mail }}</div>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom:12px;">
-                                    <div class="personne-card-field" style="margin-bottom:8px;">
-                                        <label>{{ t('postionnerPersonneTerrain') }}</label>
-                                    </div>
-                                    <div class="d-flex gap-2 flex-wrap">
-                                        {% for terrain in AfficherTerrain %}
-                                            {% set estAffecte = false %}
-                                            {% for personneTable in AfficherLesPersonnesCrees %}
-                                                {% if personneTable.personne_id == personne.id and personneTable.terrain_id == terrain.terrain_id %}
-                                                    {% set estAffecte = true %}
-                                                {% endif %}
-                                            {% endfor %}
-                                            <a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{ personne.id }}&idterrain={{ terrain.terrain_id }}&tournoiId={{ infotournoi.id }}"
-                                               class="modern-btn btn-sm {{ estAffecte ? 'btn-secondary disabled' : 'btn-success-modern' }}">
-                                                {{ terrain.nom }}
-                                            </a>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                <div class="personne-card-actions">
-                                    <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}&tab=gestionTables"
-                                       class="modern-btn btn-danger-modern btn-sm">
-                                        <i class="fa fa-trash"></i>
-                                        {{ t('supprimer') }}
-                                    </a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-
-                        {% if AfficherLesPersonnesCrees | length > 0 %}
-                        <div class="mt-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-users"></i>
-                                Personnes affectées aux terrains
-                            </h5>
-
-                            {# Desktop #}
-                            <div class="modern-table-container table-personnes-desktop">
-                                <table class="modern-table">
-                                    <thead>
-                                        <tr>
-                                            <th>{{ t('name') }}</th>
-                                            <th>{{ t('prenom') }}</th>
-                                            <th>{{ t('email') }}</th>
-                                            <th>{{ t('terrainN') }}</th>
-                                             <th>{{ t('envoiDesInformations') }}</th>
-                                            <th>{{ t('supprimerPersonneTerrain') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    
-                                        {% for personneTable in AfficherLesPersonnesCrees %}
-                                        <td colspan="3">
-                                                    <form id="form-personne-{{ personneTable.personne_id }}"
-                                                        hx-post="modifierTournoi_traitement.php"
-                                                        hx-trigger="keyup delay:800ms"
-                                                        hx-target="#msg-personne-{{ personneTable.personne_id }}"
-                                                        hx-swap="innerHTML"
-                                                        style="display:flex; gap:8px; align-items:center;">
-                                                        <input type="hidden" name="idPersonneTable" value="{{ personneTable.personne_id }}">
-                                                        <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
-                                                        <input type="text"  name="nomPersonneTable"    value="{{ personneTable.Nom }}"
-                                                            class="modern-input" style="min-width:100px;" placeholder="{{ t('name') }}">
-                                                        <input type="text"  name="prenomPersonneTable" value="{{ personneTable.Prenom }}"
-                                                            class="modern-input" style="min-width:100px;" placeholder="{{ t('prenom') }}">
-                                                        <input type="email" name="mailPersonneTable"   value="{{ personneTable.Mail }}"
-                                                            class="modern-input" style="min-width:150px;" placeholder="{{ t('email') }}">
-                                                        <span id="msg-personne-{{ personneTable.personne_id }}" style="color:var(--success-color); white-space:nowrap;"></span>
-                                                    </form>
-                                                </td>
-
-
-
-
-                                            <td>{{ personneTable.terrain_nom }}</td>
-                                            <!--<td><strong>{{ personneTable.code_pin }}</strong></td>
-                                            <td><small>{{ personneTable.url_key }}</small></td> -->
-                                            <td>
-                                                <div class="d-flex gap-2 align-items-center justify-content-center">
-                                                    <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
-                                                       class="modern-btn btn-primary-modern btn-sm">
-                                                        <i class="fa fa-envelope"></i>
-                                                        {{ t('envoyer') }}
-                                                    </a>
-                                                    {% if personneTable.sentMail == 1 %}
-                                                        <span class="status-badge success">{{ t('envoye') }}</span>
-                                                    {% else %}
-                                                        <span class="status-badge secondary">{{ t('nonEnvoye') }}</span>
-                                                    {% endif %}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
-                                                   class="modern-btn btn-danger-modern btn-sm">
-                                                    <i class="fa fa-trash"></i>
-                                                    {{ t('supprimer') }}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {# Mobile #}
-                            <div class="table-personnes-mobile">
-                                {% for personneTable in AfficherLesPersonnesCrees %}
-                                <div class="personne-card">
-                                    <div class="personne-card-header">
-                                        <div class="personne-avatar">
-                                            {{ personneTable.Nom | slice(0,1) }}{{ personneTable.Prenom | slice(0,1) }}
-                                        </div>
-                                        <div>
-                                            <div class="personne-card-name">{{ personneTable.Nom }} {{ personneTable.Prenom }}</div>
-                                            <div class="personne-card-email">{{ personneTable.Mail }}</div>
-                                        </div>
-                                    </div>
-                                    <div class="personne-card-grid">
-                                        <div class="personne-card-field">
-                                            <label>{{ t('terrainN') }}</label>
-                                            <span>{{ personneTable.terrain_nom }}</span>
-                                        </div>
-                                        <div class="personne-card-field">
-                                            <label>{{ t('codePIN') }}</label>
-                                            <span style="font-family:monospace;font-weight:700;font-size:1rem;">
-                                                {{ personneTable.code_pin }}
-                                            </span>
-                                        </div>
-                                        <div class="personne-card-field full-width">
-                                            <label>{{ t('cleSecurisee') }}</label>
-                                            <span style="font-size:0.78rem;word-break:break-all;color:var(--text-light);">
-                                                {{ personneTable.url_key }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="personne-card-actions">
-                                        <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
-                                           class="modern-btn btn-primary-modern btn-sm">
-                                            <i class="fa fa-envelope"></i>
-                                            {{ t('envoyer') }}
-                                        </a>
-                                        {% if personneTable.sentMail == 1 %}
-                                            <span class="status-badge success">{{ t('envoye') }}</span>
-                                        {% else %}
-                                            <span class="status-badge secondary">{{ t('nonEnvoye') }}</span>
-                                        {% endif %}
-                                        <a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
-                                           class="modern-btn btn-danger-modern btn-sm">
-                                            <i class="fa fa-trash"></i>
-                                            {{ t('supprimer') }}
-                                        </a>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-
-                    </div>
+        {# ============================ ONGLET ARBITRES ============================ #}
+        {% if currentTab == 'arbitres' %}
+            {% if AfficherLesClubsPourArbitres is empty %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Il faut au moins créer les équipes avant de placer les arbitres.
+                    <a href="ajoutEquipe.php?idTournoi={{ infotournoi.id }}" class="alert-link">Créer une équipe</a>
                 </div>
+            {% endif %}
+
+            <form action="modifierTournoi_traitement.php" method="GET" class="row g-2 align-items-end mb-4">
+                <input type="hidden" name="addArbitre" value="true">
+                <input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
+
+                <div class="col-md-4">
+                    <label for="nomArbitre" class="form-label">{{ t('nomArbitreOptionnel') }}</label>
+                    <input type="text" class="form-control" id="nomArbitre" name="nomArbitre"
+                           {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
+                </div>
+                <div class="col-md-4">
+                    <label for="club" class="form-label">{{ t('Club') }}</label>
+                    <select class="form-select" id="club" name="clubID"
+                            {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
+                        {% for club in AfficherLesClubsPourArbitres %}
+                            <option value="{{ club.id }}">{{ club.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-success"
+                            {% if AfficherLesClubsPourArbitres is empty %}disabled{% endif %}>
+                        <i class="fas fa-plus"></i> {{ t('ajouter') }}
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="tableDesArbitres">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{{ t('nomArbitreOptionnel') }}</th>
+                            <th>{{ t('Club') }}</th>
+                            <th>{{ t('Action') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for arbitre in AfficherLesArbitres %}
+                        <tr id="ligne-arbitre-{{ arbitre.arbitre_id }}">
+                            <td style="min-width:200px;">
+                                <form id="form-arbitre-{{ arbitre.arbitre_id }}"
+                                      hx-post="modifierTournoi_traitement.php"
+                                      hx-trigger="keyup delay:500ms"
+                                      hx-target="#message-arbitre-{{ arbitre.arbitre_id }}"
+                                      hx-swap="innerHTML">
+                                    <input type="text" name="nomArbitre" value="{{ arbitre.nom }}"
+                                           placeholder="optionnel" class="form-control">
+                                    <input type="hidden" name="idArbitre" value="{{ arbitre.arbitre_id }}">
+                                    <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+                                </form>
+                                <div id="message-arbitre-{{ arbitre.arbitre_id }}"></div>
+                            </td>
+                            <td>{{ arbitre.club_nom }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <a href="modifierTournoi_traitement.php?action=delArbitre&arbitre_id={{ arbitre.arbitre_id }}&tournoiId={{ infotournoi.id }}"
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="fa fa-trash-o"></i> {{ t('supprimerArbitre') }}
+                                    </a>
+
+                                    {% if infotournoi.gestionVoix == 1 %}
+                                        <button class="btn btn-brand btn-sm"
+                                                onclick="startRecording({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
+                                            🎤 {{ t('enregistrer') }}
+                                        </button>
+                                        <button id="stopButton_{{ arbitre.arbitre_id }}" class="btn btn-danger btn-sm"
+                                                onclick="stopRecording()" disabled>
+                                            ⏹️ {{ t('stop') }}
+                                        </button>
+
+                                        {% if arbitre.audio_path == null %}
+                                            <i class="fa-solid fa-volume-xmark text-danger" title="Aucun enregistrement"></i>
+                                        {% else %}
+                                            <i class="fa-solid fa-volume-high text-success" title="Enregistrement disponible"></i>
+                                            <button class="btn btn-success btn-sm" id="playButton_{{ arbitre.arbitre_id }}"
+                                                    onclick="playArbitreAudio({{ arbitre.arbitre_id }}, '{{ arbitre.audio_path }}')">
+                                                ▶️ Écouter
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" id="stopPlayButton_{{ arbitre.arbitre_id }}"
+                                                    onclick="stopArbitreAudio({{ arbitre.arbitre_id }})" style="display:none;">
+                                                ⏹️ Stop
+                                            </button>
+                                        {% endif %}
+
+                                        <div class="audio-announce w-100">
+                                            <i class="fa-solid fa-microphone-lines"></i>
+                                            {{ t('il faut annoncer') }} :
+                                            <strong>{{ t('arbitrée par') }} {{ arbitre.nom }}</strong>
+                                            {{ t('du club') }} <strong>{{ arbitre.club_nom }}</strong>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        {% endif %}
+
+        {# ============================ ONGLET TABLES ============================ #}
+        {% if currentTab == 'gestionTables' %}
+            <h6 class="fw-bold mb-3"><i class="fas fa-user-plus"></i> {{ t('ajouterPersonneTerrainTitre') }}</h6>
+
+            <form action="modifierTournoi_traitement.php" class="row g-2 align-items-end mb-4">
+                <input type="hidden" name="addPersonne" value="true">
+                <input type="hidden" name="tournoiId" value="{{ infotournoi.id }}">
+
+                <div class="col-md-4">
+                    <label for="Email" class="form-label">{{ t('email') }}</label>
+                    <input type="email" class="form-control" id="Email" name="mail" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="Nom" class="form-label">{{ t('name') }}</label>
+                    <input type="text" class="form-control" id="Nom" name="nom" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="prenom" class="form-label">{{ t('prenom') }}</label>
+                    <input type="text" class="form-control" id="prenom" name="prenom" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-plus"></i> {{ t('ajouter') }}
+                    </button>
+                </div>
+            </form>
+
+            {% if AfficherPersonnes | length > 0 %}
+            <input type="text" id="filtreNom" class="form-control mb-3" placeholder="🔍 Rechercher par nom...">
+
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle" id="placementPersonneSurTerrain">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{{ t('name') }}</th>
+                            <th>{{ t('prenom') }}</th>
+                            <th class="d-none d-md-table-cell">{{ t('email') }}</th>
+                            <th>{{ t('postionnerPersonneTerrain') }}</th>
+                            <th>{{ t('action') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for personne in AfficherPersonnes %}
+                        <tr data-nom="{{ personne.Nom | lower }}">
+                            <td>{{ personne.Nom }}</td>
+                            <td>{{ personne.Prenom }}</td>
+                            <td class="d-none d-md-table-cell">{{ personne.Mail }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for terrain in AfficherTerrain %}
+                                        {% set estAffecte = false %}
+                                        {% for personneTable in AfficherLesPersonnesCrees %}
+                                            {% if personneTable.personne_id == personne.id and personneTable.terrain_id == terrain.terrain_id %}
+                                                {% set estAffecte = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <a href="modifierTournoi_traitement.php?action=ajoutUserSurTable&idPersonne={{ personne.id }}&idterrain={{ terrain.terrain_id }}&tournoiId={{ infotournoi.id }}"
+                                           class="btn btn-sm {{ estAffecte ? 'btn-outline-secondary disabled' : 'btn-success' }}">
+                                            {{ terrain.nom }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <a href="modifierTournoi_traitement.php?action=delPersonne&idPersonne={{ personne.id }}&tournoiId={{ infotournoi.id }}&tab=gestionTables"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fa fa-trash"></i> {{ t('supprimer') }}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if AfficherLesPersonnesCrees | length > 0 %}
+            <h6 class="fw-bold mb-2"><i class="fas fa-users"></i> Personnes affectées aux terrains</h6>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{{ t('name') }} / {{ t('prenom') }} / {{ t('email') }}</th>
+                            <th>{{ t('terrainN') }}</th>
+                            <th>{{ t('envoiDesInformations') }}</th>
+                            <th>{{ t('supprimerPersonneTerrain') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for personneTable in AfficherLesPersonnesCrees %}
+                        <tr>
+                            <td style="min-width:320px;">
+                                <form id="form-personne-{{ personneTable.personne_id }}"
+                                      hx-post="modifierTournoi_traitement.php"
+                                      hx-trigger="keyup delay:800ms"
+                                      hx-target="#msg-personne-{{ personneTable.personne_id }}"
+                                      hx-swap="innerHTML"
+                                      class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="idPersonneTable" value="{{ personneTable.personne_id }}">
+                                    <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+                                    <input type="text"  name="nomPersonneTable"    value="{{ personneTable.Nom }}"    class="form-control form-control-sm" placeholder="{{ t('name') }}">
+                                    <input type="text"  name="prenomPersonneTable" value="{{ personneTable.Prenom }}" class="form-control form-control-sm" placeholder="{{ t('prenom') }}">
+                                    <input type="email" name="mailPersonneTable"   value="{{ personneTable.Mail }}"   class="form-control form-control-sm" placeholder="{{ t('email') }}">
+                                    <span id="msg-personne-{{ personneTable.personne_id }}" class="text-success text-nowrap"></span>
+                                </form>
+                            </td>
+                            <td>{{ personneTable.terrain_nom }}</td>
+                            <td>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <a href="modifierTournoi_traitement.php?action=sendMail&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
+                                       class="btn btn-brand btn-sm">
+                                        <i class="fa fa-envelope"></i> {{ t('envoyer') }}
+                                    </a>
+                                    {% if personneTable.sentMail == 1 %}
+                                        <span class="badge bg-success">{{ t('envoye') }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ t('nonEnvoye') }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <a href="modifierTournoi_traitement.php?action=delPersonneTable&personneTableId={{ personneTable.personne_rencontre_id }}&tournoiId={{ idTournoi }}"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fa fa-trash"></i> {{ t('supprimer') }}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        {% endif %}
+
+        {# ============================ ONGLET ARCHIVAGE ============================ #}
+        {% if currentTab == 'danger' %}
+        <div class="danger-zone">
+            <form action="modifierTournoi_traitement.php" method="POST" class="auto-submit">
+                <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
+                <input type="hidden" name="actionArchiver" value="1">
+                {{ ui.switch('isArchived', '🗃️ ' ~ t('archiverLeTournoi'), infotournoi.isArchived == 1) }}
+            </form>
+
+            {% if infotournoi.isArchived == 1 %}
+                <hr>
+                <p class="text-muted mb-2">La suppression est définitive.</p>
+                <a class="btn btn-danger"
+                   href="deleteTournament.php?idTournoi={{ infotournoi.id }}&action=delete"
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?\nL\'action est irréversible');">
+                    <i class="fa-solid fa-trash-can"></i> {{ t('suppressionDuTournoi') }}
+                </a>
+            {% else %}
+                <p class="text-muted small mb-0 mt-2">Archivez le tournoi pour pouvoir le supprimer.</p>
+            {% endif %}
         </div>
         {% endif %}
 
     </div>
-    {% endif %}
     {% endif %}
 
     <!-- Toasts -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="mailToast" class="toast align-items-center text-white bg-success border-0"
-             role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="mailToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ t('emailEnvoyeSuccess') }}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast" aria-label="Close"></button>
+                <div class="toast-body"><i class="fas fa-check-circle me-2"></i>{{ t('emailEnvoyeSuccess') }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
-
-        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0"
-             role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-times-circle me-2"></i>
-                    {{ t('emailNonEnvoyeEchec') }}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast" aria-label="Close"></button>
+                <div class="toast-body"><i class="fas fa-times-circle me-2"></i>{{ t('emailNonEnvoyeEchec') }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"><i class="fa-solid fa-check-circle me-2"></i>{{ t('lienCopie') }}</div>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        function toggleDependencies() {
-            // isVisible → sous-options horaire et classement
-            const isVisible = document.getElementById('isVisible').checked;
-            document.getElementById('heureIsVisibleContainer').style.display = isVisible ? 'block' : 'none';
-            document.getElementById('IsRankingViewContainer').style.display  = isVisible ? 'block' : 'none';
+        // Sauvegarde automatique : tout formulaire .auto-submit est envoyé au moindre changement
+        document.querySelectorAll('form.auto-submit').forEach(function (form) {
+            form.addEventListener('change', function () { form.submit(); });
+        });
 
-            // gestionVoix → effets sonores
-            const gestionVoix = document.getElementById('gestionVoix').checked;
-            document.getElementById('effetsSonoresContainer').style.display = gestionVoix ? 'block' : 'none';
+        // Affiche / masque une sous-option selon son interrupteur parent (data-controls="id-du-bloc")
+        document.querySelectorAll('[data-controls]').forEach(function (checkbox) {
+            var target = document.getElementById(checkbox.dataset.controls);
+            if (!target) return;
+            var update = function () { target.classList.toggle('d-none', !checkbox.checked); };
+            checkbox.addEventListener('change', update);
+            update();
+        });
 
-            // gestionInformations → bloc gestionInformationsContainer (qui contient gymnase + contact)
-            const gestionInformations = document.getElementById('gestionInformations').checked;
-            document.getElementById('gestionInformationsContainer').style.display = gestionInformations ? 'block' : 'none';
+        // Conserve la position de scroll entre deux rechargements
+        window.addEventListener('load', function () {
+            var pos = sessionStorage.getItem('scrollPosition');
+            if (pos !== null) window.scrollTo(0, pos);
+        });
+        window.addEventListener('beforeunload', function () {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
 
-            // gestionTempsChangement → champ minutes
-            const gestionTempsChangement = document.getElementById('gestionTempsChangement').checked;
-            document.getElementById('tempsChangementContainer').style.display = gestionTempsChangement ? 'block' : 'none';
-        }
-
-        // Appel immédiat au chargement pour appliquer l'état initial
-        toggleDependencies();
-    </script>
-
-    <script>
-        window.onload = function () {
-            if (typeof sessionStorage !== 'undefined') {
-                var pos = sessionStorage.getItem('scrollPosition');
-                if (pos !== null) window.scrollTo(0, pos);
-            }
-        };
-        window.onbeforeunload = function () {
-            if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.setItem('scrollPosition', window.scrollY);
-            }
-        };
-    </script>
-
-    <script>
+        // Filtre par nom (onglet Tables)
         document.getElementById('filtreNom')?.addEventListener('keyup', function () {
-            const filtre = this.value.toLowerCase();
-
+            var filtre = this.value.toLowerCase();
             document.querySelectorAll('#placementPersonneSurTerrain tbody tr').forEach(function (ligne) {
-                const nom = (ligne.dataset.nom || ligne.querySelector('td:nth-child(1)').textContent).toLowerCase();
-                ligne.style.display = nom.includes(filtre) ? '' : 'none';
-            });
-
-            document.querySelectorAll('.placement-card').forEach(function (carte) {
-                const nom = (carte.dataset.nom || '').toLowerCase();
-                carte.style.display = nom.includes(filtre) ? '' : 'none';
-            });
-
-            document.querySelectorAll('.table-personnes-desktop tbody tr').forEach(function (ligne) {
-                const nom = (ligne.dataset.nom || ligne.querySelector('td:nth-child(1)')?.textContent || '').toLowerCase();
-                ligne.style.display = nom.includes(filtre) ? '' : 'none';
-            });
-
-            document.querySelectorAll('.personne-card:not(.placement-card)').forEach(function (carte) {
-                const nom = (carte.dataset.nom || '').toLowerCase();
-                carte.style.display = nom.includes(filtre) ? '' : 'none';
+                ligne.style.display = (ligne.dataset.nom || '').includes(filtre) ? '' : 'none';
             });
         });
-    </script>
 
-    <script>
+        // Toasts d'envoi de mail
         document.addEventListener('DOMContentLoaded', function () {
-            const params = new URLSearchParams(window.location.search);
-            const status = params.get('status');
-            if (status === 'success') {
-                new bootstrap.Toast(document.getElementById('mailToast')).show();
-            } else if (status === 'error') {
-                new bootstrap.Toast(document.getElementById('errorToast')).show();
-            }
+            var status = new URLSearchParams(window.location.search).get('status');
+            if (status === 'success') new bootstrap.Toast(document.getElementById('mailToast')).show();
+            else if (status === 'error') new bootstrap.Toast(document.getElementById('errorToast')).show();
         });
+
+        // Copie du lien public
+        function copyTournamentLink(tournoiId) {
+            var base = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+            var link = base + 'index.php?id_tournoi=' + tournoiId;
+            var done = function () { new bootstrap.Toast(document.getElementById('copyToast'), { delay: 2500 }).show(); };
+
+            navigator.clipboard.writeText(link).then(done, function () {
+                var ta = document.createElement('textarea');
+                ta.value = link;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                done();
+            });
+        }
     </script>
 
     <script>
+        // ---------- Enregistrement audio des arbitres ----------
         let mediaRecorder;
         let audioChunks = [];
         let currentStopButton = null;
@@ -1713,11 +802,11 @@
 
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const formData  = new FormData();
+                    const formData = new FormData();
                     formData.append('audio_data', audioBlob);
-                    formData.append('idArbitre',  arbitreId);
-                    formData.append('idTournoi',  tournoiId);
-                    formData.append('type',       'arbitre');
+                    formData.append('idArbitre', arbitreId);
+                    formData.append('idTournoi', tournoiId);
+                    formData.append('type', 'arbitre');
 
                     fetch('upload_audio.php', { method: 'POST', body: formData })
                         .then(r => r.text())
@@ -1770,29 +859,6 @@
             }
             document.getElementById('playButton_' + arbitreId).style.display = '';
             document.getElementById('stopPlayButton_' + arbitreId).style.display = 'none';
-        }
-    </script>
-
-    <script>
-        function copyTournamentLink(tournoiId) {
-            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-            const link = baseUrl + 'index.php?id_tournoi=' + tournoiId;
-
-            navigator.clipboard.writeText(link).then(showToast, function () {
-                const ta = document.createElement('textarea');
-                ta.value = link;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                showToast();
-            });
-        }
-
-        function showToast() {
-            const toast = document.getElementById('copy-toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 
