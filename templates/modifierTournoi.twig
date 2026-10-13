@@ -520,17 +520,21 @@
 
                                         {% if arbitre.audio_path == null %}
                                             <i class="fa-solid fa-volume-xmark text-danger" title="Aucun enregistrement"></i>
-                                        {% else %}
-                                            <i class="fa-solid fa-volume-high text-success" title="Enregistrement disponible"></i>
-                                            <button class="btn btn-success btn-sm" id="playButton_{{ arbitre.arbitre_id }}"
-                                                    onclick="playArbitreAudio({{ arbitre.arbitre_id }}, '{{ arbitre.audio_path }}')">
-                                                ▶️ Écouter
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" id="stopPlayButton_{{ arbitre.arbitre_id }}"
-                                                    onclick="stopArbitreAudio({{ arbitre.arbitre_id }})" style="display:none;">
-                                                ⏹️ Stop
-                                            </button>
-                                        {% endif %}
+                                       {% else %}
+                                        <i class="fa-solid fa-volume-high text-success" title="Enregistrement disponible"></i>
+                                        <button class="btn btn-success btn-sm" id="playButton_{{ arbitre.arbitre_id }}"
+                                                onclick="playArbitreAudio({{ arbitre.arbitre_id }}, '{{ arbitre.audio_path }}?v={{ 'now'|date('U') }}')">
+                                            ▶️ Écouter
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" id="stopPlayButton_{{ arbitre.arbitre_id }}"
+                                                onclick="stopArbitreAudio({{ arbitre.arbitre_id }})" style="display:none;">
+                                            ⏹️ Stop
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                onclick="supprimerAudioArbitre({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
+                                            🗑️ Supprimer l'enregistrement
+                                        </button>
+                                    {% endif %}
 
                                         <div class="audio-announce w-100">
                                             <i class="fa-solid fa-microphone-lines"></i>
@@ -801,6 +805,11 @@
                 mediaRecorder.ondataavailable = event => { audioChunks.push(event.data); };
 
                 mediaRecorder.onstop = () => {
+                    // Libère le micro
+                    stream.getTracks().forEach(track => track.stop());
+
+                    if (currentStopButton) currentStopButton.disabled = true;
+
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                     const formData = new FormData();
                     formData.append('audio_data', audioBlob);
@@ -809,11 +818,11 @@
                     formData.append('type', 'arbitre');
 
                     fetch('upload_audio.php', { method: 'POST', body: formData })
-                        .then(r => r.text())
-                        .then(() => console.log('Audio enregistré'))
+                        .then(r => {
+                            if (!r.ok) throw new Error('HTTP ' + r.status);
+                            location.reload();   // rechargement une fois l'upload terminé
+                        })
                         .catch(err => alert('Erreur upload : ' + err));
-
-                    if (currentStopButton) currentStopButton.disabled = true;
                 };
 
                 mediaRecorder.start();
@@ -860,6 +869,22 @@
             document.getElementById('playButton_' + arbitreId).style.display = '';
             document.getElementById('stopPlayButton_' + arbitreId).style.display = 'none';
         }
+
+        function supprimerAudioArbitre(arbitreId, tournoiId) {
+    if (!confirm("Supprimer l'enregistrement de cet arbitre ?")) return;
+
+    const formData = new FormData();
+    formData.append('type', 'arbitre');
+    formData.append('idArbitre', arbitreId);
+    formData.append('idTournoi', tournoiId);
+
+    fetch('supprimer_audio.php', { method: 'POST', body: formData })
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            location.reload();
+        })
+        .catch(err => alert('Erreur lors de la suppression : ' + err));
+}
     </script>
 
 </body>

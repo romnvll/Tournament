@@ -15,11 +15,11 @@ class arbitreDao {
         }
     }
 
-    public function updateAudioPath(int $arbitre_id, string $audio_path): void {
+    public function updateAudioPath(int $arbitre_id, ?string $audio_path): void {
     $sql = "UPDATE Arbitres SET audio_path = :audio_path WHERE arbitre_id = :arbitre_id";
     $stmt = $this->connexion->prepare($sql);
-    $stmt->bindValue(':audio_path', $audio_path);
-    $stmt->bindValue(':arbitre_id', $arbitre_id);
+    $stmt->bindValue(':audio_path', $audio_path, $audio_path === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $stmt->bindValue(':arbitre_id', $arbitre_id, PDO::PARAM_INT);
     $stmt->execute();
 }
 
@@ -39,7 +39,7 @@ class arbitreDao {
     }
     
 
-    public function modifierArbitre(int $arbitre_id, string $nom = null, int $tournoi_id = null, int $club_id = null): void {
+    public function modifierArbitre(int $arbitre_id, ?string $nom = null, ?int $tournoi_id = null, ?int $club_id = null): void {
         $sql = "UPDATE Arbitres SET ";
         $params = [];
         if ($nom !== null) {
@@ -73,6 +73,13 @@ class arbitreDao {
         $stmt->execute();
     }
 
+    public function getAudioPathArbitre(int $arbitre_id): ?string {
+    $stmt = $this->connexion->prepare("SELECT audio_path FROM Arbitres WHERE arbitre_id = :id");
+    $stmt->bindValue(':id', $arbitre_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $path = $stmt->fetchColumn();
+    return $path !== false ? $path : null;
+}
    
     
 
