@@ -43,6 +43,38 @@ class TournoiBackupDao
      *  EXPORT
      * ================================================================== */
 
+    /* ==================================================================
+     *  LICENCE
+     * ================================================================== */
+
+    public function compterTournoisUtilisateur(int $utilisateurId): int
+    {
+        $stmt = $this->connexion->prepare('SELECT COUNT(*) FROM Tournois WHERE utilisateur_id = ?');
+        $stmt->execute([$utilisateurId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Limite de tournois de la licence active de l'utilisateur (la plus récente parmi
+     * celles non expirées), ou null si l'utilisateur n'a aucune licence (dans ce cas
+     * on ne bloque pas : pas de limite connue).
+     */
+    public function limiteTournoisUtilisateur(int $utilisateurId): ?int
+    {
+        $stmt = $this->connexion->prepare(
+            'SELECT lt.limite_tournois
+             FROM Licence l
+             INNER JOIN LicenceType lt ON lt.id = l.licence_type_id
+             WHERE l.utilisateur_id = ?
+               AND (l.date_fin IS NULL OR l.date_fin >= CURDATE())
+             ORDER BY l.date_debut DESC
+             LIMIT 1'
+        );
+        $stmt->execute([$utilisateurId]);
+        $valeur = $stmt->fetchColumn();
+        return $valeur !== false ? (int) $valeur : null;
+    }
+
     public function exporter(int $idTournoi): array
     {
         $tournoi = $this->fetchOne('SELECT * FROM Tournois WHERE id = ?', [$idTournoi]);
@@ -484,8 +516,18 @@ class TournoiBackupDao
             $personneId = $mapPersonne[$r['personne_id']] ?? null;
             $terrainId = $mapTerrain[$r['terrain_id']] ?? null;
             if ($personneId === null || $terrainId === null) continue;
-            // code_pin / url_key régénérés pour éviter toute collision avec l'original
-            $stmt->execute([$personneId, $terrainId, bin2hex(random_bytes(4)), bin2hex(random_bytes(16)), $newTournoiId]);
+
+            // code_pin / url_key recopiés à l'identique (pour que les liens/mails déjà envoyés
+            // restent valides après restauration). ATTENTION : url_key doit être unique en base ;
+            // si le tournoi d'origine existe encore en parallèle, ceci crée un doublon de url_key
+            // (ambiguïté de lookup dans PersonneTableDao::recupererInformationsParCle()).
+            $stmt->execute([
+                $personneId,
+                $terrainId,
+                $r['code_pin'],
+                $r['url_key'],
+                $newTournoiId,
+            ]);
         }
     }
 

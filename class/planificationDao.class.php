@@ -45,73 +45,53 @@ public function nettoyerPlanificationsVides(int $tournoi_id): int {
     return $stmt->rowCount();
 }
 
-    public function ajouterOuModifierPlanification(int $terrain_id, int $creneau_id, ?int $rencontre_id, int $tournoi_id, ?int $arbitre_id = null, ?int $label_id = null): void {
-        // Vérifier si la planification avec ce couple terrain_id et creneau_id existe déjà
-        $checkStmt = $this->connexion->prepare("SELECT COUNT(*) FROM Planification WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id");
-        $checkStmt->bindParam(':terrain_id', $terrain_id);
-        $checkStmt->bindParam(':creneau_id', $creneau_id);
-        $checkStmt->execute();
-        $exists = $checkStmt->fetchColumn() > 0;
-    
-        if ($exists) {
-            // Construction de la requête SQL dynamique pour la mise à jour
-            $query = "UPDATE Planification SET tournoi_id = :tournoi_id";
-            if ($rencontre_id !== null) {
-                $query .= ", rencontre_id = :rencontre_id";
-            }
-            if ($arbitre_id !== null) {
-                $query .= ", arbitre_id = :arbitre_id";
-            }
-            if ($label_id !== null) {
-                $query .= ", label_id = :label_id";
-            }
-            $query .= " WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id";
-    
-            $updateStmt = $this->connexion->prepare($query);
-            $updateStmt->bindParam(':terrain_id', $terrain_id);
-            $updateStmt->bindParam(':creneau_id', $creneau_id);
-            $updateStmt->bindParam(':tournoi_id', $tournoi_id);
-            if ($rencontre_id !== null) {
-                $updateStmt->bindParam(':rencontre_id', $rencontre_id);
-            }
-            if ($arbitre_id !== null) {
-                $updateStmt->bindParam(':arbitre_id', $arbitre_id);
-            }
-            if ($label_id !== null) {
-                $updateStmt->bindParam(':label_id', $label_id);
-            }
-    
-            $updateStmt->execute();
-        } else {
-            // Insérer une nouvelle planification
-            $insertStmt = $this->connexion->prepare("
-                INSERT INTO Planification (terrain_id, creneau_id, rencontre_id, tournoi_id, arbitre_id, label_id)
-                VALUES (:terrain_id, :creneau_id, :rencontre_id, :tournoi_id, :arbitre_id, :label_id)
-            ");
-            $insertStmt->bindParam(':terrain_id', $terrain_id);
-            $insertStmt->bindParam(':creneau_id', $creneau_id);
-            $insertStmt->bindParam(':tournoi_id', $tournoi_id);
-            if ($rencontre_id !== null) {
-                $insertStmt->bindParam(':rencontre_id', $rencontre_id);
-            } else {
-                $insertStmt->bindValue(':rencontre_id', null, PDO::PARAM_NULL);
-            }
-            if ($arbitre_id !== null) {
-                $insertStmt->bindParam(':arbitre_id', $arbitre_id);
-            } else {
-                $insertStmt->bindValue(':arbitre_id', null, PDO::PARAM_NULL);
-            }
-            if ($label_id !== null) {
-                $insertStmt->bindParam(':label_id', $label_id);
-            } else {
-                $insertStmt->bindValue(':label_id', null, PDO::PARAM_NULL);
-            }
-    
-            $insertStmt->execute();
-        }
-    
-        echo "ok";
+   public function ajouterOuModifierPlanification(int $terrain_id, int $creneau_id, ?int $rencontre_id, int $tournoi_id, ?int $arbitre_id = null, ?int $label_id = null): void {
+
+    if ($rencontre_id !== null) {
+        $this->upsertEntite($terrain_id, $creneau_id, $tournoi_id, 'rencontre_id', $rencontre_id);
+    } elseif ($arbitre_id !== null) {
+        $this->upsertEntite($terrain_id, $creneau_id, $tournoi_id, 'arbitre_id', $arbitre_id);
+    } elseif ($label_id !== null) {
+        $this->upsertEntite($terrain_id, $creneau_id, $tournoi_id, 'label_id', $label_id);
     }
+
+    echo "ok";
+}
+
+private function upsertEntite(int $terrain_id, int $creneau_id, int $tournoi_id, string $colonne, int $valeur): void {
+    // Cherche une ligne existante SUR CE COUPLE terrain+créneau QUI A DÉJÀ cette colonne renseignée
+    $checkStmt = $this->connexion->prepare(
+        "SELECT planification_id FROM Planification 
+         WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id AND {$colonne} IS NOT NULL"
+    );
+    $checkStmt->bindParam(':terrain_id', $terrain_id);
+    $checkStmt->bindParam(':creneau_id', $creneau_id);
+    $checkStmt->execute();
+    $existingId = $checkStmt->fetchColumn();
+
+    if ($existingId !== false) {
+        // Une ligne de ce type existe déjà pour cette case → on la met à jour
+        $updateStmt = $this->connexion->prepare(
+            "UPDATE Planification SET {$colonne} = :valeur, tournoi_id = :tournoi_id 
+             WHERE planification_id = :id"
+        );
+        $updateStmt->bindParam(':valeur', $valeur);
+        $updateStmt->bindParam(':tournoi_id', $tournoi_id);
+        $updateStmt->bindParam(':id', $existingId);
+        $updateStmt->execute();
+    } else {
+        // Aucune ligne de ce type pour cette case → on en crée une nouvelle, dédiée à cette entité
+        $insertStmt = $this->connexion->prepare(
+            "INSERT INTO Planification (terrain_id, creneau_id, tournoi_id, {$colonne}) 
+             VALUES (:terrain_id, :creneau_id, :tournoi_id, :valeur)"
+        );
+        $insertStmt->bindParam(':terrain_id', $terrain_id);
+        $insertStmt->bindParam(':creneau_id', $creneau_id);
+        $insertStmt->bindParam(':tournoi_id', $tournoi_id);
+        $insertStmt->bindParam(':valeur', $valeur);
+        $insertStmt->execute();
+    }
+}
     
 
 /**
@@ -560,8 +540,8 @@ public function convertLabelsToRencontres(int $tournoi_id): void {
 }
 
     public function afficherCreneauxArbitres(int $tournoi_id): array {
-        $stmt = $this->connexion->prepare("
-       SELECT
+    $stmt = $this->connexion->prepare("
+   SELECT
     p.planification_id,
     p.terrain_id,
     t.nom AS terrain_nom,
@@ -589,8 +569,8 @@ public function convertLabelsToRencontres(int $tournoi_id): void {
     cat.id_categorie AS categorie_id,
     cat.Nom_categorie AS categorie_nom,
     cat.Couleur AS categorie_couleur,
-    COUNT(p.rencontre_id) OVER (PARTITION BY p.arbitre_id) AS nombre_matchs_arbitre,
-    COUNT(p.rencontre_id) OVER (PARTITION BY a.club_id) AS nombre_matchs_club
+    COUNT(r.id) OVER (PARTITION BY p.arbitre_id) AS nombre_matchs_arbitre,
+    COUNT(r.id) OVER (PARTITION BY a.club_id) AS nombre_matchs_club
 FROM
     Planification p
 LEFT JOIN
@@ -602,7 +582,14 @@ LEFT JOIN
 LEFT JOIN
     Clubs cl ON a.club_id = cl.id
 LEFT JOIN
-    Rencontres r ON p.rencontre_id = r.id
+    Rencontres r ON r.id = (
+        SELECT p2.rencontre_id
+        FROM Planification p2
+        WHERE p2.terrain_id = p.terrain_id
+          AND p2.creneau_id = p.creneau_id
+          AND p2.rencontre_id IS NOT NULL
+        LIMIT 1
+    )
 LEFT JOIN
     Equipes eq1 ON r.equipe1_id = eq1.id
 LEFT JOIN
@@ -617,18 +604,14 @@ WHERE
     p.tournoi_id = :tournoi_id
     AND p.arbitre_id IS NOT NULL
 ORDER BY 
-    (TIME(c.nom) < '06:00:00') ASC,  -- Met les horaires après minuit à la fin
+    (TIME(c.nom) < '06:00:00') ASC,
     TIME(c.nom) ASC, 
     t.nom;
-
-
-
-
-        ");
-        $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    ");
+    $stmt->bindParam(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     
 public function afficherRencontresSansPlanification(int $tournoi_id, bool $onlyPresent = false): array {
@@ -765,7 +748,14 @@ public function getPlanificationsTerrainAvecDetails($terrainId, $tournoiId) {
         LEFT JOIN 
             Labels l ON p.label_id = l.label_id
         LEFT JOIN 
-            Arbitres a ON p.arbitre_id = a.arbitre_id
+            Arbitres a ON a.arbitre_id = (
+                SELECT p2.arbitre_id 
+                FROM Planification p2 
+                WHERE p2.terrain_id = p.terrain_id 
+                  AND p2.creneau_id = p.creneau_id 
+                  AND p2.arbitre_id IS NOT NULL
+                LIMIT 1
+            )
         LEFT JOIN 
             Rencontres r ON p.rencontre_id = r.id
         LEFT JOIN 

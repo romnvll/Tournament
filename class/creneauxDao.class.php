@@ -62,22 +62,30 @@ public function getAudiosPourCreneau(int $creneau_id): array {
             E1.isPresent AS equipe1_isPresent,
             E1.nom AS equipe1_nom,
             E2.nom AS equipe2_nom,
-            A.nom AS arbitre_nom,
+            Arb.nom AS arbitre_nom,
             C1.nom AS club1_nom,
-            CA.nom AS arbitre_club_nom,
+            ClubArb.nom AS arbitre_club_nom,
             E2.isPresent AS equipe2_isPresent,
             E1.audio_path AS equipe1_audio,
             E2.audio_path AS equipe2_audio,
-            A.audio_path AS arbitre_audio
+            Arb.audio_path AS arbitre_audio
         FROM Planification P
         LEFT JOIN Rencontres R ON R.id = P.rencontre_id
         LEFT JOIN Terrains T ON T.terrain_id = P.terrain_id
         LEFT JOIN Equipes E1 ON E1.id = R.equipe1_id
         LEFT JOIN Equipes E2 ON E2.id = R.equipe2_id
-        LEFT JOIN Arbitres A ON A.arbitre_id = P.arbitre_id
         LEFT JOIN Clubs C1 ON C1.id = E1.club_id
-        LEFT JOIN Clubs CA ON CA.id = A.club_id
+        LEFT JOIN Arbitres Arb ON Arb.arbitre_id = (
+            SELECT P2.arbitre_id 
+            FROM Planification P2 
+            WHERE P2.terrain_id = P.terrain_id 
+              AND P2.creneau_id = P.creneau_id 
+              AND P2.arbitre_id IS NOT NULL
+            LIMIT 1
+        )
+        LEFT JOIN Clubs ClubArb ON ClubArb.id = Arb.club_id
         WHERE P.creneau_id = :creneau_id
+          AND P.rencontre_id IS NOT NULL
         ORDER BY T.terrain_id
     ");
     $stmt->bindParam(':creneau_id', $creneau_id, PDO::PARAM_INT);

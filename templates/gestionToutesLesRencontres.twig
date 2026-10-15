@@ -940,140 +940,151 @@
 									</td>
 									{% for j in 0..terrains|length - 1 %}
 										<td>
-											{% for planification in afficherPlanification %}
-												{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
-													{% if planification.rencontre_id is not null or planification.arbitre_id is not null %}
-													
-														<div class="match-card  {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
-																match-absent
-															{% endif %}">
-															{% if tournoiInfo.gestionArbitres == 1 %}
-																<div class="text-center mb-2">
-																	<i class="fas fa-user-tie me-1"></i>
-																	{% if planification.arbitre_id is not null %}
-																		<strong>{{planification.arbitre_nom}}</strong>
-																		<small class="text-muted d-block">{{planification.club_nom_arbitre}}</small>
-																	{% else %}
-																		<em class="text-muted">Aucun arbitre</em>
-																	{% endif %}
-																</div>
+											{% set arbitreNom = null %}
+{% set clubArbitreNom = null %}
+{% for p in afficherPlanification %}
+    {% if p.terrain_id == terrains[j]['terrain_id'] and p.creneau_id == creneau.creneau_id and p.arbitre_id is not null %}
+        {% set arbitreNom = p.arbitre_nom %}
+        {% set clubArbitreNom = p.club_nom_arbitre %}
+    {% endif %}
+{% endfor %}
+
+									{% for planification in afficherPlanification %}
+										{% if planification.terrain_id == terrains[j]['terrain_id'] and planification.creneau_id == creneau.creneau_id %}
+
+											{% if planification.rencontre_id is not null %}
+
+												<div class="match-card  {% if planification.equipe1_isPresent == 0 or planification.equipe2_isPresent == 0 %}
+														match-absent
+													{% endif %}">
+
+													{% if tournoiInfo.gestionArbitres == 1 %}
+														<div class="text-center mb-2">
+															<i class="fas fa-user-tie me-1"></i>
+															{% if arbitreNom is not null %}
+																<strong>{{ arbitreNom }}</strong>
+																<small class="text-muted d-block">{{ clubArbitreNom }}</small>
+															{% else %}
+																<em class="text-muted">Aucun arbitre</em>
 															{% endif %}
-																
-															{% if planification.rencontre_id is not null %}
-																<div class="match-header" style="background: {{ planification.equipe1_categorie_couleur }};">
-																	{% if planification.type_rencontre_id == 3 and planification.phase_finale_id is null %}
-																		<i class="fa fa-trophy me-1"></i>
-																		Phase finale – Tour {{ planification.tour }} – {{planification.poule_nom }} – {{ planification.equipe1_categorie_nom }}
-																	{% elseif planification.phase_finale_id is not null %}
-																		{{ planification.phase_finale_libelle }} {{ planification.equipe1_categorie_nom }} {{planification.equipe1_nom}} vs {{planification.equipe2_nom}}
-																	
-																	{% elseif planification.type_rencontre_id == 4 %}
-																		<span class="match-category" style="background-color: #ffc107; color: #212529;">
-																			<i class="fa fa-star"></i>Rencontre amicale
-																		</span>
-																	{% else %}
-																		Tour {{ planification.tour }} – {{planification.poule_nom }}
-																	{% endif %}
-																</div>
-
-																{% if planification.isTerminated == 1 %}
-																	<div class="match-status status-finished" id="Label{{planification.rencontre_id}}">
-																		✓ Rencontre terminée
-																	</div>
-																{% endif %}
-																{% if planification.isTerminated == 0 %}
-																	<div class="match-status status-upcoming" id="Label{{planification.rencontre_id}}">
-																		⏱️ Rencontre à venir
-																	</div>
-																{% endif %}
-																{% if planification.isTerminated == 2 %}
-																	<div class="match-status status-ongoing" id="Label{{planification.rencontre_id}}">
-																		▶️ Rencontre en cours
-																	</div>
-																{% endif %}
-
-																<div class="status-buttons no-print">
-																	<div class="status-dot red" 
-																	     hx-post="gestionRencontres_traitement.php"
-																	     hx-trigger="click touchstart" 
-																	     hx-target="#Label{{planification.rencontre_id}}" 
-																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
-																	     hx-swap="innerHTML" 
-																	     hx-vals='{"etat": "Avenir"}'
-																	     title="À venir"></div>
-
-																	<div class="status-dot orange" 
-																	     hx-post="gestionRencontres_traitement.php"
-																	     hx-trigger="click touchstart" 
-																	     hx-target="#Label{{planification.rencontre_id}}" 
-																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
-																	     hx-swap="innerHTML" 
-																	     hx-vals='{"etat": "enCours"}'
-																	     title="En cours"></div>
-
-																	<div class="status-dot green" 
-																	     hx-post="gestionRencontres_traitement.php"
-																	     hx-trigger="click touchstart" 
-																	     hx-target="#Label{{planification.rencontre_id}}" 
-																	     hx-include="#idRencontre{{ planification.rencontre_id }}" 
-																	     hx-swap="innerHTML" 
-																	     hx-vals='{"etat": "terminee"}'
-																	     title="Terminée"></div>
-																</div>
-
-																<div class="text-center mb-2">
-																	<small class="text-muted">Terrain <strong>{{planification.terrain_nom}}</strong></small>
-																</div>
-							
-																<div class="text-center">
-																	<div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-																		<span class="fw-bold">{{ planification.equipe1_nom }} {% if planification.equipe1_isPresent == 0 %}(Absente){% endif %}</span>
-																		
-																		{% if tournoiInfo.gestionVoix == 1 %}
-																			<span class="icon-badge {% if planification.audio1 is null %}icon-danger{% else %}icon-success{% endif %}">
-																				<i class="fas fa-microphone{% if planification.audio1 is null %}-slash{% endif %}"></i>
-																			</span>
-																		{% endif %}
-																		<span class="text-muted">vs</span>
-																		<span class="fw-bold">{{ planification.equipe2_nom }} {% if planification.equipe2_isPresent == 0 %}(Absente){% endif %}</span>
-																		{% if tournoiInfo.gestionVoix == 1 %}
-																			<span class="icon-badge {% if planification.audio2 is null %}icon-danger{% else %}icon-success{% endif %}">
-																				<i class="fas fa-microphone{% if planification.audio2 is null %}-slash{% endif %}"></i>
-																			</span>
-																		{% endif %}
-																	</div>
-
-																	<input type="hidden" name="idRencontre" value="{{ planification.rencontre_id }}" id="idRencontre{{ planification.rencontre_id }}">
-
-																	<div class="score-inputs">
-																		<input type="number" name="scoreEquipe1" value="{{ planification.score1 }}" 
-																		       class="score-input" min="0" 
-																		       hx-post="gestionRencontres_traitement.php" 
-																		       hx-trigger="change" 
-																		       hx-include="#idRencontre{{ planification.rencontre_id }}">
-
-																		<input type="number" name="scoreEquipe2" value="{{ planification.score2 }}" 
-																		       class="score-input" min="0" 
-																		       hx-post="gestionRencontres_traitement.php" 
-																		       hx-trigger="change" 
-																		       hx-include="#idRencontre{{ planification.rencontre_id }}">
-																	</div>
-																</div>
-															{% endif %}
-														</div>
-													{% elseif planification.label_id is not null %}
-														<div class="match-card" style="background: #9ca3af; color: white;">
-															<div class="text-center fw-bold">
-																 {{ planification.label_description }}
-															</div>
 														</div>
 													{% endif %}
-												{% endif %}
-											{% endfor %}
-										</td>
-									{% endfor %}
-								</tr>
 
+													<div class="match-header" style="background: {{ planification.equipe1_categorie_couleur }};">
+														{% if planification.type_rencontre_id == 3 and planification.phase_finale_id is null %}
+															<i class="fa fa-trophy me-1"></i>
+															Phase finale – Tour {{ planification.tour }} – {{planification.poule_nom }} – {{ planification.equipe1_categorie_nom }}
+														{% elseif planification.phase_finale_id is not null %}
+															{{ planification.phase_finale_libelle }} {{ planification.equipe1_categorie_nom }} {{planification.equipe1_nom}} vs {{planification.equipe2_nom}}
+
+														{% elseif planification.type_rencontre_id == 4 %}
+															<span class="match-category" style="background-color: #ffc107; color: #212529;">
+																<i class="fa fa-star"></i>Rencontre amicale
+															</span>
+														{% else %}
+															Tour {{ planification.tour }} – {{planification.poule_nom }}
+														{% endif %}
+													</div>
+
+													{% if planification.isTerminated == 1 %}
+														<div class="match-status status-finished" id="Label{{planification.rencontre_id}}">
+															✓ Rencontre terminée
+														</div>
+													{% endif %}
+													{% if planification.isTerminated == 0 %}
+														<div class="match-status status-upcoming" id="Label{{planification.rencontre_id}}">
+															⏱️ Rencontre à venir
+														</div>
+													{% endif %}
+													{% if planification.isTerminated == 2 %}
+														<div class="match-status status-ongoing" id="Label{{planification.rencontre_id}}">
+															▶️ Rencontre en cours
+														</div>
+													{% endif %}
+
+													<div class="status-buttons no-print">
+														<div class="status-dot red" 
+															hx-post="gestionRencontres_traitement.php"
+															hx-trigger="click touchstart" 
+															hx-target="#Label{{planification.rencontre_id}}" 
+															hx-include="#idRencontre{{ planification.rencontre_id }}" 
+															hx-swap="innerHTML" 
+															hx-vals='{"etat": "Avenir"}'
+															title="À venir"></div>
+
+														<div class="status-dot orange" 
+															hx-post="gestionRencontres_traitement.php"
+															hx-trigger="click touchstart" 
+															hx-target="#Label{{planification.rencontre_id}}" 
+															hx-include="#idRencontre{{ planification.rencontre_id }}" 
+															hx-swap="innerHTML" 
+															hx-vals='{"etat": "enCours"}'
+															title="En cours"></div>
+
+														<div class="status-dot green" 
+															hx-post="gestionRencontres_traitement.php"
+															hx-trigger="click touchstart" 
+															hx-target="#Label{{planification.rencontre_id}}" 
+															hx-include="#idRencontre{{ planification.rencontre_id }}" 
+															hx-swap="innerHTML" 
+															hx-vals='{"etat": "terminee"}'
+															title="Terminée"></div>
+													</div>
+
+													<div class="text-center mb-2">
+														<small class="text-muted">Terrain <strong>{{planification.terrain_nom}}</strong></small>
+													</div>
+
+													<div class="text-center">
+														<div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+															<span class="fw-bold">{{ planification.equipe1_nom }} {% if planification.equipe1_isPresent == 0 %}(Absente){% endif %}</span>
+
+															{% if tournoiInfo.gestionVoix == 1 %}
+																<span class="icon-badge {% if planification.audio1 is null %}icon-danger{% else %}icon-success{% endif %}">
+																	<i class="fas fa-microphone{% if planification.audio1 is null %}-slash{% endif %}"></i>
+																</span>
+															{% endif %}
+															<span class="text-muted">vs</span>
+															<span class="fw-bold">{{ planification.equipe2_nom }} {% if planification.equipe2_isPresent == 0 %}(Absente){% endif %}</span>
+															{% if tournoiInfo.gestionVoix == 1 %}
+																<span class="icon-badge {% if planification.audio2 is null %}icon-danger{% else %}icon-success{% endif %}">
+																	<i class="fas fa-microphone{% if planification.audio2 is null %}-slash{% endif %}"></i>
+																</span>
+															{% endif %}
+														</div>
+
+														<input type="hidden" name="idRencontre" value="{{ planification.rencontre_id }}" id="idRencontre{{ planification.rencontre_id }}">
+
+														<div class="score-inputs">
+															<input type="number" name="scoreEquipe1" value="{{ planification.score1 }}" 
+																class="score-input" min="0" 
+																hx-post="gestionRencontres_traitement.php" 
+																hx-trigger="change" 
+																hx-include="#idRencontre{{ planification.rencontre_id }}">
+
+															<input type="number" name="scoreEquipe2" value="{{ planification.score2 }}" 
+																class="score-input" min="0" 
+																hx-post="gestionRencontres_traitement.php" 
+																hx-trigger="change" 
+																hx-include="#idRencontre{{ planification.rencontre_id }}">
+														</div>
+													</div>
+
+												</div>
+
+												{% elseif planification.label_id is not null %}
+												<div class="match-card" style="background: #9ca3af; color: white;">
+													<div class="text-center fw-bold">
+														{{ planification.label_description }}
+													</div>
+												</div>
+											{% endif %}
+
+										{% endif %}
+									{% endfor %}
+									</td>
+								{% endfor %}
+							</tr>
 								
 								<!-- Bande de changement entre créneaux -->
 								{% if not loop.last and tournoiInfo.gestionTempsChangement %}

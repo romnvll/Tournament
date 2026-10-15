@@ -1,268 +1,602 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=0.7">
-		<title>Planning des Arbitres</title>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning des arbitres - Brackito</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --bg-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
 
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
-	</head>
-<style>
-@media (max-width: 576px) {
-	img.logo-club {
-		width: 30px !important;
-		height: 30px !important;
-	}
-}
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
 
-</style>
-    
-	<body class="bg-light">
+        .container-fluid { padding: 12px; max-width: 900px; margin: 0 auto; }
 
-		<div class="container mt-4">
-			<h2 class="text-center mb-4">Planning des Arbitres:
-				{{infoTournoi}}</h2>
+        .card-modern {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 10px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.4s ease;
+        }
 
-			<div class="row">
-				<div class="col-md-6">
-					<input type="text" id="filterArbitre" class="form-control filter-input mb-10" placeholder="Filtrer par nom de l'arbitre...">
-				</div>
-				<div class="col-md-6">
-					<input type="text" id="filterClub" class="form-control filter-input mb-10" placeholder="Filtrer par nom du club...">
-				</div>
-			</div>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-			<div class="table-responsive table-sm" id="arbitreTable">
-				<table class="table table-striped table-bordered align-middle table-sm">
-					<thead class="table-dark">
-						<tr class="text-center">
-							<th>Arbitre
-								<i class="fas fa-user"></i>
-							</th>
-							<th>Club
-								<i class="fas fa-futbol"></i>
-							</th>
-							<th>Informations
-								<i class="fas fa-map-marker-alt"></i>
-							</th>
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.3;
+        }
 
-						</tr>
-					</thead>
+        /* ---------- Filtres ---------- */
+        .filter-box { padding: 12px; }
 
-					<tbody id="arbitreTableBody">
+        .filter-field { position: relative; }
+        .filter-field + .filter-field { margin-top: 10px; }
 
-						{% for arbitre in creneauxArbitres %}
-						
+        .filter-field i.lead-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
 
-							<tr>
-								<td class="text-center">
-                                    <div class="d-flex flex-column align-items-center">
-                                        {% if arbitre.arbitre_nom|length == 0 %}
-                                            <span class="text-primary">Un arbitre du club</span>
-                                        {% else %}
-                                            <p class="mb-0 fw-bold">{{ arbitre.arbitre_nom|upper }}</p>
-                                            <p class="mb-0 text-muted">
-                                                ({{ arbitre.nombre_matchs_arbitre }} rencontre(s) arbitrée(s))
-												
-                                            </p>
-                                        {% endif %}
-                                    </div>
-                                </td>
+        .filter-field input {
+            width: 100%;
+            height: 46px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0 40px 0 40px;
+            font-size: 16px; /* évite le zoom auto sur iOS */
+            background: var(--bg-light);
+            transition: border-color .2s;
+        }
 
-								<td class="text-center">
-                                <div class="d-flex flex-column align-items-center">
-                                    <!-- Logo en haut -->
-                                    <img src="{{ arbitre.arbitre_club_logo }}" alt="Logo {{ arbitre.club_nom }}" class="mb-2 logo-club" style="width: 48px; height: 48px;">
+        .filter-field input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+        }
 
-                                    <!-- Nom du club -->
-                                    <p class="mb-0"><strong>{{ arbitre.arbitre_club_nom }}</strong></p>
+        .filter-clear {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
 
-                                    <!-- Nombre de matchs -->
-                                    <p class="mb-0 text-muted">({{ arbitre.nombre_matchs_club }} rencontre(s) arbitrée(s))</p>
-                                </div>
-                            </td>
+        .filter-field.has-value .filter-clear { display: flex; }
 
-								<td class="text-center">
-                                
-	<!-- Affichage mobile (vertical) -->
-<div class="d-flex flex-column align-items-center d-md-none mb-3">
+        .result-count {
+            font-size: .8rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+        }
 
-  <!-- Ligne unique pour logos + noms + tiret -->
-  <div class="d-flex align-items-center justify-content-center text-center mb-2 flex-nowrap">
-    
-    <!-- Équipe 1 -->
-    <div class="d-flex align-items-center me-2">
-      <img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" style="width: 24px; height: 24px;" class="me-1">
-      <strong class="text-nowrap">{{ arbitre.equipe1_nom }}</strong>
-	  {% if arbitre.score1 is not empty  %} <span class="ms-2 fw-bold">({{arbitre.score1}}</span>{% endif %}
+        /* ---------- Carte arbitre / rencontre ---------- */
+        .ref-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            overflow: hidden;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .ref-card.finished { border-left-color: var(--success-color); }
+        .ref-card.ongoing  { border-left-color: var(--info-color); }
+
+        .ref-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-light);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ref-club-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .ref-info { min-width: 0; flex: 1; }
+
+        .ref-name {
+            font-weight: 700;
+            font-size: .95rem;
+            color: var(--bg-dark);
+            margin: 0;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ref-name.club-ref { color: var(--primary-color); }
+
+        .ref-club {
+            font-size: .78rem;
+            color: #6b7280;
+            margin: 2px 0 0;
+            line-height: 1.2;
+        }
+
+        .ref-counts {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .count-pill {
+            font-size: .68rem;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 3px 9px;
+            white-space: nowrap;
+        }
+
+        .count-pill.ref  { background: rgba(79,70,229,.12); color: var(--primary-color); }
+        .count-pill.club { background: rgba(245,158,11,.15); color: #b45309; }
+
+        /* ---------- Match ---------- */
+        .match-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            padding: 16px 12px;
+            align-items: center;
+        }
+
+        .team-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .team-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--shadow-sm);
+            background: white;
+        }
+
+        .team-name {
+            font-size: clamp(0.62rem, 2.6vw, 0.85rem);
+            text-align: center;
+            background: var(--bg-dark);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            line-height: 1.2;
+            max-width: 100%;
+            word-break: break-word;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .match-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .match-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-light);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .85rem;
+            white-space: nowrap;
+        }
+
+        .match-score {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .score-badge {
+            padding: 4px 11px;
+            border-radius: 10px;
+            color: white;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .score-win  { background: var(--success-color); }
+        .score-lose { background: var(--danger-color); }
+        .score-draw { background: #6b7280; }
+
+        .vs-badge {
+            font-weight: 800;
+            font-size: .8rem;
+            color: #9ca3af;
+            letter-spacing: .08em;
+        }
+
+        .terrain-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .75rem;
+            font-weight: 600;
+            border-radius: 20px;
+            padding: 5px 10px;
+            background: #222;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+            max-width: 110px;
+        }
+
+        .terrain-pill svg { flex-shrink: 0; }
+
+        .terrain-pill span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .match-details {
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .match-category {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .8rem;
+            color: white;
+            display: inline-block;
+        }
+
+        .match-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .status-pending  { background: var(--warning-color); color: white; }
+        .status-finished { background: var(--danger-color); color: white; }
+        .status-ongoing  { background: var(--info-color); color: white; }
+
+        .empty-state {
+            text-align: center;
+            padding: 28px 16px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .empty-state i { font-size: 2rem; color: #d1d5db; display: block; margin-bottom: 10px; }
+
+        .no-match-filter { display: none; }
+
+        /* ---------- Petits écrans ---------- */
+        @media (max-width: 380px) {
+            .team-logo { width: 46px; height: 46px; }
+            .match-header { padding: 14px 8px; gap: 6px; }
+            .match-score { font-size: 1.25rem; }
+            .score-badge { min-width: 34px; padding: 3px 8px; }
+        }
+
+        /* ---------- Desktop ---------- */
+        @media (min-width: 768px) {
+            body { background: #f8f9fa; }
+            .container-fluid { padding: 24px; }
+            .team-logo { width: 80px; height: 80px; }
+            .match-header { padding: 22px 32px; gap: 24px; }
+            .team-name { font-size: .95rem; }
+            .match-score { font-size: 2rem; }
+            .ref-card { transition: box-shadow .2s ease, transform .2s ease; }
+            .ref-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <!-- Titre -->
+    <div class="card-modern">
+        <div class="card-header-modern">
+            <i class="fas fa-whistle"></i>
+            <i class="fas fa-user-tie"></i>
+            <span>Planning des arbitres<br><small style="font-weight:500; opacity:.9;">{{ infoTournoi }}</small></span>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filter-box">
+            <div class="filter-field" id="fieldArbitre">
+                <i class="fas fa-user lead-icon"></i>
+                <input type="search" id="filterArbitre" placeholder="Filtrer par arbitre..." autocomplete="off">
+                <button type="button" class="filter-clear" data-target="filterArbitre" aria-label="Effacer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="filter-field" id="fieldClub">
+                <i class="fas fa-shield-halved lead-icon"></i>
+                <input type="search" id="filterClub" placeholder="Filtrer par club..." autocomplete="off">
+                <button type="button" class="filter-clear" data-target="filterClub" aria-label="Effacer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="result-count" id="resultCount"></div>
+        </div>
     </div>
-	
-    <!-- Séparateur -->
-	
-    <span class="fw-bold mx-1">-</span>
-	
-    <!-- Équipe 2 -->
-    <div class="d-flex align-items-center ms-2">
-	 {% if arbitre.score2 is not empty  %}<span class="me-2 fw-bold">{{arbitre.score2}})</span>{% endif %}
-      <strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
-      <img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" style="width: 24px; height: 24px;" class="ms-1">
-    </div>
 
-  </div>
+    <!-- Liste (rafraîchie automatiquement) -->
+    <div id="arbitreList">
+
+        {% for arbitre in creneauxArbitres %}
+            {% set statusClass = arbitre.isTerminated == 1 ? 'finished' : (arbitre.isTerminated == 2 ? 'ongoing' : '') %}
+            {% set sansArbitre = arbitre.arbitre_nom|length == 0 %}
+
+            <div class="ref-card {{ statusClass }}"
+                 data-arbitre="{{ (sansArbitre ? 'un arbitre du club' : arbitre.arbitre_nom)|lower }}"
+                 data-club="{{ arbitre.arbitre_club_nom|lower }}">
+
+                <!-- Arbitre + club -->
+                <div class="ref-top">
+                    <img src="{{ arbitre.arbitre_club_logo }}" alt="Logo {{ arbitre.arbitre_club_nom }}" class="ref-club-logo" loading="lazy">
+                    <div class="ref-info">
+                        {% if sansArbitre %}
+                            <p class="ref-name club-ref"><i class="fas fa-user-tie me-1"></i>Un arbitre du club</p>
+                        {% else %}
+                            <p class="ref-name"><i class="fas fa-user-tie me-1"></i>{{ arbitre.arbitre_nom|upper }}</p>
+                        {% endif %}
+                        <p class="ref-club">{{ arbitre.arbitre_club_nom|upper }}</p>
+                    </div>
+                    <div class="ref-counts">
+                        {% if not sansArbitre %}
+                            <span class="count-pill ref" title="Rencontres arbitrées par cet arbitre">
+                                <i class="fas fa-user"></i> {{ arbitre.nombre_matchs_arbitre }}
+                            </span>
+                        {% endif %}
+                        <span class="count-pill club" title="Rencontres arbitrées par le club">
+                            <i class="fas fa-shield-halved"></i> {{ arbitre.nombre_matchs_club }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Rencontre -->
+                <div class="match-header">
+                    <div class="team-side">
+                        <img src="{{ arbitre.equipe1_club_logo }}" class="team-logo" alt="{{ arbitre.equipe1_nom }}" loading="lazy" width="56" height="56">
+                        <span class="team-name">{{ arbitre.equipe1_nom|upper }}</span>
+                    </div>
+
+                    <div class="match-center">
+                        {% if arbitre.creneau_nom %}
+                            <div class="match-time">
+                                <i class="fas fa-clock"></i>
+                                {{ arbitre.creneau_nom|slice(0, -3) }}
+                            </div>
+                        {% endif %}
+
+                        {% if arbitre.score1 is not empty or arbitre.score2 is not empty %}
+                            <div class="match-score">
+                                {% if arbitre.score1 > arbitre.score2 %}
+                                    <span class="score-badge score-win">{{ arbitre.score1 }}</span>
+                                    <span>-</span>
+                                    <span class="score-badge score-lose">{{ arbitre.score2 }}</span>
+                                {% elseif arbitre.score1 < arbitre.score2 %}
+                                    <span class="score-badge score-lose">{{ arbitre.score1 }}</span>
+                                    <span>-</span>
+                                    <span class="score-badge score-win">{{ arbitre.score2 }}</span>
+                                {% else %}
+                                    <span class="score-badge score-draw">{{ arbitre.score1 ?? 0 }}</span>
+                                    <span>-</span>
+                                    <span class="score-badge score-draw">{{ arbitre.score2 ?? 0 }}</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span class="vs-badge">VS</span>
+                        {% endif %}
+
+                        <span class="terrain-pill">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="20" height="20" stroke="#4CAF50" stroke-width="2" fill="none"/>
+                                <line x1="12" y1="2" x2="12" y2="22" stroke="#4CAF50" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="2" stroke="#4CAF50" stroke-width="2" fill="none"/>
+                            </svg>
+                            <span>{{ arbitre.terrain_nom }}</span>
+                        </span>
+                    </div>
+
+                    <div class="team-side">
+                        <img src="{{ arbitre.equipe2_club_logo }}" class="team-logo" alt="{{ arbitre.equipe2_nom }}" loading="lazy" width="56" height="56">
+                        <span class="team-name">{{ arbitre.equipe2_nom|upper }}</span>
+                    </div>
+                </div>
+
+                <!-- Catégorie + statut -->
+                <div class="match-details">
+                    <span class="match-category" style="background-color: {{ arbitre.categorie_couleur }};">
+                        {{ arbitre.categorie_nom }}
+                    </span>
+
+                    {% if arbitre.isTerminated == 0 %}
+                        <span class="match-status status-pending"><i class="fas fa-clock"></i> À venir</span>
+                    {% elseif arbitre.isTerminated == 1 %}
+                        <span class="match-status status-finished"><i class="fas fa-check-circle"></i> Terminée</span>
+                    {% elseif arbitre.isTerminated == 2 %}
+                        <span class="match-status status-ongoing">
+                            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> En cours
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="card-modern empty-state">
+                <i class="fas fa-calendar-xmark"></i>
+                Aucune planification trouvée
+            </div>
+        {% endfor %}
+
+        <div class="card-modern empty-state no-match-filter" id="noMatchFilter">
+            <i class="fas fa-magnifying-glass"></i>
+            Aucun résultat pour ces filtres
+        </div>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script>
+$(function () {
+    const refreshInterval = {{ infoTournoiRefresh["refreshClientTime"] }};
 
+    const filterArbitre = document.getElementById('filterArbitre');
+    const filterClub    = document.getElementById('filterClub');
+    const fieldArbitre  = document.getElementById('fieldArbitre');
+    const fieldClub     = document.getElementById('fieldClub');
 
-	<!-- Affichage desktop (horizontal) -->
-	<div class="d-none d-md-flex flex-row justify-content-between align-items-center mb-2">
-		<div class="d-flex align-items-center justify-content-center">
-			<img src="{{ arbitre.equipe1_club_logo }}" alt="{{ arbitre.equipe1_nom }} Logo" class="me-2" style="width: 36px; height: 36px;">
-			
-			<strong class="d-block text-truncate">{{ arbitre.equipe1_nom }}</strong>
-		</div>
-			 {% if arbitre.score1 is not empty  %}<span class="fw-bold">({{arbitre.score1}}</span>{% endif %}
+    function safeGet(key) {
+        try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSet(key, value) {
+        try { localStorage.setItem(key, value); } catch (e) {}
+    }
 
-        
-			{% if arbitre.score1 is not empty or arbitre.score2 is not empty %}
+    function filterList() {
+        const vArbitre = filterArbitre.value.toLowerCase().trim();
+        const vClub    = filterClub.value.toLowerCase().trim();
 
-        <span class="fw-bold">-</span>
-		{% endif %}
-       	
-		{% if arbitre.score2 is not empty  %}<span class="fw-bold">{{arbitre.score2}})</span>{% endif %}
+        fieldArbitre.classList.toggle('has-value', vArbitre !== '');
+        fieldClub.classList.toggle('has-value', vClub !== '');
 
-	    
-		<div class="d-flex align-items-center justify-content-center">
-			<strong class="text-nowrap">{{ arbitre.equipe2_nom }}</strong>
-			<img src="{{ arbitre.equipe2_club_logo }}" alt="{{ arbitre.equipe2_nom }} Logo" class="ms-2" style="width: 36px; height: 36px;">
-		</div>
-	</div>
+        const cards = document.querySelectorAll('#arbitreList .ref-card');
+        let visible = 0;
 
-	<!-- Badge catégorie -->
-	<span class="badge text-white px-3 py-2 mb-2" style="background-color: {{ arbitre.categorie_couleur }};">
-		{{ arbitre.categorie_nom }}
-	</span>
+        cards.forEach(function (card) {
+            const ok = (card.dataset.arbitre || '').includes(vArbitre)
+                    && (card.dataset.club || '').includes(vClub);
+            card.style.display = ok ? '' : 'none';
+            if (ok) visible++;
+        });
 
-	<!-- Terrain -->
-	<div class="mt-2">
-		<strong class="d-flex align-items-center justify-content-center gap-1">
-			<svg width="18" height="18" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect x="2" y="2" width="20" height="20" stroke="green" stroke-width="2" fill="none"/>
-				<line x1="12" y1="2" x2="12" y2="22" stroke="green" stroke-width="2"/>
-				<circle cx="12" cy="12" r="2" stroke="green" stroke-width="2" fill="none"/>
-			</svg>
-			{{ arbitre.terrain_nom }}
-		</strong>
-	</div>
+        const noMatch = document.getElementById('noMatchFilter');
+        if (noMatch) {
+            noMatch.style.display = (cards.length > 0 && visible === 0) ? 'block' : 'none';
+        }
 
-	<!-- Créneau -->
-	<em class="text-muted d-block mt-1">{{ arbitre.creneau_nom|slice(0, -3) }}</em>
+        const counter = document.getElementById('resultCount');
+        if (counter) {
+            counter.textContent = cards.length
+                ? visible + ' rencontre' + (visible > 1 ? 's' : '') + ' sur ' + cards.length
+                : '';
+        }
+    }
 
-	<!-- Statut de la rencontre -->
-	<div class="mt-2">
-		{% if arbitre.isTerminated == 0 %}
-			<span class="badge bg-warning text-dark">À venir</span>
-		{% elseif arbitre.isTerminated == 1 %}
-			<span class="badge bg-danger">Rencontre terminée</span>
-		{% elseif arbitre.isTerminated == 2 %}
-			<span class="badge bg-info text-dark d-inline-flex align-items-center">
-				<span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-				Rencontre en cours
-			</span>
-		{% endif %}
-	</div>
-</td>
+    filterArbitre.addEventListener('input', function () {
+        safeSet('arbitreFilter', filterArbitre.value);
+        filterList();
+    });
 
+    filterClub.addEventListener('input', function () {
+        safeSet('clubFilter', filterClub.value);
+        filterList();
+    });
 
+    document.querySelectorAll('.filter-clear').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById(btn.dataset.target);
+            input.value = '';
+            input.dispatchEvent(new Event('input'));
+            input.focus();
+        });
+    });
 
-							</tr>
-						{% else %}
-							<tr>
-								<td colspan="4" class="text-center">Aucune planification trouvée</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
+    // Restaurer les filtres sauvegardés
+    const savedArbitre = safeGet('arbitreFilter');
+    const savedClub    = safeGet('clubFilter');
+    if (savedArbitre) filterArbitre.value = savedArbitre;
+    if (savedClub)    filterClub.value = savedClub;
 
-			<!--<div class="text-center mt-3">
-						        <a href="index.php?id_tournoi={{idTournoi}}" class="btn btn-primary">Retour au tournoi {{infoTournoi}}</a>
-						    </div>-->
-		</div>
+    filterList();
 
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-		<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-		<script>
-			$(document).ready(function () { // Définir l'intervalle de rafraîchissement en millisecondes (par exemple, 10 secondes)
-const refreshInterval = {{ infoTournoiRefresh["refreshClientTime"] }};
-
-// Fonction pour rafraîchir le contenu du tableau
-setInterval(function () {
-$('#arbitreTable').load(location.href + ' #arbitreTable', function () { // Réappliquer les filtres après le rafraîchissement
-const filterArbitre = document.getElementById('filterArbitre');
-const filterClub = document.getElementById('filterClub');
-filterTable();
+    // Rafraîchissement automatique (sans toucher aux champs de filtre)
+    setInterval(function () {
+        $('#arbitreList').load(location.href + ' #arbitreList > *', filterList);
+    }, refreshInterval);
 });
-}, refreshInterval);
+</script>
 
-// Fonction pour filtrer le tableau
-function filterTable() {
-const filterValueArbitre = filterArbitre.value.toLowerCase();
-const filterValueClub = filterClub.value.toLowerCase();
-const rows = document.getElementById('arbitreTableBody').getElementsByTagName('tr');
-
-for (let row of rows) {
-const cells = row.getElementsByTagName('td');
-if (cells.length < 2) 
-continue;
-
-// Éviter de filtrer la ligne "Aucune planification trouvée"
-
-const arbitreNom = cells[0].textContent.toLowerCase();
-const clubNom = cells[1].textContent.toLowerCase();
-
-const matchArbitre = arbitreNom.includes(filterValueArbitre);
-const matchClub = clubNom.includes(filterValueClub);
-
-if (matchArbitre && matchClub) {
-row.style.display = '';
-} else {
-row.style.display = 'none';
-}
-}
-}
-
-// Ajouter les événements de filtrage
-const filterArbitre = document.getElementById('filterArbitre');
-const filterClub = document.getElementById('filterClub');
-
-filterArbitre.addEventListener('input', () => {
-localStorage.setItem('arbitreFilter', filterArbitre.value.toLowerCase());
-filterTable();
-});
-
-filterClub.addEventListener('input', () => {
-localStorage.setItem('clubFilter', filterClub.value.toLowerCase());
-filterTable();
-});
-
-// Récupérer les filtres stockés dans le localStorage
-const savedArbitreFilter = localStorage.getItem('arbitreFilter');
-const savedClubFilter = localStorage.getItem('clubFilter');
-
-if (savedArbitreFilter) {
-filterArbitre.value = savedArbitreFilter;
-}
-if (savedClubFilter) {
-filterClub.value = savedClubFilter;
-}
-
-// Appliquer les filtres au chargement initial
-filterTable();
-});
-		</script>
-
-	</body>
+</body>
 </html>

@@ -79,6 +79,19 @@
     </div>
     {% endif %}
 
+    {% if limiteTournois is not null %}
+        {% set limiteAtteinte = nombreTournoisActuel >= limiteTournois %}
+        <div class="alert {{ limiteAtteinte ? 'alert-warning' : 'alert-light border' }} d-flex align-items-center gap-2">
+            <i class="fas fa-id-card"></i>
+            <span>
+                {{ nombreTournoisActuel }} / {{ limiteTournois }} tournoi{{ limiteTournois > 1 ? 's' : '' }} utilisé{{ limiteTournois > 1 ? 's' : '' }} selon votre licence.
+                {% if limiteAtteinte %}
+                    La restauration est bloquée tant que la limite est atteinte — supprimez un tournoi ou changez de licence.
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
     <div class="row g-3">
 
         <!-- ===================== SAUVEGARDER ===================== -->
@@ -193,7 +206,7 @@
                                             </button>
                                         </form>
 
-                                        <a href="sauvegardeTournoi_traitement.php?action=supprimerSauvegarde&fichier={{ sauvegarde.nom|url_encode }}"
+                                        <a href="sauvegardeTournoi_traitement.php?action=supprimerSauvegarde&fichier={{ sauvegarde.nom|url_encode }}&tournoiId={{ tournoiId }}"
                                            class="btn btn-outline-danger btn-sm btn-suppr-sauvegarde">
                                             <i class="fas fa-trash"></i>
                                         </a>
@@ -227,7 +240,7 @@
                 form.method = 'POST';
                 form.action = 'sauvegardeTournoi_traitement.php';
 
-                [['action', 'renommerSauvegarde'], ['fichier', fichier], ['nouveauNom', nouveauNom.trim()],['idTournoi',{{ListeDesTournois|last.id }}]]
+                [['action', 'renommerSauvegarde'], ['fichier', fichier], ['nouveauNom', nouveauNom.trim()], ['tournoiId', '{{ tournoiId }}']]
                     .forEach(function (paire) {
                         var input = document.createElement('input');
                         input.type = 'hidden';
@@ -278,6 +291,5 @@
             }
         });
     </script>
-    
 </body>
 </html>

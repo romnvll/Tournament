@@ -347,7 +347,14 @@ LEFT JOIN Clubs c2 ON e2.club_id = c2.id
 
 INNER JOIN phases_finales pf ON r.phase_finale_id = pf.id
 LEFT JOIN Planification p ON r.id = p.rencontre_id
-LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+LEFT JOIN Arbitres a ON a.arbitre_id = (
+    SELECT p2.arbitre_id 
+    FROM Planification p2 
+    WHERE p2.terrain_id = p.terrain_id 
+      AND p2.creneau_id = p.creneau_id 
+      AND p2.arbitre_id IS NOT NULL
+    LIMIT 1
+)
 LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
 LEFT JOIN Creneaux cr ON p.creneau_id = cr.creneau_id
 
@@ -1144,7 +1151,14 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
         JOIN Planification p ON p.rencontre_id = r.id
         LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
-        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN Arbitres a ON a.arbitre_id = (
+    SELECT p2.arbitre_id 
+    FROM Planification p2 
+    WHERE p2.terrain_id = p.terrain_id 
+      AND p2.creneau_id = p.creneau_id 
+      AND p2.arbitre_id IS NOT NULL
+    LIMIT 1
+)
         LEFT JOIN Equipes e1 ON r.equipe1_id = e1.id
         LEFT JOIN Equipes e2 ON r.equipe2_id = e2.id
         WHERE r.isTerminated IN (0, 2)
@@ -1285,18 +1299,25 @@ public function getPhaseFinaleId($tournoi_id, $ordre)
     
 
     $joins = "
-        JOIN      Equipes     equipe1      ON r.equipe1_id    = equipe1.id
-        JOIN      Clubs       club1        ON equipe1.club_id = club1.id
-        LEFT JOIN Categorie   cat1         ON equipe1.categorie = cat1.id_categorie
-        JOIN      Equipes     equipe2      ON r.equipe2_id    = equipe2.id
-        JOIN      Clubs       club2        ON equipe2.club_id = club2.id
-        LEFT JOIN Categorie   cat2         ON equipe2.categorie = cat2.id_categorie
-        LEFT JOIN Planification p          ON r.id            = p.rencontre_id
-        LEFT JOIN Creneaux    c            ON p.creneau_id    = c.creneau_id
-        LEFT JOIN Terrains    t            ON p.terrain_id    = t.terrain_id
-        LEFT JOIN Arbitres    a            ON p.arbitre_id    = a.arbitre_id
-        LEFT JOIN Clubs       clubArbitre  ON a.club_id       = clubArbitre.id
-    ";
+    JOIN      Equipes     equipe1      ON r.equipe1_id    = equipe1.id
+    JOIN      Clubs       club1        ON equipe1.club_id = club1.id
+    LEFT JOIN Categorie   cat1         ON equipe1.categorie = cat1.id_categorie
+    JOIN      Equipes     equipe2      ON r.equipe2_id    = equipe2.id
+    JOIN      Clubs       club2        ON equipe2.club_id = club2.id
+    LEFT JOIN Categorie   cat2         ON equipe2.categorie = cat2.id_categorie
+    LEFT JOIN Planification p          ON r.id            = p.rencontre_id
+    LEFT JOIN Creneaux    c            ON p.creneau_id    = c.creneau_id
+    LEFT JOIN Terrains    t            ON p.terrain_id    = t.terrain_id
+    LEFT JOIN Arbitres    a            ON a.arbitre_id = (
+        SELECT p2.arbitre_id 
+        FROM Planification p2 
+        WHERE p2.terrain_id = p.terrain_id 
+          AND p2.creneau_id = p.creneau_id 
+          AND p2.arbitre_id IS NOT NULL
+        LIMIT 1
+    )
+    LEFT JOIN Clubs       clubArbitre  ON a.club_id       = clubArbitre.id
+";
 
     // ── Requête principale : rencontres de la poule ──────────────────────
     $queryPoule = "
@@ -1602,12 +1623,19 @@ public function getRencontreByCategorie($categorieId, $tournoiId, $typeRencontre
         JOIN Clubs club2 ON equipe2.club_id = club2.id
         LEFT JOIN Categorie cat2 ON equipe2.categorie = cat2.id_categorie
 
-        LEFT JOIN Planification p ON r.id = p.rencontre_id
-        LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
-        LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
+      LEFT JOIN Planification p ON r.id = p.rencontre_id
+LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
+LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
 
-        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
-        LEFT JOIN Clubs clubArbitre ON a.club_id = clubArbitre.id
+LEFT JOIN Arbitres a ON a.arbitre_id = (
+    SELECT p2.arbitre_id 
+    FROM Planification p2 
+    WHERE p2.terrain_id = p.terrain_id 
+      AND p2.creneau_id = p.creneau_id 
+      AND p2.arbitre_id IS NOT NULL
+    LIMIT 1
+)
+LEFT JOIN Clubs clubArbitre ON a.club_id = clubArbitre.id
 
         WHERE 
             r.type_rencontre_id = :typeRencontreId
@@ -2061,17 +2089,24 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
                 Clubs club2 ON equipe2.club_id = club2.id
             JOIN 
                 Categorie cat2 ON equipe2.categorie = cat2.id_categorie
-            LEFT JOIN 
-                Planification p ON r.id = p.rencontre_id
-            LEFT JOIN 
-                Creneaux c ON p.creneau_id = c.creneau_id
-            LEFT JOIN 
-                Terrains t ON p.terrain_id = t.terrain_id
-            
-            LEFT JOIN 
-                Arbitres a ON p.arbitre_id = a.arbitre_id
-            LEFT JOIN 
-                Clubs clubArbitre ON a.club_id = clubArbitre.id
+          LEFT JOIN 
+    Planification p ON r.id = p.rencontre_id
+LEFT JOIN 
+    Creneaux c ON p.creneau_id = c.creneau_id
+LEFT JOIN 
+    Terrains t ON p.terrain_id = t.terrain_id
+
+LEFT JOIN 
+    Arbitres a ON a.arbitre_id = (
+        SELECT p2.arbitre_id 
+        FROM Planification p2 
+        WHERE p2.terrain_id = p.terrain_id 
+          AND p2.creneau_id = p.creneau_id 
+          AND p2.arbitre_id IS NOT NULL
+        LIMIT 1
+    )
+LEFT JOIN 
+    Clubs clubArbitre ON a.club_id = clubArbitre.id
             WHERE 
                 (equipe1.club_id = :club OR equipe2.club_id = :club)
                 AND (equipe1.tournoi_id = :idTournoi OR equipe2.tournoi_id = :idTournoi)
@@ -2257,7 +2292,14 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
         LEFT JOIN Creneaux c ON p.creneau_id = c.creneau_id
         LEFT JOIN Terrains t ON p.terrain_id = t.terrain_id
 
-        LEFT JOIN Arbitres a ON p.arbitre_id = a.arbitre_id
+        LEFT JOIN Arbitres a ON a.arbitre_id = (
+    SELECT p2.arbitre_id 
+    FROM Planification p2 
+    WHERE p2.terrain_id = p.terrain_id 
+      AND p2.creneau_id = p.creneau_id 
+      AND p2.arbitre_id IS NOT NULL
+    LIMIT 1
+)
         LEFT JOIN Clubs clubArbitre ON a.club_id = clubArbitre.id
 
         WHERE 

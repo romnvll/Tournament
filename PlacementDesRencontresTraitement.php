@@ -16,28 +16,34 @@ if (isset ($_POST['nomTerrain'])) {
 
     $planification->nettoyerPlanificationsVides($_POST['idTournoi']);
 
-    $planifId      = (int) $_POST['planifId'];
-    $newTerrain    = (int) $_POST['newTerrain'];
-    $newCreneau    = (int) $_POST['newCreneau'];
-    $targetPlanifId = isset($_POST['targetPlanifId']) && $_POST['targetPlanifId'] !== '' 
+    $planifId        = (int) $_POST['planifId'];
+    $newTerrain      = (int) $_POST['newTerrain'];
+    $newCreneau      = (int) $_POST['newCreneau'];
+    $targetPlanifId  = isset($_POST['targetPlanifId']) && $_POST['targetPlanifId'] !== '' 
                         ? (int) $_POST['targetPlanifId'] 
                         : null;
-    $originTerrain = (int) $_POST['originTerrain'];
-    $originCreneau = (int) $_POST['originCreneau'];
+    $arbitrePlanifId = isset($_POST['arbitrePlanifId']) && $_POST['arbitrePlanifId'] !== ''
+                        ? (int) $_POST['arbitrePlanifId']
+                        : null;
+    $originTerrain   = (int) $_POST['originTerrain'];
+    $originCreneau   = (int) $_POST['originCreneau'];
 
     if ($targetPlanifId !== null) {
-        // SWAP : déplacer d'abord la cible vers l'origine, puis la source vers la destination
+        // SWAP : la cible repart vers l'origine, la source va vers la destination
         $planification->deplacerPlanification($targetPlanifId, $originTerrain, $originCreneau);
         $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
     } else {
-        // Déplacement simple
         $planification->deplacerPlanification($planifId, $newTerrain, $newCreneau);
+    }
+
+    // Déplace l'arbitre "compagnon" en même temps que la rencontre, sans l'impliquer dans le swap
+    if ($arbitrePlanifId !== null) {
+        $planification->deplacerPlanification($arbitrePlanifId, $newTerrain, $newCreneau);
     }
 
     http_response_code(200);
     exit;
 }
-
 
 
 if (isset($_POST['action']) && $_POST['action'] === 'deplanifier') {

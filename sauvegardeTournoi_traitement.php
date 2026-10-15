@@ -17,7 +17,7 @@ $stockage = new SauvegardeStockage();
 if (($_GET['action'] ?? null) === 'export' && isset($_GET['idTournoi'])) {
     $idTournoi = (int) $_GET['idTournoi'];
     $tournoi = $tournoiDao->getTournoiById($idTournoi);
-    
+
     $estProprietaire = $tournoi && (int) $tournoi['utilisateur_id'] === (int) $userData['id'];
     $estAdmin = $userData['role'] === 'admin';
 
@@ -76,11 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? null) === 'ren
     );
 
     if ($nouveauFichier === null) {
-        header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode('Renommage impossible (nom vide ou déjà utilisé).'));
+        header('Location: Sauvegardetournoi.php?idTournoi=' . urlencode($_POST['tournoiId'] ?? '') . '&status=error&message=' . urlencode('Renommage impossible (nom vide ou déjà utilisé).'));
         exit;
     }
 
-   header('Location: Sauvegardetournoi.php?idTournoi=' . urlencode($_POST['idTournoi'] ?? '') );
+    header('Location: Sauvegardetournoi.php?idTournoi=' . urlencode($_POST['tournoiId'] ?? ''));
     exit;
 }
 
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? null) === 'ren
  * --------------------------------------------------------------- */
 if (($_GET['action'] ?? null) === 'supprimerSauvegarde' && isset($_GET['fichier'])) {
     $stockage->supprimer((int) $userData['id'], $_GET['fichier']);
-    header('Location: sauvegardeTournoi.php');
+    header('Location: Sauvegardetournoi.php.php?idTournoi=' . urlencode($_GET['tournoiId'] ?? '') . '&status=deleted');
     exit;
 }
 
@@ -102,13 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['fichierSauvegarde']
     if (!empty($_POST['fichierStocke'])) {
         $contenu = $stockage->lire((int) $userData['id'], $_POST['fichierStocke']);
         if ($contenu === null) {
-            header('Location: sauvegardeTournoi.php?status=error&message=' . urlencode('Sauvegarde introuvable sur le serveur.'));
+            header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode('Sauvegarde introuvable sur le serveur.'));
             exit;
         }
     } else {
         $fichier = $_FILES['fichierSauvegarde'];
         if ($fichier['error'] !== UPLOAD_ERR_OK) {
-            header('Location: sauvegardeTournoi.php?status=error&message=' . urlencode('Échec du téléversement du fichier.'));
+            header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode('Échec du téléversement du fichier.'));
             exit;
         }
         $contenu = file_get_contents($fichier['tmp_name']);
@@ -117,18 +117,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['fichierSauvegarde']
     $donnees = json_decode($contenu, true);
 
     if (!is_array($donnees) || !isset($donnees['tournoi'])) {
-        header('Location: sauvegardeTournoi.php?status=error&message=' . urlencode('Fichier de sauvegarde invalide.'));
+        header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode('Fichier de sauvegarde invalide.'));
+        exit;
+    }
+
+    // La restauration crée un nouveau tournoi : elle ne doit pas permettre de dépasser
+    // la limite de la licence de l'utilisateur.
+    $nombreActuel = $backupDao->compterTournoisUtilisateur((int) $userData['id']);
+    $limite = $backupDao->limiteTournoisUtilisateur((int) $userData['id']);
+    if ($limite !== null && $nombreActuel >= $limite) {
+        header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode(
+            "Limite de tournois atteinte ($nombreActuel/$limite) pour votre licence. Supprimez un tournoi existant ou mettez à niveau votre licence avant de restaurer."
+        ));
         exit;
     }
 
     try {
         $nouvelIdTournoi = $backupDao->restaurer($donnees, (int) $userData['id']);
     } catch (Throwable $e) {
-        header('Location: sauvegardeTournoi.php?status=error&message=' . urlencode('Échec de la restauration : ' . $e->getMessage()));
+        header('Location: Sauvegardetournoi.php?status=error&message=' . urlencode('Échec de la restauration : ' . $e->getMessage()));
         exit;
     }
 
-    header('Location: modifierTournoi.php?idTournoi=' . $nouvelIdTournoi . '&status=restored');
+    header('Location: modifierTournoi.php?idTournoi=' . $nouvelIdTournoi  );
     exit;
 }
 

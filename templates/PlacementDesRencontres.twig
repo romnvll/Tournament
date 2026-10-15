@@ -858,17 +858,24 @@
 
                                                 {# ── Arbitre ── #}
                                                 {% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
-                                                    <div class="arbitre-card">
-                                                        <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
-                                                           class="delete-match-btn">
-                                                            <i class="fas fa-calendar-times"></i>
-                                                        </a>
-                                                        <div>
-                                                            <i class="fas fa-user-tie"></i>
-                                                            <i class="material-icons" style="font-size: 20px;">sports</i>
-                                                            {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
+                                                    {% if planification.arbitre_id is not null and tournoiInfo.gestionArbitres == 1 %}
+                                                        <div class="arbitre-card"
+                                                            draggable="true"
+                                                            data-planif-id="{{ planification.planification_id }}"
+                                                            data-terrain-id="{{ terrains[j]['terrain_id'] }}"
+                                                            data-creneau-id="{{ creneau.creneau_id }}"
+                                                            data-type="arbitre">
+                                                            <a href="PlacementDesRencontresTraitement.php?action=noPlanifEvent&event={{ planification.planification_id }}&arbitre_id={{ planification.arbitre_id }}&tournoi_id={{ idTournoi }}#planif-{{ terrains[j]['terrain_id'] }}-{{ creneau.creneau_id }}"
+                                                            class="delete-match-btn">
+                                                                <i class="fas fa-calendar-times"></i>
+                                                            </a>
+                                                            <div>
+                                                                <i class="fas fa-user-tie"></i>
+                                                                <i class="material-icons" style="font-size: 20px;">sports</i>
+                                                                {{ planification.arbitre_nom }} {{ planification.club_nom_arbitre }}
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    {% endif %}
                                                 {% elseif tournoiInfo.gestionArbitres == 1 %}
                                                     <form action="PlacementDesRencontresTraitement.php" method="post" class="arbitreForm">
                                                         <select class="empty-select" name="Addevent">
@@ -1227,8 +1234,7 @@ function cocherCategorie() {
     var dragged = null;
 
     /* Sélecteur unique : match-card ET label-card draggables */
-    var draggableSelector = '.match-card[draggable], .label-card[draggable]';
-
+            var draggableSelector = '.match-card[draggable], .label-card[draggable], .arbitre-card[draggable]';
     document.querySelectorAll(draggableSelector).forEach(function (card) {
         card.addEventListener('dragstart', function (e) {
             dragged = card;
@@ -1253,39 +1259,57 @@ function cocherCategorie() {
         zone.addEventListener('dragleave', function (e) {
             if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
         });
-        zone.addEventListener('drop', function (e) {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            if (!dragged) return;
+       zone.addEventListener('drop', function (e) {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (!dragged) return;
 
-            var planifId      = dragged.dataset.planifId;
-            var originTerrain = dragged.dataset.terrainId;
-            var originCreneau = dragged.dataset.creneauId;
-            var newTerrain    = zone.dataset.terrainId;
-            var newCreneau    = zone.dataset.creneauId;
+    var planifId      = dragged.dataset.planifId;
+    var draggedType    = dragged.dataset.type; // 'rencontre', 'arbitre', ou 'label'
+    var originTerrain = dragged.dataset.terrainId;
+    var originCreneau = dragged.dataset.creneauId;
+    var newTerrain    = zone.dataset.terrainId;
+    var newCreneau    = zone.dataset.creneauId;
 
-            /* Carte déjà présente dans la zone cible (pour le swap) */
-            var targetCard      = zone.querySelector('.match-card:not(.dragging), .label-card:not(.dragging)');
-            var targetPlanifId  = targetCard ? targetCard.dataset.planifId : '';
+    // Cible pour un éventuel swap : uniquement un élément du MÊME type
+    var targetCard = zone.querySelector(
+        '.' + dragged.className.split(' ').find(c => ['match-card','label-card','arbitre-card'].includes(c)) + ':not(.dragging)'
+    );
+    var targetPlanifId = targetCard ? targetCard.dataset.planifId : '';
 
-            fetch('PlacementDesRencontresTraitement.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action:         'deplacerPlanification',
-                    planifId:       planifId,
-                    newTerrain:     newTerrain,
-                    newCreneau:     newCreneau,
-                    idTournoi:      '{{ idTournoi }}',
-                    targetPlanifId: targetPlanifId,
-                    originTerrain:  originTerrain,
-                    originCreneau:  originCreneau,
-                })
-            }).then(function (r) {
-                if (r.ok) location.reload();
-                else alert('Erreur lors du déplacement.');
-            });
-        });
+    // Si on déplace une rencontre, cherche l'arbitre resté dans la case d'origine
+    var arbitrePlanifId = null;
+    if (draggedType === 'rencontre') {
+        var origineCell = document.querySelector(
+            '[data-terrain-id="' + originTerrain + '"][data-creneau-id="' + originCreneau + '"]'
+        );
+        var arbitreCard = origineCell ? origineCell.querySelector('.arbitre-card[draggable]') : null;
+        if (arbitreCard) {
+            arbitrePlanifId = arbitreCard.dataset.planifId;
+        }
+    }
+
+    fetch('PlacementDesRencontresTraitement.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            action:          'deplacerPlanification',
+            planifId:        planifId,
+            arbitrePlanifId: arbitrePlanifId || '',
+            newTerrain:      newTerrain,
+            newCreneau:      newCreneau,
+            idTournoi:       '{{ idTournoi }}',
+            targetPlanifId:  targetPlanifId,
+            originTerrain:   originTerrain,
+            originCreneau:   originCreneau,
+        })
+    }).then(function (r) {
+        if (r.ok) location.reload();
+        else alert('Erreur lors du déplacement.');
+    });
+});
+
+
     });
 })();
 </script>
