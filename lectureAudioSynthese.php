@@ -52,7 +52,7 @@ $terrainAudio = trim((string) ($audio['terrain_audio'] ?? ''));
 if ($terrainAudio !== '' || $terrainNom !== '') {
     ajouterAnnonce(
         $messages,
-        trim("Se prépare sur le terrain " . $terrainNom),
+        trim("se prépare sur le terrain " . $terrainNom),
         $terrainAudio
     );
 }
@@ -109,7 +109,7 @@ if ($arbitreAudio !== '') {
 }
 
 
-var_dump($audio);
+
 
 
     }
@@ -655,18 +655,28 @@ if (
 |--------------------------------------------------------------------------
 */
 
-window.addEventListener(
-    'load',
-    function () {
+window.addEventListener('load', function () {
+    let started = false;
+    const start = function () {
+        if (started) return;
+        started = true;
+        setTimeout(playNext, 300);
+    };
+    warmUp(start);
+});
 
-        setTimeout(
-            playNext,
-            500
-        );
+/* Réveille la sortie audio avec une annonce muette avant la première vraie annonce */
+function warmUp(onDone) {
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0;
+    u.lang   = 'fr-FR';
+    u.onend   = onDone;
+    u.onerror = onDone;
+    synth.speak(u);
 
-    }
-);
-
+    // Sécurité : certains navigateurs n'appellent jamais onend sur un texte vide
+    setTimeout(onDone, 700);
+}
 </script>
 
 </body>

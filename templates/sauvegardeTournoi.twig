@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <title>Sauvegarde &amp; restauration des tournois</title>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --surface: #f9fafb;
+            --radius: 12px;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            padding: 20px;
+        }
+        .panel {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .option-card {
+            height: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+        }
+        .option-card h6 {
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-brand { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .btn-brand:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+        .table > :not(caption) > * > * { vertical-align: middle; }
+        .drop-zone {
+            border: 2px dashed var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            color: var(--muted);
+            transition: border-color .15s, background .15s;
+        }
+        .drop-zone.dragover { border-color: var(--primary); background: var(--surface); }
+    </style>
+</head>
+<body>
+    {{ include('header.twig') }}
+
+    <div class="panel">
+        <h4 class="mb-1"><i class="fas fa-box-archive me-2"></i>Sauvegarde &amp; restauration des tournois</h4>
+        <p class="text-muted mb-0">
+            Téléchargez une sauvegarde complète d'un tournoi (équipes, poules, rencontres, planification, arbitres…)
+            ou restaurez-en une dans votre compte, sous forme d'un nouveau tournoi.
+        </p>
+    </div>
+
+    {% if status == 'error' %}
+    <div class="alert alert-danger">
+        <i class="fas fa-triangle-exclamation me-1"></i> {{ message|default('Une erreur est survenue.') }}
+    </div>
+    {% elseif status == 'restored' %}
+    <div class="alert alert-success">
+        <i class="fas fa-circle-check me-1"></i> Tournoi restauré avec succès.
+    </div>
+    {% endif %}
+
+    <div class="row g-3">
+
+        <!-- ===================== SAUVEGARDER ===================== -->
+        <div class="col-lg-7">
+            <div class="panel h-100">
+                <div class="option-card">
+                    <h6><i class="fas fa-download"></i> Sauvegarder un tournoi existant</h6>
+
+                    {% if ListeDesTournois is empty %}
+                        <p class="text-muted mb-0">Vous n'avez pas encore de tournoi à sauvegarder.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Tournoi</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tournoi in ListeDesTournois %}
+                                    <tr>
+                                        <td>{{ tournoi.nom }}</td>
+                                        <td>{{ tournoi.dateDebut }}</td>
+                                        <td class="text-end">
+                                            <a href="sauvegardeTournoi_traitement.php?action=export&idTournoi={{ tournoi.id }}"
+                                               class="btn btn-brand btn-sm">
+                                                <i class="fas fa-file-arrow-down"></i> Télécharger la sauvegarde
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== RESTAURER ===================== -->
+        <div class="col-lg-5">
+            <div class="panel h-100">
+                <div class="option-card">
+                    <h6><i class="fas fa-upload"></i> Restaurer une sauvegarde</h6>
+                    <p class="text-muted small">
+                        La restauration crée un <strong>nouveau tournoi</strong> à partir du fichier :
+                        rien n'est écrasé dans votre compte.
+                    </p>
+
+                    <form action="sauvegardeTournoi_traitement.php" method="POST" enctype="multipart/form-data" id="formRestauration">
+                        <label for="fichierSauvegarde" class="drop-zone mb-3 d-block" id="dropZone" style="cursor:pointer;">
+                            <i class="fas fa-file-arrow-up fa-2x mb-2"></i>
+                            <div id="dropZoneLabel">Glissez le fichier .json ici, ou cliquez pour le choisir</div>
+                            <input type="file" id="fichierSauvegarde" name="fichierSauvegarde" accept=".json,application/json" class="d-none" required>
+                        </label>
+
+                        <button type="submit" class="btn btn-brand w-100">
+                            <i class="fas fa-rotate"></i> Restaurer ce tournoi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===================== SAUVEGARDES STOCKÉES SUR LE SERVEUR ===================== -->
+    <div class="panel">
+        <div class="option-card">
+            <h6><i class="fas fa-server"></i> Sauvegardes stockées sur le serveur</h6>
+            <p class="text-muted small">
+                Chaque téléchargement en garde automatiquement une copie ici, accessible uniquement par vous.
+            </p>
+
+            {% if SauvegardesStockees is empty %}
+                <p class="text-muted mb-0">Aucune sauvegarde stockée pour le moment.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fichier</th>
+                                <th>Date</th>
+                                <th>Taille</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sauvegarde in SauvegardesStockees %}
+                            <tr>
+                                <td class="text-break">{{ sauvegarde.nom }}</td>
+                                <td>{{ sauvegarde.date }}</td>
+                                <td>{{ sauvegarde.taille }}</td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        <a href="sauvegardeTournoi_traitement.php?action=telecharger&fichier={{ sauvegarde.nom|url_encode }}"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-download"></i> Télécharger
+                                        </a>
+
+                                        <button type="button" class="btn btn-outline-secondary btn-sm btn-renommer-sauvegarde"
+                                                data-fichier="{{ sauvegarde.nom }}">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+
+                                        <form action="sauvegardeTournoi_traitement.php" method="POST" class="d-inline restaurer-stockee">
+                                            <input type="hidden" name="fichierStocke" value="{{ sauvegarde.nom }}">
+                                            <button type="submit" class="btn btn-brand btn-sm">
+                                                <i class="fas fa-rotate"></i> Restaurer
+                                            </button>
+                                        </form>
+
+                                        <a href="sauvegardeTournoi_traitement.php?action=supprimerSauvegarde&fichier={{ sauvegarde.nom|url_encode }}"
+                                           class="btn btn-outline-danger btn-sm btn-suppr-sauvegarde">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.restaurer-stockee').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                if (!confirm('Restaurer cette sauvegarde va créer un nouveau tournoi dans votre compte. Continuer ?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        document.querySelectorAll('.btn-renommer-sauvegarde').forEach(function (bouton) {
+            bouton.addEventListener('click', function () {
+                var fichier = bouton.dataset.fichier;
+                var nomActuel = fichier.replace(/\.json$/i, '');
+                var nouveauNom = prompt('Nouveau nom de la sauvegarde :', nomActuel);
+                if (nouveauNom === null || nouveauNom.trim() === '' || nouveauNom.trim() === nomActuel) return;
+
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'sauvegardeTournoi_traitement.php';
+
+                [['action', 'renommerSauvegarde'], ['fichier', fichier], ['nouveauNom', nouveauNom.trim()],['idTournoi',{{ListeDesTournois|last.id }}]]
+                    .forEach(function (paire) {
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = paire[0];
+                        input.value = paire[1];
+                        form.appendChild(input);
+                    });
+
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+        document.querySelectorAll('.btn-suppr-sauvegarde').forEach(function (lien) {
+            lien.addEventListener('click', function (e) {
+                if (!confirm('Supprimer définitivement cette sauvegarde du serveur ?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const input = document.getElementById('fichierSauvegarde');
+        const label = document.getElementById('dropZoneLabel');
+
+        input.addEventListener('change', function () {
+            if (input.files.length) label.textContent = input.files[0].name;
+        });
+
+        ['dragenter', 'dragover'].forEach(evt =>
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); })
+        );
+        ['dragleave', 'drop'].forEach(evt =>
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); })
+        );
+        dropZone.addEventListener('drop', function (e) {
+            if (e.dataTransfer.files.length) {
+                input.files = e.dataTransfer.files;
+                label.textContent = e.dataTransfer.files[0].name;
+            }
+        });
+
+        document.getElementById('formRestauration').addEventListener('submit', function (e) {
+            if (!input.files.length) return;
+            if (!confirm('Restaurer ce fichier va créer un nouveau tournoi dans votre compte. Continuer ?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -14,3 +14,4 @@ img/planTournoi/*
 uploadsAssistance/*
 !uploadsAssistance/.gitignore
 videos/HBCAT_Tournoi_herbe.mp4
+sauvegardes/*

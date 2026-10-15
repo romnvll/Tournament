@@ -530,9 +530,10 @@
                                                 onclick="stopArbitreAudio({{ arbitre.arbitre_id }})" style="display:none;">
                                             ⏹️ Stop
                                         </button>
-                                        <button class="btn btn-outline-danger btn-sm"
-                                                onclick="supprimerAudioArbitre({{ arbitre.arbitre_id }}, {{ infotournoi.id }})">
-                                            🗑️ Supprimer l'enregistrement
+                                        <button type="button" class="btn btn-outline-danger btn-sm btn-suppr-audio"
+                                                style="touch-action: manipulation;"
+                                                data-arbitre="{{ arbitre.arbitre_id }}" data-tournoi="{{ infotournoi.id }}">
+                                            🗑️ Supprimer
                                         </button>
                                     {% endif %}
 
@@ -694,6 +695,12 @@
                 <input type="hidden" name="actionArchiver" value="1">
                 {{ ui.switch('isArchived', '🗃️ ' ~ t('archiverLeTournoi'), infotournoi.isArchived == 1) }}
             </form>
+
+             <hr>
+            <a href="sauvegardeTournoi_traitement.php?action=export&idTournoi={{ infotournoi.id }}"
+            class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-file-arrow-down"></i> Télécharger une sauvegarde de ce tournoi
+            </a>
 
             {% if infotournoi.isArchived == 1 %}
                 <hr>
@@ -870,21 +877,42 @@
             document.getElementById('stopPlayButton_' + arbitreId).style.display = 'none';
         }
 
-        function supprimerAudioArbitre(arbitreId, tournoiId) {
-    if (!confirm("Supprimer l'enregistrement de cet arbitre ?")) return;
+       document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-suppr-audio');
+    if (!btn) return;
+
+    // Premier appui : demande de confirmation sur le bouton lui-même (pas de confirm())
+    if (!btn.dataset.confirm) {
+        btn.dataset.confirm = '1';
+        btn.textContent = '⚠️ Confirmer ?';
+        setTimeout(() => {
+            delete btn.dataset.confirm;
+            btn.textContent = '🗑️ Supprimer';
+        }, 3000);
+        return;
+    }
+
+    btn.disabled = true;
 
     const formData = new FormData();
     formData.append('type', 'arbitre');
-    formData.append('idArbitre', arbitreId);
-    formData.append('idTournoi', tournoiId);
+    formData.append('idArbitre', btn.dataset.arbitre);
+    formData.append('idTournoi', btn.dataset.tournoi);
 
-    fetch('supprimer_audio.php', { method: 'POST', body: formData })
+    fetch('supprimer_audio.php', { method: 'POST', body: formData, cache: 'no-store' })
         .then(r => {
             if (!r.ok) throw new Error('HTTP ' + r.status);
-            location.reload();
+            // Recharge avec un paramètre unique pour contourner le cache
+            const url = new URL(window.location.href);
+            url.searchParams.set('_', Date.now());
+            window.location.replace(url.toString());
         })
-        .catch(err => alert('Erreur lors de la suppression : ' + err));
-}
+        .catch(err => {
+            btn.disabled = false;
+            btn.textContent = '🗑️ Supprimer';
+            alert('Erreur lors de la suppression : ' + err.message);
+        });
+});
     </script>
 
 </body>
