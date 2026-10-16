@@ -1110,7 +1110,6 @@
    SCRIPTS
 ══════════════════════════════════════════════ #}
 
-{# -- Filtre localStorage -- #}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const filterInput = document.getElementById('filter-input');
@@ -1122,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 function filterOptions(filter) {
-    document.querySelectorAll('select option').forEach(function (option) {
+    document.querySelectorAll('.rencontreLabel .empty-select option').forEach(function (option) {
         option.classList.toggle('hidden', !option.text.toLowerCase().includes(filter));
     });
 }
