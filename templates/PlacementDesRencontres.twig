@@ -1121,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 function filterOptions(filter) {
-    document.querySelectorAll('.rencontreLabel .empty-select option').forEach(function (option) {
+    document.querySelectorAll('.rencontreLabel .empty-select option, .arbitreForm .empty-select option').forEach(function (option) {
         option.classList.toggle('hidden', !option.text.toLowerCase().includes(filter));
     });
 }

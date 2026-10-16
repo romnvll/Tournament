@@ -956,7 +956,94 @@ public function afficherArbreTournoi($tournoi_id, $categorie_id)
     $stmt->bindValue(':pouleId', $pouleId, PDO::PARAM_INT);
     $stmt->execute();
 
-    return true;
+    return (int) $this->connexion->lastInsertId();
+}
+
+
+/**
+ * Place une rencontre existante sur un couple (terrain, créneau) libre.
+ * Met à jour la ligne Planification si elle existe déjà (placeholder),
+ * sinon en crée une. Revérifie que le créneau est toujours libre
+ * (protection contre une double réservation concurrente).
+ */
+public function placerRencontreSurCreneau(int $rencontre_id, int $equipe1Id, int $equipe2Id, int $terrain_id, int $creneau_id, int $tournoi_id): bool
+{
+    $this->connexion->beginTransaction();
+    try {
+        // Vérifier que les équipes ne jouent pas déjà sur ce créneau (verrouillage implicite via la transaction)
+        if (!$this->equipesDisponiblesSurCreneau($equipe1Id, $equipe2Id, $creneau_id, $tournoi_id)) {
+            $this->connexion->rollBack();
+            return false;
+        }
+
+        $stmt = $this->connexion->prepare("
+            SELECT planification_id, rencontre_id, label_id
+            FROM Planification
+            WHERE terrain_id = :terrain_id AND creneau_id = :creneau_id AND tournoi_id = :tournoi_id
+            LIMIT 1
+            FOR UPDATE
+        ");
+        $stmt->execute([
+            ':terrain_id' => $terrain_id,
+            ':creneau_id' => $creneau_id,
+            ':tournoi_id' => $tournoi_id,
+        ]);
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            if ($existing['rencontre_id'] !== null || $existing['label_id'] !== null) {
+                $this->connexion->rollBack();
+                return false;
+            }
+            $update = $this->connexion->prepare("
+                UPDATE Planification SET rencontre_id = :rencontre_id WHERE planification_id = :id
+            ");
+            $update->execute([':rencontre_id' => $rencontre_id, ':id' => $existing['planification_id']]);
+        } else {
+            $insert = $this->connexion->prepare("
+                INSERT INTO Planification (terrain_id, creneau_id, rencontre_id, tournoi_id)
+                VALUES (:terrain_id, :creneau_id, :rencontre_id, :tournoi_id)
+            ");
+            $insert->execute([
+                ':terrain_id'   => $terrain_id,
+                ':creneau_id'   => $creneau_id,
+                ':rencontre_id' => $rencontre_id,
+                ':tournoi_id'   => $tournoi_id,
+            ]);
+        }
+
+        $this->connexion->commit();
+        return true;
+    } catch (Exception $e) {
+        $this->connexion->rollBack();
+        throw $e;
+    }
+}
+
+/**
+ * Vérifie que ni équipe1 ni équipe2 n'ont déjà une rencontre planifiée sur ce créneau.
+ */
+private function equipesDisponiblesSurCreneau(int $equipe1Id, int $equipe2Id, int $creneau_id, int $tournoi_id): bool
+{
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(*)
+        FROM Planification p
+        INNER JOIN Rencontres r ON r.id = p.rencontre_id
+        WHERE p.creneau_id = :creneau_id
+          AND p.tournoi_id = :tournoi_id
+          AND (
+              r.equipe1_id IN (:equipe1Id, :equipe2Id)
+              OR r.equipe2_id IN (:equipe1Id, :equipe2Id)
+          )
+    ");
+    $stmt->execute([
+        ':creneau_id' => $creneau_id,
+        ':tournoi_id' => $tournoi_id,
+        ':equipe1Id'  => $equipe1Id,
+        ':equipe2Id'  => $equipe2Id,
+    ]);
+
+    return $stmt->fetchColumn() == 0;
 }
 
 public function afficherRencontresParType($tournoi_id, $type_rencontre_id)

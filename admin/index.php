@@ -6,6 +6,7 @@ require_once '../class/utilisateurDao.class.php';
 require_once '../class/tournoiDao.class.php';
 require_once '../class/licenceDao.class.php';
 require_once '../class/assistanceDao.class.php'; // NOUVEAU
+require_once '../class/clubDao.class.php'; // NOUVEAU
 
 // Twig
 require_once '../vendor/autoload.php';
@@ -27,6 +28,7 @@ $utilisateurDAO = new UtilisateurDAO();
 $tournoiDAO     = new TournoiDAO();
 $licenceDAO     = new LicenceDAO();
 $assistanceDAO  = new AssistanceDao(); // NOUVEAU
+$clubDAO        = new ClubDAO(); // NOUVEAU
 
 // Récupération des données
 $utilisateurs = $utilisateurDAO->getAllUtilisateurs();
@@ -48,6 +50,9 @@ foreach ($utilisateurs as $u) {
 
 // Demandes d'assistance (NOUVEAU)
 $demandesAssistance = $assistanceDAO->getToutesLesDemandes();
+
+// Clubs (NOUVEAU)
+$clubs = $clubDAO->afficherClubs();
 
 // -----------------------------
 // Calcul des statistiques globales
@@ -81,6 +86,15 @@ foreach ($licences as $l) {
     }
 }
 
+// Clubs : total et répartition par sport
+$totalClubs = count($clubs);
+$clubsParSport = [];
+foreach ($clubs as $c) {
+    $sport = $c['nom_type_sport'] ?? 'Non défini';
+    $clubsParSport[$sport] = ($clubsParSport[$sport] ?? 0) + 1;
+}
+arsort($clubsParSport);
+
 // Demandes d'assistance : total et récentes (7 derniers jours)
 $totalDemandesAssistance   = count($demandesAssistance);
 $demandesAssistanceRecentes = count(array_filter($demandesAssistance, function ($d) {
@@ -93,6 +107,7 @@ echo $twig->render('index.twig', [
     'tournois'           => $tournois,
     'licences'           => $licences,
     'demandesAssistance' => $demandesAssistance,
+    'clubs'              => $clubs,
     'user'               => $userData, // pour afficher qui est connecté
 
     // stats globales
@@ -106,4 +121,6 @@ echo $twig->render('index.twig', [
     'licencesExpirees'           => $licencesExpirees,
     'totalDemandesAssistance'    => $totalDemandesAssistance,
     'demandesAssistanceRecentes' => $demandesAssistanceRecentes,
+    'totalClubs'                 => $totalClubs,
+    'clubsParSport'              => $clubsParSport,
 ]);

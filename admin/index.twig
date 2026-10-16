@@ -101,6 +101,19 @@
                 </div>
             </div>
         </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="stat-value">{{ totalClubs }}</div>
+                    <div class="stat-label">
+                        Clubs créés
+                        {% if clubsParSport|length > 0 %}
+                            ({% for sport, nb in clubsParSport %}{{ sport }} : {{ nb }}{% if not loop.last %} · {% endif %}{% endfor %})
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Utilisateurs -->

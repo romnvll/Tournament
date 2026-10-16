@@ -93,7 +93,50 @@ public function getAudiosPourCreneau(int $creneau_id): array {
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+/**
+ * Retourne les couples (terrain, créneau) libres à partir d'une heure donnée,
+ * en excluant les créneaux où l'une des deux équipes joue déjà (sur n'importe quel terrain).
+ */
+public function getCreneauxLibres(int $tournoi_id, string $heureMin, int $equipe1Id = 0, int $equipe2Id = 0, int $limit = 12): array
+{
+    $sql = "
+        SELECT t.terrain_id, t.nom AS terrain_nom, c.creneau_id, c.nom AS creneau_nom
+        FROM Terrains t
+        CROSS JOIN Creneaux c
+        LEFT JOIN Planification p
+               ON p.terrain_id = t.terrain_id
+              AND p.creneau_id = c.creneau_id
+              AND p.tournoi_id = c.tournoi_id
+        WHERE t.fk_idTournoi = :tournoi_id
+          AND c.tournoi_id   = :tournoi_id
+          AND c.nom >= :heureMin
+          AND (p.planification_id IS NULL OR (p.rencontre_id IS NULL AND p.label_id IS NULL))
+          AND NOT EXISTS (
+              SELECT 1
+              FROM Planification p2
+              INNER JOIN Rencontres r2 ON r2.id = p2.rencontre_id
+              WHERE p2.creneau_id = c.creneau_id
+                AND p2.tournoi_id = c.tournoi_id
+                AND (
+                    (:equipe1Id <> 0 AND (r2.equipe1_id = :equipe1Id OR r2.equipe2_id = :equipe1Id))
+                    OR
+                    (:equipe2Id <> 0 AND (r2.equipe1_id = :equipe2Id OR r2.equipe2_id = :equipe2Id))
+                )
+          )
+        ORDER BY c.ordre ASC, t.nom ASC
+        LIMIT :limit
+    ";
 
+    $stmt = $this->connexion->prepare($sql);
+    $stmt->bindValue(':tournoi_id', $tournoi_id, PDO::PARAM_INT);
+    $stmt->bindValue(':heureMin', $heureMin, PDO::PARAM_STR);
+    $stmt->bindValue(':equipe1Id', $equipe1Id, PDO::PARAM_INT);
+    $stmt->bindValue(':equipe2Id', $equipe2Id, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
 
