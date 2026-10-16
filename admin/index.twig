@@ -4,25 +4,120 @@
     <meta charset="UTF-8">
     <title>Panneau d'administration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table.sortable th[data-sort] {
+            cursor: pointer;
+            user-select: none;
+        }
+        table.sortable th[data-sort]:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        table.sortable th[data-sort]::after {
+            content: '⇅';
+            opacity: 0.35;
+            margin-left: 6px;
+            font-size: 0.8em;
+        }
+        table.sortable th[data-sort].sort-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+        table.sortable th[data-sort].sort-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+        .stat-card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .stat-card .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+        .filter-btn.active {
+            font-weight: 600;
+        }
+        .message-cell {
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .message-cell.expanded {
+            white-space: normal;
+            max-width: none;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <h1 class="mb-4">Panneau d'administration</h1>
     <p class="text-muted">Connecté en tant que <strong>{{ user.nom }}</strong> ({{ user.role }})</p>
+
+    <!-- Statistiques globales -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="stat-value">{{ totalUtilisateurs }}</div>
+                    <div class="stat-label">Utilisateurs
+                        ({{ statsUtilisateursParRole.admin }} admin · {{ statsUtilisateursParRole.organisateur }} organisateur · {{ statsUtilisateursParRole.arbitre }} arbitre · {{ statsUtilisateursParRole.club }} club)
+                    </div>
+                    {% if utilisateursNonConfirmes > 0 %}
+                        <div class="small mt-1">⚠ {{ utilisateursNonConfirmes }} email(s) non confirmé(s)</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <div class="stat-value">{{ totalTournois }}</div>
+                    <div class="stat-label">Tournois ({{ tournoisActifs }} actifs · {{ tournoisArchives }} archivés)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="stat-value">{{ revenuTotalLicences|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Revenu licences payantes</div>
+                    {% if licencesExpirees > 0 %}
+                        <div class="small mt-1">⚠ {{ licencesExpirees }} licence(s) expirée(s)</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <div class="stat-value">{{ totalDemandesAssistance }}</div>
+                    <div class="stat-label">Demandes d'assistance ({{ demandesAssistanceRecentes }} sur 7 jours)</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Utilisateurs -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">Utilisateurs</div>
         <div class="card-body">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover sortable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nom</th>
-                        <th>Email</th>
-                        <th>Rôle</th>
-                        <th>last connexion</th>
+                        <th data-sort="number">ID</th>
+                        <th data-sort="text">Nom</th>
+                        <th data-sort="text">Prénom</th>
+                        <th data-sort="text">Email</th>
+                        <th data-sort="text">Rôle</th>
+                        <th data-sort="text">Email confirmé</th>
+                        <th data-sort="date">Date création</th>
+                        <th data-sort="date">Dernière connexion</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,50 +125,88 @@
                     <tr>
                         <td>{{ u.id }}</td>
                         <td>{{ u.nom }}</td>
+                        <td>{{ u.prenom }}</td>
                         <td>{{ u.email }}</td>
                         <td>{{ u.role }}</td>
-                        <td>{{ u.dernier_login ?? '—' }}</td>
+                        <td>
+                            {% if u.email_confirme %}
+                                <span class="badge bg-success">Confirmé</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Non confirmé</span>
+                            {% endif %}
+                        </td>
+                        <td data-value="{{ u.date_creation|date('Y-m-d') }}">{{ u.date_creation|date('d/m/Y') }}</td>
+                        <td data-value="{{ u.dernier_login ? u.dernier_login|date('Y-m-d H:i:s') : '' }}">
+                            {{ u.dernier_login ? u.dernier_login|date('d/m/Y H:i') : '—' }}
+                        </td>
                     </tr>
                 {% else %}
-                    <tr><td colspan="4" class="text-center">Aucun utilisateur trouvé</td></tr>
+                    <tr><td colspan="8" class="text-center">Aucun utilisateur trouvé</td></tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Tournois en cours -->
+    <!-- Tournois -->
     <div class="card mb-4">
-        <div class="card-header bg-success text-white">Tournois en cours</div>
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <span>Tournois</span>
+            <div>
+                <button type="button" class="btn btn-sm btn-light filter-btn active" data-filter="actifs">Actifs</button>
+                <button type="button" class="btn btn-sm btn-light filter-btn" data-filter="archives">Archivés</button>
+                <button type="button" class="btn btn-sm btn-light filter-btn" data-filter="tous">Tous</button>
+            </div>
+        </div>
         <div class="card-body">
-            {% if tournoisEnCours|length > 0 %}
-                <table class="table table-striped table-hover">
+            {% if tournois|length > 0 %}
+                <table class="table table-striped table-hover sortable" id="table-tournois">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nom tu tournoi</th>
-                            <th>Date début</th>
-                            <th>Créé par (email)</th>
+                            <th data-sort="number">ID</th>
+                            <th data-sort="text">Nom du tournoi</th>
+                            <th data-sort="date">Date début</th>
+                            <th data-sort="text">Sport</th>
+                            <th data-sort="number">Terrains</th>
+                            <th data-sort="number">Équipes</th>
+                            <th data-sort="text">Statut</th>
+                            <th data-sort="text">Créé par</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for t in tournoisEnCours|sort((a, b) => b.id <=> a.id) %}
-                            <tr>
+                        {% for t in tournois|sort((a, b) => b.id <=> a.id) %}
+                            <tr data-archived="{{ t.isArchived }}">
                                 <td><a href="../modifierTournoi.php?idTournoi={{ t.id }}">{{ t.id }}</a></td>
                                 <td>{{ t.nom }}</td>
-                                <td>
+                                <td data-value="{{ t.dateDebut|date('Y-m-d') }}">
                                     {{ t.dateDebut }}
                                     {% if t.dateDebut|date('Y-m-d') < "now"|date('Y-m-d') %}
                                         <span style="color: red;">&#x2713; Terminé</span>
                                     {% endif %}
                                 </td>
-                                <td> {{ t.email_utilisateur }}</td>
+                                <td>{{ t.nom_type_sport ?? '—' }}</td>
+                                <td>{{ t.nb_terrains }}</td>
+                                <td>{{ t.nombre_equipes }}</td>
+                                <td>
+                                    {% if t.isArchived %}
+                                        <span class="badge bg-secondary">Archivé</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Actif</span>
+                                    {% endif %}
+                                    {% if not t.isVisible %}
+                                        <span class="badge bg-dark">Masqué</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ t.nom_utilisateur }} {{ t.prenom_utilisateur }}<br>
+                                    <small class="text-muted">{{ t.email_utilisateur }}</small>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             {% else %}
-                <p>Aucun tournoi en cours.</p>
+                <p>Aucun tournoi trouvé.</p>
             {% endif %}
         </div>
     </div>
@@ -83,18 +216,19 @@
         <div class="card-header bg-warning text-dark">Licences</div>
         <div class="card-body">
             {% if licences|length > 0 %}
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover sortable">
                     <thead>
                         <tr>
-                            <th>ID Licence</th>
-                            <th>Utilisateur</th>
-                            <th>Email</th>
-                            <th>Type</th>
-                            <th>Date début</th>
-                            <th>Date fin</th>
-                            <th>Prix</th>
-                            <th>Limite tournois</th>
-                            <th>Limite équipes</th>
+                            <th data-sort="number">ID Licence</th>
+                            <th data-sort="text">Utilisateur</th>
+                            <th data-sort="text">Email</th>
+                            <th data-sort="text">Type</th>
+                            <th data-sort="date">Date début</th>
+                            <th data-sort="date">Date fin</th>
+                            <th data-sort="text">Statut</th>
+                            <th data-sort="number">Prix</th>
+                            <th data-sort="number">Limite tournois</th>
+                            <th data-sort="number">Limite équipes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -105,8 +239,15 @@
                                     <td>{{ l.nom_utilisateur }}</td>
                                     <td>{{ l.email_utilisateur }}</td>
                                     <td>{{ l.type_licence }}</td>
-                                    <td>{{ l.date_debut }}</td>
-                                    <td>{{ l.date_fin ?? '—' }}</td>
+                                    <td data-value="{{ l.date_debut }}">{{ l.date_debut }}</td>
+                                    <td data-value="{{ l.date_fin ?? '' }}">{{ l.date_fin ?? '—' }}</td>
+                                    <td>
+                                        {% if l.date_fin and l.date_fin < "now"|date('Y-m-d') %}
+                                            <span class="badge bg-danger">Expirée</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ l.prix }} €</td>
                                     <td>{{ l.limite_tournois }}</td>
                                     <td>{{ l.limite_equipes }}</td>
@@ -121,7 +262,122 @@
         </div>
     </div>
 
+    <!-- Demandes d'assistance -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">Demandes d'assistance</div>
+        <div class="card-body">
+            {% if demandesAssistance|length > 0 %}
+                <table class="table table-striped table-hover sortable">
+                    <thead>
+                        <tr>
+                            <th data-sort="date">Date</th>
+                            <th data-sort="text">Utilisateur</th>
+                            <th data-sort="text">Email</th>
+                            <th data-sort="text">Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in demandesAssistance %}
+                            <tr>
+                                <td data-value="{{ d.date_creation|date('Y-m-d H:i:s') }}">{{ d.date_creation|date('d/m/Y H:i') }}</td>
+                                <td>{{ d.nom }} {{ d.prenom }}</td>
+                                <td>{{ d.email }}</td>
+                                <td class="message-cell" title="Cliquer pour afficher en entier">{{ d.message|striptags }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune demande d'assistance.</p>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
+
+<script>
+// Tri des colonnes
+document.querySelectorAll('table.sortable').forEach(function (table) {
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+
+    thead.querySelectorAll('th[data-sort]').forEach(function (th, colIndex) {
+        th.addEventListener('click', function () {
+            const type = th.dataset.sort;
+            const isAsc = !th.classList.contains('sort-asc');
+
+            thead.querySelectorAll('th').forEach(function (el) {
+                el.classList.remove('sort-asc', 'sort-desc');
+            });
+            th.classList.add(isAsc ? 'sort-asc' : 'sort-desc');
+
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter(function (row) {
+                return row.cells.length > 1;
+            });
+
+            rows.sort(function (rowA, rowB) {
+                const cellA = rowA.cells[colIndex];
+                const cellB = rowB.cells[colIndex];
+
+                let valA = cellA.dataset.value ?? cellA.textContent.trim();
+                let valB = cellB.dataset.value ?? cellB.textContent.trim();
+
+                if (type === 'number') {
+                    valA = parseFloat(valA.replace(',', '.').replace(/[^\d.-]/g, '')) || 0;
+                    valB = parseFloat(valB.replace(',', '.').replace(/[^\d.-]/g, '')) || 0;
+                } else if (type === 'date') {
+                    valA = new Date(valA).getTime() || 0;
+                    valB = new Date(valB).getTime() || 0;
+                } else {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+
+                if (valA < valB) return isAsc ? -1 : 1;
+                if (valA > valB) return isAsc ? 1 : -1;
+                return 0;
+            });
+
+            rows.forEach(function (row) {
+                tbody.appendChild(row);
+            });
+        });
+    });
+});
+
+// Filtre Actifs / Archivés / Tous pour les tournois
+(function () {
+    const buttons = document.querySelectorAll('.filter-btn');
+    const rows = document.querySelectorAll('#table-tournois tbody tr');
+
+    function applyFilter(filter) {
+        rows.forEach(function (row) {
+            const archived = row.dataset.archived === '1';
+            let show = true;
+            if (filter === 'actifs') show = !archived;
+            if (filter === 'archives') show = archived;
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilter(btn.dataset.filter);
+        });
+    });
+
+    applyFilter('actifs'); // filtre par défaut au chargement
+})();
+
+// Expansion des messages d'assistance au clic
+document.querySelectorAll('.message-cell').forEach(function (cell) {
+    cell.addEventListener('click', function () {
+        cell.classList.toggle('expanded');
+    });
+});
+</script>
 
 </body>
 </html>

@@ -1630,7 +1630,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const existantes = [...document.querySelectorAll('#tableEquipes tbody tr')]
                             .filter(tr => tr.querySelector('.club-badge')?.textContent.trim() === name)
                             .length;
-                        nomEquipeInput.value = name + (existantes + 1);
+                        nomEquipeInput.value = name + " " +(existantes + 1);
                         nomEquipeInput.focus();
                         const len = nomEquipeInput.value.length;
                         nomEquipeInput.setSelectionRange(len, len);

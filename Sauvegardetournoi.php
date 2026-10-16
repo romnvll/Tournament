@@ -20,7 +20,7 @@ $template = $twig->load('sauvegardeTournoi.twig');
 
 echo $template->render([
     'email' => $userData['email'],
-    'pageEnCours' => 'SauvegardeTournois',
+    'pageEnCours' => 'GestionTournois',
     'ListeDesTournois' => $tournoiDao->afficherLesTournois($userData['id']),
     'SauvegardesStockees' => $stockage->lister((int) $userData['id']),
     'nombreTournoisActuel' => $backupDao->compterTournoisUtilisateur((int) $userData['id']),
@@ -28,4 +28,5 @@ echo $template->render([
     'status' => $_GET['status'] ?? null,
     'message' => $_GET['message'] ?? null,
     'tournoiId' => $_GET['idTournoi'] ?? null,
+    'idTournoi' => $_GET['idTournoi'] ?? null,
 ]);
