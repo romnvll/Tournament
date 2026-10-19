@@ -1625,12 +1625,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedLogo.src = img ? img.src : '';
                     selectedName.textContent = name;
 
-                    const nomEquipeInput = document.getElementById('nomEquipe');
-                    if (nomEquipeInput) {
-                        const existantes = [...document.querySelectorAll('#tableEquipes tbody tr')]
-                            .filter(tr => tr.querySelector('.club-badge')?.textContent.trim() === name)
-                            .length;
-                        nomEquipeInput.value = name + " " +(existantes + 1);
+                   const nomEquipeInput = document.getElementById('nomEquipe');
+        if (nomEquipeInput) {
+            const existantes = [...document.querySelectorAll('#tableEquipes tbody tr')]
+                .filter(tr => tr.querySelector('.club-badge')?.textContent.trim().toUpperCase() === name.toUpperCase())
+                .length;
+            nomEquipeInput.value = name + " " + (existantes + 1);
                         nomEquipeInput.focus();
                         const len = nomEquipeInput.value.length;
                         nomEquipeInput.setSelectionRange(len, len);
