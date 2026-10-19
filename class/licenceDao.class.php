@@ -152,7 +152,7 @@ public function creerLicenceParDefaut(int $utilisateurId): void {
 
     // Récupérer tous les types de licence
     public function getTousLesTypesDeLicence(): array {
-        $stmt = $this->connexion->prepare("SELECT * FROM LicenceType ORDER BY id ASC");
+        $stmt = $this->connexion->prepare("SELECT * FROM LicenceType ORDER BY id DESC");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
