@@ -1937,7 +1937,7 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
 
 
 
-       public function GetResultatDesPoules(int $idPoule, int $typeRencontreId = TYPE_RENCONTRE_POULE)
+      public function GetResultatDesPoules(int $idPoule, int $typeRencontreId = TYPE_RENCONTRE_POULE)
 {
     $query = "
         SELECT
@@ -1949,6 +1949,12 @@ public function rencontresExistByCategorieAndTournoi(string $categorie, int $idt
             e.club_id,
             c.nom AS club_nom,
             c.logo AS club_logo,
+            (SELECT COUNT(*) FROM Rencontres r 
+                WHERE r.type_rencontre_id = :typeRencontreId 
+                AND r.phase_finale_id IS NULL 
+                AND (r.equipe1_id = e.id OR r.equipe2_id = e.id)
+                AND r.score1 IS NOT NULL AND r.score2 IS NOT NULL
+            ) AS nombreMatchsJoues,
             ((SELECT COUNT(*) FROM Rencontres r WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL AND ((r.equipe1_id = e.id AND r.score1 > r.score2) OR (r.equipe2_id = e.id AND r.score2 > r.score1))) * 3) +
             ((SELECT COUNT(*) FROM Rencontres r WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL AND ((r.equipe1_id = e.id OR r.equipe2_id = e.id) AND r.score1 = r.score2)) * 2) +
             ((SELECT COUNT(*) FROM Rencontres r WHERE r.type_rencontre_id = :typeRencontreId AND r.phase_finale_id IS NULL AND ((r.equipe1_id = e.id AND r.score1 < r.score2) OR (r.equipe2_id = e.id AND r.score2 < r.score1)))) AS TotalDesPoints,

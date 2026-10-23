@@ -20,8 +20,8 @@ $licence=$licenceDao->getLicencesParUtilisateur($userData['id'])[0];
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
-    'cache' => false,
-    'debug' => true,
+    'cache' => __DIR__ . '/var/cache/twig',
+    'debug' => false,
 
 ]);
 

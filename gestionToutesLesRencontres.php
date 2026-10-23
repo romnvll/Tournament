@@ -28,8 +28,8 @@ if (!isset ($_GET['id_tournoi']) || $_GET['id_tournoi'] == 0) {
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
-  'cache' => false,
-  'debug' => true,
+  'cache' => __DIR__ . '/var/cache/twig',
+  'debug' => false,
 
 ]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());

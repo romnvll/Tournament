@@ -37,8 +37,8 @@ function getVisiteurId(): string {
 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader, [
-  'cache' => false,
-  'debug' => true,
+  'cache' => __DIR__ . '/var/cache/twig',
+  'debug' => false,
 
 ]);
 
@@ -346,7 +346,6 @@ if (isset ($_GET['idCategorie'])) {
    $getCategorieCourante = $categorieDao->obtenirCategorie($_GET['idCategorie']);
     
 }
-
 
 echo $template->render([
     'infoTournoiEnCours'=> $tournoiDao->getTournoiById($idTournoi),

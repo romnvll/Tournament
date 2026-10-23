@@ -15,7 +15,7 @@ if (isset($_GET['lang'])) {
 } else {
     $userLang = 'fr'; // valeur par défaut
 }
-
+session_write_close();
 // Fichier unique contenant toutes les langues
 $allLangs = [
     'fr' => [
