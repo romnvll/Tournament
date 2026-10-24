@@ -6,11 +6,11 @@ if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === "off") {
 }
 
 ob_start();
-session_start();
+
 require_once '../class/databaseInformations.php';
 require_once '../class/utilisateurDao.class.php';
 require_once '../Lang/lang.php';
-
+session_start();
 if (!isset($_SESSION['captcha_question'])) {
     $a = rand(1, 10);
     $b = rand(1, 10);
@@ -88,6 +88,7 @@ if (isset($_POST['btn-login'])) {
         $_SESSION['captcha_question'] = "$a + $b = ?";
     }
 }
+ session_write_close(); 
 ?>
 <!DOCTYPE html>
 <html lang="fr">
