@@ -32,6 +32,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        .pagination-compact {
+    max-width: 100%;
+    gap: 4px;
+}
+.pagination-compact .page-link {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
         .main-container {
             margin-top: 40px;
         }
@@ -513,79 +522,34 @@
                         <div class="col-md-6 mb-3 mb-md-0">
                             <div class="search-wrapper">
                                 <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="searchClub" class="search-input" 
-                                       placeholder="Rechercher un club...">
+                                <input type="text" id="searchClub" name="nom" class="search-input"
+                                    placeholder="Rechercher un club..."
+                                    hx-get="recherche_clubs.php"
+                                    hx-trigger="keyup changed delay:400ms"
+                                    hx-target="#contenuClubs" hx-swap="innerHTML"
+                                    hx-include="#searchSport" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="search-wrapper">
                                 <i class="fas fa-basketball search-icon"></i>
-                                <input type="text" id="searchSport" class="search-input" 
-                                       placeholder="Rechercher un sport...">
+                                <input type="text" id="searchSport" name="sport" class="search-input"
+                                    placeholder="Rechercher un sport..."
+                                    hx-get="recherche_clubs.php"
+                                    hx-trigger="keyup changed delay:400ms"
+                                    hx-target="#contenuClubs" hx-swap="innerHTML"
+                                    hx-include="#searchClub" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Table -->
-                <div class="table-container">
-                    <table class="table modern-table" id="tableClubs">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Logo</th>
-                                <th>Sport</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for club in ListeDesClubs %}
-                            <tr>
-                                <td>
-                               
-                                    {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
-                                        <a class="btn-edit" href="modifierClub.php?idclub={{ club.id }}">
-                                            <i class="fas fa-edit"></i>
-                                            {{ club.nom }}
-                                        </a>
-                                    {% else %}
-                                        <button type="button" class="btn-locked" disabled>
-                                            <i class="fas fa-lock"></i>
-                                            {{ club.nom }}
-                                        </button>
-                                        <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 5px;">
-                                            Créé par un autre utilisateur
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <img src="{{ club.logo }}" alt="Logo {{ club.nom }}" class="club-logo" />
-                                </td>
-                                <td>
-                                    {% if club.nom_type_sport %}
-                                        <span class="badge-modern badge-primary-modern">
-                                            {{ club.nom_type_sport }}
-                                        </span>
-                                    {% else %}
-                                        <span class="badge-modern badge-secondary-modern">
-                                            Non spécifié
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
-                                        <button type="button" class="btn-edit" style="background: linear-gradient(135deg, #ef4444, #dc2626);"
-                                            onclick="confirmerSuppression({{ club.id }}, '{{ club.nom }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                
+                <div class="table-container" id="contenuClubs">
+                    {{ include('_clubsTable.twig') }}
                 </div>
-            </div>
+            
         </div>
     </div>
 

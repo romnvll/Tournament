@@ -1,0 +1,89 @@
+<table class="table modern-table" id="tableClubs">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Logo</th>
+            <th>Sport</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for club in ListeDesClubs %}
+        <tr>
+            <td>
+                {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
+                    <a class="btn-edit" href="modifierClub.php?idclub={{ club.id }}">
+                        <i class="fas fa-edit"></i>
+                        {{ club.nom }}
+                    </a>
+                {% else %}
+                    <button type="button" class="btn-locked" disabled>
+                        <i class="fas fa-lock"></i>
+                        {{ club.nom }}
+                    </button>
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 5px;">
+                        Créé par un autre utilisateur
+                    </div>
+                {% endif %}
+            </td>
+            <td><img src="{{ club.logo }}" alt="Logo {{ club.nom }}" class="club-logo" /></td>
+            <td>
+                {% if club.nom_type_sport %}
+                    <span class="badge-modern badge-primary-modern">{{ club.nom_type_sport }}</span>
+                {% else %}
+                    <span class="badge-modern badge-secondary-modern">Non spécifié</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if idUser == club.utilisateur_id or isAdmin == 'admin' %}
+                    <button type="button" class="btn-edit" style="background: linear-gradient(135deg, #ef4444, #dc2626);"
+                        onclick="confirmerSuppression({{ club.id }}, '{{ club.nom }}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if totalPages > 1 %}
+<nav aria-label="Pagination des clubs" class="mt-3 d-flex justify-content-center" id="paginationClubs">
+    <ul class="pagination pagination-compact flex-wrap">
+        <li class="page-item {% if pageCourante == 1 %}disabled{% endif %}">
+            <a class="page-link" href="#"
+               hx-get="recherche_clubs.php?page={{ pageCourante - 1 }}&nom={{ nomRecherche }}&sport={{ sportRecherche }}"
+               hx-target="#contenuClubs" hx-swap="innerHTML">&laquo;</a>
+        </li>
+
+        {% set debut = max(1, pageCourante - 2) %}
+        {% set fin = min(totalPages, pageCourante + 2) %}
+
+        {% if debut > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="recherche_clubs.php?page=1&nom={{ nomRecherche }}&sport={{ sportRecherche }}" hx-target="#contenuClubs" hx-swap="innerHTML">1</a>
+            </li>
+            {% if debut > 2 %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+        {% endif %}
+
+        {% for p in debut..fin %}
+            <li class="page-item {% if p == pageCourante %}active{% endif %}">
+                <a class="page-link" href="#" hx-get="recherche_clubs.php?page={{ p }}&nom={{ nomRecherche }}&sport={{ sportRecherche }}" hx-target="#contenuClubs" hx-swap="innerHTML">{{ p }}</a>
+            </li>
+        {% endfor %}
+
+        {% if fin < totalPages %}
+            {% if fin < totalPages - 1 %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
+            <li class="page-item">
+                <a class="page-link" href="#" hx-get="recherche_clubs.php?page={{ totalPages }}&nom={{ nomRecherche }}&sport={{ sportRecherche }}" hx-target="#contenuClubs" hx-swap="innerHTML">{{ totalPages }}</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item {% if pageCourante == totalPages %}disabled{% endif %}">
+            <a class="page-link" href="#"
+               hx-get="recherche_clubs.php?page={{ pageCourante + 1 }}&nom={{ nomRecherche }}&sport={{ sportRecherche }}"
+               hx-target="#contenuClubs" hx-swap="innerHTML">&raquo;</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}

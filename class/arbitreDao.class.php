@@ -83,22 +83,26 @@ class arbitreDao {
    
     
 
-    public function afficherArbitres(int $tournoi_id): array {
-        $stmt = $this->connexion->prepare("
-            SELECT a.*, 
-                   c.nom AS club_nom, 
-                   COUNT(p.rencontre_id) AS nombre_matchs,
-                   SUM(COUNT(p.rencontre_id)) OVER (PARTITION BY c.id) AS nombre_matchs_club
-            FROM Arbitres a
-            JOIN Clubs c ON a.club_id = c.id
-            LEFT JOIN Planification p ON a.arbitre_id = p.arbitre_id AND p.tournoi_id = :tournoi_id
-            WHERE a.tournoi_id = :tournoi_id
-            GROUP BY a.arbitre_id, c.id
-        ");
-        $stmt->bindParam(':tournoi_id', $tournoi_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+   public function afficherArbitres(int $tournoi_id): array {
+    $stmt = $this->connexion->prepare("
+        SELECT a.*, 
+               c.nom AS club_nom, 
+               COUNT(rencontre_match.rencontre_id) AS nombre_matchs,
+               SUM(COUNT(rencontre_match.rencontre_id)) OVER (PARTITION BY c.id) AS nombre_matchs_club
+        FROM Arbitres a
+        JOIN Clubs c ON a.club_id = c.id
+        LEFT JOIN Planification p ON a.arbitre_id = p.arbitre_id AND p.tournoi_id = :tournoi_id
+        LEFT JOIN Planification rencontre_match 
+            ON rencontre_match.terrain_id = p.terrain_id 
+           AND rencontre_match.creneau_id = p.creneau_id 
+           AND rencontre_match.rencontre_id IS NOT NULL
+        WHERE a.tournoi_id = :tournoi_id
+        GROUP BY a.arbitre_id, c.id
+    ");
+    $stmt->bindParam(':tournoi_id', $tournoi_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
     
     
     public function supprimerArbitresParTournoi(int $tournoi_id): void {

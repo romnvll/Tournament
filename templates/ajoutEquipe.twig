@@ -142,26 +142,6 @@
     line-height: 1;
 }
 
-/* Version inline (dans le tableau) */
-.club-picker-inline .club-search-input {
-    padding: 7px 10px;
-    font-size: 0.82rem;
-}
-
-.club-picker-inline .club-option {
-    padding: 7px 10px;
-    font-size: 0.82rem;
-}
-
-.club-picker-inline .club-option img {
-    width: 26px;
-    height: 26px;
-}
-.club-picker-inline {
-    display: none;
-    margin-top: 8px;
-}
-
 /* Scrollbar du dropdown */
 .club-dropdown::-webkit-scrollbar { width: 6px; }
 .club-dropdown::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -561,11 +541,6 @@
             box-shadow: var(--shadow-lg);
         }
 
-        .club-select {
-            display: none;
-            margin-top: 10px;
-        }
-
         /* Nom d'équipe input */
         .team-name-input {
             padding: 8px 12px;
@@ -913,6 +888,17 @@
 <body>
     {{ include('header.twig') }}
 
+    {# ============================================================
+       Clubs triés UNE SEULE FOIS pour toute la page.
+       Avant : ce tri + la boucle de rendu des options étaient
+       refaits À L'INTÉRIEUR de la boucle sur les équipes, donc
+       dupliqués autant de fois qu'il y a d'équipes affichées
+       (coût O(équipes × clubs) et un DOM qui explose).
+       Maintenant : un seul dropdown partagé, réutilisé en JS
+       pour la ligne sur laquelle on double-clique.
+       ============================================================ #}
+    {% set sortedClubs = AfficherClub is not empty ? AfficherClub|sort((a, b) => a.nom <=> b.nom) : [] %}
+
     <div class="main-container">
         {% if tournoiEnCours != 0 %}
         <div class="row">
@@ -954,7 +940,6 @@
                     <div class="club-search-wrapper">
                         <input type="text" class="club-search-input" placeholder="🔍 Rechercher un club..." autocomplete="off">
                         <div class="club-dropdown">
-                            {% set sortedClubs = AfficherClub|sort((a, b) => a.nom <=> b.nom) %}
                             {% for club in sortedClubs %}
                                 <div class="club-option" data-value="{{ club.id }}" data-name="{{ club.nom|upper }}">
                                     <img src="{{ club.logo }}" alt="{{ club.nom }}" onerror="this.src='logos/default.png'">
@@ -1126,48 +1111,33 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
+                                {% set today = "now"|date('Y-m-d')|date %}
                                 {% for equipe in AfficherLesEquipes.resultats %}
                                     <tr style="background-color: {{ equipe.cat_couleur }} !important;">
                                         <td style="display:none">{{ equipe.id }}</td>
-                                        
+
                                         <!-- Club -->
                                         <td>
                                             <div class="club-cell">
                                                 <span class="club-badge">{{ equipe.nom_club }}</span>
-                                              <div class="club-logo-wrapper" ondblclick="toggleSelect(this.querySelector('img'))">
+                                                <div class="club-logo-wrapper"
+                                                     data-equipe-id="{{ equipe.id }}"
+                                                     ondblclick="openSharedClubPicker(this)">
                                                     <img class="club-logo"
                                                         src="{{ equipe.logo }}"
                                                         alt="{{ equipe.nom_club }}">
                                                     <span class="edit-hint ms-5">⊕ double-clic pour modifier le club</span>
-                                               </div>
-                                                
-                                                <form action="modifierEquipe.php" method="POST" class="d-inline club-change-form">
-    <input type="hidden" name="idEquipe" value="{{ equipe.id }}">
-    <input type="hidden" name="changeClub" value="true">
+                                                </div>
 
-    <div class="club-picker club-picker-inline" id="club-picker-{{ equipe.id }}">
-        <div class="club-search-wrapper">
-            <input type="text" class="club-search-input" placeholder="🔍 Rechercher..." autocomplete="off">
-            <div class="club-dropdown">
-                <div class="club-option" data-value="" data-name="">
-                    <span style="color: var(--text-light); font-style: italic;">{{t('selectionnerClub')}}</span>
-                </div>
-                {% set sortedClubs = AfficherClub|sort((a, b) => a.nom <=> b.nom) %}
-                {% for club in sortedClubs %}
-                    {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-                    {% set today = "now"|date('Y-m-d')|date %}
-                    <div class="club-option {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today > dateFin %}club-option-disabled{% endif %}"
-                         data-value="{{ club.id }}"
-                         data-name="{{ club.nom|upper }}">
-                        <img src="{{ club.logo }}" alt="{{ club.nom }}" onerror="this.src='logos/default.png'">
-                        <span>{{ club.nom|upper }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <input type="hidden" name="club_id" class="club-hidden-input">
-    </div>
-</form>
+                                                {# Un simple formulaire "cible" : plus aucun dropdown dupliqué ici,
+                                                   il n'y a qu'un hidden input que le dropdown partagé vient remplir. #}
+                                                <form action="modifierEquipe.php" method="POST" class="d-inline club-change-form"
+                                                      id="club-form-{{ equipe.id }}">
+                                                    <input type="hidden" name="idEquipe" value="{{ equipe.id }}">
+                                                    <input type="hidden" name="changeClub" value="true">
+                                                    <input type="hidden" name="club_id" class="club-hidden-input">
+                                                </form>
                                             </div>
                                         </td>
 
@@ -1191,8 +1161,6 @@
            hx-trigger="blur"
            hx-target="#notif-{{ equipe.id }}"
            hx-swap="innerHTML"
-           {% set dateFin = licence.date_fin|date('Y-m-d')|date %}
-           {% set today = "now"|date('Y-m-d')|date %}
            {% if AfficherLesEquipes['nombre'] > licence.limite_equipes and today >= dateFin %} 
                disabled 
            {% endif %}>
@@ -1361,6 +1329,26 @@
         {% endif %}
     </div>
 
+    {# ============================================================
+       Dropdown club PARTAGÉ pour l'édition inline dans le tableau.
+       Un seul bloc pour TOUTES les équipes, réutilisé en JS
+       (voir openSharedClubPicker) au lieu d'un dropdown par ligne.
+       ============================================================ #}
+    <div class="club-dropdown" id="shared-club-dropdown">
+        <div class="club-search-wrapper" style="padding: 8px;">
+            <input type="text" class="club-search-input" id="shared-club-search" placeholder="🔍 Rechercher..." autocomplete="off">
+        </div>
+        <div class="club-option" data-value="" data-name="">
+            <span style="color: var(--text-light); font-style: italic;">{{t('selectionnerClub')}}</span>
+        </div>
+        {% for club in sortedClubs %}
+            <div class="club-option" data-value="{{ club.id }}" data-name="{{ club.nom|upper }}">
+                <img src="{{ club.logo }}" alt="{{ club.nom }}" onerror="this.src='logos/default.png'">
+                <span>{{ club.nom|upper }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
     <script>
     // Autocomplete le club depuis le nom d'équipe
 document.addEventListener('DOMContentLoaded', function() {
@@ -1420,24 +1408,6 @@ window.onbeforeunload = function() {
         sessionStorage.setItem('scrollPosition', window.scrollY);
     }
 };
-
-// Toggle select club
-function toggleSelect(imgElement) {
-    const td = imgElement.closest('td');
-    const picker = td.querySelector('.club-picker-inline');
-    if (picker) {
-        const isVisible = picker.style.display === 'block';
-        picker.style.display = isVisible ? 'none' : 'block';
-        if (!isVisible) {
-            const searchInput = picker.querySelector('.club-search-input');
-            if (searchInput) searchInput.focus();
-        }
-        return;
-    }
-    const select = td.querySelector('select.club-select');
-    if (!select) return;
-    select.style.display = (select.style.display === 'none' || select.style.display === '') ? 'inline-block' : 'none';
-}
 
 // Enregistrement audio
 let mediaRecorder;
@@ -1572,20 +1542,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// ===== Club Picker =====
+// ===== Club Picker du formulaire d'ajout (colonne de gauche) =====
 document.addEventListener('DOMContentLoaded', function () {
 
     function initClubPicker(picker) {
         const searchInput = picker.querySelector('.club-search-input');
         const dropdown = picker.querySelector('.club-dropdown');
         const options = picker.querySelectorAll('.club-option');
-        const hiddenInput = picker.querySelector('input[type="hidden"][name="idClubs"], input[type="hidden"][name="club_id"]');
+        const hiddenInput = picker.querySelector('input[type="hidden"][name="idClubs"]');
         const selectedDisplay = picker.querySelector('.club-selected-display');
         const selectedLogo = picker.querySelector('.selected-logo');
         const selectedName = picker.querySelector('.selected-name');
         const clearBtn = picker.querySelector('.club-clear-btn');
-        const form = picker.closest('form');
-        const isInline = picker.classList.contains('club-picker-inline');
         let highlighted = -1;
 
         function openDropdown() {
@@ -1618,60 +1586,53 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdown.classList.remove('open');
             highlighted = -1;
 
-            if (!isInline) {
-                if (val && name) {
-                    searchInput.style.display = 'none';
-                    selectedDisplay.style.display = 'flex';
-                    selectedLogo.src = img ? img.src : '';
-                    selectedName.textContent = name;
+            if (val && name) {
+                searchInput.style.display = 'none';
+                selectedDisplay.style.display = 'flex';
+                selectedLogo.src = img ? img.src : '';
+                selectedName.textContent = name;
 
-                   const nomEquipeInput = document.getElementById('nomEquipe');
-        if (nomEquipeInput) {
-            const existantes = [...document.querySelectorAll('#tableEquipes tbody tr')]
-                .filter(tr => tr.querySelector('.club-badge')?.textContent.trim().toUpperCase() === name.toUpperCase())
-                .length;
-            nomEquipeInput.value = name + " " + (existantes + 1);
-                        nomEquipeInput.focus();
-                        const len = nomEquipeInput.value.length;
-                        nomEquipeInput.setSelectionRange(len, len);
-                    }
-                }
-            } else {
-                if (val && form) {
-                    searchInput.value = name;
-                    form.submit();
+                const nomEquipeInput = document.getElementById('nomEquipe');
+                if (nomEquipeInput) {
+                    const existantes = [...document.querySelectorAll('#tableEquipes tbody tr')]
+                        .filter(tr => tr.querySelector('.club-badge')?.textContent.trim().toUpperCase() === name.toUpperCase())
+                        .length;
+                    nomEquipeInput.value = name + " " + (existantes + 1);
+                    nomEquipeInput.focus();
+                    const len = nomEquipeInput.value.length;
+                    nomEquipeInput.setSelectionRange(len, len);
                 }
             }
         }
 
         // Ouvrir sur frappe (1 caractère minimum)
-       searchInput.addEventListener('input', () => {
-    if (searchInput.value.length >= 1) {
-        openDropdown();
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length >= 1) {
+                openDropdown();
 
-        // Vérifier si aucune option visible
-        const visibles = [...options].filter(opt => !opt.classList.contains('hidden'));
-        
-        // Supprimer l'ancien lien s'il existe
-        const existingLink = dropdown.querySelector('.create-club-link');
-        if (existingLink) existingLink.remove();
+                // Vérifier si aucune option visible
+                const visibles = [...options].filter(opt => !opt.classList.contains('hidden'));
 
-        if (visibles.length === 0) {
-            const link = document.createElement('div');
-            link.className = 'create-club-link club-option';
-            link.style.color = 'var(--primary-color)';
-            link.innerHTML = `<i class="fas fa-plus-circle"></i> Créer le club "<strong>${searchInput.value}</strong>"`;
-            link.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                window.location.href = `creerClub.php?nom=${encodeURIComponent(searchInput.value)}`;
-            });
-            dropdown.appendChild(link);
-        }
-    } else {
-        dropdown.classList.remove('open');
-        highlighted = -1;
-    }
-});
+                // Supprimer l'ancien lien s'il existe
+                const existingLink = dropdown.querySelector('.create-club-link');
+                if (existingLink) existingLink.remove();
+
+                if (visibles.length === 0) {
+                    const link = document.createElement('div');
+                    link.className = 'create-club-link club-option';
+                    link.style.color = 'var(--primary-color)';
+                    link.innerHTML = `<i class="fas fa-plus-circle"></i> Créer le club "<strong>${searchInput.value}</strong>"`;
+                    link.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        window.location.href = `creerClub.php?nom=${encodeURIComponent(searchInput.value)}`;
+                    });
+                    dropdown.appendChild(link);
+                }
+            } else {
+                dropdown.classList.remove('open');
+                highlighted = -1;
+            }
+        });
 
         // Repositionner au scroll
         document.addEventListener('scroll', () => {
@@ -1680,10 +1641,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Navigation clavier
         searchInput.addEventListener('keydown', (e) => {
-            const visibles = [...options].filter(opt =>
-                !opt.classList.contains('hidden') &&
-                !opt.classList.contains('club-option-disabled')
-            );
+            const visibles = [...options].filter(opt => !opt.classList.contains('hidden'));
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 highlighted = Math.min(highlighted + 1, visibles.length - 1);
@@ -1708,7 +1666,6 @@ document.addEventListener('DOMContentLoaded', function () {
         options.forEach(opt => {
             opt.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                if (opt.classList.contains('club-option-disabled')) return;
                 selectOption(opt);
             });
         });
@@ -1746,8 +1703,98 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    document.querySelectorAll('.club-picker').forEach(initClubPicker);
+    const addPicker = document.getElementById('club-picker-add');
+    if (addPicker) initClubPicker(addPicker);
 });
+
+// ===== Dropdown club PARTAGÉ pour l'édition inline du tableau =====
+// Un seul dropdown pour toutes les lignes : on le repositionne et on le
+// "branche" sur le formulaire de la ligne concernée à chaque double-clic,
+// au lieu d'en générer un par équipe côté serveur.
+(function () {
+    const sharedDropdown = document.getElementById('shared-club-dropdown');
+    if (!sharedDropdown) return;
+
+    const sharedSearch = document.getElementById('shared-club-search');
+    const sharedOptions = () => sharedDropdown.querySelectorAll('.club-option');
+    let activeEquipeId = null;
+    let highlighted = -1;
+
+    function filterSharedOptions(query) {
+        const q = query.toLowerCase().trim();
+        highlighted = -1;
+        sharedOptions().forEach(opt => {
+            const name = opt.dataset.name || '';
+            opt.style.background = '';
+            opt.classList.toggle('hidden', name !== '' && !name.toLowerCase().includes(q));
+        });
+    }
+
+    window.openSharedClubPicker = function (wrapperEl) {
+        activeEquipeId = wrapperEl.dataset.equipeId;
+        const rect = wrapperEl.getBoundingClientRect();
+        sharedDropdown.style.top = (rect.bottom + 6) + 'px';
+        sharedDropdown.style.left = rect.left + 'px';
+        sharedDropdown.classList.add('open');
+        if (sharedSearch) {
+            sharedSearch.value = '';
+            filterSharedOptions('');
+            sharedSearch.focus();
+        }
+    };
+
+    function selectSharedOption(opt) {
+        if (!activeEquipeId) return;
+        const form = document.getElementById('club-form-' + activeEquipeId);
+        if (!form) return;
+        form.querySelector('.club-hidden-input').value = opt.dataset.value;
+        sharedDropdown.classList.remove('open');
+        form.submit();
+    }
+
+    sharedDropdown.addEventListener('mousedown', (e) => {
+        const opt = e.target.closest('.club-option');
+        if (!opt) return;
+        e.preventDefault();
+        selectSharedOption(opt);
+    });
+
+    if (sharedSearch) {
+        sharedSearch.addEventListener('input', () => filterSharedOptions(sharedSearch.value));
+        sharedSearch.addEventListener('keydown', (e) => {
+            const visibles = [...sharedOptions()].filter(opt => !opt.classList.contains('hidden'));
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlighted = Math.min(highlighted + 1, visibles.length - 1);
+                visibles.forEach((opt, i) => { opt.style.background = i === highlighted ? 'rgba(79, 70, 229, 0.12)' : ''; });
+                visibles[highlighted]?.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlighted = Math.max(highlighted - 1, 0);
+                visibles.forEach((opt, i) => { opt.style.background = i === highlighted ? 'rgba(79, 70, 229, 0.12)' : ''; });
+                visibles[highlighted]?.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const cible = highlighted >= 0 ? visibles[highlighted] : visibles[0];
+                if (cible) selectSharedOption(cible);
+            } else if (e.key === 'Escape') {
+                sharedDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    document.addEventListener('scroll', () => {
+        // Le dropdown se ferme au scroll plutôt que de se repositionner :
+        // plus simple et suffisant pour un picker qui s'ouvre au double-clic.
+        sharedDropdown.classList.remove('open');
+    }, true);
+
+    document.addEventListener('click', (e) => {
+        if (!sharedDropdown.contains(e.target) && !e.target.closest('.club-logo-wrapper')) {
+            sharedDropdown.classList.remove('open');
+        }
+    });
+})();
 
 // Focus sur le champ club au chargement
 function focusNomClub() {

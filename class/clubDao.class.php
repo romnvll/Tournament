@@ -46,7 +46,7 @@ class ClubDAO {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 */
-  public function afficherClubs(): array {
+  public function afficherClubs(int $limit = 25, int $offset = 0): array {
     $stmt = $this->connexion->prepare("
         SELECT 
             c.*, 
@@ -55,9 +55,52 @@ class ClubDAO {
             Clubs c
         LEFT JOIN 
             TypeDeSport tds ON c.type_sport_id = tds.id
+        ORDER BY 
+            c.nom ASC
+        LIMIT :limit OFFSET :offset
     ");
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function compterClubs(): int {
+    $stmt = $this->connexion->prepare("SELECT COUNT(*) FROM Clubs");
+    $stmt->execute();
+    return (int) $stmt->fetchColumn();
+}
+
+public function rechercherClubs(string $nom = '', string $sport = '', int $limit = 25, int $offset = 0): array {
+    $stmt = $this->connexion->prepare("
+        SELECT c.*, tds.nom AS nom_type_sport
+        FROM Clubs c
+        LEFT JOIN TypeDeSport tds ON c.type_sport_id = tds.id
+        WHERE c.nom LIKE :nom
+          AND (tds.nom LIKE :sport OR tds.nom IS NULL)
+        ORDER BY c.nom ASC
+        LIMIT :limit OFFSET :offset
+    ");
+    $stmt->bindValue(':nom', "%$nom%", PDO::PARAM_STR);
+    $stmt->bindValue(':sport', "%$sport%", PDO::PARAM_STR);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function compterClubsFiltres(string $nom = '', string $sport = ''): int {
+    $stmt = $this->connexion->prepare("
+        SELECT COUNT(*)
+        FROM Clubs c
+        LEFT JOIN TypeDeSport tds ON c.type_sport_id = tds.id
+        WHERE c.nom LIKE :nom
+          AND (tds.nom LIKE :sport OR tds.nom IS NULL)
+    ");
+    $stmt->bindValue(':nom', "%$nom%", PDO::PARAM_STR);
+    $stmt->bindValue(':sport', "%$sport%", PDO::PARAM_STR);
+    $stmt->execute();
+    return (int) $stmt->fetchColumn();
 }
 
 public function afficherClubsParTypeDeSport(int $typeSportId): array {

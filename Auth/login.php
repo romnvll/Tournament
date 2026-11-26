@@ -87,8 +87,7 @@ if (isset($_POST['btn-login'])) {
         $_SESSION['captcha_answer'] = $a + $b;
         $_SESSION['captcha_question'] = "$a + $b = ?";
     }
-}
- session_write_close(); 
+}session_write_close(); 
 ?>
 <!DOCTYPE html>
 <html lang="fr">
