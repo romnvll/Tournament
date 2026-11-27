@@ -52,8 +52,9 @@ $prev = json_decode(base64_decode($_SERVER['HTTP_LAST_EVENT_ID'] ?? ''), true);
 if (is_array($prev)) {
     $hashes = array_merge($hashes, array_intersect_key($prev, $hashes));
 }
-
 echo "retry: 20000\n\n";
+//$retry = random_int(15000, 25000);
+//echo "retry: {$retry}\n\n";
 flush();
 
 /* DAO (connexions ouvertes seulement pour cette passe) */

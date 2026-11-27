@@ -70,7 +70,7 @@ if (isset($_GET['action'])) {
             exit;
 
         case 'delArbitre':
-            
+
             require 'class/arbitreDao.class.php';
             $arbitre = new arbitreDao();
             try {
@@ -159,6 +159,7 @@ if (isset($_POST['actionArchiver'])) {
     $tournoiDao->modifierTournoi(
         $tournoiId,
         $infoActuelle['nom'],
+        $infoActuelle['dateDebut'],
         $infoActuelle['heure_debut'],
         $infoActuelle['isClassement'],
         $infoActuelle['pasHoraire'],
@@ -213,6 +214,9 @@ if (isset($_POST['nom'])) {
     $gestionInformations= isset($_POST['gestionInformations'])? 1 : 0;
     $gestionRepas       = isset($_POST['gestionRepas'])       ? 1 : 0;
 
+    // ← ajouté : date du tournoi, saisie via le nouveau champ date_debut
+    $dateDebut = $_POST['date_debut'] ?? '';
+
     $isClassement = (!empty($_POST['idParent'])) ? 1 : 0;
 
         $tournoiDao->gestionTempChangement(
@@ -241,6 +245,7 @@ if (isset($_POST['tempsChangementMinutes'])) {
     $tournoiDao->modifierTournoi(
         $tournoiId,
         $_POST['nom']          ?? '',
+        $dateDebut,
         $_POST['heure_debut']  ?? '',
         $isClassement,
         $_POST['pasHoraire']   ?? 0,

@@ -287,7 +287,6 @@
         <form action="modifierTournoi_traitement.php" method="POST" class="auto-submit">
             <input type="hidden" name="idTournoi" value="{{ infotournoi.id }}">
             {# Champs en lecture seule conservés pour le traitement #}
-            <input type="hidden" name="dateDebut" value="{{ infotournoi.dateDebut }}">
             <input type="hidden" name="pasHoraire" value="{{ infotournoi.pasHoraire }}">
             <input type="hidden" name="refreshClientTime" value="{{ infotournoi.refreshClientTime / 1000 }}">
 
@@ -299,6 +298,10 @@
                         <div class="mb-3">
                             <label for="nom" class="form-label">{{ t('nameOfTournament') }}</label>
                             <input type="text" class="form-control" id="nom" name="nom" value="{{ infotournoi.nom }}">
+                        </div>
+                        <div>
+                            <label for="date_debut" class="form-label">Date du tournoi</label>
+                            <input type="date" class="form-control" id="date_debut" name="date_debut" value="{{ infotournoi.dateDebut }}">
                         </div>
                         <div>
                             <label for="heure_debut" class="form-label">{{ t('hourStart') }}</label>

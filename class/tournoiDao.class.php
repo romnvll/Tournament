@@ -666,7 +666,8 @@ public function toggleEffetsSonores(int $tournoiId, bool $activer): bool {
 
 public function modifierTournoi(
     int $idTournoi, 
-    ?string $nom = null,      
+    ?string $nom = null,
+    ?string $dateDebut = null,
     ?string $heure_debut = null, 
     ?int $isClassement = null, 
     ?int $pasHoraire = null, 
@@ -688,6 +689,11 @@ public function modifierTournoi(
     if ($nom !== null) {
         $fields[] = "nom = :nom";
         $params[':nom'] = $nom;
+    }
+
+    if ($dateDebut !== null && $dateDebut !== '') {
+        $fields[] = "dateDebut = :dateDebut";
+        $params[':dateDebut'] = $dateDebut;
     }
 
     if ($heure_debut !== null) {
@@ -866,13 +872,7 @@ public function effacertournoi($idTournoi){
 
 }
 
-
-
-
-
-
-
-    
+   
 
 
 
